@@ -1,0 +1,39 @@
+# Dependencies
+/vendor/
+/node_modules/
+
+# Composer
+composer.lock
+
+# PHPUnit
+.phpunit.result.cache
+.phpunit.cache/
+
+# Claude Code
+.claude/
+
+# IDE
+.idea/
+*.swp
+*.swo
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+/build/
+*.zip
+
+# Logs
+*.log
+debug.log
+
+# Environment files
+.env
+.env.local
+
+# Testing
+/tests/e2e/test-results/
+/tests/e2e/playwright-report/
