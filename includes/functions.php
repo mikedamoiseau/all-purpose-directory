@@ -7,8 +7,8 @@
 
 declare(strict_types=1);
 
-// Exit if accessed directly (but allow testing frameworks).
-if ( ! defined( 'ABSPATH' ) && ! defined( 'PHPUNIT_COMPOSER_INSTALL' ) && ! defined( 'APD_TESTING' ) ) {
+// Prevent direct file access.
+if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 

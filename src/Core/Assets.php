@@ -9,6 +9,11 @@ declare(strict_types=1);
 
 namespace APD\Core;
 
+// Prevent direct file access.
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 /**
  * Class Assets
  *

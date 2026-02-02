@@ -9,6 +9,11 @@ declare(strict_types=1);
 
 namespace APD\Core;
 
+// Prevent direct file access.
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 /**
  * Class Plugin
  *
@@ -54,7 +59,6 @@ final class Plugin {
     private function __construct() {
         $this->init_components();
         $this->init_hooks();
-        $this->load_textdomain();
 
         /**
          * Fires after the plugin is fully initialized.
@@ -105,19 +109,6 @@ final class Plugin {
          * @since 1.0.0
          */
         do_action( 'apd_loaded' );
-    }
-
-    /**
-     * Load plugin textdomain.
-     *
-     * @return void
-     */
-    private function load_textdomain(): void {
-        load_plugin_textdomain(
-            'all-purpose-directory',
-            false,
-            dirname( APD_PLUGIN_BASENAME ) . '/languages'
-        );
     }
 
     /**

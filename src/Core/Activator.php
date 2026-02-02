@@ -9,6 +9,11 @@ declare(strict_types=1);
 
 namespace APD\Core;
 
+// Prevent direct file access.
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 /**
  * Class Activator
  *
@@ -54,7 +59,7 @@ class Activator {
                 sprintf(
                     /* translators: %s: Required PHP version */
                     esc_html__( 'All Purpose Directory requires PHP %s or higher.', 'all-purpose-directory' ),
-                    APD_MIN_PHP_VERSION
+                    esc_html( APD_MIN_PHP_VERSION )
                 ),
                 'Plugin Activation Error',
                 [ 'back_link' => true ]
@@ -67,7 +72,7 @@ class Activator {
                 sprintf(
                     /* translators: %s: Required WordPress version */
                     esc_html__( 'All Purpose Directory requires WordPress %s or higher.', 'all-purpose-directory' ),
-                    APD_MIN_WP_VERSION
+                    esc_html( APD_MIN_WP_VERSION )
                 ),
                 'Plugin Activation Error',
                 [ 'back_link' => true ]
