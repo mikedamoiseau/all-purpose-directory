@@ -1,12 +1,12 @@
 {
-    "name": "buzzwoo/all-purpose-directory",
+    "name": "damoiseau/all-purpose-directory",
     "description": "A flexible WordPress plugin for building directory and listing websites",
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",
     "authors": [
         {
-            "name": "Buzzwoo",
-            "email": "dev@buzzwoo.com"
+            "name": "Michaël Damoiseau",
+            "homepage": "https://damoiseau.net"
         }
     ],
     "require": {
@@ -29,6 +29,8 @@
     "autoload-dev": {
         "psr-4": {
             "APD\\Tests\\": "tests/",
+            "APD\\Tests\\Unit\\": "tests/unit/",
+            "APD\\Tests\\Integration\\": "tests/integration/",
             "APD\\Tests\\Factories\\": "tests/factories/"
         }
     },
