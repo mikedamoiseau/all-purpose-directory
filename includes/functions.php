@@ -141,3 +141,118 @@ function apd_log( mixed $message, string $level = 'debug' ): void {
 
     error_log( sprintf( '[APD %s] %s', strtoupper( $level ), $message ) );
 }
+
+/**
+ * Get categories assigned to a listing.
+ *
+ * @param int $listing_id Listing post ID.
+ * @return \WP_Term[] Array of WP_Term objects, or empty array if none.
+ */
+function apd_get_listing_categories( int $listing_id ): array {
+    $terms = get_the_terms( $listing_id, apd_get_category_taxonomy() );
+
+    if ( is_wp_error( $terms ) || empty( $terms ) ) {
+        return [];
+    }
+
+    return $terms;
+}
+
+/**
+ * Get tags assigned to a listing.
+ *
+ * @param int $listing_id Listing post ID.
+ * @return \WP_Term[] Array of WP_Term objects, or empty array if none.
+ */
+function apd_get_listing_tags( int $listing_id ): array {
+    $terms = get_the_terms( $listing_id, apd_get_tag_taxonomy() );
+
+    if ( is_wp_error( $terms ) || empty( $terms ) ) {
+        return [];
+    }
+
+    return $terms;
+}
+
+/**
+ * Get listings in a specific category.
+ *
+ * @param int   $category_id   Category term ID.
+ * @param array $args          Optional. Additional WP_Query args.
+ * @return \WP_Post[] Array of WP_Post objects.
+ */
+function apd_get_category_listings( int $category_id, array $args = [] ): array {
+    $defaults = [
+        'post_type'      => apd_get_listing_post_type(),
+        'post_status'    => 'publish',
+        'posts_per_page' => -1,
+        'tax_query'      => [
+            [
+                'taxonomy' => apd_get_category_taxonomy(),
+                'field'    => 'term_id',
+                'terms'    => $category_id,
+            ],
+        ],
+    ];
+
+    $query_args = wp_parse_args( $args, $defaults );
+
+    // Allow filtering the query args.
+    $query_args = apply_filters( 'apd_category_listings_query_args', $query_args, $category_id );
+
+    $query = new \WP_Query( $query_args );
+
+    return $query->posts;
+}
+
+/**
+ * Get all categories with their listing counts.
+ *
+ * @param array $args Optional. Additional get_terms args.
+ * @return \WP_Term[] Array of WP_Term objects with 'count' property.
+ */
+function apd_get_categories_with_count( array $args = [] ): array {
+    $defaults = [
+        'taxonomy'   => apd_get_category_taxonomy(),
+        'hide_empty' => false,
+        'orderby'    => 'name',
+        'order'      => 'ASC',
+    ];
+
+    $query_args = wp_parse_args( $args, $defaults );
+
+    // Allow filtering the query args.
+    $query_args = apply_filters( 'apd_categories_with_count_args', $query_args );
+
+    $terms = get_terms( $query_args );
+
+    if ( is_wp_error( $terms ) ) {
+        return [];
+    }
+
+    return $terms;
+}
+
+/**
+ * Get category icon class (dashicon).
+ *
+ * @param int|\WP_Term $category Category term ID or object.
+ * @return string Dashicon class or empty string.
+ */
+function apd_get_category_icon( int|\WP_Term $category ): string {
+    $term_id = $category instanceof \WP_Term ? $category->term_id : $category;
+
+    return \APD\Taxonomy\CategoryTaxonomy::get_icon( $term_id );
+}
+
+/**
+ * Get category color (hex).
+ *
+ * @param int|\WP_Term $category Category term ID or object.
+ * @return string Hex color or empty string.
+ */
+function apd_get_category_color( int|\WP_Term $category ): string {
+    $term_id = $category instanceof \WP_Term ? $category->term_id : $category;
+
+    return \APD\Taxonomy\CategoryTaxonomy::get_color( $term_id );
+}

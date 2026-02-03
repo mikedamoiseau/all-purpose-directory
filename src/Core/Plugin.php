@@ -132,8 +132,14 @@ final class Plugin {
      * @return void
      */
     public function register_taxonomies(): void {
-        // Taxonomy registration will be implemented in Taxonomy classes.
-        // This is a placeholder for the hook connection.
+        // Register category taxonomy.
+        $category_taxonomy = new \APD\Taxonomy\CategoryTaxonomy();
+        $category_taxonomy->register();
+        $category_taxonomy->init_admin();
+
+        // Register tag taxonomy.
+        $tag_taxonomy = new \APD\Taxonomy\TagTaxonomy();
+        $tag_taxonomy->register();
     }
 
     /**

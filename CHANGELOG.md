@@ -23,6 +23,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CSS styles for admin list table enhancements
 - `AdminColumns::increment_views()` and `AdminColumns::get_views()` utility methods
 - Integration tests for admin columns (8 new tests)
+- `apd_category` hierarchical taxonomy with custom meta fields (icon, color)
+- `apd_tag` non-hierarchical taxonomy for flexible labeling
+- Category admin UI enhancements (custom columns, color picker, dashicon selector)
+- Taxonomy helper functions: `apd_get_listing_categories()`, `apd_get_listing_tags()`, `apd_get_category_listings()`, `apd_get_categories_with_count()`, `apd_get_category_icon()`, `apd_get_category_color()`
+- Integration tests for taxonomies (25+ tests)
 
 ### Changed
 - Updated "Tested up to" version to WordPress 6.9 in README.txt
