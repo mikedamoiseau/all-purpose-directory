@@ -182,4 +182,32 @@ final class Capabilities {
             self::DELETE_LISTINGS,
         ];
     }
+
+    /**
+     * Get the capability mapping for the listing post type.
+     *
+     * Maps WordPress capability types to our custom capabilities.
+     * Used when registering the apd_listing post type.
+     *
+     * @return array<string, string>
+     */
+    public static function get_listing_caps(): array {
+        return [
+            // Singular capabilities.
+            'edit_post'              => self::EDIT_LISTING,
+            'read_post'              => self::READ_LISTING,
+            'delete_post'            => self::DELETE_LISTING,
+            // Plural capabilities.
+            'edit_posts'             => self::EDIT_LISTINGS,
+            'edit_others_posts'      => self::EDIT_OTHERS_LISTINGS,
+            'publish_posts'          => self::PUBLISH_LISTINGS,
+            'read_private_posts'     => self::READ_PRIVATE_LISTINGS,
+            'delete_posts'           => self::DELETE_LISTINGS,
+            'delete_private_posts'   => self::DELETE_PRIVATE_LISTINGS,
+            'delete_published_posts' => self::DELETE_PUBLISHED_LISTINGS,
+            'delete_others_posts'    => self::DELETE_OTHERS_LISTINGS,
+            'edit_private_posts'     => self::EDIT_PRIVATE_LISTINGS,
+            'edit_published_posts'   => self::EDIT_PUBLISHED_LISTINGS,
+        ];
+    }
 }

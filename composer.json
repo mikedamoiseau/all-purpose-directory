@@ -21,10 +21,7 @@
     "autoload": {
         "psr-4": {
             "APD\\": "src/"
-        },
-        "files": [
-            "includes/functions.php"
-        ]
+        }
     },
     "autoload-dev": {
         "psr-4": {

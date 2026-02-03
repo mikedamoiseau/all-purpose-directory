@@ -52,6 +52,11 @@ if ( file_exists( APD_PLUGIN_DIR . 'vendor/autoload.php' ) ) {
 }
 
 /**
+ * Load helper functions.
+ */
+require_once APD_PLUGIN_DIR . 'includes/functions.php';
+
+/**
  * Initialize the plugin.
  *
  * @return void

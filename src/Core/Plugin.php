@@ -103,6 +103,10 @@ final class Plugin {
         add_action( 'init', [ $this, 'register_post_types' ], 5 );
         add_action( 'init', [ $this, 'register_taxonomies' ], 5 );
 
+        // Initialize admin columns for listings.
+        $admin_columns = new \APD\Listing\AdminColumns();
+        $admin_columns->init();
+
         /**
          * Fires after plugin hooks are initialized.
          *
@@ -117,8 +121,9 @@ final class Plugin {
      * @return void
      */
     public function register_post_types(): void {
-        // Post type registration will be implemented in Listing\PostType class.
-        // This is a placeholder for the hook connection.
+        $post_type = new \APD\Listing\PostType();
+        $post_type->register();
+        $post_type->register_statuses();
     }
 
     /**

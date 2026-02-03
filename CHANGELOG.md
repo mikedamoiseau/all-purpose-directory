@@ -13,6 +13,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Research analysis of 30+ competitor directory plugins
 - `.distignore` file for WordPress.org distribution packaging
 - `languages/` directory for translations
+- `apd_listing` custom post type with full REST API support
+- Custom `expired` post status for listings
+- `Capabilities::get_listing_caps()` for post type capability mapping
+- Integration tests for post type registration (12 tests)
+- Admin columns for listing post type (thumbnail, category, status badge, views count)
+- Sortable admin columns (views count, status)
+- Color-coded status badges in admin list (publish, pending, draft, expired)
+- CSS styles for admin list table enhancements
+- `AdminColumns::increment_views()` and `AdminColumns::get_views()` utility methods
+- Integration tests for admin columns (8 new tests)
 
 ### Changed
 - Updated "Tested up to" version to WordPress 6.9 in README.txt
