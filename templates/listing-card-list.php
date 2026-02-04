@@ -101,6 +101,17 @@ $card_classes = apply_filters( 'apd_listing_card_classes', $card_classes, $listi
 			<a href="<?php echo esc_url( $card_data['permalink'] ); ?>" aria-hidden="true" tabindex="-1">
 				<?php echo get_the_post_thumbnail( $listing_id, 'medium', [ 'loading' => 'lazy' ] ); ?>
 			</a>
+
+			<?php
+			/**
+			 * Fires inside the image area.
+			 *
+			 * @since 1.0.0
+			 *
+			 * @param int $listing_id The listing post ID.
+			 */
+			do_action( 'apd_listing_card_image', $listing_id );
+			?>
 		</div>
 	<?php endif; ?>
 
@@ -128,6 +139,30 @@ $card_classes = apply_filters( 'apd_listing_card_classes', $card_classes, $listi
 					<?php echo esc_html( $card_data['title'] ); ?>
 				</a>
 			</h2>
+
+			<?php
+			// Display star rating if function exists.
+			if ( function_exists( 'apd_get_listing_rating_count' ) ) :
+				$rating_count = apd_get_listing_rating_count( $listing_id );
+
+				if ( $rating_count > 0 ) :
+					?>
+					<div class="apd-listing-card__rating">
+						<?php
+						apd_render_listing_star_rating(
+							$listing_id,
+							[
+								'size'         => 'small',
+								'show_count'   => true,
+								'show_average' => true,
+							]
+						);
+						?>
+					</div>
+					<?php
+				endif;
+			endif;
+			?>
 
 			<?php if ( ! empty( $card_data['excerpt'] ) ) : ?>
 				<div class="apd-listing-card__excerpt">

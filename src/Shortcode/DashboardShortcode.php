@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace APD\Shortcode;
 
+use APD\Frontend\Dashboard\Dashboard;
+
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -44,10 +46,9 @@ final class DashboardShortcode extends AbstractShortcode {
 	 * @var array<string, mixed>
 	 */
 	protected array $defaults = [
-		'show_stats'    => 'true',
-		'show_listings' => 'true',
-		'show_favorites' => 'true',
-		'class'         => '',
+		'default_tab' => 'my-listings',
+		'show_stats'  => 'true',
+		'class'       => '',
 	];
 
 	/**
@@ -56,22 +57,17 @@ final class DashboardShortcode extends AbstractShortcode {
 	 * @var array<string, array>
 	 */
 	protected array $attribute_docs = [
-		'show_stats'    => [
+		'default_tab' => [
+			'type'        => 'string',
+			'description' => 'Default tab to display (my-listings, add-new, favorites, profile).',
+			'default'     => 'my-listings',
+		],
+		'show_stats'  => [
 			'type'        => 'boolean',
-			'description' => 'Show statistics overview.',
+			'description' => 'Show statistics overview section.',
 			'default'     => 'true',
 		],
-		'show_listings' => [
-			'type'        => 'boolean',
-			'description' => 'Show user listings.',
-			'default'     => 'true',
-		],
-		'show_favorites' => [
-			'type'        => 'boolean',
-			'description' => 'Show favorite listings.',
-			'default'     => 'true',
-		],
-		'class'         => [
+		'class'       => [
 			'type'        => 'string',
 			'description' => 'Additional CSS classes.',
 			'default'     => '',
@@ -86,7 +82,7 @@ final class DashboardShortcode extends AbstractShortcode {
 	 * @return string
 	 */
 	public function get_example(): string {
-		return '[apd_dashboard show_stats="true" show_listings="true"]';
+		return '[apd_dashboard default_tab="my-listings" show_stats="true"]';
 	}
 
 	/**
@@ -99,36 +95,23 @@ final class DashboardShortcode extends AbstractShortcode {
 	 * @return string Shortcode output.
 	 */
 	protected function output( array $atts, ?string $content ): string {
-		// Require login.
-		if ( ! is_user_logged_in() ) {
-			return $this->require_login( __( 'Please log in to access your dashboard.', 'all-purpose-directory' ) );
-		}
+		// Build dashboard configuration.
+		$config = [
+			'default_tab' => $atts['default_tab'],
+			'show_stats'  => $atts['show_stats'],
+			'class'       => $atts['class'],
+		];
 
-		/**
-		 * Filter to enable the dashboard.
-		 *
-		 * Return true to enable custom dashboard implementation.
-		 *
-		 * @since 1.0.0
-		 *
-		 * @param bool  $enabled Whether the dashboard is enabled.
-		 * @param array $atts    The shortcode attributes.
-		 */
-		$enabled = apply_filters( 'apd_dashboard_enabled', false, $atts );
+		// Create dashboard instance.
+		$dashboard = new Dashboard( $config );
 
-		if ( $enabled ) {
-			/**
-			 * Filter the dashboard output.
-			 *
-			 * @since 1.0.0
-			 *
-			 * @param string $output The dashboard output.
-			 * @param array  $atts   The shortcode attributes.
-			 */
-			return apply_filters( 'apd_dashboard_output', '', $atts );
-		}
+		// Render the dashboard.
+		$output = $dashboard->render();
 
-		// Default: show coming soon message.
-		return $this->coming_soon( __( 'User dashboard', 'all-purpose-directory' ) );
+		// Wrap in shortcode container.
+		return sprintf(
+			'<div class="apd-dashboard-shortcode">%s</div>',
+			$output
+		);
 	}
 }

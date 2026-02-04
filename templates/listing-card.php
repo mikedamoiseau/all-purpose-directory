@@ -147,6 +147,29 @@ $card_classes = apply_filters( 'apd_listing_card_classes', $card_classes, $listi
 		<?php endif; ?>
 
 		<?php
+		// Display star rating if function exists.
+		if ( function_exists( 'apd_get_listing_rating_count' ) ) :
+			$rating_count = apd_get_listing_rating_count( $listing_id );
+
+			if ( $rating_count > 0 ) :
+				?>
+				<div class="apd-listing-card__rating">
+					<?php
+					apd_render_listing_star_rating(
+						$listing_id,
+						[
+							'size'       => 'small',
+							'show_count' => true,
+						]
+					);
+					?>
+				</div>
+				<?php
+			endif;
+		endif;
+		?>
+
+		<?php
 		/**
 		 * Fires inside the card body, after the excerpt.
 		 *

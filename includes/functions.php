@@ -1634,3 +1634,1962 @@ function apd_has_block( string $name ): bool {
 function apd_get_blocks(): array {
     return apd_block_manager()->get_all();
 }
+
+// ============================================================================
+// Submission Form Functions
+// ============================================================================
+
+/**
+ * Get a new submission form instance.
+ *
+ * @since 1.0.0
+ *
+ * @param array $config Optional. Form configuration.
+ *                      - redirect: (string) URL to redirect after submission.
+ *                      - show_title: (bool) Show title field.
+ *                      - show_content: (bool) Show content field.
+ *                      - show_excerpt: (bool) Show excerpt field.
+ *                      - show_categories: (bool) Show category selector.
+ *                      - show_tags: (bool) Show tag selector.
+ *                      - show_featured_image: (bool) Show featured image upload.
+ *                      - show_terms: (bool) Show terms acceptance checkbox.
+ *                      - terms_text: (string) Terms checkbox text.
+ *                      - terms_link: (string) URL to terms page.
+ *                      - terms_required: (bool) Whether terms are required.
+ *                      - submit_text: (string) Submit button text.
+ *                      - class: (string) Additional CSS classes.
+ *                      - listing_id: (int) Listing ID for editing (0 for new).
+ *                      - submitted_values: (array) Previously submitted values.
+ * @return \APD\Frontend\Submission\SubmissionForm
+ */
+function apd_submission_form( array $config = [] ): \APD\Frontend\Submission\SubmissionForm {
+    return new \APD\Frontend\Submission\SubmissionForm( $config );
+}
+
+/**
+ * Render the submission form.
+ *
+ * @since 1.0.0
+ *
+ * @param array $config Optional. Form configuration (see apd_submission_form()).
+ * @return string Rendered form HTML.
+ */
+function apd_render_submission_form( array $config = [] ): string {
+    $form = apd_submission_form( $config );
+    return $form->render();
+}
+
+/**
+ * Get fields configured for frontend submission.
+ *
+ * Returns all fields that are not admin-only and should be shown
+ * on the frontend submission form.
+ *
+ * @since 1.0.0
+ *
+ * @param int $listing_id Optional. Listing ID for editing context.
+ * @return array<string, array<string, mixed>> Fields keyed by name.
+ */
+function apd_get_submission_fields( int $listing_id = 0 ): array {
+    $form = apd_submission_form( [ 'listing_id' => $listing_id ] );
+    return $form->get_submission_fields();
+}
+
+/**
+ * Store submission errors for display after redirect.
+ *
+ * Used by the form handler to store validation errors that will
+ * be displayed when the form is re-rendered.
+ *
+ * @since 1.0.0
+ *
+ * @param array|\WP_Error $errors Errors keyed by field name, or WP_Error.
+ * @param int             $user_id Optional. User ID. Defaults to current user.
+ * @return bool True on success.
+ */
+function apd_set_submission_errors( array|\WP_Error $errors, int $user_id = 0 ): bool {
+    if ( $user_id <= 0 ) {
+        $user_id = get_current_user_id();
+    }
+
+    if ( $user_id <= 0 ) {
+        return false;
+    }
+
+    $error_array = [];
+
+    if ( is_wp_error( $errors ) ) {
+        foreach ( $errors->get_error_codes() as $code ) {
+            $error_array[ $code ] = $errors->get_error_messages( $code );
+        }
+    } else {
+        $error_array = $errors;
+    }
+
+    $transient_key = 'apd_submission_errors_' . $user_id;
+    return set_transient( $transient_key, $error_array, 5 * MINUTE_IN_SECONDS );
+}
+
+/**
+ * Store submitted values for display after redirect.
+ *
+ * Used by the form handler to preserve form values that will
+ * be re-populated when the form is re-rendered after validation failure.
+ *
+ * @since 1.0.0
+ *
+ * @param array $values Submitted values keyed by field name.
+ * @param int   $user_id Optional. User ID. Defaults to current user.
+ * @return bool True on success.
+ */
+function apd_set_submission_values( array $values, int $user_id = 0 ): bool {
+    if ( $user_id <= 0 ) {
+        $user_id = get_current_user_id();
+    }
+
+    if ( $user_id <= 0 ) {
+        return false;
+    }
+
+    $transient_key = 'apd_submission_values_' . $user_id;
+    return set_transient( $transient_key, $values, 5 * MINUTE_IN_SECONDS );
+}
+
+// ============================================================================
+// Submission Handler Functions
+// ============================================================================
+
+/**
+ * Get the submission handler instance.
+ *
+ * Returns a singleton instance of the submission handler that is
+ * initialized and ready to process form submissions.
+ *
+ * @since 1.0.0
+ *
+ * @param array $config Optional. Configuration options.
+ *                      - default_status: (string) Default status for new listings.
+ *                      - require_login: (bool) Require user to be logged in.
+ *                      - require_title: (bool) Require listing title.
+ *                      - require_content: (bool) Require listing content.
+ *                      - require_category: (bool) Require at least one category.
+ *                      - require_featured_image: (bool) Require featured image.
+ *                      - send_admin_notification: (bool) Send email to admin.
+ * @return \APD\Frontend\Submission\SubmissionHandler
+ */
+function apd_submission_handler( array $config = [] ): \APD\Frontend\Submission\SubmissionHandler {
+    static $handler = null;
+
+    if ( $handler === null || ! empty( $config ) ) {
+        $handler = new \APD\Frontend\Submission\SubmissionHandler( $config );
+    }
+
+    return $handler;
+}
+
+/**
+ * Process a listing submission programmatically.
+ *
+ * This function allows you to submit a listing without going through
+ * the form submission process. Useful for API endpoints or imports.
+ *
+ * @since 1.0.0
+ *
+ * @param array $data        Listing data.
+ *                           - listing_title: (string) The listing title.
+ *                           - listing_content: (string) The listing description.
+ *                           - listing_excerpt: (string) Optional. Short description.
+ *                           - listing_categories: (array) Category term IDs.
+ *                           - listing_tags: (array) Tag term IDs.
+ *                           - featured_image: (int) Attachment ID for featured image.
+ *                           - custom_fields: (array) Custom field values.
+ *                           - post_status: (string) Override default status.
+ *                           - post_author: (int) Override author.
+ * @param int   $listing_id  Optional. Existing listing ID for updates.
+ * @return int|\WP_Error     The listing ID on success, WP_Error on failure.
+ */
+function apd_process_submission( array $data, int $listing_id = 0 ): int|\WP_Error {
+    $errors = new \WP_Error();
+
+    // Validate required data.
+    if ( empty( $data['listing_title'] ) ) {
+        $errors->add( 'listing_title', __( 'Listing title is required.', 'all-purpose-directory' ) );
+    }
+
+    if ( empty( $data['listing_content'] ) ) {
+        $errors->add( 'listing_content', __( 'Listing description is required.', 'all-purpose-directory' ) );
+    }
+
+    if ( $errors->has_errors() ) {
+        return $errors;
+    }
+
+    // Prepare post data.
+    $post_data = [
+        'post_type'    => 'apd_listing',
+        'post_title'   => sanitize_text_field( $data['listing_title'] ),
+        'post_content' => wp_kses_post( $data['listing_content'] ),
+        'post_excerpt' => isset( $data['listing_excerpt'] ) ? sanitize_textarea_field( $data['listing_excerpt'] ) : '',
+        'post_status'  => $data['post_status'] ?? apd_get_default_listing_status(),
+    ];
+
+    // Set author.
+    if ( ! empty( $data['post_author'] ) ) {
+        $post_data['post_author'] = absint( $data['post_author'] );
+    } elseif ( $listing_id === 0 ) {
+        $post_data['post_author'] = get_current_user_id();
+    }
+
+    // Create or update.
+    if ( $listing_id > 0 ) {
+        $post_data['ID'] = $listing_id;
+        $result = wp_update_post( $post_data, true );
+    } else {
+        $result = wp_insert_post( $post_data, true );
+    }
+
+    if ( is_wp_error( $result ) ) {
+        return $result;
+    }
+
+    $listing_id = $result;
+
+    // Assign categories.
+    if ( ! empty( $data['listing_categories'] ) ) {
+        wp_set_object_terms( $listing_id, array_map( 'absint', $data['listing_categories'] ), 'apd_category' );
+    }
+
+    // Assign tags.
+    if ( ! empty( $data['listing_tags'] ) ) {
+        wp_set_object_terms( $listing_id, array_map( 'absint', $data['listing_tags'] ), 'apd_tag' );
+    }
+
+    // Set featured image.
+    if ( ! empty( $data['featured_image'] ) ) {
+        set_post_thumbnail( $listing_id, absint( $data['featured_image'] ) );
+    }
+
+    // Save custom fields.
+    if ( ! empty( $data['custom_fields'] ) && is_array( $data['custom_fields'] ) ) {
+        $processed = apd_process_fields( $data['custom_fields'] );
+        foreach ( $processed['values'] as $field_name => $value ) {
+            apd_set_listing_field( $listing_id, $field_name, $value );
+        }
+    }
+
+    /**
+     * Fires after a listing has been processed programmatically.
+     *
+     * @since 1.0.0
+     *
+     * @param int   $listing_id The listing ID.
+     * @param array $data       The submitted data.
+     * @param bool  $is_update  Whether this was an update.
+     */
+    do_action( 'apd_listing_processed', $listing_id, $data, $listing_id === $result );
+
+    return $listing_id;
+}
+
+/**
+ * Get the default status for new listing submissions.
+ *
+ * @since 1.0.0
+ *
+ * @return string Default status (publish, pending, draft).
+ */
+function apd_get_default_listing_status(): string {
+    /**
+     * Filter the default status for new listing submissions.
+     *
+     * @since 1.0.0
+     *
+     * @param string $status  The default status.
+     * @param int    $user_id The current user ID.
+     */
+    return apply_filters( 'apd_default_listing_status', 'pending', get_current_user_id() );
+}
+
+/**
+ * Check if a user can edit a listing.
+ *
+ * Verifies ownership or appropriate capabilities.
+ *
+ * @since 1.0.0
+ *
+ * @param int      $listing_id The listing post ID.
+ * @param int|null $user_id    Optional. User ID to check. Defaults to current user.
+ * @return bool True if user can edit the listing.
+ */
+function apd_user_can_edit_listing( int $listing_id, ?int $user_id = null ): bool {
+    if ( $user_id === null ) {
+        $user_id = get_current_user_id();
+    }
+
+    if ( $user_id <= 0 ) {
+        return false;
+    }
+
+    $post = get_post( $listing_id );
+
+    if ( ! $post || $post->post_type !== apd_get_listing_post_type() ) {
+        return false;
+    }
+
+    // Check if user is the author.
+    if ( (int) $post->post_author === $user_id ) {
+        return true;
+    }
+
+    // Check if user has capability to edit others' listings.
+    if ( user_can( $user_id, 'edit_others_apd_listings' ) ) {
+        return true;
+    }
+
+    // Check specific post capability.
+    if ( user_can( $user_id, 'edit_apd_listing', $listing_id ) ) {
+        return true;
+    }
+
+    /**
+     * Filter whether the user can edit this listing.
+     *
+     * Use this filter for custom permission logic, such as
+     * allowing specific roles or subscription-based access.
+     *
+     * @since 1.0.0
+     *
+     * @param bool $can_edit   Whether user can edit. Default false.
+     * @param int  $listing_id The listing ID.
+     * @param int  $user_id    The user ID.
+     */
+    return apply_filters( 'apd_user_can_edit_listing', false, $listing_id, $user_id );
+}
+
+/**
+ * Get the URL to edit a listing on the frontend.
+ *
+ * @since 1.0.0
+ *
+ * @param int    $listing_id    The listing post ID.
+ * @param string $submission_url Optional. The base submission URL.
+ *                               Defaults to the page with [apd_submission_form] shortcode.
+ * @return string The edit URL, or empty string if no submission page found.
+ */
+function apd_get_edit_listing_url( int $listing_id, string $submission_url = '' ): string {
+    if ( $listing_id <= 0 ) {
+        return '';
+    }
+
+    // If no submission URL provided, try to find the submission page.
+    if ( empty( $submission_url ) ) {
+        /**
+         * Filter the default submission page URL.
+         *
+         * Use this to specify the page URL that contains the submission form.
+         *
+         * @since 1.0.0
+         *
+         * @param string $url        The submission page URL.
+         * @param int    $listing_id The listing ID being edited.
+         */
+        $submission_url = apply_filters( 'apd_submission_page_url', '', $listing_id );
+
+        if ( empty( $submission_url ) ) {
+            // Try to find a page with the shortcode.
+            $pages = get_pages( [
+                'post_status' => 'publish',
+                'number'      => 1,
+                's'           => '[apd_submission_form',
+            ] );
+
+            if ( ! empty( $pages ) ) {
+                $submission_url = get_permalink( $pages[0]->ID );
+            }
+        }
+    }
+
+    if ( empty( $submission_url ) ) {
+        return '';
+    }
+
+    /**
+     * Filter the edit listing URL.
+     *
+     * @since 1.0.0
+     *
+     * @param string $url        The edit URL.
+     * @param int    $listing_id The listing ID.
+     */
+    return apply_filters(
+        'apd_edit_listing_url',
+        add_query_arg( 'edit_listing', $listing_id, $submission_url ),
+        $listing_id
+    );
+}
+
+/**
+ * Check if the current request is in edit mode.
+ *
+ * Checks for the `edit_listing` URL parameter.
+ *
+ * @since 1.0.0
+ *
+ * @return bool True if in edit mode.
+ */
+function apd_is_edit_mode(): bool {
+    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Just checking for mode.
+    return isset( $_GET['edit_listing'] ) && absint( $_GET['edit_listing'] ) > 0;
+}
+
+/**
+ * Get the listing ID being edited from the URL.
+ *
+ * @since 1.0.0
+ *
+ * @return int Listing ID or 0 if not in edit mode.
+ */
+function apd_get_edit_listing_id(): int {
+    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Just getting listing ID.
+    return isset( $_GET['edit_listing'] ) ? absint( $_GET['edit_listing'] ) : 0;
+}
+
+/**
+ * Check if a submission was successful.
+ *
+ * Checks the URL parameters to determine if we're displaying
+ * a success state after form submission.
+ *
+ * @since 1.0.0
+ *
+ * @return bool True if submission was successful.
+ */
+function apd_is_submission_success(): bool {
+    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Just checking for success state.
+    return isset( $_GET['apd_submission'] ) && $_GET['apd_submission'] === 'success';
+}
+
+/**
+ * Get the listing ID from a successful submission.
+ *
+ * @since 1.0.0
+ *
+ * @return int Listing ID or 0 if not available.
+ */
+function apd_get_submitted_listing_id(): int {
+    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Just getting listing ID.
+    return isset( $_GET['listing_id'] ) ? absint( $_GET['listing_id'] ) : 0;
+}
+
+/**
+ * Render the submission success message.
+ *
+ * @since 1.0.0
+ *
+ * @param int    $listing_id Optional. The listing ID. Defaults to URL parameter.
+ * @param string $submit_url Optional. URL to submit another listing.
+ * @param bool   $is_update  Optional. Whether this was an update.
+ * @return string The success message HTML.
+ */
+function apd_render_submission_success( int $listing_id = 0, string $submit_url = '', bool $is_update = false ): string {
+    if ( $listing_id <= 0 ) {
+        $listing_id = apd_get_submitted_listing_id();
+    }
+
+    $post = get_post( $listing_id );
+
+    $args = [
+        'listing_id'  => $listing_id,
+        'listing_url' => $post && $post->post_status === 'publish' ? get_permalink( $listing_id ) : '',
+        'status'      => $post ? $post->post_status : 'pending',
+        'title'       => $post ? $post->post_title : '',
+        'submit_url'  => $submit_url,
+        'is_update'   => $is_update,
+    ];
+
+    /**
+     * Filter the submission success template arguments.
+     *
+     * @since 1.0.0
+     *
+     * @param array $args       Template arguments.
+     * @param int   $listing_id The listing ID.
+     */
+    $args = apply_filters( 'apd_submission_success_args', $args, $listing_id );
+
+    return apd_get_template_html( 'submission/submission-success.php', $args );
+}
+
+// ============================================================================
+// Spam Protection Functions
+// ============================================================================
+
+/**
+ * Get the submission rate limit.
+ *
+ * Returns the maximum number of submissions allowed in the time period.
+ *
+ * @since 1.0.0
+ *
+ * @return int Maximum submissions allowed.
+ */
+function apd_get_submission_rate_limit(): int {
+    /**
+     * Filter the submission rate limit.
+     *
+     * @since 1.0.0
+     *
+     * @param int $limit Maximum submissions allowed. Default 5.
+     */
+    return apply_filters( 'apd_submission_rate_limit', 5 );
+}
+
+/**
+ * Get the submission rate limit time period.
+ *
+ * Returns the time period in seconds for rate limiting.
+ *
+ * @since 1.0.0
+ *
+ * @return int Time period in seconds.
+ */
+function apd_get_submission_rate_period(): int {
+    /**
+     * Filter the submission rate limit time period.
+     *
+     * @since 1.0.0
+     *
+     * @param int $period Time period in seconds. Default 3600 (1 hour).
+     */
+    return apply_filters( 'apd_submission_rate_period', HOUR_IN_SECONDS );
+}
+
+/**
+ * Check if a user/IP is rate limited for submissions.
+ *
+ * @since 1.0.0
+ *
+ * @param string $identifier User ID prefixed with 'user_' or hashed IP prefixed with 'ip_'.
+ * @return bool True if within limit, false if rate limited.
+ */
+function apd_check_submission_rate_limit( string $identifier ): bool {
+    $limit         = apd_get_submission_rate_limit();
+    $transient_key = 'apd_submission_count_' . $identifier;
+    $count         = (int) get_transient( $transient_key );
+
+    return $count < $limit;
+}
+
+/**
+ * Get the current submission count for a user/IP.
+ *
+ * @since 1.0.0
+ *
+ * @param string $identifier User ID prefixed with 'user_' or hashed IP prefixed with 'ip_'.
+ * @return int Current submission count.
+ */
+function apd_get_submission_count( string $identifier ): int {
+    $transient_key = 'apd_submission_count_' . $identifier;
+
+    return (int) get_transient( $transient_key );
+}
+
+/**
+ * Increment the submission count for a user/IP.
+ *
+ * @since 1.0.0
+ *
+ * @param string $identifier User ID prefixed with 'user_' or hashed IP prefixed with 'ip_'.
+ * @return int New submission count.
+ */
+function apd_increment_submission_count( string $identifier ): int {
+    $period        = apd_get_submission_rate_period();
+    $transient_key = 'apd_submission_count_' . $identifier;
+    $count         = (int) get_transient( $transient_key );
+    $new_count     = $count + 1;
+
+    set_transient( $transient_key, $new_count, $period );
+
+    return $new_count;
+}
+
+/**
+ * Reset the submission count for a user/IP.
+ *
+ * Useful for testing or admin override.
+ *
+ * @since 1.0.0
+ *
+ * @param string $identifier User ID prefixed with 'user_' or hashed IP prefixed with 'ip_'.
+ * @return bool True on success.
+ */
+function apd_reset_submission_count( string $identifier ): bool {
+    $transient_key = 'apd_submission_count_' . $identifier;
+
+    return delete_transient( $transient_key );
+}
+
+/**
+ * Get the rate limit identifier for the current user/visitor.
+ *
+ * @since 1.0.0
+ *
+ * @return string Rate limit identifier.
+ */
+function apd_get_rate_limit_identifier(): string {
+    $user_id = get_current_user_id();
+
+    if ( $user_id > 0 ) {
+        return 'user_' . $user_id;
+    }
+
+    // Use IP address for guests.
+    $ip = apd_get_client_ip();
+
+    // Hash the IP for privacy and to create a safe transient key.
+    return 'ip_' . md5( $ip );
+}
+
+/**
+ * Get the client IP address.
+ *
+ * @since 1.0.0
+ *
+ * @return string Client IP address.
+ */
+function apd_get_client_ip(): string {
+    $ip = '';
+
+    // Check for proxy headers first.
+    $headers = [
+        'HTTP_CF_CONNECTING_IP', // Cloudflare.
+        'HTTP_X_FORWARDED_FOR',
+        'HTTP_X_REAL_IP',
+        'REMOTE_ADDR',
+    ];
+
+    foreach ( $headers as $header ) {
+        if ( ! empty( $_SERVER[ $header ] ) ) {
+            // Take the first IP if comma-separated.
+            $ip = strtok( sanitize_text_field( wp_unslash( $_SERVER[ $header ] ) ), ',' );
+            break;
+        }
+    }
+
+    // Validate the IP.
+    $ip = trim( (string) $ip );
+    if ( filter_var( $ip, FILTER_VALIDATE_IP ) ) {
+        return $ip;
+    }
+
+    return '0.0.0.0';
+}
+
+/**
+ * Check if a submission appears to be spam.
+ *
+ * Runs all spam protection checks. This is a convenience function
+ * that can be used outside the normal form submission flow.
+ *
+ * @since 1.0.0
+ *
+ * @param array $post_data Optional. POST data to check. Defaults to $_POST.
+ * @return bool|WP_Error True if not spam, WP_Error if spam detected.
+ */
+function apd_is_submission_spam( array $post_data = [] ): bool|\WP_Error {
+    if ( empty( $post_data ) ) {
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing
+        $post_data = $_POST;
+    }
+
+    $user_id = get_current_user_id();
+
+    /**
+     * Filter whether to bypass spam protection entirely.
+     *
+     * @since 1.0.0
+     *
+     * @param bool $bypass  Whether to bypass. Default false.
+     * @param int  $user_id The current user ID.
+     */
+    $bypass = apply_filters( 'apd_bypass_spam_protection', false, $user_id );
+
+    if ( $bypass ) {
+        return true;
+    }
+
+    // Check honeypot.
+    $honeypot_field = apply_filters( 'apd_honeypot_field_name', 'website_url' );
+    if ( isset( $post_data[ $honeypot_field ] ) && ! hash_equals( '', (string) $post_data[ $honeypot_field ] ) ) {
+        return new \WP_Error(
+            'submission_failed',
+            __( 'Submission failed. Please try again.', 'all-purpose-directory' )
+        );
+    }
+
+    // Check timing.
+    if ( isset( $post_data['apd_form_token'] ) ) {
+        $decoded = base64_decode( (string) $post_data['apd_form_token'], true );
+        if ( $decoded !== false ) {
+            $form_load_time = (int) $decoded;
+            $current_time   = time();
+
+            // Check if timestamp is valid.
+            if ( $form_load_time <= $current_time && $form_load_time >= ( $current_time - DAY_IN_SECONDS ) ) {
+                $elapsed  = $current_time - $form_load_time;
+                $min_time = apply_filters( 'apd_submission_min_time', 3 );
+
+                if ( $elapsed < $min_time ) {
+                    return new \WP_Error(
+                        'submission_failed',
+                        __( 'Submission failed. Please try again.', 'all-purpose-directory' )
+                    );
+                }
+            }
+        }
+    }
+
+    // Check rate limit.
+    $identifier = apd_get_rate_limit_identifier();
+    if ( ! apd_check_submission_rate_limit( $identifier ) ) {
+        return new \WP_Error(
+            'rate_limited',
+            __( 'You have submitted too many listings. Please try again later.', 'all-purpose-directory' )
+        );
+    }
+
+    /**
+     * Filter to run custom spam checks.
+     *
+     * @since 1.0.0
+     *
+     * @param bool|WP_Error $result    Current result. True if passed.
+     * @param array         $post_data The POST data.
+     * @param int           $user_id   The current user ID.
+     */
+    return apply_filters( 'apd_submission_spam_check', true, $post_data, $user_id );
+}
+
+/**
+ * Get the minimum time required for form submission.
+ *
+ * @since 1.0.0
+ *
+ * @return int Minimum seconds before submission is allowed.
+ */
+function apd_get_submission_min_time(): int {
+    /**
+     * Filter the minimum time required for form submission.
+     *
+     * @since 1.0.0
+     *
+     * @param int $min_time Minimum seconds before submission is allowed. Default 3.
+     */
+    return apply_filters( 'apd_submission_min_time', 3 );
+}
+
+/**
+ * Get the honeypot field name.
+ *
+ * @since 1.0.0
+ *
+ * @return string The honeypot field name.
+ */
+function apd_get_honeypot_field_name(): string {
+    /**
+     * Filter the honeypot field name.
+     *
+     * @since 1.0.0
+     *
+     * @param string $field_name The honeypot field name.
+     */
+    return apply_filters( 'apd_honeypot_field_name', 'website_url' );
+}
+
+// ============================================================================
+// Dashboard Functions
+// ============================================================================
+
+/**
+ * Get the dashboard instance.
+ *
+ * @since 1.0.0
+ *
+ * @param array $config Optional. Dashboard configuration.
+ * @return \APD\Frontend\Dashboard\Dashboard
+ */
+function apd_dashboard( array $config = [] ): \APD\Frontend\Dashboard\Dashboard {
+    return \APD\Frontend\Dashboard\Dashboard::get_instance( $config );
+}
+
+/**
+ * Render the dashboard.
+ *
+ * @since 1.0.0
+ *
+ * @param array $config Optional. Dashboard configuration.
+ *                      - default_tab: (string) Default tab slug.
+ *                      - show_stats: (bool) Show statistics section.
+ *                      - class: (string) Additional CSS classes.
+ * @return string Rendered dashboard HTML.
+ */
+function apd_render_dashboard( array $config = [] ): string {
+    $dashboard = new \APD\Frontend\Dashboard\Dashboard( $config );
+    return $dashboard->render();
+}
+
+/**
+ * Get the dashboard URL.
+ *
+ * Returns the URL to the page containing the dashboard shortcode.
+ *
+ * @since 1.0.0
+ *
+ * @return string Dashboard URL.
+ */
+function apd_get_dashboard_url(): string {
+    /**
+     * Filter the dashboard page URL.
+     *
+     * Use this to specify the page URL that contains the dashboard.
+     *
+     * @since 1.0.0
+     *
+     * @param string $url The dashboard page URL.
+     */
+    $url = apply_filters( 'apd_dashboard_url', '' );
+
+    if ( empty( $url ) ) {
+        // Try to find a page with the shortcode.
+        $pages = get_pages( [
+            'post_status' => 'publish',
+            'number'      => 1,
+            's'           => '[apd_dashboard',
+        ] );
+
+        if ( ! empty( $pages ) ) {
+            $url = get_permalink( $pages[0]->ID );
+        }
+    }
+
+    return $url ?: '';
+}
+
+/**
+ * Get the URL to a specific dashboard tab.
+ *
+ * @since 1.0.0
+ *
+ * @param string $tab Tab slug (my-listings, add-new, favorites, profile).
+ * @return string Tab URL.
+ */
+function apd_get_dashboard_tab_url( string $tab ): string {
+    $base_url = apd_get_dashboard_url();
+
+    if ( empty( $base_url ) ) {
+        return '';
+    }
+
+    if ( $tab === \APD\Frontend\Dashboard\Dashboard::DEFAULT_TAB ) {
+        return $base_url;
+    }
+
+    return add_query_arg( \APD\Frontend\Dashboard\Dashboard::TAB_PARAM, $tab, $base_url );
+}
+
+/**
+ * Get user's listing statistics.
+ *
+ * Returns an array of statistics for the specified user's listings.
+ *
+ * @since 1.0.0
+ *
+ * @param int $user_id Optional. User ID. Defaults to current user.
+ * @return array<string, int> Statistics array with keys:
+ *                            - total: Total listing count.
+ *                            - published: Published listings count.
+ *                            - pending: Pending listings count.
+ *                            - draft: Draft listings count.
+ *                            - expired: Expired listings count.
+ *                            - views: Total views across all listings.
+ */
+function apd_get_user_listing_stats( int $user_id = 0 ): array {
+    $dashboard = apd_dashboard();
+    return $dashboard->get_user_stats( $user_id );
+}
+
+/**
+ * Count user's listings by status.
+ *
+ * @since 1.0.0
+ *
+ * @param int    $user_id User ID.
+ * @param string $status  Post status (publish, pending, draft, expired).
+ *                        Use 'any' for all statuses.
+ * @return int Listing count.
+ */
+function apd_get_user_listings_count( int $user_id, string $status = 'any' ): int {
+    if ( $user_id <= 0 ) {
+        return 0;
+    }
+
+    $post_status = $status === 'any' ? [ 'publish', 'pending', 'draft', 'expired' ] : $status;
+
+    $query = new \WP_Query( [
+        'post_type'      => 'apd_listing',
+        'post_status'    => $post_status,
+        'author'         => $user_id,
+        'posts_per_page' => -1,
+        'fields'         => 'ids',
+        'no_found_rows'  => true,
+    ] );
+
+    return $query->post_count;
+}
+
+/**
+ * Check if we're currently on the dashboard page.
+ *
+ * @since 1.0.0
+ *
+ * @return bool True if on dashboard page.
+ */
+function apd_is_dashboard(): bool {
+    if ( ! is_page() ) {
+        return false;
+    }
+
+    $post = get_post();
+
+    if ( ! $post ) {
+        return false;
+    }
+
+    return has_shortcode( $post->post_content, 'apd_dashboard' );
+}
+
+/**
+ * Get the current dashboard tab.
+ *
+ * @since 1.0.0
+ *
+ * @return string Current tab slug or empty string if not on dashboard.
+ */
+function apd_get_current_dashboard_tab(): string {
+    if ( ! apd_is_dashboard() ) {
+        return '';
+    }
+
+    $dashboard = apd_dashboard();
+    return $dashboard->get_current_tab();
+}
+
+// ============================================================================
+// My Listings Functions
+// ============================================================================
+
+/**
+ * Get the My Listings instance.
+ *
+ * @since 1.0.0
+ *
+ * @param array $config Optional. Configuration options.
+ * @return \APD\Frontend\Dashboard\MyListings
+ */
+function apd_my_listings( array $config = [] ): \APD\Frontend\Dashboard\MyListings {
+    return \APD\Frontend\Dashboard\MyListings::get_instance( $config );
+}
+
+/**
+ * Get listings for a specific user with optional filters.
+ *
+ * @since 1.0.0
+ *
+ * @param int   $user_id Optional. User ID. Defaults to current user.
+ * @param array $args    Optional. Query arguments.
+ *                       - status: (string) Filter by status (all, publish, pending, draft, expired).
+ *                       - orderby: (string) Order by field (date, title, views).
+ *                       - order: (string) Order direction (ASC, DESC).
+ *                       - paged: (int) Page number.
+ *                       - per_page: (int) Items per page.
+ * @return \WP_Query Query result.
+ */
+function apd_get_user_listings( int $user_id = 0, array $args = [] ): \WP_Query {
+    if ( $user_id <= 0 ) {
+        $user_id = get_current_user_id();
+    }
+
+    if ( $user_id <= 0 ) {
+        // Return empty query.
+        return new \WP_Query( [ 'post__in' => [ 0 ] ] );
+    }
+
+    $my_listings = apd_my_listings();
+    $my_listings->set_user_id( $user_id );
+
+    return $my_listings->get_listings( $args );
+}
+
+/**
+ * Delete a user's listing with ownership verification.
+ *
+ * @since 1.0.0
+ *
+ * @param int      $listing_id Listing post ID.
+ * @param int|null $user_id    Optional. User ID to verify ownership. Defaults to current user.
+ * @param bool     $permanent  Optional. Whether to permanently delete. Default false (trash).
+ * @return bool True on success, false on failure.
+ */
+function apd_delete_user_listing( int $listing_id, ?int $user_id = null, bool $permanent = false ): bool {
+    if ( $user_id === null ) {
+        $user_id = get_current_user_id();
+    }
+
+    $my_listings = apd_my_listings();
+    $my_listings->set_user_id( $user_id );
+
+    if ( $permanent ) {
+        return $my_listings->delete_listing( $listing_id, $user_id );
+    }
+
+    return $my_listings->trash_listing( $listing_id, $user_id );
+}
+
+/**
+ * Check if a user can delete a specific listing.
+ *
+ * @since 1.0.0
+ *
+ * @param int      $listing_id Listing post ID.
+ * @param int|null $user_id    Optional. User ID to check. Defaults to current user.
+ * @return bool True if user can delete, false otherwise.
+ */
+function apd_can_delete_listing( int $listing_id, ?int $user_id = null ): bool {
+    if ( $user_id === null ) {
+        $user_id = get_current_user_id();
+    }
+
+    $my_listings = apd_my_listings();
+    $my_listings->set_user_id( $user_id );
+
+    return $my_listings->can_delete_listing( $listing_id, $user_id );
+}
+
+/**
+ * Update a user's listing status with ownership verification.
+ *
+ * @since 1.0.0
+ *
+ * @param int      $listing_id Listing post ID.
+ * @param string   $status     New status (publish, draft, pending, expired).
+ * @param int|null $user_id    Optional. User ID to verify ownership. Defaults to current user.
+ * @return bool True on success, false on failure.
+ */
+function apd_update_user_listing_status( int $listing_id, string $status, ?int $user_id = null ): bool {
+    if ( $user_id === null ) {
+        $user_id = get_current_user_id();
+    }
+
+    $my_listings = apd_my_listings();
+    $my_listings->set_user_id( $user_id );
+
+    return $my_listings->update_listing_status( $listing_id, $status, $user_id );
+}
+
+// ============================================================================
+// Profile Functions
+// ============================================================================
+
+/**
+ * Get the Profile instance.
+ *
+ * @since 1.0.0
+ *
+ * @param array $config Optional. Configuration options.
+ * @return \APD\Frontend\Dashboard\Profile
+ */
+function apd_profile( array $config = [] ): \APD\Frontend\Dashboard\Profile {
+    return \APD\Frontend\Dashboard\Profile::get_instance( $config );
+}
+
+/**
+ * Get user's profile data.
+ *
+ * Returns an array containing the user's profile information including
+ * core WordPress user data and custom APD fields.
+ *
+ * @since 1.0.0
+ *
+ * @param int $user_id Optional. User ID. Defaults to current user.
+ * @return array<string, mixed> User profile data array containing:
+ *                              - display_name: (string) Public display name.
+ *                              - first_name: (string) First name.
+ *                              - last_name: (string) Last name.
+ *                              - user_email: (string) Email address.
+ *                              - description: (string) Bio/description.
+ *                              - user_url: (string) Website URL.
+ *                              - phone: (string) Phone number.
+ *                              - avatar_id: (int) Custom avatar attachment ID.
+ *                              - social: (array) Social media links.
+ */
+function apd_get_user_profile_data( int $user_id = 0 ): array {
+    if ( $user_id <= 0 ) {
+        $user_id = get_current_user_id();
+    }
+
+    $profile = apd_profile();
+    return $profile->get_user_data( $user_id );
+}
+
+/**
+ * Save user's profile data.
+ *
+ * Validates and saves user profile data to the database.
+ *
+ * @since 1.0.0
+ *
+ * @param array    $data    Profile data to save.
+ *                          - display_name: (string) Public display name.
+ *                          - first_name: (string) First name.
+ *                          - last_name: (string) Last name.
+ *                          - user_email: (string) Email address.
+ *                          - description: (string) Bio/description.
+ *                          - user_url: (string) Website URL.
+ *                          - phone: (string) Phone number.
+ *                          - avatar_id: (int) Custom avatar attachment ID.
+ *                          - social: (array) Social media links.
+ * @param int|null $user_id Optional. User ID. Defaults to current user.
+ * @return true|\WP_Error True on success, WP_Error on failure.
+ */
+function apd_save_user_profile( array $data, ?int $user_id = null ): true|\WP_Error {
+    if ( $user_id === null ) {
+        $user_id = get_current_user_id();
+    }
+
+    if ( $user_id <= 0 ) {
+        return new \WP_Error( 'invalid_user', __( 'Invalid user ID.', 'all-purpose-directory' ) );
+    }
+
+    $profile = apd_profile();
+    $profile->set_user_id( $user_id );
+
+    // Validate the data.
+    $validation = $profile->validate_profile( $data );
+
+    if ( is_wp_error( $validation ) ) {
+        return $validation;
+    }
+
+    return $profile->save_profile( $data );
+}
+
+/**
+ * Get user's avatar URL.
+ *
+ * Returns the user's custom avatar if set, otherwise falls back to Gravatar.
+ *
+ * @since 1.0.0
+ *
+ * @param int $user_id Optional. User ID. Defaults to current user.
+ * @param int $size    Optional. Avatar size in pixels. Default 96.
+ * @return string Avatar URL.
+ */
+function apd_get_user_avatar_url( int $user_id = 0, int $size = 96 ): string {
+    if ( $user_id <= 0 ) {
+        $user_id = get_current_user_id();
+    }
+
+    if ( $user_id <= 0 ) {
+        return '';
+    }
+
+    $profile = apd_profile();
+    return $profile->get_avatar_url( $user_id, $size );
+}
+
+/**
+ * Get user's social media links.
+ *
+ * Returns an array of the user's social media profile URLs.
+ *
+ * @since 1.0.0
+ *
+ * @param int $user_id Optional. User ID. Defaults to current user.
+ * @return array<string, string> Social links keyed by platform (facebook, twitter, linkedin, instagram).
+ */
+function apd_get_user_social_links( int $user_id = 0 ): array {
+    if ( $user_id <= 0 ) {
+        $user_id = get_current_user_id();
+    }
+
+    if ( $user_id <= 0 ) {
+        return [];
+    }
+
+    $profile = apd_profile();
+    return $profile->get_social_links( $user_id );
+}
+
+/**
+ * Check if a user has a custom avatar.
+ *
+ * @since 1.0.0
+ *
+ * @param int $user_id Optional. User ID. Defaults to current user.
+ * @return bool True if user has a custom avatar.
+ */
+function apd_user_has_custom_avatar( int $user_id = 0 ): bool {
+    if ( $user_id <= 0 ) {
+        $user_id = get_current_user_id();
+    }
+
+    if ( $user_id <= 0 ) {
+        return false;
+    }
+
+    $profile = apd_profile();
+    return $profile->has_custom_avatar( $user_id );
+}
+
+// ============================================================================
+// Favorites Functions
+// ============================================================================
+
+/**
+ * Get the Favorites instance.
+ *
+ * @since 1.0.0
+ *
+ * @return \APD\User\Favorites
+ */
+function apd_favorites(): \APD\User\Favorites {
+    return \APD\User\Favorites::get_instance();
+}
+
+/**
+ * Add a listing to user's favorites.
+ *
+ * @since 1.0.0
+ *
+ * @param int      $listing_id Listing post ID.
+ * @param int|null $user_id    Optional. User ID. Defaults to current user.
+ * @return bool True if added successfully.
+ */
+function apd_add_favorite( int $listing_id, ?int $user_id = null ): bool {
+    return apd_favorites()->add( $listing_id, $user_id );
+}
+
+/**
+ * Remove a listing from user's favorites.
+ *
+ * @since 1.0.0
+ *
+ * @param int      $listing_id Listing post ID.
+ * @param int|null $user_id    Optional. User ID. Defaults to current user.
+ * @return bool True if removed successfully.
+ */
+function apd_remove_favorite( int $listing_id, ?int $user_id = null ): bool {
+    return apd_favorites()->remove( $listing_id, $user_id );
+}
+
+/**
+ * Toggle a listing's favorite status.
+ *
+ * @since 1.0.0
+ *
+ * @param int      $listing_id Listing post ID.
+ * @param int|null $user_id    Optional. User ID. Defaults to current user.
+ * @return bool|null The new state (true = favorited, false = unfavorited), null on error.
+ */
+function apd_toggle_favorite( int $listing_id, ?int $user_id = null ): ?bool {
+    return apd_favorites()->toggle( $listing_id, $user_id );
+}
+
+/**
+ * Check if a listing is in user's favorites.
+ *
+ * @since 1.0.0
+ *
+ * @param int      $listing_id Listing post ID.
+ * @param int|null $user_id    Optional. User ID. Defaults to current user.
+ * @return bool True if listing is favorited.
+ */
+function apd_is_favorite( int $listing_id, ?int $user_id = null ): bool {
+    return apd_favorites()->is_favorite( $listing_id, $user_id );
+}
+
+/**
+ * Get all favorite listing IDs for a user.
+ *
+ * @since 1.0.0
+ *
+ * @param int|null $user_id Optional. User ID. Defaults to current user.
+ * @return int[] Array of listing IDs.
+ */
+function apd_get_user_favorites( ?int $user_id = null ): array {
+    return apd_favorites()->get_favorites( $user_id );
+}
+
+/**
+ * Get the total count of favorites for a user.
+ *
+ * @since 1.0.0
+ *
+ * @param int|null $user_id Optional. User ID. Defaults to current user.
+ * @return int Favorites count.
+ */
+function apd_get_favorites_count( ?int $user_id = null ): int {
+    return apd_favorites()->get_count( $user_id );
+}
+
+/**
+ * Get the number of users who have favorited a listing.
+ *
+ * @since 1.0.0
+ *
+ * @param int $listing_id Listing post ID.
+ * @return int Favorite count.
+ */
+function apd_get_listing_favorites_count( int $listing_id ): int {
+    return apd_favorites()->get_listing_favorite_count( $listing_id );
+}
+
+/**
+ * Check if login is required for favorites.
+ *
+ * @since 1.0.0
+ *
+ * @return bool True if login is required.
+ */
+function apd_favorites_require_login(): bool {
+    return apd_favorites()->requires_login();
+}
+
+/**
+ * Clear all favorites for a user.
+ *
+ * @since 1.0.0
+ *
+ * @param int|null $user_id Optional. User ID. Defaults to current user.
+ * @return bool True on success.
+ */
+function apd_clear_favorites( ?int $user_id = null ): bool {
+    return apd_favorites()->clear( $user_id );
+}
+
+/**
+ * Get user's favorite listings as WP_Post objects.
+ *
+ * @since 1.0.0
+ *
+ * @param int|null $user_id Optional. User ID. Defaults to current user.
+ * @param array    $args    Optional. Additional WP_Query arguments.
+ * @return \WP_Post[] Array of listing posts.
+ */
+function apd_get_favorite_listings( ?int $user_id = null, array $args = [] ): array {
+    $favorite_ids = apd_get_user_favorites( $user_id );
+
+    if ( empty( $favorite_ids ) ) {
+        return [];
+    }
+
+    $defaults = [
+        'post_type'      => 'apd_listing',
+        'post_status'    => 'publish',
+        'post__in'       => $favorite_ids,
+        'orderby'        => 'post__in',
+        'posts_per_page' => -1,
+    ];
+
+    $query_args = wp_parse_args( $args, $defaults );
+
+    /**
+     * Filter the favorite listings query arguments.
+     *
+     * @since 1.0.0
+     *
+     * @param array $query_args Query arguments.
+     * @param int[] $favorite_ids Favorite listing IDs.
+     */
+    $query_args = apply_filters( 'apd_favorite_listings_query_args', $query_args, $favorite_ids );
+
+    $query = new \WP_Query( $query_args );
+
+    return $query->posts;
+}
+
+/**
+ * Get the favorite toggle instance.
+ *
+ * @since 1.0.0
+ *
+ * @return \APD\User\FavoriteToggle
+ */
+function apd_favorite_toggle(): \APD\User\FavoriteToggle {
+    return \APD\User\FavoriteToggle::get_instance();
+}
+
+/**
+ * Render the favorite button HTML.
+ *
+ * Outputs the favorite toggle button for a listing. Can be placed anywhere
+ * in templates to allow users to add/remove listings from their favorites.
+ *
+ * @since 1.0.0
+ *
+ * @param int   $listing_id Listing post ID.
+ * @param array $args       Optional. Button arguments.
+ *                          - show_count: bool Whether to show favorite count. Default false.
+ *                          - size: string Button size (small, medium, large). Default 'medium'.
+ *                          - class: string Additional CSS classes. Default ''.
+ * @return void
+ */
+function apd_render_favorite_button( int $listing_id, array $args = [] ): void {
+    apd_favorite_toggle()->render_button( $listing_id, $args );
+}
+
+/**
+ * Get the favorite button HTML as a string.
+ *
+ * Returns the favorite toggle button HTML for a listing. Useful when you need
+ * to manipulate the HTML before outputting.
+ *
+ * @since 1.0.0
+ *
+ * @param int   $listing_id Listing post ID.
+ * @param array $args       Optional. Button arguments.
+ *                          - show_count: bool Whether to show favorite count. Default false.
+ *                          - size: string Button size (small, medium, large). Default 'medium'.
+ *                          - class: string Additional CSS classes. Default ''.
+ * @return string Button HTML.
+ */
+function apd_get_favorite_button( int $listing_id, array $args = [] ): string {
+    return apd_favorite_toggle()->get_button( $listing_id, $args );
+}
+
+/**
+ * Get the FavoritesPage instance.
+ *
+ * @since 1.0.0
+ *
+ * @param array<string, mixed> $config Optional. Configuration options.
+ * @return \APD\Frontend\Dashboard\FavoritesPage
+ */
+function apd_favorites_page( array $config = [] ): \APD\Frontend\Dashboard\FavoritesPage {
+    return \APD\Frontend\Dashboard\FavoritesPage::get_instance( $config );
+}
+
+/**
+ * Render the favorites page.
+ *
+ * Outputs the favorites page content for the current user.
+ * Typically used within the dashboard or a custom page template.
+ *
+ * @since 1.0.0
+ *
+ * @param array<string, mixed> $config Optional. Configuration options.
+ *                                     - per_page: int Number of favorites per page. Default 12.
+ *                                     - show_view_toggle: bool Show grid/list toggle. Default true.
+ *                                     - columns: int Number of grid columns. Default 4.
+ * @return void
+ */
+function apd_render_favorites_page( array $config = [] ): void {
+    $page = apd_favorites_page( $config );
+    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Output is escaped in template.
+    echo $page->render();
+}
+
+// ============================================================================
+// Review Functions
+// ============================================================================
+
+/**
+ * Get the Review Manager instance.
+ *
+ * @since 1.0.0
+ *
+ * @return \APD\Review\ReviewManager
+ */
+function apd_review_manager(): \APD\Review\ReviewManager {
+    return \APD\Review\ReviewManager::get_instance();
+}
+
+/**
+ * Create a new review for a listing.
+ *
+ * @since 1.0.0
+ *
+ * @param int   $listing_id Listing post ID.
+ * @param array $data       Review data.
+ *                          - rating: (int) Required. Rating 1-5.
+ *                          - content: (string) Required. Review text.
+ *                          - title: (string) Optional. Review title.
+ *                          - author_name: (string) Guest name (if not logged in).
+ *                          - author_email: (string) Guest email (if not logged in).
+ *                          - user_id: (int) Override user ID.
+ * @return int|\WP_Error Review ID on success, WP_Error on failure.
+ */
+function apd_create_review( int $listing_id, array $data ): int|\WP_Error {
+    return apd_review_manager()->create( $listing_id, $data );
+}
+
+/**
+ * Get a review by ID.
+ *
+ * @since 1.0.0
+ *
+ * @param int $review_id Review (comment) ID.
+ * @return array|null Review data array or null if not found.
+ */
+function apd_get_review( int $review_id ): ?array {
+    return apd_review_manager()->get( $review_id );
+}
+
+/**
+ * Get reviews for a listing.
+ *
+ * @since 1.0.0
+ *
+ * @param int   $listing_id Listing post ID.
+ * @param array $args       Query arguments.
+ *                          - status: (string) Review status (approved, pending, all). Default 'approved'.
+ *                          - orderby: (string) Order by field (date, rating). Default 'date'.
+ *                          - order: (string) Order direction (ASC, DESC). Default 'DESC'.
+ *                          - number: (int) Number of reviews. Default 10.
+ *                          - offset: (int) Number to skip. Default 0.
+ *                          - rating: (int) Filter by specific rating.
+ * @return array{reviews: array[], total: int, pages: int} Reviews data with pagination info.
+ */
+function apd_get_listing_reviews( int $listing_id, array $args = [] ): array {
+    return apd_review_manager()->get_listing_reviews( $listing_id, $args );
+}
+
+/**
+ * Get a user's review for a specific listing.
+ *
+ * @since 1.0.0
+ *
+ * @param int $listing_id Listing post ID.
+ * @param int $user_id    User ID.
+ * @return array|null Review data or null if not found.
+ */
+function apd_get_user_review( int $listing_id, int $user_id ): ?array {
+    return apd_review_manager()->get_user_review( $listing_id, $user_id );
+}
+
+/**
+ * Check if a user has reviewed a listing.
+ *
+ * @since 1.0.0
+ *
+ * @param int $listing_id Listing post ID.
+ * @param int $user_id    User ID.
+ * @return bool True if user has reviewed the listing.
+ */
+function apd_has_user_reviewed( int $listing_id, int $user_id ): bool {
+    return apd_review_manager()->has_user_reviewed( $listing_id, $user_id );
+}
+
+/**
+ * Get the review count for a listing.
+ *
+ * @since 1.0.0
+ *
+ * @param int    $listing_id Listing post ID.
+ * @param string $status     Review status (approved, pending, all). Default 'approved'.
+ * @return int Review count.
+ */
+function apd_get_review_count( int $listing_id, string $status = 'approved' ): int {
+    return apd_review_manager()->get_review_count( $listing_id, $status );
+}
+
+/**
+ * Delete a review.
+ *
+ * @since 1.0.0
+ *
+ * @param int  $review_id    Review (comment) ID.
+ * @param bool $force_delete Whether to permanently delete. Default false (move to trash).
+ * @return bool True on success, false on failure.
+ */
+function apd_delete_review( int $review_id, bool $force_delete = false ): bool {
+    return apd_review_manager()->delete( $review_id, $force_delete );
+}
+
+/**
+ * Approve a pending review.
+ *
+ * @since 1.0.0
+ *
+ * @param int $review_id Review (comment) ID.
+ * @return bool True on success, false on failure.
+ */
+function apd_approve_review( int $review_id ): bool {
+    return apd_review_manager()->approve( $review_id );
+}
+
+/**
+ * Check if login is required to submit reviews.
+ *
+ * @since 1.0.0
+ *
+ * @return bool True if login is required.
+ */
+function apd_reviews_require_login(): bool {
+    return apd_review_manager()->requires_login();
+}
+
+// ============================================================================
+// Rating Calculator Functions
+// ============================================================================
+
+/**
+ * Get the Rating Calculator instance.
+ *
+ * @since 1.0.0
+ *
+ * @return \APD\Review\RatingCalculator
+ */
+function apd_rating_calculator(): \APD\Review\RatingCalculator {
+    return \APD\Review\RatingCalculator::get_instance();
+}
+
+/**
+ * Get the average rating for a listing.
+ *
+ * @since 1.0.0
+ *
+ * @param int $listing_id Listing post ID.
+ * @return float Average rating (0 if no ratings).
+ */
+function apd_get_listing_rating( int $listing_id ): float {
+    return apd_rating_calculator()->get_average( $listing_id );
+}
+
+/**
+ * Get the rating count for a listing.
+ *
+ * @since 1.0.0
+ *
+ * @param int $listing_id Listing post ID.
+ * @return int Number of ratings.
+ */
+function apd_get_listing_rating_count( int $listing_id ): int {
+    return apd_rating_calculator()->get_count( $listing_id );
+}
+
+/**
+ * Get the rating distribution for a listing.
+ *
+ * Returns an array of counts per star rating.
+ *
+ * @since 1.0.0
+ *
+ * @param int $listing_id Listing post ID.
+ * @return array<int, int> Distribution array keyed by star rating.
+ */
+function apd_get_rating_distribution( int $listing_id ): array {
+    return apd_rating_calculator()->get_distribution( $listing_id );
+}
+
+/**
+ * Render star rating HTML.
+ *
+ * @since 1.0.0
+ *
+ * @param float $rating The rating value (0-5).
+ * @param array $args   Display options.
+ *                      - size: (string) Size variant (small, medium, large). Default 'medium'.
+ *                      - show_count: (bool) Whether to show rating count. Default false.
+ *                      - show_average: (bool) Whether to show average number. Default false.
+ *                      - count: (int) Number of ratings (for show_count).
+ *                      - inline: (bool) Display inline. Default true.
+ * @return void Outputs HTML directly.
+ */
+function apd_render_star_rating( float $rating, array $args = [] ): void {
+    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Output is escaped in render method.
+    echo apd_rating_calculator()->render_stars( $rating, $args );
+}
+
+/**
+ * Get star rating HTML as a string.
+ *
+ * @since 1.0.0
+ *
+ * @param float $rating The rating value (0-5).
+ * @param array $args   Display options (see apd_render_star_rating).
+ * @return string HTML output.
+ */
+function apd_get_star_rating( float $rating, array $args = [] ): string {
+    return apd_rating_calculator()->render_stars( $rating, $args );
+}
+
+/**
+ * Render star rating HTML for a listing.
+ *
+ * Convenience function that fetches rating data for a listing.
+ *
+ * @since 1.0.0
+ *
+ * @param int   $listing_id Listing post ID.
+ * @param array $args       Display options (see apd_render_star_rating).
+ * @return void Outputs HTML directly.
+ */
+function apd_render_listing_star_rating( int $listing_id, array $args = [] ): void {
+    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Output is escaped in render method.
+    echo apd_rating_calculator()->render_listing_stars( $listing_id, $args );
+}
+
+/**
+ * Get star rating HTML for a listing as a string.
+ *
+ * Convenience function that fetches rating data for a listing.
+ *
+ * @since 1.0.0
+ *
+ * @param int   $listing_id Listing post ID.
+ * @param array $args       Display options (see apd_render_star_rating).
+ * @return string HTML output.
+ */
+function apd_get_listing_star_rating( int $listing_id, array $args = [] ): string {
+    return apd_rating_calculator()->render_listing_stars( $listing_id, $args );
+}
+
+/**
+ * Force recalculate rating statistics for a listing.
+ *
+ * @since 1.0.0
+ *
+ * @param int $listing_id Listing post ID.
+ * @return array{average: float, count: int, distribution: array<int, int>} Rating statistics.
+ */
+function apd_recalculate_listing_rating( int $listing_id ): array {
+    return apd_rating_calculator()->recalculate( $listing_id );
+}
+
+/**
+ * Invalidate cached rating for a listing.
+ *
+ * Clears the cached values. Next call to get functions will trigger recalculation.
+ *
+ * @since 1.0.0
+ *
+ * @param int $listing_id Listing post ID.
+ * @return void
+ */
+function apd_invalidate_listing_rating( int $listing_id ): void {
+    apd_rating_calculator()->invalidate( $listing_id );
+}
+
+// ============================================================================
+// Review Form Functions
+// ============================================================================
+
+/**
+ * Get the Review Form instance.
+ *
+ * @since 1.0.0
+ *
+ * @return \APD\Review\ReviewForm
+ */
+function apd_review_form(): \APD\Review\ReviewForm {
+    return \APD\Review\ReviewForm::get_instance();
+}
+
+/**
+ * Render the review submission form for a listing.
+ *
+ * @since 1.0.0
+ *
+ * @param int $listing_id Listing post ID.
+ * @return void Outputs HTML directly.
+ */
+function apd_render_review_form( int $listing_id ): void {
+    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Output is escaped in render method.
+    echo apd_review_form()->render( $listing_id );
+}
+
+/**
+ * Get the review form HTML as a string.
+ *
+ * @since 1.0.0
+ *
+ * @param int $listing_id Listing post ID.
+ * @return string HTML output.
+ */
+function apd_get_review_form( int $listing_id ): string {
+    return apd_review_form()->render( $listing_id );
+}
+
+/**
+ * Get the Review Handler instance.
+ *
+ * @since 1.0.0
+ *
+ * @return \APD\Review\ReviewHandler
+ */
+function apd_review_handler(): \APD\Review\ReviewHandler {
+    return \APD\Review\ReviewHandler::get_instance();
+}
+
+/**
+ * Check if the current user has reviewed a listing.
+ *
+ * Convenience function that uses the current user ID.
+ *
+ * @since 1.0.0
+ *
+ * @param int $listing_id Listing post ID.
+ * @return bool True if current user has reviewed the listing.
+ */
+function apd_current_user_has_reviewed( int $listing_id ): bool {
+    $user_id = get_current_user_id();
+
+    if ( $user_id <= 0 ) {
+        return false;
+    }
+
+    return apd_has_user_reviewed( $listing_id, $user_id );
+}
+
+/**
+ * Get the current user's review for a listing.
+ *
+ * Convenience function that uses the current user ID.
+ *
+ * @since 1.0.0
+ *
+ * @param int $listing_id Listing post ID.
+ * @return array|null Review data or null if not found.
+ */
+function apd_get_current_user_review( int $listing_id ): ?array {
+    $user_id = get_current_user_id();
+
+    if ( $user_id <= 0 ) {
+        return null;
+    }
+
+    return apd_get_user_review( $listing_id, $user_id );
+}
+
+/**
+ * Update an existing review.
+ *
+ * @since 1.0.0
+ *
+ * @param int   $review_id Review (comment) ID.
+ * @param array $data      Review data to update.
+ *                         - rating: (int) Rating 1-5.
+ *                         - content: (string) Review text.
+ *                         - title: (string) Review title.
+ * @return bool|\WP_Error True on success, WP_Error on failure.
+ */
+function apd_update_review( int $review_id, array $data ): bool|\WP_Error {
+    return apd_review_manager()->update( $review_id, $data );
+}
+
+// ============================================================================
+// Review Display Functions
+// ============================================================================
+
+/**
+ * Get the Review Display instance.
+ *
+ * @since 1.0.0
+ *
+ * @return \APD\Review\ReviewDisplay
+ */
+function apd_review_display(): \APD\Review\ReviewDisplay {
+    return \APD\Review\ReviewDisplay::get_instance();
+}
+
+/**
+ * Render the full reviews section for a listing.
+ *
+ * Includes rating summary, review form, reviews list, and pagination.
+ *
+ * @since 1.0.0
+ *
+ * @param int   $listing_id Listing post ID.
+ * @param array $args       Optional display arguments.
+ *                          - per_page: (int) Reviews per page. Default 10.
+ *                          - show_summary: (bool) Show rating summary. Default true.
+ *                          - show_form: (bool) Show review form. Default true.
+ *                          - show_pagination: (bool) Show pagination. Default true.
+ * @return void Outputs HTML directly.
+ */
+function apd_render_reviews_section( int $listing_id, array $args = [] ): void {
+    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Output is escaped in render method.
+    echo apd_review_display()->render( $listing_id, $args );
+}
+
+/**
+ * Get the reviews section HTML as a string.
+ *
+ * @since 1.0.0
+ *
+ * @param int   $listing_id Listing post ID.
+ * @param array $args       Optional display arguments (see apd_render_reviews_section).
+ * @return string HTML output.
+ */
+function apd_get_reviews_section( int $listing_id, array $args = [] ): string {
+    return apd_review_display()->render( $listing_id, $args );
+}
+
+/**
+ * Render the rating summary box for a listing.
+ *
+ * Shows average rating and distribution bars.
+ *
+ * @since 1.0.0
+ *
+ * @param int $listing_id Listing post ID.
+ * @return void Outputs HTML directly.
+ */
+function apd_render_rating_summary( int $listing_id ): void {
+    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Output is escaped in render method.
+    echo apd_review_display()->render_summary( $listing_id );
+}
+
+/**
+ * Get the rating summary HTML as a string.
+ *
+ * @since 1.0.0
+ *
+ * @param int $listing_id Listing post ID.
+ * @return string HTML output.
+ */
+function apd_get_rating_summary( int $listing_id ): string {
+    return apd_review_display()->render_summary( $listing_id );
+}
+
+/**
+ * Render the reviews list for a listing.
+ *
+ * @since 1.0.0
+ *
+ * @param int   $listing_id Listing post ID.
+ * @param array $args       Query arguments.
+ *                          - number: (int) Number of reviews. Default 10.
+ *                          - offset: (int) Offset. Default 0.
+ *                          - orderby: (string) Order by (date, rating). Default 'date'.
+ *                          - order: (string) Order direction. Default 'DESC'.
+ * @return void Outputs HTML directly.
+ */
+function apd_render_reviews_list( int $listing_id, array $args = [] ): void {
+    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Output is escaped in render method.
+    echo apd_review_display()->render_reviews_list( $listing_id, $args );
+}
+
+/**
+ * Get the reviews list HTML as a string.
+ *
+ * @since 1.0.0
+ *
+ * @param int   $listing_id Listing post ID.
+ * @param array $args       Query arguments (see apd_render_reviews_list).
+ * @return string HTML output.
+ */
+function apd_get_reviews_list( int $listing_id, array $args = [] ): string {
+    return apd_review_display()->render_reviews_list( $listing_id, $args );
+}

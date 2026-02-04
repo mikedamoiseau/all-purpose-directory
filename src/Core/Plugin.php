@@ -143,9 +143,53 @@ final class Plugin {
         $block_manager = \APD\Blocks\BlockManager::get_instance();
         $block_manager->init();
 
+        // Initialize submission handler for frontend form processing.
+        $submission_handler = new \APD\Frontend\Submission\SubmissionHandler();
+        $submission_handler->init();
+
         // Register AJAX handlers.
         add_action( 'wp_ajax_apd_filter_listings', [ $this, 'ajax_filter_listings' ] );
         add_action( 'wp_ajax_nopriv_apd_filter_listings', [ $this, 'ajax_filter_listings' ] );
+
+        // Register AJAX handlers for dashboard listing actions.
+        add_action( 'wp_ajax_apd_delete_listing', [ $this, 'ajax_delete_listing' ] );
+        add_action( 'wp_ajax_apd_update_listing_status', [ $this, 'ajax_update_listing_status' ] );
+
+        // Initialize My Listings action handling.
+        $my_listings = \APD\Frontend\Dashboard\MyListings::get_instance();
+        $my_listings->init();
+
+        // Initialize Favorites system.
+        $favorites = \APD\User\Favorites::get_instance();
+        $favorites->init();
+
+        // Initialize Favorite Toggle UI.
+        $favorite_toggle = \APD\User\FavoriteToggle::get_instance();
+        $favorite_toggle->init();
+
+        // Initialize Review Manager.
+        $review_manager = \APD\Review\ReviewManager::get_instance();
+        $review_manager->init();
+
+        // Initialize Rating Calculator.
+        $rating_calculator = \APD\Review\RatingCalculator::get_instance();
+        $rating_calculator->init();
+
+        // Initialize Review Form.
+        $review_form = \APD\Review\ReviewForm::get_instance();
+        $review_form->init();
+
+        // Initialize Review Handler.
+        $review_handler = \APD\Review\ReviewHandler::get_instance();
+        $review_handler->init();
+
+        // Initialize Review Display.
+        $review_display = \APD\Review\ReviewDisplay::get_instance();
+        $review_display->init();
+
+        // Initialize Review Moderation admin page.
+        $review_moderation = \APD\Admin\ReviewModeration::get_instance();
+        $review_moderation->init();
 
         /**
          * Fires after plugin hooks are initialized.
@@ -372,6 +416,105 @@ final class Plugin {
         do_action( 'apd_after_ajax_filter' );
 
         wp_send_json_success( $response );
+    }
+
+    /**
+     * AJAX handler for deleting a listing.
+     *
+     * @since 1.0.0
+     *
+     * @return void
+     */
+    public function ajax_delete_listing(): void {
+        // Verify nonce.
+        if ( ! check_ajax_referer( \APD\Frontend\Dashboard\MyListings::NONCE_ACTION, '_apd_nonce', false ) ) {
+            wp_send_json_error( [ 'message' => __( 'Invalid security token.', 'all-purpose-directory' ) ], 403 );
+        }
+
+        // Check if user is logged in.
+        if ( ! is_user_logged_in() ) {
+            wp_send_json_error( [ 'message' => __( 'You must be logged in.', 'all-purpose-directory' ) ], 401 );
+        }
+
+        // Get listing ID.
+        $listing_id = isset( $_POST['listing_id'] ) ? absint( $_POST['listing_id'] ) : 0;
+        if ( $listing_id <= 0 ) {
+            wp_send_json_error( [ 'message' => __( 'Invalid listing ID.', 'all-purpose-directory' ) ], 400 );
+        }
+
+        // Get action type (trash or delete).
+        $delete_type = isset( $_POST['delete_type'] ) && $_POST['delete_type'] === 'permanent' ? 'permanent' : 'trash';
+
+        $my_listings = \APD\Frontend\Dashboard\MyListings::get_instance();
+
+        if ( $delete_type === 'permanent' ) {
+            $result = $my_listings->delete_listing( $listing_id );
+        } else {
+            $result = $my_listings->trash_listing( $listing_id );
+        }
+
+        if ( $result ) {
+            wp_send_json_success( [
+                'message'    => $delete_type === 'permanent'
+                    ? __( 'Listing permanently deleted.', 'all-purpose-directory' )
+                    : __( 'Listing moved to trash.', 'all-purpose-directory' ),
+                'listing_id' => $listing_id,
+            ] );
+        } else {
+            wp_send_json_error( [
+                'message' => __( 'Failed to delete listing. You may not have permission.', 'all-purpose-directory' ),
+            ], 403 );
+        }
+    }
+
+    /**
+     * AJAX handler for updating listing status.
+     *
+     * @since 1.0.0
+     *
+     * @return void
+     */
+    public function ajax_update_listing_status(): void {
+        // Verify nonce.
+        if ( ! check_ajax_referer( \APD\Frontend\Dashboard\MyListings::NONCE_ACTION, '_apd_nonce', false ) ) {
+            wp_send_json_error( [ 'message' => __( 'Invalid security token.', 'all-purpose-directory' ) ], 403 );
+        }
+
+        // Check if user is logged in.
+        if ( ! is_user_logged_in() ) {
+            wp_send_json_error( [ 'message' => __( 'You must be logged in.', 'all-purpose-directory' ) ], 401 );
+        }
+
+        // Get listing ID.
+        $listing_id = isset( $_POST['listing_id'] ) ? absint( $_POST['listing_id'] ) : 0;
+        if ( $listing_id <= 0 ) {
+            wp_send_json_error( [ 'message' => __( 'Invalid listing ID.', 'all-purpose-directory' ) ], 400 );
+        }
+
+        // Get new status.
+        $new_status = isset( $_POST['status'] ) ? sanitize_key( $_POST['status'] ) : '';
+        $valid_statuses = [ 'publish', 'draft', 'pending', 'expired' ];
+        if ( ! in_array( $new_status, $valid_statuses, true ) ) {
+            wp_send_json_error( [ 'message' => __( 'Invalid status.', 'all-purpose-directory' ) ], 400 );
+        }
+
+        $my_listings = \APD\Frontend\Dashboard\MyListings::get_instance();
+        $result      = $my_listings->update_listing_status( $listing_id, $new_status );
+
+        if ( $result ) {
+            $status_badge = $my_listings->get_status_badge( $new_status );
+
+            wp_send_json_success( [
+                'message'      => __( 'Listing status updated.', 'all-purpose-directory' ),
+                'listing_id'   => $listing_id,
+                'new_status'   => $new_status,
+                'status_badge' => $status_badge,
+            ] );
+        } else {
+            wp_send_json_error( [
+                'message' => __( 'Failed to update listing status. You may not have permission.', 'all-purpose-directory' ),
+            ], 403 );
+        }
     }
 
     /**

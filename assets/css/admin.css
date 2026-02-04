@@ -677,3 +677,212 @@
         grid-template-columns: repeat(3, 1fr);
     }
 }
+
+/* ==========================================================================
+   Review Moderation Admin Page
+   ========================================================================== */
+
+/**
+ * Reviews table layout
+ */
+.apd-reviews-wrap {
+    max-width: 100%;
+}
+
+.apd-reviews-table .column-cb {
+    width: 2.2em;
+}
+
+.apd-reviews-table .column-listing {
+    width: 15%;
+}
+
+.apd-reviews-table .column-author {
+    width: 12%;
+}
+
+.apd-reviews-table .column-rating {
+    width: 100px;
+}
+
+.apd-reviews-table .column-review {
+    width: auto;
+}
+
+.apd-reviews-table .column-status {
+    width: 80px;
+}
+
+.apd-reviews-table .column-date {
+    width: 12%;
+}
+
+/**
+ * Star rating display
+ */
+.apd-stars {
+    display: inline-flex;
+    gap: 1px;
+    color: #f0c674;
+}
+
+.apd-stars .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+.apd-stars .dashicons-star-empty {
+    color: #ccc;
+}
+
+/**
+ * Review status badges
+ */
+.apd-review-status {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.4;
+    text-transform: capitalize;
+}
+
+.apd-review-status--approved {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.apd-review-status--pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.apd-review-status--spam {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.apd-review-status--trash {
+    background-color: #e2e3e5;
+    color: #383d41;
+}
+
+/**
+ * Unapproved row highlighting
+ */
+.apd-reviews-table tr.unapproved {
+    background-color: #fcf9e8;
+}
+
+.apd-reviews-table tr.unapproved:hover {
+    background-color: #f5f0dd;
+}
+
+/**
+ * Row actions
+ */
+.apd-reviews-table .row-actions {
+    visibility: hidden;
+    padding-top: 3px;
+}
+
+.apd-reviews-table tr:hover .row-actions,
+.apd-reviews-table tr:focus-within .row-actions {
+    visibility: visible;
+}
+
+.apd-reviews-table .row-actions a {
+    text-decoration: none;
+}
+
+.apd-reviews-table .row-actions .submitdelete {
+    color: #b32d2e;
+}
+
+.apd-reviews-table .row-actions .submitdelete:hover {
+    color: #a00;
+}
+
+/**
+ * Filters
+ */
+.apd-reviews-filters {
+    clear: both;
+    margin: 1em 0;
+}
+
+.apd-reviews-filters .search-box {
+    margin-bottom: 0;
+}
+
+/**
+ * Filter dropdowns alignment
+ */
+.apd-reviews-wrap .tablenav .actions select {
+    float: left;
+    margin-right: 6px;
+}
+
+/**
+ * Pending count bubble in menu
+ */
+.awaiting-mod {
+    display: inline-block;
+    vertical-align: top;
+    box-sizing: border-box;
+    margin: 1px 0 -1px 2px;
+    padding: 0 5px;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    background-color: #d63638;
+    color: #fff;
+    font-size: 11px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+#adminmenu .awaiting-mod .pending-count {
+    color: #fff;
+}
+
+/**
+ * Review content truncation
+ */
+.apd-reviews-table .column-review strong {
+    display: block;
+    margin-bottom: 3px;
+}
+
+/**
+ * Responsive styles for review moderation
+ */
+@media screen and (max-width: 782px) {
+    .apd-reviews-table .column-listing,
+    .apd-reviews-table .column-author,
+    .apd-reviews-table .column-date {
+        display: none;
+    }
+
+    .apd-reviews-table .column-rating,
+    .apd-reviews-table .column-status {
+        width: auto;
+    }
+
+    .apd-reviews-table .row-actions {
+        visibility: visible;
+    }
+
+    .apd-reviews-wrap .tablenav .actions select {
+        float: none;
+        display: block;
+        width: 100%;
+        margin-bottom: 6px;
+    }
+
+    .apd-reviews-wrap .tablenav .actions input[type="submit"] {
+        width: 100%;
+    }
+}
