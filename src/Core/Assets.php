@@ -184,13 +184,19 @@ class Assets {
      */
     private function get_frontend_script_data(): array {
         $data = [
-            'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-            'nonce'   => wp_create_nonce( 'apd_frontend' ),
-            'i18n'    => [
-                'loading'      => __( 'Loading...', 'all-purpose-directory' ),
-                'error'        => __( 'An error occurred. Please try again.', 'all-purpose-directory' ),
-                'addFavorite'  => __( 'Add to favorites', 'all-purpose-directory' ),
+            'ajaxUrl'     => admin_url( 'admin-ajax.php' ),
+            'nonce'       => wp_create_nonce( 'apd_frontend' ),
+            'filterNonce' => wp_create_nonce( 'apd_filter_listings' ),
+            'archiveUrl'  => get_post_type_archive_link( 'apd_listing' ) ?: '',
+            'i18n'        => [
+                'loading'        => __( 'Loading...', 'all-purpose-directory' ),
+                'error'          => __( 'An error occurred. Please try again.', 'all-purpose-directory' ),
+                'noResults'      => __( 'No listings found.', 'all-purpose-directory' ),
+                'addFavorite'    => __( 'Add to favorites', 'all-purpose-directory' ),
                 'removeFavorite' => __( 'Remove from favorites', 'all-purpose-directory' ),
+                'filtering'      => __( 'Filtering listings...', 'all-purpose-directory' ),
+                'resultsFound'   => __( '%d listings found', 'all-purpose-directory' ),
+                'oneResultFound' => __( '1 listing found', 'all-purpose-directory' ),
             ],
         ];
 
