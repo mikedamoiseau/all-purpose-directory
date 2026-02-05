@@ -87,8 +87,8 @@ do_action( 'apd_before_review_form', $listing_id );
 		<p>
 			<?php
 			printf(
-				/* translators: 1: login URL, 2: register URL */
 				wp_kses(
+					/* translators: 1: login URL, 2: register URL */
 					__( 'Please <a href="%1$s">log in</a> or <a href="%2$s">register</a> to write a review.', 'all-purpose-directory' ),
 					[ 'a' => [ 'href' => [] ] ]
 				),

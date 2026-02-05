@@ -4,11 +4,18 @@
  *
  * Processes contact form submissions.
  *
- * @package All_Purpose_Directory
+ * @package APD\Contact
  * @since 1.0.0
  */
 
+declare(strict_types=1);
+
 namespace APD\Contact;
+
+// Prevent direct file access.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * ContactHandler class.

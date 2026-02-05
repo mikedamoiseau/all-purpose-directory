@@ -200,5 +200,363 @@ if ( ! function_exists( '_doing_it_wrong' ) ) {
 	}
 }
 
+// Define WP_REST_Response class for unit tests if not already defined.
+if ( ! class_exists( 'WP_REST_Response' ) ) {
+	/**
+	 * Minimal WP_REST_Response implementation for unit tests.
+	 *
+	 * This is a simplified version of WordPress's WP_REST_Response class
+	 * that provides the essential functionality needed for testing.
+	 */
+	class WP_REST_Response {
+		/**
+		 * Response data.
+		 *
+		 * @var mixed
+		 */
+		private mixed $data;
+
+		/**
+		 * HTTP status code.
+		 *
+		 * @var int
+		 */
+		private int $status;
+
+		/**
+		 * Response headers.
+		 *
+		 * @var array<string, string>
+		 */
+		private array $headers = [];
+
+		/**
+		 * Constructor.
+		 *
+		 * @param mixed $data   Response data.
+		 * @param int   $status HTTP status code.
+		 */
+		public function __construct( mixed $data = null, int $status = 200 ) {
+			$this->data   = $data;
+			$this->status = $status;
+		}
+
+		/**
+		 * Get response data.
+		 *
+		 * @return mixed
+		 */
+		public function get_data(): mixed {
+			return $this->data;
+		}
+
+		/**
+		 * Set response data.
+		 *
+		 * @param mixed $data Response data.
+		 */
+		public function set_data( mixed $data ): void {
+			$this->data = $data;
+		}
+
+		/**
+		 * Get HTTP status code.
+		 *
+		 * @return int
+		 */
+		public function get_status(): int {
+			return $this->status;
+		}
+
+		/**
+		 * Set HTTP status code.
+		 *
+		 * @param int $status HTTP status code.
+		 */
+		public function set_status( int $status ): void {
+			$this->status = $status;
+		}
+
+		/**
+		 * Set a header.
+		 *
+		 * @param string $key   Header name.
+		 * @param string $value Header value.
+		 */
+		public function header( string $key, string $value ): void {
+			$this->headers[ $key ] = $value;
+		}
+
+		/**
+		 * Get all headers.
+		 *
+		 * @return array<string, string>
+		 */
+		public function get_headers(): array {
+			return $this->headers;
+		}
+	}
+}
+
+// Define WP_REST_Request class for unit tests if not already defined.
+if ( ! class_exists( 'WP_REST_Request' ) ) {
+	/**
+	 * Minimal WP_REST_Request implementation for unit tests.
+	 *
+	 * This is a simplified version of WordPress's WP_REST_Request class
+	 * that provides the essential functionality needed for testing.
+	 */
+	class WP_REST_Request {
+		/**
+		 * Request parameters.
+		 *
+		 * @var array<string, mixed>
+		 */
+		private array $params = [];
+
+		/**
+		 * Request headers.
+		 *
+		 * @var array<string, string>
+		 */
+		private array $headers = [];
+
+		/**
+		 * HTTP method.
+		 *
+		 * @var string
+		 */
+		private string $method = 'GET';
+
+		/**
+		 * Request route.
+		 *
+		 * @var string
+		 */
+		private string $route = '';
+
+		/**
+		 * Constructor.
+		 *
+		 * @param string $method HTTP method.
+		 * @param string $route  Request route.
+		 */
+		public function __construct( string $method = 'GET', string $route = '' ) {
+			$this->method = $method;
+			$this->route  = $route;
+		}
+
+		/**
+		 * Get a parameter value.
+		 *
+		 * @param string $key Parameter key.
+		 * @return mixed
+		 */
+		public function get_param( string $key ): mixed {
+			return $this->params[ $key ] ?? null;
+		}
+
+		/**
+		 * Set a parameter value.
+		 *
+		 * @param string $key   Parameter key.
+		 * @param mixed  $value Parameter value.
+		 */
+		public function set_param( string $key, mixed $value ): void {
+			$this->params[ $key ] = $value;
+		}
+
+		/**
+		 * Get all parameters.
+		 *
+		 * @return array<string, mixed>
+		 */
+		public function get_params(): array {
+			return $this->params;
+		}
+
+		/**
+		 * Get a header value.
+		 *
+		 * @param string $key Header key.
+		 * @return string|null
+		 */
+		public function get_header( string $key ): ?string {
+			return $this->headers[ $key ] ?? null;
+		}
+
+		/**
+		 * Set a header value.
+		 *
+		 * @param string $key   Header key.
+		 * @param string $value Header value.
+		 */
+		public function set_header( string $key, string $value ): void {
+			$this->headers[ $key ] = $value;
+		}
+
+		/**
+		 * Get HTTP method.
+		 *
+		 * @return string
+		 */
+		public function get_method(): string {
+			return $this->method;
+		}
+
+		/**
+		 * Get route.
+		 *
+		 * @return string
+		 */
+		public function get_route(): string {
+			return $this->route;
+		}
+	}
+}
+
+// Define WP_Post class for unit tests if not already defined.
+if ( ! class_exists( 'WP_Post' ) ) {
+	/**
+	 * Minimal WP_Post implementation for unit tests.
+	 *
+	 * Uses mixed types for flexibility in testing - WordPress's actual
+	 * WP_Post doesn't strictly type properties.
+	 */
+	class WP_Post {
+		/** @var mixed */
+		public $ID = 0;
+		/** @var mixed */
+		public $post_author = '0';
+		/** @var mixed */
+		public $post_date = '';
+		/** @var mixed */
+		public $post_date_gmt = '';
+		/** @var mixed */
+		public $post_content = '';
+		/** @var mixed */
+		public $post_title = '';
+		/** @var mixed */
+		public $post_excerpt = '';
+		/** @var mixed */
+		public $post_status = 'publish';
+		/** @var mixed */
+		public $comment_status = 'open';
+		/** @var mixed */
+		public $ping_status = 'open';
+		/** @var mixed */
+		public $post_password = '';
+		/** @var mixed */
+		public $post_name = '';
+		/** @var mixed */
+		public $to_ping = '';
+		/** @var mixed */
+		public $pinged = '';
+		/** @var mixed */
+		public $post_modified = '';
+		/** @var mixed */
+		public $post_modified_gmt = '';
+		/** @var mixed */
+		public $post_content_filtered = '';
+		/** @var mixed */
+		public $post_parent = 0;
+		/** @var mixed */
+		public $guid = '';
+		/** @var mixed */
+		public $menu_order = 0;
+		/** @var mixed */
+		public $post_type = 'post';
+		/** @var mixed */
+		public $post_mime_type = '';
+		/** @var mixed */
+		public $comment_count = '0';
+		/** @var mixed */
+		public $filter = 'raw';
+
+		/**
+		 * Constructor.
+		 *
+		 * @param object|array|null $post Post data.
+		 */
+		public function __construct( object|array|null $post = null ) {
+			if ( is_object( $post ) ) {
+				foreach ( get_object_vars( $post ) as $key => $value ) {
+					$this->$key = $value;
+				}
+			} elseif ( is_array( $post ) ) {
+				foreach ( $post as $key => $value ) {
+					$this->$key = $value;
+				}
+			}
+		}
+	}
+}
+
+// Define WP_REST_Server class for unit tests if not already defined.
+if ( ! class_exists( 'WP_REST_Server' ) ) {
+	/**
+	 * Minimal WP_REST_Server implementation for unit tests.
+	 */
+	class WP_REST_Server {
+		/**
+		 * HTTP method constants.
+		 */
+		public const READABLE   = 'GET';
+		public const CREATABLE  = 'POST';
+		public const EDITABLE   = 'POST, PUT, PATCH';
+		public const DELETABLE  = 'DELETE';
+		public const ALLMETHODS = 'GET, POST, PUT, PATCH, DELETE';
+	}
+}
+
+// Define WP_Term class for unit tests if not already defined.
+if ( ! class_exists( 'WP_Term' ) ) {
+	/**
+	 * Minimal WP_Term implementation for unit tests.
+	 */
+	class WP_Term {
+		/** @var mixed */
+		public $term_id = 0;
+		/** @var mixed */
+		public $name = '';
+		/** @var mixed */
+		public $slug = '';
+		/** @var mixed */
+		public $term_group = 0;
+		/** @var mixed */
+		public $term_taxonomy_id = 0;
+		/** @var mixed */
+		public $taxonomy = '';
+		/** @var mixed */
+		public $description = '';
+		/** @var mixed */
+		public $parent = 0;
+		/** @var mixed */
+		public $count = 0;
+		/** @var mixed */
+		public $filter = 'raw';
+
+		/**
+		 * Constructor.
+		 *
+		 * @param object|array|null $term Term data.
+		 */
+		public function __construct( object|array|null $term = null ) {
+			if ( is_object( $term ) ) {
+				foreach ( get_object_vars( $term ) as $key => $value ) {
+					$this->$key = $value;
+				}
+			} elseif ( is_array( $term ) ) {
+				foreach ( $term as $key => $value ) {
+					$this->$key = $value;
+				}
+			}
+		}
+	}
+}
+
+// Load helper functions for testing.
+require_once dirname(__DIR__, 2) . '/includes/module-functions.php';
+
 // Load test case base class.
 require_once __DIR__ . '/UnitTestCase.php';

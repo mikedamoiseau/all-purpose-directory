@@ -66,6 +66,7 @@ $base_url = get_post_type_archive_link( 'apd_listing' );
 				<a
 					href="<?php echo esc_url( $remove_url ); ?>"
 					class="apd-active-filters__remove"
+					<?php /* translators: %s: Filter label (e.g., Category, Tag, Keyword) */ ?>
 					aria-label="<?php echo esc_attr( sprintf( __( 'Remove %s filter', 'all-purpose-directory' ), $filter->getLabel() ) ); ?>"
 				>
 					<span aria-hidden="true">&times;</span>

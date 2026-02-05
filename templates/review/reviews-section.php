@@ -25,6 +25,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// Set default values for args to prevent undefined array key warnings.
+$args = wp_parse_args(
+	$args ?? [],
+	[
+		'per_page'        => 10,
+		'show_summary'    => true,
+		'show_form'       => true,
+		'show_pagination' => true,
+	]
+);
+
 $display = \APD\Review\ReviewDisplay::get_instance();
 ?>
 

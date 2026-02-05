@@ -53,7 +53,7 @@ class MyListings {
 	 *
 	 * @var array<string>
 	 */
-	private const VALID_ORDERBY = [ 'date', 'title', 'views' ];
+	private const VALID_ORDERBY = [ 'date', 'title', 'views', 'inquiries' ];
 
 	/**
 	 * Current user ID.
@@ -75,10 +75,11 @@ class MyListings {
 	 * @var array<string, mixed>
 	 */
 	private const DEFAULTS = [
-		'per_page'      => self::PER_PAGE,
-		'show_views'    => true,
-		'show_date'     => true,
+		'per_page'       => self::PER_PAGE,
+		'show_views'     => true,
+		'show_date'      => true,
 		'show_thumbnail' => true,
+		'show_inquiries' => true,
 	];
 
 	/**
@@ -247,6 +248,9 @@ class MyListings {
 		if ( $args['orderby'] === 'views' ) {
 			$query_args['meta_key'] = '_apd_views_count';
 			$query_args['orderby']  = 'meta_value_num';
+		} elseif ( $args['orderby'] === 'inquiries' ) {
+			$query_args['meta_key'] = \APD\Contact\InquiryTracker::LISTING_INQUIRY_COUNT;
+			$query_args['orderby']  = 'meta_value_num';
 		} else {
 			$query_args['orderby'] = $args['orderby'];
 		}
@@ -371,10 +375,24 @@ class MyListings {
 	 */
 	public function get_orderby_options(): array {
 		return [
-			'date'  => __( 'Date', 'all-purpose-directory' ),
-			'title' => __( 'Title', 'all-purpose-directory' ),
-			'views' => __( 'Views', 'all-purpose-directory' ),
+			'date'      => __( 'Date', 'all-purpose-directory' ),
+			'title'     => __( 'Title', 'all-purpose-directory' ),
+			'views'     => __( 'Views', 'all-purpose-directory' ),
+			'inquiries' => __( 'Inquiries', 'all-purpose-directory' ),
 		];
+	}
+
+	/**
+	 * Get the inquiry count for a listing.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int $listing_id Listing post ID.
+	 * @return int Inquiry count.
+	 */
+	public function get_listing_inquiry_count( int $listing_id ): int {
+		$tracker = \APD\Contact\InquiryTracker::get_instance();
+		return $tracker->get_listing_inquiry_count( $listing_id );
 	}
 
 	/**

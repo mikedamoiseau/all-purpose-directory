@@ -92,7 +92,10 @@ if ( $end_page - $start_page < 4 ) {
 				<?php else : ?>
 					<a href="<?php echo esc_url( $display->build_pagination_url( $base_url, $page ) . '#reviews' ); ?>"
 					   class="apd-reviews-pagination__link apd-reviews-pagination__link--number"
-					   aria-label="<?php printf( esc_attr__( 'Page %d', 'all-purpose-directory' ), $page ); ?>">
+					   aria-label="<?php
+						   /* translators: %d: Page number */
+						   echo esc_attr( sprintf( __( 'Page %d', 'all-purpose-directory' ), $page ) );
+					   ?>">
 						<?php echo esc_html( $page ); ?>
 					</a>
 				<?php endif; ?>
@@ -109,7 +112,10 @@ if ( $end_page - $start_page < 4 ) {
 			<li class="apd-reviews-pagination__item">
 				<a href="<?php echo esc_url( $display->build_pagination_url( $base_url, $total_pages ) . '#reviews' ); ?>"
 				   class="apd-reviews-pagination__link apd-reviews-pagination__link--number"
-				   aria-label="<?php printf( esc_attr__( 'Page %d', 'all-purpose-directory' ), $total_pages ); ?>">
+				   aria-label="<?php
+					   /* translators: %d: Page number */
+					   echo esc_attr( sprintf( __( 'Page %d', 'all-purpose-directory' ), $total_pages ) );
+				   ?>">
 					<?php echo esc_html( $total_pages ); ?>
 				</a>
 			</li>

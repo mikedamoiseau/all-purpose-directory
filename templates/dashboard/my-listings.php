@@ -126,6 +126,9 @@ $message = $my_listings->get_message();
 						<?php if ( $config['show_views'] ) : ?>
 							<th class="apd-my-listings__col-views" scope="col"><?php esc_html_e( 'Views', 'all-purpose-directory' ); ?></th>
 						<?php endif; ?>
+						<?php if ( $config['show_inquiries'] ) : ?>
+							<th class="apd-my-listings__col-inquiries" scope="col"><?php esc_html_e( 'Inquiries', 'all-purpose-directory' ); ?></th>
+						<?php endif; ?>
 						<?php if ( $config['show_date'] ) : ?>
 							<th class="apd-my-listings__col-date" scope="col"><?php esc_html_e( 'Date', 'all-purpose-directory' ); ?></th>
 						<?php endif; ?>

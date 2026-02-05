@@ -195,6 +195,7 @@ class Assets {
                 'addFavorite'    => __( 'Add to favorites', 'all-purpose-directory' ),
                 'removeFavorite' => __( 'Remove from favorites', 'all-purpose-directory' ),
                 'filtering'      => __( 'Filtering listings...', 'all-purpose-directory' ),
+                /* translators: %d: Number of listings found */
                 'resultsFound'   => __( '%d listings found', 'all-purpose-directory' ),
                 'oneResultFound' => __( '1 listing found', 'all-purpose-directory' ),
             ],

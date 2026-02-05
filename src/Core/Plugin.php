@@ -113,6 +113,12 @@ final class Plugin {
      * @return void
      */
     private function init_hooks(): void {
+        // Load text domain for translations (early priority).
+        add_action( 'init', [ $this, 'load_textdomain' ], 0 );
+
+        // Initialize module registry (priority 1, after text domain).
+        add_action( 'init', [ $this, 'init_modules' ], 1 );
+
         // Register post types and taxonomies.
         add_action( 'init', [ $this, 'register_post_types' ], 5 );
         add_action( 'init', [ $this, 'register_taxonomies' ], 5 );
@@ -199,12 +205,87 @@ final class Plugin {
         $contact_handler = \APD\Contact\ContactHandler::get_instance();
         $contact_handler->init();
 
+        // Initialize Inquiry Tracker for logging contact inquiries.
+        $inquiry_tracker = \APD\Contact\InquiryTracker::get_instance();
+        $inquiry_tracker->init();
+
+        // Initialize Email Manager for notifications.
+        $email_manager = \APD\Email\EmailManager::get_instance();
+        $email_manager->init();
+
+        // Initialize Admin Settings page.
+        $settings = \APD\Admin\Settings::get_instance();
+        $settings->init();
+
+        // Initialize Modules admin page.
+        $modules_page = \APD\Module\ModulesAdminPage::get_instance();
+        $modules_page->init();
+
+        // Initialize Demo Data page (admin only).
+        $demo_data_page = \APD\Admin\DemoData\DemoDataPage::get_instance();
+        $demo_data_page->init();
+
+        // Initialize REST API controller.
+        $rest_controller = \APD\Api\RestController::get_instance();
+        $rest_controller->init();
+
+        // Register REST API endpoints.
+        add_action( 'apd_register_rest_routes', [ $this, 'register_rest_endpoints' ] );
+
+        // Initialize Performance manager for caching.
+        Performance::get_instance();
+
         /**
          * Fires after plugin hooks are initialized.
          *
          * @since 1.0.0
          */
         do_action( 'apd_loaded' );
+    }
+
+    /**
+     * Register post types.
+     *
+     * @return void
+     */
+    /**
+     * Load plugin text domain for translations.
+     *
+     * Loads translations from:
+     * 1. WP_LANG_DIR/plugins/all-purpose-directory-{locale}.mo (global)
+     * 2. plugin/languages/all-purpose-directory-{locale}.mo (plugin)
+     *
+     * @since 1.0.0
+     *
+     * @return void
+     */
+    public function load_textdomain(): void {
+        load_plugin_textdomain(
+            'all-purpose-directory',
+            false,
+            dirname( APD_PLUGIN_BASENAME ) . '/languages'
+        );
+
+        /**
+         * Fires after the plugin text domain is loaded.
+         *
+         * @since 1.0.0
+         */
+        do_action( 'apd_textdomain_loaded' );
+    }
+
+    /**
+     * Initialize the module registry.
+     *
+     * Fires the apd_modules_init action allowing external modules to register.
+     *
+     * @since 1.0.0
+     *
+     * @return void
+     */
+    public function init_modules(): void {
+        $module_registry = \APD\Module\ModuleRegistry::get_instance();
+        $module_registry->init();
     }
 
     /**
@@ -567,5 +648,45 @@ final class Plugin {
             <?php endif; ?>
         </article>
         <?php
+    }
+
+    /**
+     * Register REST API endpoints.
+     *
+     * @since 1.0.0
+     *
+     * @param \APD\Api\RestController $controller REST controller instance.
+     * @return void
+     */
+    public function register_rest_endpoints( \APD\Api\RestController $controller ): void {
+        // Register Listings endpoint.
+        $controller->register_endpoint(
+            'listings',
+            new \APD\Api\Endpoints\ListingsEndpoint( $controller )
+        );
+
+        // Register Taxonomies endpoint.
+        $controller->register_endpoint(
+            'taxonomies',
+            new \APD\Api\Endpoints\TaxonomiesEndpoint( $controller )
+        );
+
+        // Register Favorites endpoint.
+        $controller->register_endpoint(
+            'favorites',
+            new \APD\Api\Endpoints\FavoritesEndpoint( $controller )
+        );
+
+        // Register Reviews endpoint.
+        $controller->register_endpoint(
+            'reviews',
+            new \APD\Api\Endpoints\ReviewsEndpoint( $controller )
+        );
+
+        // Register Inquiries endpoint.
+        $controller->register_endpoint(
+            'inquiries',
+            new \APD\Api\Endpoints\InquiriesEndpoint( $controller )
+        );
     }
 }

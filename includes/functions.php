@@ -1238,7 +1238,8 @@ function apd_get_related_listings( int $listing_id, int $limit = 4, array $args 
         'post__not_in'        => [ $listing_id ],
         'ignore_sticky_posts' => true,
         'orderby'             => 'rand',
-        'tax_query'           => $tax_query,
+        'tax_query'           => $tax_query, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+        'no_found_rows'       => true, // Performance: skip counting total rows.
     ];
 
     $query_args = wp_parse_args( $args, $defaults );
@@ -3715,4 +3716,967 @@ function apd_send_contact_email( int $listing_id, array $data, array $config = [
 
     $handler = apd_contact_handler( $config );
     return $handler->send_email( $data, $listing, $owner );
+}
+
+// =============================================================================
+// Inquiry Tracker Functions
+// =============================================================================
+
+/**
+ * Get the InquiryTracker instance.
+ *
+ * @since 1.0.0
+ *
+ * @return \APD\Contact\InquiryTracker InquiryTracker instance.
+ */
+function apd_inquiry_tracker(): \APD\Contact\InquiryTracker {
+    return \APD\Contact\InquiryTracker::get_instance();
+}
+
+/**
+ * Log an inquiry from contact form data.
+ *
+ * @since 1.0.0
+ *
+ * @param array    $data    Form data.
+ * @param \WP_Post $listing Listing post.
+ * @param \WP_User $owner   Listing owner.
+ * @return int|false Inquiry ID on success, false on failure.
+ */
+function apd_log_inquiry( array $data, \WP_Post $listing, \WP_User $owner ): int|false {
+    return apd_inquiry_tracker()->log_inquiry( $data, $listing, $owner );
+}
+
+/**
+ * Save an inquiry to the database.
+ *
+ * @since 1.0.0
+ *
+ * @param array $data Inquiry data (listing_id, sender_name, sender_email, sender_phone, subject, message).
+ * @return int|false Inquiry ID on success, false on failure.
+ */
+function apd_save_inquiry( array $data ): int|false {
+    return apd_inquiry_tracker()->save_inquiry( $data );
+}
+
+/**
+ * Get a single inquiry by ID.
+ *
+ * @since 1.0.0
+ *
+ * @param int $inquiry_id Inquiry ID.
+ * @return array|null Inquiry data or null if not found.
+ */
+function apd_get_inquiry( int $inquiry_id ): ?array {
+    return apd_inquiry_tracker()->get_inquiry( $inquiry_id );
+}
+
+/**
+ * Get inquiries for a listing.
+ *
+ * @since 1.0.0
+ *
+ * @param int   $listing_id Listing ID.
+ * @param array $args       Query arguments (number, offset, orderby, order, status).
+ * @return array Array of inquiry data.
+ */
+function apd_get_listing_inquiries( int $listing_id, array $args = [] ): array {
+    return apd_inquiry_tracker()->get_listing_inquiries( $listing_id, $args );
+}
+
+/**
+ * Get inquiries for a user (all their listings).
+ *
+ * @since 1.0.0
+ *
+ * @param int   $user_id User ID. Defaults to current user.
+ * @param array $args    Query arguments (number, offset, orderby, order, status, listing_id).
+ * @return array Array of inquiry data.
+ */
+function apd_get_user_inquiries( int $user_id = 0, array $args = [] ): array {
+    if ( $user_id <= 0 ) {
+        $user_id = get_current_user_id();
+    }
+    return apd_inquiry_tracker()->get_user_inquiries( $user_id, $args );
+}
+
+/**
+ * Get inquiry count for a listing.
+ *
+ * @since 1.0.0
+ *
+ * @param int $listing_id Listing ID.
+ * @return int Inquiry count.
+ */
+function apd_get_listing_inquiry_count( int $listing_id ): int {
+    return apd_inquiry_tracker()->get_listing_inquiry_count( $listing_id );
+}
+
+/**
+ * Get inquiry count for a user.
+ *
+ * @since 1.0.0
+ *
+ * @param int    $user_id User ID. Defaults to current user.
+ * @param string $status  Status filter (all, read, unread).
+ * @return int Inquiry count.
+ */
+function apd_get_user_inquiry_count( int $user_id = 0, string $status = 'all' ): int {
+    if ( $user_id <= 0 ) {
+        $user_id = get_current_user_id();
+    }
+    return apd_inquiry_tracker()->count_user_inquiries( $user_id, $status );
+}
+
+/**
+ * Mark an inquiry as read.
+ *
+ * @since 1.0.0
+ *
+ * @param int $inquiry_id Inquiry ID.
+ * @return bool True on success.
+ */
+function apd_mark_inquiry_read( int $inquiry_id ): bool {
+    return apd_inquiry_tracker()->mark_as_read( $inquiry_id );
+}
+
+/**
+ * Mark an inquiry as unread.
+ *
+ * @since 1.0.0
+ *
+ * @param int $inquiry_id Inquiry ID.
+ * @return bool True on success.
+ */
+function apd_mark_inquiry_unread( int $inquiry_id ): bool {
+    return apd_inquiry_tracker()->mark_as_unread( $inquiry_id );
+}
+
+/**
+ * Delete an inquiry.
+ *
+ * @since 1.0.0
+ *
+ * @param int  $inquiry_id   Inquiry ID.
+ * @param bool $force_delete Whether to bypass trash.
+ * @return bool True on success.
+ */
+function apd_delete_inquiry( int $inquiry_id, bool $force_delete = false ): bool {
+    return apd_inquiry_tracker()->delete_inquiry( $inquiry_id, $force_delete );
+}
+
+/**
+ * Check if a user can view an inquiry.
+ *
+ * @since 1.0.0
+ *
+ * @param int $inquiry_id Inquiry ID.
+ * @param int $user_id    User ID. Defaults to current user.
+ * @return bool True if user can view.
+ */
+function apd_can_view_inquiry( int $inquiry_id, int $user_id = 0 ): bool {
+    if ( $user_id <= 0 ) {
+        $user_id = get_current_user_id();
+    }
+    return apd_inquiry_tracker()->can_user_view( $inquiry_id, $user_id );
+}
+
+/**
+ * Recalculate inquiry count for a listing.
+ *
+ * @since 1.0.0
+ *
+ * @param int $listing_id Listing ID.
+ * @return int Recalculated count.
+ */
+function apd_recalculate_listing_inquiry_count( int $listing_id ): int {
+    return apd_inquiry_tracker()->recalculate_listing_count( $listing_id );
+}
+
+// -----------------------------------------------------------------------------
+// Email Manager Functions
+// -----------------------------------------------------------------------------
+
+/**
+ * Get the EmailManager instance.
+ *
+ * @since 1.0.0
+ *
+ * @return \APD\Email\EmailManager
+ */
+function apd_email_manager(): \APD\Email\EmailManager {
+    return \APD\Email\EmailManager::get_instance();
+}
+
+/**
+ * Send an email using the EmailManager.
+ *
+ * @since 1.0.0
+ *
+ * @param string $to          Recipient email address.
+ * @param string $subject     Email subject (supports placeholders).
+ * @param string $message     Email body (supports placeholders).
+ * @param array  $headers     Optional. Additional headers.
+ * @param array  $context     Optional. Placeholder context data.
+ * @param array  $attachments Optional. File attachments.
+ * @return bool True if email was sent successfully.
+ */
+function apd_send_email(
+    string $to,
+    string $subject,
+    string $message,
+    array $headers = [],
+    array $context = [],
+    array $attachments = []
+): bool {
+    return apd_email_manager()->send( $to, $subject, $message, $headers, $context, $attachments );
+}
+
+/**
+ * Send a listing submitted notification to admin.
+ *
+ * @since 1.0.0
+ *
+ * @param int $listing_id Listing ID.
+ * @return bool True if email was sent successfully.
+ */
+function apd_send_listing_submitted_email( int $listing_id ): bool {
+    return apd_email_manager()->send_listing_submitted( $listing_id );
+}
+
+/**
+ * Send a listing approved notification to author.
+ *
+ * @since 1.0.0
+ *
+ * @param int $listing_id Listing ID.
+ * @return bool True if email was sent successfully.
+ */
+function apd_send_listing_approved_email( int $listing_id ): bool {
+    return apd_email_manager()->send_listing_approved( $listing_id );
+}
+
+/**
+ * Send a listing rejected notification to author.
+ *
+ * @since 1.0.0
+ *
+ * @param int    $listing_id Listing ID.
+ * @param string $reason     Optional rejection reason.
+ * @return bool True if email was sent successfully.
+ */
+function apd_send_listing_rejected_email( int $listing_id, string $reason = '' ): bool {
+    return apd_email_manager()->send_listing_rejected( $listing_id, $reason );
+}
+
+/**
+ * Send a listing expiring soon notification to author.
+ *
+ * @since 1.0.0
+ *
+ * @param int $listing_id Listing ID.
+ * @param int $days_left  Days until expiration.
+ * @return bool True if email was sent successfully.
+ */
+function apd_send_listing_expiring_email( int $listing_id, int $days_left = 7 ): bool {
+    return apd_email_manager()->send_listing_expiring( $listing_id, $days_left );
+}
+
+/**
+ * Send a listing expired notification to author.
+ *
+ * @since 1.0.0
+ *
+ * @param int $listing_id Listing ID.
+ * @return bool True if email was sent successfully.
+ */
+function apd_send_listing_expired_email( int $listing_id ): bool {
+    return apd_email_manager()->send_listing_expired( $listing_id );
+}
+
+/**
+ * Send a new review notification to listing author.
+ *
+ * @since 1.0.0
+ *
+ * @param int $review_id Review comment ID.
+ * @return bool True if email was sent successfully.
+ */
+function apd_send_new_review_email( int $review_id ): bool {
+    return apd_email_manager()->send_new_review( $review_id );
+}
+
+/**
+ * Send a new inquiry notification to listing author.
+ *
+ * @since 1.0.0
+ *
+ * @param int   $listing_id Listing ID.
+ * @param array $inquiry    Inquiry data (name, email, phone, message).
+ * @return bool True if email was sent successfully.
+ */
+function apd_send_new_inquiry_email( int $listing_id, array $inquiry ): bool {
+    return apd_email_manager()->send_new_inquiry( $listing_id, $inquiry );
+}
+
+/**
+ * Check if an email notification type is enabled.
+ *
+ * @since 1.0.0
+ *
+ * @param string $type Notification type.
+ * @return bool True if enabled.
+ */
+function apd_is_email_notification_enabled( string $type ): bool {
+    return apd_email_manager()->is_notification_enabled( $type );
+}
+
+/**
+ * Enable or disable an email notification type.
+ *
+ * @since 1.0.0
+ *
+ * @param string $type    Notification type.
+ * @param bool   $enabled Whether to enable.
+ * @return void
+ */
+function apd_set_email_notification_enabled( string $type, bool $enabled ): void {
+    apd_email_manager()->set_notification_enabled( $type, $enabled );
+}
+
+/**
+ * Register a custom email placeholder.
+ *
+ * @since 1.0.0
+ *
+ * @param string   $name     Placeholder name (without braces).
+ * @param callable $callback Callback that returns the replacement value.
+ * @return void
+ */
+function apd_register_email_placeholder( string $name, callable $callback ): void {
+    apd_email_manager()->register_placeholder( $name, $callback );
+}
+
+/**
+ * Replace placeholders in text using the EmailManager.
+ *
+ * @since 1.0.0
+ *
+ * @param string $text    Text containing placeholders.
+ * @param array  $context Additional context data.
+ * @return string Processed text.
+ */
+function apd_replace_email_placeholders( string $text, array $context = [] ): string {
+    return apd_email_manager()->replace_placeholders( $text, $context );
+}
+
+/**
+ * Get listing context for email placeholders.
+ *
+ * @since 1.0.0
+ *
+ * @param int|\WP_Post $listing Listing ID or post object.
+ * @return array Context array with listing data.
+ */
+function apd_get_email_listing_context( int|\WP_Post $listing ): array {
+    return apd_email_manager()->get_listing_context( $listing );
+}
+
+/**
+ * Get user context for email placeholders.
+ *
+ * @since 1.0.0
+ *
+ * @param int|\WP_User $user User ID or object.
+ * @return array Context array with user data.
+ */
+function apd_get_email_user_context( int|\WP_User $user ): array {
+    return apd_email_manager()->get_user_context( $user );
+}
+
+/**
+ * Get review context for email placeholders.
+ *
+ * @since 1.0.0
+ *
+ * @param int|\WP_Comment $review Review ID or comment object.
+ * @return array Context array with review data.
+ */
+function apd_get_email_review_context( int|\WP_Comment $review ): array {
+    return apd_email_manager()->get_review_context( $review );
+}
+
+/**
+ * Get the admin email for notifications.
+ *
+ * @since 1.0.0
+ *
+ * @return string Admin email address.
+ */
+function apd_get_notification_admin_email(): string {
+    return apd_email_manager()->get_admin_email();
+}
+
+/**
+ * Get the from name for emails.
+ *
+ * @since 1.0.0
+ *
+ * @return string From name.
+ */
+function apd_get_email_from_name(): string {
+    return apd_email_manager()->get_from_name();
+}
+
+/**
+ * Get the from email for emails.
+ *
+ * @since 1.0.0
+ *
+ * @return string From email address.
+ */
+function apd_get_email_from_email(): string {
+    return apd_email_manager()->get_from_email();
+}
+
+// =============================================================================
+// Admin Settings Functions
+// =============================================================================
+
+/**
+ * Get the Settings instance.
+ *
+ * @since 1.0.0
+ *
+ * @return \APD\Admin\Settings
+ */
+function apd_settings(): \APD\Admin\Settings {
+    return \APD\Admin\Settings::get_instance();
+}
+
+/**
+ * Get a single setting value.
+ *
+ * @since 1.0.0
+ *
+ * @param string $key     Setting key.
+ * @param mixed  $default Default value if not set.
+ * @return mixed
+ */
+function apd_get_setting( string $key, mixed $default = null ): mixed {
+    return apd_settings()->get( $key, $default );
+}
+
+/**
+ * Update a single setting value.
+ *
+ * @since 1.0.0
+ *
+ * @param string $key   Setting key.
+ * @param mixed  $value Setting value.
+ * @return bool True if updated, false otherwise.
+ */
+function apd_set_setting( string $key, mixed $value ): bool {
+    return apd_settings()->set( $key, $value );
+}
+
+/**
+ * Get all settings with defaults applied.
+ *
+ * @since 1.0.0
+ *
+ * @return array<string, mixed> All settings.
+ */
+function apd_get_all_settings(): array {
+    return apd_settings()->get_all();
+}
+
+/**
+ * Get the default settings.
+ *
+ * @since 1.0.0
+ *
+ * @return array<string, mixed> Default settings.
+ */
+function apd_get_default_settings(): array {
+    return apd_settings()->get_defaults();
+}
+
+/**
+ * Get the settings page URL.
+ *
+ * @since 1.0.0
+ *
+ * @param string $tab Optional tab to link to.
+ * @return string Settings page URL.
+ */
+function apd_get_settings_url( string $tab = '' ): string {
+    return apd_settings()->get_settings_url( $tab );
+}
+
+/**
+ * Check if reviews are enabled.
+ *
+ * @since 1.0.0
+ *
+ * @return bool True if reviews are enabled.
+ */
+function apd_reviews_enabled(): bool {
+    return (bool) apd_get_setting( 'enable_reviews', true );
+}
+
+/**
+ * Check if favorites are enabled.
+ *
+ * @since 1.0.0
+ *
+ * @return bool True if favorites are enabled.
+ */
+function apd_favorites_enabled(): bool {
+    return (bool) apd_get_setting( 'enable_favorites', true );
+}
+
+/**
+ * Check if the contact form is enabled.
+ *
+ * @since 1.0.0
+ *
+ * @return bool True if contact form is enabled.
+ */
+function apd_contact_form_enabled(): bool {
+    return (bool) apd_get_setting( 'enable_contact_form', true );
+}
+
+/**
+ * Get the number of listings per page.
+ *
+ * @since 1.0.0
+ *
+ * @return int Number of listings per page.
+ */
+function apd_get_listings_per_page(): int {
+    return (int) apd_get_setting( 'listings_per_page', 12 );
+}
+
+/**
+ * Get the default listing view.
+ *
+ * @since 1.0.0
+ *
+ * @return string View type (grid or list).
+ */
+function apd_get_default_view(): string {
+    return apd_get_setting( 'default_view', 'grid' );
+}
+
+/**
+ * Get the number of grid columns.
+ *
+ * @since 1.0.0
+ *
+ * @return int Number of columns (2-4).
+ */
+function apd_get_default_grid_columns(): int {
+    return (int) apd_get_setting( 'grid_columns', 3 );
+}
+
+/**
+ * Get the currency symbol.
+ *
+ * @since 1.0.0
+ *
+ * @return string Currency symbol.
+ */
+function apd_get_currency_symbol(): string {
+    return apd_get_setting( 'currency_symbol', '$' );
+}
+
+/**
+ * Get the currency position.
+ *
+ * @since 1.0.0
+ *
+ * @return string Currency position (before or after).
+ */
+function apd_get_currency_position(): string {
+    return apd_get_setting( 'currency_position', 'before' );
+}
+
+/**
+ * Format a price with currency symbol.
+ *
+ * @since 1.0.0
+ *
+ * @param float|int|string $amount Amount to format.
+ * @return string Formatted price with currency.
+ */
+function apd_format_price( float|int|string $amount ): string {
+    $symbol   = apd_get_currency_symbol();
+    $position = apd_get_currency_position();
+    $amount   = number_format( (float) $amount, 2 );
+
+    if ( $position === 'after' ) {
+        return $amount . $symbol;
+    }
+
+    return $symbol . $amount;
+}
+
+/**
+ * Get the distance unit.
+ *
+ * @since 1.0.0
+ *
+ * @return string Distance unit (km or miles).
+ */
+function apd_get_distance_unit(): string {
+    return apd_get_setting( 'distance_unit', 'km' );
+}
+
+/**
+ * Check if debug mode is enabled.
+ *
+ * @since 1.0.0
+ *
+ * @return bool True if debug mode is enabled.
+ */
+function apd_is_debug_mode(): bool {
+    return (bool) apd_get_setting( 'debug_mode', false );
+}
+
+/**
+ * Log a debug message if debug mode is enabled.
+ *
+ * @since 1.0.0
+ *
+ * @param string $message Message to log.
+ * @param array  $context Optional context data.
+ * @return void
+ */
+function apd_debug_log( string $message, array $context = [] ): void {
+    if ( ! apd_is_debug_mode() ) {
+        return;
+    }
+
+    $log_message = '[APD Debug] ' . $message;
+
+    if ( ! empty( $context ) ) {
+        $log_message .= ' | Context: ' . wp_json_encode( $context );
+    }
+
+    // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+    error_log( $log_message );
+}
+
+// =============================================================================
+// REST API Functions
+// =============================================================================
+
+/**
+ * Get the REST API controller instance.
+ *
+ * @since 1.0.0
+ *
+ * @return \APD\Api\RestController
+ */
+function apd_rest_controller(): \APD\Api\RestController {
+    return \APD\Api\RestController::get_instance();
+}
+
+/**
+ * Get the REST API namespace.
+ *
+ * @since 1.0.0
+ *
+ * @return string The namespace (e.g., 'apd/v1').
+ */
+function apd_get_rest_namespace(): string {
+    return \APD\Api\RestController::NAMESPACE;
+}
+
+/**
+ * Get a REST API URL for an endpoint.
+ *
+ * Builds a full URL to a REST API endpoint using the plugin's namespace.
+ *
+ * @since 1.0.0
+ *
+ * @param string $route Endpoint route (without namespace).
+ * @return string Full REST URL.
+ */
+function apd_get_rest_url( string $route = '' ): string {
+    return apd_rest_controller()->get_rest_url( $route );
+}
+
+/**
+ * Register a REST API endpoint controller.
+ *
+ * Registers an endpoint controller that will have its register_routes()
+ * method called when the REST API is initialized.
+ *
+ * @since 1.0.0
+ *
+ * @param string $name     Unique endpoint identifier.
+ * @param object $endpoint Endpoint controller instance.
+ * @return void
+ */
+function apd_register_rest_endpoint( string $name, object $endpoint ): void {
+    apd_rest_controller()->register_endpoint( $name, $endpoint );
+}
+
+/**
+ * Unregister a REST API endpoint controller.
+ *
+ * @since 1.0.0
+ *
+ * @param string $name Endpoint identifier to remove.
+ * @return bool True if removed, false if not found.
+ */
+function apd_unregister_rest_endpoint( string $name ): bool {
+    return apd_rest_controller()->unregister_endpoint( $name );
+}
+
+/**
+ * Check if a REST API endpoint is registered.
+ *
+ * @since 1.0.0
+ *
+ * @param string $name Endpoint identifier.
+ * @return bool True if registered, false otherwise.
+ */
+function apd_has_rest_endpoint( string $name ): bool {
+    return apd_rest_controller()->has_endpoint( $name );
+}
+
+/**
+ * Get a registered REST API endpoint controller.
+ *
+ * @since 1.0.0
+ *
+ * @param string $name Endpoint identifier.
+ * @return object|null Endpoint controller or null if not found.
+ */
+function apd_get_rest_endpoint( string $name ): ?object {
+    return apd_rest_controller()->get_endpoint( $name );
+}
+
+/**
+ * Create a standardized REST API response.
+ *
+ * Helper function to create consistent API responses across endpoints.
+ *
+ * @since 1.0.0
+ *
+ * @param mixed $data    Response data.
+ * @param int   $status  HTTP status code. Default 200.
+ * @param array $headers Optional additional headers.
+ * @return \WP_REST_Response
+ */
+function apd_rest_response( mixed $data, int $status = 200, array $headers = [] ): \WP_REST_Response {
+    return apd_rest_controller()->create_response( $data, $status, $headers );
+}
+
+/**
+ * Create a standardized REST API error response.
+ *
+ * Helper function to create consistent error responses across endpoints.
+ *
+ * @since 1.0.0
+ *
+ * @param string $code    Error code.
+ * @param string $message Error message.
+ * @param int    $status  HTTP status code. Default 400.
+ * @param array  $data    Optional additional error data.
+ * @return \WP_Error
+ */
+function apd_rest_error( string $code, string $message, int $status = 400, array $data = [] ): \WP_Error {
+    return apd_rest_controller()->create_error( $code, $message, $status, $data );
+}
+
+/**
+ * Create a paginated REST API response.
+ *
+ * Creates a response with pagination metadata and headers.
+ *
+ * @since 1.0.0
+ *
+ * @param array $items      Items for the current page.
+ * @param int   $total      Total number of items.
+ * @param int   $page       Current page number.
+ * @param int   $per_page   Items per page.
+ * @param array $extra_data Optional additional data to include.
+ * @return \WP_REST_Response
+ */
+function apd_rest_paginated_response(
+    array $items,
+    int $total,
+    int $page,
+    int $per_page,
+    array $extra_data = []
+): \WP_REST_Response {
+    return apd_rest_controller()->create_paginated_response(
+        $items,
+        $total,
+        $page,
+        $per_page,
+        $extra_data
+    );
+}
+
+// ============================================================================
+// Performance Functions
+// ============================================================================
+
+/**
+ * Get the Performance instance.
+ *
+ * @since 1.0.0
+ *
+ * @return \APD\Core\Performance
+ */
+function apd_performance(): \APD\Core\Performance {
+    return \APD\Core\Performance::get_instance();
+}
+
+/**
+ * Get a cached value or compute and cache it.
+ *
+ * This is the primary caching function. Pass a callback that generates
+ * the value, and it will be cached for subsequent calls.
+ *
+ * @since 1.0.0
+ *
+ * @param string   $key        Cache key.
+ * @param callable $callback   Function to generate value if not cached.
+ * @param int      $expiration Cache expiration in seconds. Default 3600 (1 hour).
+ * @return mixed Cached or generated value.
+ */
+function apd_cache_remember( string $key, callable $callback, int $expiration = HOUR_IN_SECONDS ): mixed {
+    return apd_performance()->remember( $key, $callback, $expiration );
+}
+
+/**
+ * Get a cached value.
+ *
+ * @since 1.0.0
+ *
+ * @param string $key Cache key.
+ * @return mixed|false Cached value or false if not found.
+ */
+function apd_cache_get( string $key ): mixed {
+    return apd_performance()->get( $key );
+}
+
+/**
+ * Set a cached value.
+ *
+ * @since 1.0.0
+ *
+ * @param string $key        Cache key.
+ * @param mixed  $value      Value to cache.
+ * @param int    $expiration Cache expiration in seconds. Default 3600 (1 hour).
+ * @return bool True on success.
+ */
+function apd_cache_set( string $key, mixed $value, int $expiration = HOUR_IN_SECONDS ): bool {
+    return apd_performance()->set( $key, $value, $expiration );
+}
+
+/**
+ * Delete a cached value.
+ *
+ * @since 1.0.0
+ *
+ * @param string $key Cache key.
+ * @return bool True on success.
+ */
+function apd_cache_delete( string $key ): bool {
+    return apd_performance()->delete( $key );
+}
+
+/**
+ * Clear all plugin caches.
+ *
+ * Clears all transients and object cache entries created by the plugin.
+ *
+ * @since 1.0.0
+ *
+ * @return int Number of deleted cache entries.
+ */
+function apd_cache_clear_all(): int {
+    return apd_performance()->clear_all();
+}
+
+/**
+ * Get categories with counts (cached).
+ *
+ * Caches the result of get_terms for category queries to reduce database load.
+ *
+ * @since 1.0.0
+ *
+ * @param array $args Query arguments for get_terms.
+ * @return array Array of WP_Term objects.
+ */
+function apd_get_cached_categories( array $args = [] ): array {
+    return apd_performance()->get_categories_with_counts( $args );
+}
+
+/**
+ * Get related listings (cached).
+ *
+ * Returns listings in the same category as the given listing.
+ * Results are cached to reduce database queries.
+ *
+ * @since 1.0.0
+ *
+ * @param int   $listing_id Listing ID.
+ * @param int   $limit      Number of related listings. Default 4.
+ * @param array $args       Additional query arguments.
+ * @return array Array of WP_Post objects.
+ */
+function apd_get_cached_related_listings( int $listing_id, int $limit = 4, array $args = [] ): array {
+    return apd_performance()->get_related_listings( $listing_id, $limit, $args );
+}
+
+/**
+ * Get dashboard stats (cached).
+ *
+ * Returns user's dashboard statistics including listing counts, views, and favorites.
+ * Results are cached to reduce expensive aggregate queries.
+ *
+ * @since 1.0.0
+ *
+ * @param int $user_id User ID.
+ * @return array Dashboard stats array with keys: listings, views, favorites.
+ */
+function apd_get_cached_dashboard_stats( int $user_id ): array {
+    return apd_performance()->get_dashboard_stats( $user_id );
+}
+
+/**
+ * Get popular listings (cached).
+ *
+ * Returns listings ordered by view count.
+ * Results are cached to reduce database queries.
+ *
+ * @since 1.0.0
+ *
+ * @param int   $limit Number of listings. Default 10.
+ * @param array $args  Additional query arguments.
+ * @return array Array of WP_Post objects.
+ */
+function apd_get_popular_listings( int $limit = 10, array $args = [] ): array {
+    return apd_performance()->get_popular_listings( $limit, $args );
+}
+
+/**
+ * Invalidate category-related caches.
+ *
+ * Call this when category data changes to ensure fresh data.
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
+function apd_invalidate_category_cache(): void {
+    apd_performance()->invalidate_category_cache();
 }

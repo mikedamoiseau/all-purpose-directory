@@ -44,9 +44,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<?php echo esc_html( $tab['label'] ); ?>
 				</span>
 				<?php if ( $has_count && $tab['count'] > 0 ) : ?>
-					<?php
-					/* translators: %d: Number of items in this tab */
-					?>
+					<?php /* translators: %d: Number of items in this tab */ ?>
 					<span class="apd-dashboard-nav__count" aria-label="<?php echo esc_attr( sprintf( __( '%d items', 'all-purpose-directory' ), $tab['count'] ) ); ?>">
 						<?php echo absint( $tab['count'] ); ?>
 					</span>

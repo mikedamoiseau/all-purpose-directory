@@ -4,11 +4,18 @@
  *
  * Renders the contact form for listings.
  *
- * @package suspended suspended suspended All_Purpose_Directory
+ * @package APD\Contact
  * @since 1.0.0
  */
 
+declare(strict_types=1);
+
 namespace APD\Contact;
+
+// Prevent direct file access.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * ContactForm class.

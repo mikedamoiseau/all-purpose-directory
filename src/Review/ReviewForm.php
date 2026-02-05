@@ -414,10 +414,13 @@ class ReviewForm {
 			'reviewUpdated'          => __( 'Your review has been updated.', 'all-purpose-directory' ),
 			'reviewError'            => __( 'Failed to submit review. Please try again.', 'all-purpose-directory' ),
 			'ratingRequired'         => __( 'Please select a rating.', 'all-purpose-directory' ),
+			/* translators: %d: Minimum number of characters required for review */
 			'reviewTooShort'         => __( 'Your review is too short. Please write at least %d characters.', 'all-purpose-directory' ),
 			'reviewPending'          => __( 'Your review has been submitted and is pending approval.', 'all-purpose-directory' ),
 			'selectRating'           => __( 'Select a rating', 'all-purpose-directory' ),
+			/* translators: %d: Star rating number (singular) */
 			'starLabel'              => __( '%d star', 'all-purpose-directory' ),
+			/* translators: %d: Star rating number (plural) */
 			'starsLabel'             => __( '%d stars', 'all-purpose-directory' ),
 		] );
 

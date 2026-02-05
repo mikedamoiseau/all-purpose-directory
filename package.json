@@ -9,11 +9,14 @@
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:report": "playwright show-report",
-    "test:e2e:update-snapshots": "playwright test --update-snapshots"
+    "test:e2e:update-snapshots": "playwright test --update-snapshots",
+    "i18n:pot": "wp-pot --src 'src/**/*.php' --src 'includes/**/*.php' --src 'templates/**/*.php' --src 'all-purpose-directory.php' --dest-file 'languages/all-purpose-directory.pot' --domain 'all-purpose-directory' --package 'All Purpose Directory' --bug-report 'https://github.com/damoiseau/all-purpose-directory/issues' --last-translator 'Michaël Damoiseau <michael@damoiseau.net>' --team 'All Purpose Directory <team@damoiseau.net>'"
   },
   "devDependencies": {
     "@playwright/test": "^1.40.0",
-    "@types/node": "^20.10.0"
+    "@types/node": "^20.10.0",
+    "wp-pot": "^2.0.0",
+    "wp-pot-cli": "^1.5.0"
   },
   "engines": {
     "node": ">=18.0.0"

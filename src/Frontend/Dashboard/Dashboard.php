@@ -224,12 +224,14 @@ class Dashboard {
 		}
 
 		$stats = [
-			'total'     => 0,
-			'published' => 0,
-			'pending'   => 0,
-			'draft'     => 0,
-			'expired'   => 0,
-			'views'     => 0,
+			'total'             => 0,
+			'published'         => 0,
+			'pending'           => 0,
+			'draft'             => 0,
+			'expired'           => 0,
+			'views'             => 0,
+			'inquiries'         => 0,
+			'unread_inquiries'  => 0,
 		];
 
 		// Count listings by status.
@@ -249,6 +251,11 @@ class Dashboard {
 
 		// Get total views.
 		$stats['views'] = $this->get_user_total_views( $user_id );
+
+		// Get inquiry counts.
+		$inquiry_tracker = \APD\Contact\InquiryTracker::get_instance();
+		$stats['inquiries']        = $inquiry_tracker->count_user_inquiries( $user_id, 'all' );
+		$stats['unread_inquiries'] = $inquiry_tracker->count_user_inquiries( $user_id, 'unread' );
 
 		/**
 		 * Filter the user's dashboard statistics.
@@ -270,12 +277,14 @@ class Dashboard {
 	 */
 	private function get_empty_stats(): array {
 		return [
-			'total'     => 0,
-			'published' => 0,
-			'pending'   => 0,
-			'draft'     => 0,
-			'expired'   => 0,
-			'views'     => 0,
+			'total'             => 0,
+			'published'         => 0,
+			'pending'           => 0,
+			'draft'             => 0,
+			'expired'           => 0,
+			'views'             => 0,
+			'inquiries'         => 0,
+			'unread_inquiries'  => 0,
 		];
 	}
 

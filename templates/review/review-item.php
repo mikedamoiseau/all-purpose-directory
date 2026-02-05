@@ -52,6 +52,7 @@ $star_label = $review['rating'] === 1
 						width="48"
 						height="48"
 						loading="lazy"
+						decoding="async"
 						class="apd-review-item__avatar-image">
 				</div>
 			<?php endif; ?>

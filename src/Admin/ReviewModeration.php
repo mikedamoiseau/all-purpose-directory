@@ -319,9 +319,6 @@ final class ReviewModeration {
 			<form method="get" class="apd-reviews-filters">
 				<input type="hidden" name="post_type" value="apd_listing">
 				<input type="hidden" name="page" value="<?php echo esc_attr( self::PAGE_SLUG ); ?>">
-				<?php if ( $current_status !== 'all' ) : ?>
-					<input type="hidden" name="status" value="<?php echo esc_attr( $current_status ); ?>">
-				<?php endif; ?>
 
 				<p class="search-box">
 					<label class="screen-reader-text" for="review-search-input">
@@ -332,9 +329,23 @@ final class ReviewModeration {
 				</p>
 			</form>
 
+			<form method="get" class="apd-reviews-filter-form">
+				<input type="hidden" name="post_type" value="apd_listing">
+				<input type="hidden" name="page" value="<?php echo esc_attr( self::PAGE_SLUG ); ?>">
+				<div class="tablenav apd-filters-nav">
+					<div class="alignleft actions">
+						<?php echo wp_kses( $this->render_status_filter( $current_status ), $this->get_allowed_filter_html() ); ?>
+						<?php echo wp_kses( $this->render_listing_filter( $current_listing ), $this->get_allowed_filter_html() ); ?>
+						<?php echo wp_kses( $this->render_rating_filter( $current_rating ), $this->get_allowed_filter_html() ); ?>
+						<input type="submit" class="button" value="<?php esc_attr_e( 'Filter', 'all-purpose-directory' ); ?>">
+					</div>
+					<br class="clear">
+				</div>
+			</form>
+
 			<form method="post" id="apd-reviews-form">
 				<?php wp_nonce_field( self::NONCE_ACTION, self::NONCE_NAME ); ?>
-				<input type="hidden" name="status" value="<?php echo esc_attr( $current_status ); ?>">
+				<input type="hidden" name="current_status" value="<?php echo esc_attr( $current_status ); ?>">
 
 				<div class="tablenav top">
 					<div class="alignleft actions bulkactions">
@@ -358,12 +369,6 @@ final class ReviewModeration {
 							<?php endif; ?>
 						</select>
 						<input type="submit" id="doaction" class="button action" value="<?php esc_attr_e( 'Apply', 'all-purpose-directory' ); ?>">
-					</div>
-
-					<div class="alignleft actions">
-						<?php echo wp_kses( $this->render_listing_filter( $current_listing ), $this->get_allowed_filter_html() ); ?>
-						<?php echo wp_kses( $this->render_rating_filter( $current_rating ), $this->get_allowed_filter_html() ); ?>
-						<input type="submit" class="button" value="<?php esc_attr_e( 'Filter', 'all-purpose-directory' ); ?>">
 					</div>
 
 					<?php echo wp_kses_post( $this->render_pagination( $paged, $total_pages, $total, 'top' ) ); ?>
@@ -768,6 +773,41 @@ final class ReviewModeration {
 	}
 
 	/**
+	 * Render status filter dropdown.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $current_status Currently selected status.
+	 * @return string HTML for the filter.
+	 */
+	private function render_status_filter( string $current_status ): string {
+		$statuses = [
+			'all'      => __( 'All Statuses', 'all-purpose-directory' ),
+			'pending'  => __( 'Pending', 'all-purpose-directory' ),
+			'approved' => __( 'Approved', 'all-purpose-directory' ),
+			'spam'     => __( 'Spam', 'all-purpose-directory' ),
+			'trash'    => __( 'Trash', 'all-purpose-directory' ),
+		];
+
+		$output = '<label for="filter-by-status" class="screen-reader-text">' .
+			esc_html__( 'Filter by status', 'all-purpose-directory' ) . '</label>';
+		$output .= '<select name="status" id="filter-by-status">';
+
+		foreach ( $statuses as $value => $label ) {
+			$output .= sprintf(
+				'<option value="%s" %s>%s</option>',
+				esc_attr( $value ),
+				selected( $current_status, $value, false ),
+				esc_html( $label )
+			);
+		}
+
+		$output .= '</select>';
+
+		return $output;
+	}
+
+	/**
 	 * Render listing filter dropdown.
 	 *
 	 * @since 1.0.0
@@ -782,6 +822,7 @@ final class ReviewModeration {
 			'orderby'        => 'title',
 			'order'          => 'ASC',
 			'post_status'    => 'any',
+			'no_found_rows'  => true, // Performance: skip counting total rows.
 		] );
 
 		if ( empty( $listings ) ) {
@@ -1096,7 +1137,7 @@ final class ReviewModeration {
 		}
 
 		$message = $this->get_action_message( $action );
-		$status  = isset( $_POST['status'] ) ? sanitize_key( $_POST['status'] ) : 'all';
+		$status  = isset( $_POST['current_status'] ) ? sanitize_key( $_POST['current_status'] ) : 'all';
 
 		$redirect_url = add_query_arg(
 			[

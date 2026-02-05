@@ -64,12 +64,21 @@ final class TemplateLoader {
 	 * Checks if we're on a listing-related page and loads
 	 * the appropriate plugin template if available.
 	 *
+	 * Note: Block themes (FSE) handle their own templates via the Site Editor,
+	 * so we don't override templates for block themes.
+	 *
 	 * @since 1.0.0
 	 *
 	 * @param string $template The path of the template to include.
 	 * @return string The filtered template path.
 	 */
 	public function template_include( string $template ): string {
+		// Block themes (FSE) handle templates differently - don't override.
+		// They use block templates and don't have header.php/footer.php.
+		if ( function_exists( 'wp_is_block_theme' ) && wp_is_block_theme() ) {
+			return $template;
+		}
+
 		// Listing post type archive.
 		if ( is_post_type_archive( 'apd_listing' ) ) {
 			$located = $this->template->locate_template( 'archive-listing.php' );

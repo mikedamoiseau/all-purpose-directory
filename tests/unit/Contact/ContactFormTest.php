@@ -353,7 +353,8 @@ class ContactFormTest extends TestCase {
 		Functions\when( 'get_post' )->justReturn( $post );
 		Functions\when( 'get_userdata' )->justReturn( $user );
 		Functions\when( 'is_email' )->justReturn( true );
-		Functions\when( 'apply_filters' )->returnArg( 1 );
+		// returnArg is 1-indexed: arg 2 is the $value passed to apply_filters.
+		Functions\when( 'apply_filters' )->returnArg( 2 );
 
 		$form = new ContactForm();
 		$this->assertTrue( $form->can_receive_contact( 123 ) );

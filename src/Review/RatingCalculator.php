@@ -281,6 +281,7 @@ class RatingCalculator {
 			'post_status'    => 'any',
 			'posts_per_page' => -1,
 			'fields'         => 'ids',
+			'no_found_rows'  => true, // Performance: skip counting total rows.
 		] );
 
 		$count = 0;

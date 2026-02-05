@@ -32,7 +32,7 @@ $edit_url   = $my_listings->get_edit_url( $listing_id );
 		<td class="apd-listing-row__image">
 			<?php if ( has_post_thumbnail( $listing_id ) ) : ?>
 				<a href="<?php echo esc_url( $edit_url ?: get_permalink( $listing_id ) ); ?>" class="apd-listing-row__thumbnail-link">
-					<?php echo get_the_post_thumbnail( $listing_id, 'thumbnail', [ 'class' => 'apd-listing-row__thumbnail' ] ); ?>
+					<?php echo get_the_post_thumbnail( $listing_id, 'thumbnail', [ 'class' => 'apd-listing-row__thumbnail', 'loading' => 'lazy', 'decoding' => 'async' ] ); ?>
 				</a>
 			<?php else : ?>
 				<div class="apd-listing-row__thumbnail-placeholder">
@@ -100,6 +100,18 @@ $edit_url   = $my_listings->get_edit_url( $listing_id );
 			</span>
 			<span class="apd-listing-row__views-label screen-reader-text">
 				<?php esc_html_e( 'views', 'all-purpose-directory' ); ?>
+			</span>
+		</td>
+	<?php endif; ?>
+
+	<?php if ( $config['show_inquiries'] ) : ?>
+		<?php $inquiry_count = $my_listings->get_listing_inquiry_count( $listing_id ); ?>
+		<td class="apd-listing-row__inquiries">
+			<span class="apd-listing-row__inquiries-count">
+				<?php echo esc_html( number_format_i18n( $inquiry_count ) ); ?>
+			</span>
+			<span class="apd-listing-row__inquiries-label screen-reader-text">
+				<?php esc_html_e( 'inquiries', 'all-purpose-directory' ); ?>
 			</span>
 		</td>
 	<?php endif; ?>
