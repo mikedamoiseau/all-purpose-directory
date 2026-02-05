@@ -32,7 +32,6 @@ class BlockManagerTest extends TestCase {
 		// Reset the singleton for each test.
 		$reflection = new \ReflectionClass( BlockManager::class );
 		$instance = $reflection->getProperty( 'instance' );
-		$instance->setAccessible( true );
 		$instance->setValue( null, null );
 	}
 

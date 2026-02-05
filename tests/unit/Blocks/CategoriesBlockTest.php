@@ -180,7 +180,7 @@ class CategoriesBlockTest extends TestCase {
 		// Use reflection to check the icon.
 		$reflection = new \ReflectionClass( $block );
 		$property = $reflection->getProperty( 'icon' );
-		$property->setAccessible( true );
+		
 
 		$this->assertSame( 'category', $property->getValue( $block ) );
 	}
@@ -194,7 +194,7 @@ class CategoriesBlockTest extends TestCase {
 		// Use reflection to check the category.
 		$reflection = new \ReflectionClass( $block );
 		$property = $reflection->getProperty( 'category' );
-		$property->setAccessible( true );
+		
 
 		$this->assertSame( 'widgets', $property->getValue( $block ) );
 	}
@@ -208,7 +208,7 @@ class CategoriesBlockTest extends TestCase {
 		// Use reflection to check keywords.
 		$reflection = new \ReflectionClass( $block );
 		$property = $reflection->getProperty( 'keywords' );
-		$property->setAccessible( true );
+		
 
 		$keywords = $property->getValue( $block );
 
@@ -228,7 +228,7 @@ class CategoriesBlockTest extends TestCase {
 		// Use reflection to check uses_ssr.
 		$reflection = new \ReflectionClass( $block );
 		$property = $reflection->getProperty( 'uses_ssr' );
-		$property->setAccessible( true );
+		
 
 		$this->assertTrue( $property->getValue( $block ) );
 	}
