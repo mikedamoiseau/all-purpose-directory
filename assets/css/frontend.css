@@ -4995,3 +4995,149 @@ h3.apd-submission-form__group-title {
 .apd-reviews-section__content {
     margin-top: 1rem;
 }
+
+/* ==========================================================================
+   Contact Form
+   ========================================================================== */
+
+.apd-contact-form-wrapper {
+    background: var(--apd-bg-secondary);
+    border: 1px solid var(--apd-border-color);
+    border-radius: var(--apd-radius);
+    padding: 1.5rem;
+    margin-top: 2rem;
+}
+
+.apd-contact-form-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+    color: var(--apd-text-color);
+}
+
+.apd-contact-form-errors {
+    margin-bottom: 1rem;
+}
+
+.apd-contact-form-errors ul {
+    margin: 0;
+    padding: 0 0 0 1.25rem;
+}
+
+.apd-contact-form-errors li {
+    margin: 0.25rem 0;
+}
+
+.apd-contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.apd-contact-form-field label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.375rem;
+    color: var(--apd-text-color);
+    font-size: 0.875rem;
+}
+
+.apd-contact-form-field input,
+.apd-contact-form-field textarea {
+    width: 100%;
+    padding: 0.625rem 0.75rem;
+    border: 1px solid var(--apd-border-color);
+    border-radius: var(--apd-radius);
+    font-size: 1rem;
+    font-family: inherit;
+    background: var(--apd-bg-color);
+    color: var(--apd-text-color);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.apd-contact-form-field input:focus,
+.apd-contact-form-field textarea:focus {
+    outline: none;
+    border-color: var(--apd-primary-color);
+    box-shadow: var(--apd-focus-ring);
+}
+
+.apd-contact-form-field input:invalid:not(:placeholder-shown),
+.apd-contact-form-field textarea:invalid:not(:placeholder-shown) {
+    border-color: var(--apd-error-color, #dc2626);
+}
+
+.apd-contact-form-field textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.apd-contact-form-field .apd-required {
+    color: var(--apd-error-color, #dc2626);
+    margin-left: 0.125rem;
+}
+
+.apd-contact-form-field .apd-optional {
+    color: var(--apd-text-muted);
+    font-weight: 400;
+    font-size: 0.875rem;
+}
+
+.apd-contact-form-field .apd-field-hint {
+    font-size: 0.75rem;
+    color: var(--apd-text-muted);
+    margin: 0.25rem 0 0 0;
+}
+
+.apd-contact-form-submit {
+    margin-top: 0.5rem;
+}
+
+.apd-contact-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    background: var(--apd-primary-color);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--apd-radius);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.apd-contact-submit:hover {
+    background: var(--apd-primary-hover);
+}
+
+.apd-contact-submit:focus {
+    outline: none;
+    box-shadow: var(--apd-focus-ring);
+}
+
+.apd-contact-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.apd-contact-submit.apd-loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.apd-contact-form-success {
+    margin-top: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .apd-contact-form-wrapper {
+        padding: 1rem;
+    }
+
+    .apd-contact-submit {
+        width: 100%;
+    }
+}

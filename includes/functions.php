@@ -3593,3 +3593,126 @@ function apd_render_reviews_list( int $listing_id, array $args = [] ): void {
 function apd_get_reviews_list( int $listing_id, array $args = [] ): string {
     return apd_review_display()->render_reviews_list( $listing_id, $args );
 }
+
+// ============================================================================
+// Contact Form Functions
+// ============================================================================
+
+/**
+ * Get the ContactForm instance.
+ *
+ * @since 1.0.0
+ *
+ * @param array $config Optional configuration.
+ * @return \APD\Contact\ContactForm ContactForm instance.
+ */
+function apd_contact_form( array $config = [] ): \APD\Contact\ContactForm {
+    if ( empty( $config ) ) {
+        return \APD\Contact\ContactForm::get_instance();
+    }
+    return new \APD\Contact\ContactForm( $config );
+}
+
+/**
+ * Get the ContactHandler instance.
+ *
+ * @since 1.0.0
+ *
+ * @param array $config Optional configuration.
+ * @return \APD\Contact\ContactHandler ContactHandler instance.
+ */
+function apd_contact_handler( array $config = [] ): \APD\Contact\ContactHandler {
+    if ( empty( $config ) ) {
+        return \APD\Contact\ContactHandler::get_instance();
+    }
+    return new \APD\Contact\ContactHandler( $config );
+}
+
+/**
+ * Render the contact form for a listing.
+ *
+ * @since 1.0.0
+ *
+ * @param int   $listing_id Listing post ID.
+ * @param array $config     Optional configuration.
+ * @return void
+ */
+function apd_render_contact_form( int $listing_id, array $config = [] ): void {
+    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Output is escaped in template.
+    echo apd_get_contact_form( $listing_id, $config );
+}
+
+/**
+ * Get the contact form HTML.
+ *
+ * @since 1.0.0
+ *
+ * @param int   $listing_id Listing post ID.
+ * @param array $config     Optional configuration.
+ * @return string HTML output.
+ */
+function apd_get_contact_form( int $listing_id, array $config = [] ): string {
+    $form = apd_contact_form( $config );
+    return $form->get_html( $listing_id );
+}
+
+/**
+ * Check if a listing can receive contact messages.
+ *
+ * @since 1.0.0
+ *
+ * @param int $listing_id Listing post ID.
+ * @return bool True if listing can receive messages.
+ */
+function apd_can_receive_contact( int $listing_id ): bool {
+    return apd_contact_form()->can_receive_contact( $listing_id );
+}
+
+/**
+ * Process a contact form submission.
+ *
+ * @since 1.0.0
+ *
+ * @param array $data    Form data.
+ * @param array $config  Handler configuration.
+ * @return true|\WP_Error True on success, WP_Error on failure.
+ */
+function apd_process_contact( array $data, array $config = [] ): bool|\WP_Error {
+    $handler = apd_contact_handler( $config );
+
+    // Manually set $_POST for the handler.
+    $original_post = $_POST;
+    $_POST = $data;
+
+    $result = $handler->process();
+
+    // Restore $_POST.
+    $_POST = $original_post;
+
+    return $result;
+}
+
+/**
+ * Send a contact email for a listing.
+ *
+ * @since 1.0.0
+ *
+ * @param int    $listing_id Listing post ID.
+ * @param array  $data       Contact data (contact_name, contact_email, contact_message, etc.).
+ * @param array  $config     Handler configuration.
+ * @return bool True on success, false on failure.
+ */
+function apd_send_contact_email( int $listing_id, array $data, array $config = [] ): bool {
+    $listing = get_post( $listing_id );
+    if ( ! $listing || 'apd_listing' !== $listing->post_type ) {
+        return false;
+    }
+
+    $owner = get_userdata( $listing->post_author );
+    if ( ! $owner ) {
+        return false;
+    }
+
+    $handler = apd_contact_handler( $config );
+    return $handler->send_email( $data, $listing, $owner );
+}

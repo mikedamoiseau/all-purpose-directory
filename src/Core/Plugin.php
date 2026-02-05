@@ -191,6 +191,14 @@ final class Plugin {
         $review_moderation = \APD\Admin\ReviewModeration::get_instance();
         $review_moderation->init();
 
+        // Initialize Contact Form system.
+        $contact_form = \APD\Contact\ContactForm::get_instance();
+        $contact_form->init();
+
+        // Initialize Contact Handler for AJAX processing.
+        $contact_handler = \APD\Contact\ContactHandler::get_instance();
+        $contact_handler->init();
+
         /**
          * Fires after plugin hooks are initialized.
          *
