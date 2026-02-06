@@ -100,7 +100,7 @@ class SwitchField extends AbstractFieldType {
 			$attributes = array_merge( $attributes, $field['attributes'] );
 		}
 
-		$html = '<label class="apd-switch">';
+		$html  = '<label class="apd-switch">';
 		$html .= sprintf(
 			'<input %s%s>',
 			$this->buildAttributes( $attributes ),

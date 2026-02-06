@@ -64,9 +64,9 @@ final class DemoDataPage {
 	 * @var array<string, int>
 	 */
 	private array $defaults = [
-		'users'     => 5,
-		'tags'      => 10,
-		'listings'  => 25,
+		'users'    => 5,
+		'tags'     => 10,
+		'listings' => 25,
 	];
 
 	/**
@@ -180,25 +180,29 @@ final class DemoDataPage {
 			true
 		);
 
-		wp_localize_script( 'apd-admin-demo-data', 'apdDemoData', [
-			'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
-			'generateNonce' => wp_create_nonce( self::NONCE_GENERATE ),
-			'deleteNonce'   => wp_create_nonce( self::NONCE_DELETE ),
-			'strings'       => [
-				'generating'       => __( 'Generating demo data...', 'all-purpose-directory' ),
-				'deleting'         => __( 'Deleting demo data...', 'all-purpose-directory' ),
-				'confirmDelete'    => __( 'Are you sure you want to delete ALL demo data? This cannot be undone.', 'all-purpose-directory' ),
-				'success'          => __( 'Operation completed successfully!', 'all-purpose-directory' ),
-				'error'            => __( 'An error occurred. Please try again.', 'all-purpose-directory' ),
-				'generatingUsers'  => __( 'Creating users...', 'all-purpose-directory' ),
-				'generatingCats'   => __( 'Creating categories...', 'all-purpose-directory' ),
-				'generatingTags'   => __( 'Creating tags...', 'all-purpose-directory' ),
-				'generatingList'   => __( 'Creating listings...', 'all-purpose-directory' ),
-				'generatingReviews' => __( 'Creating reviews...', 'all-purpose-directory' ),
-				'generatingInq'    => __( 'Creating inquiries...', 'all-purpose-directory' ),
-				'generatingFavs'   => __( 'Creating favorites...', 'all-purpose-directory' ),
-			],
-		] );
+		wp_localize_script(
+			'apd-admin-demo-data',
+			'apdDemoData',
+			[
+				'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
+				'generateNonce' => wp_create_nonce( self::NONCE_GENERATE ),
+				'deleteNonce'   => wp_create_nonce( self::NONCE_DELETE ),
+				'strings'       => [
+					'generating'        => __( 'Generating demo data...', 'all-purpose-directory' ),
+					'deleting'          => __( 'Deleting demo data...', 'all-purpose-directory' ),
+					'confirmDelete'     => __( 'Are you sure you want to delete ALL demo data? This cannot be undone.', 'all-purpose-directory' ),
+					'success'           => __( 'Operation completed successfully!', 'all-purpose-directory' ),
+					'error'             => __( 'An error occurred. Please try again.', 'all-purpose-directory' ),
+					'generatingUsers'   => __( 'Creating users...', 'all-purpose-directory' ),
+					'generatingCats'    => __( 'Creating categories...', 'all-purpose-directory' ),
+					'generatingTags'    => __( 'Creating tags...', 'all-purpose-directory' ),
+					'generatingList'    => __( 'Creating listings...', 'all-purpose-directory' ),
+					'generatingReviews' => __( 'Creating reviews...', 'all-purpose-directory' ),
+					'generatingInq'     => __( 'Creating inquiries...', 'all-purpose-directory' ),
+					'generatingFavs'    => __( 'Creating favorites...', 'all-purpose-directory' ),
+				],
+			]
+		);
 	}
 
 	/**
@@ -450,13 +454,13 @@ final class DemoDataPage {
 
 		// Generate users.
 		if ( $generate_users ) {
-			$user_ids           = $generator->generate_users( $users_count );
+			$user_ids         = $generator->generate_users( $users_count );
 			$results['users'] = count( $user_ids );
 		}
 
 		// Generate categories.
 		if ( $generate_categories ) {
-			$category_ids           = $generator->generate_categories();
+			$category_ids          = $generator->generate_categories();
 			$results['categories'] = count( $category_ids );
 		}
 
@@ -468,19 +472,19 @@ final class DemoDataPage {
 
 		// Generate listings.
 		if ( $generate_listings ) {
-			$listing_ids          = $generator->generate_listings( $listings_count );
+			$listing_ids         = $generator->generate_listings( $listings_count );
 			$results['listings'] = count( $listing_ids );
 		}
 
 		// Generate reviews (requires listings).
 		if ( $generate_reviews && ! empty( $listing_ids ) ) {
-			$review_ids          = $generator->generate_reviews( $listing_ids, $user_ids );
+			$review_ids         = $generator->generate_reviews( $listing_ids, $user_ids );
 			$results['reviews'] = count( $review_ids );
 		}
 
 		// Generate inquiries (requires listings).
 		if ( $generate_inquiries && ! empty( $listing_ids ) ) {
-			$inquiry_ids           = $generator->generate_inquiries( $listing_ids );
+			$inquiry_ids          = $generator->generate_inquiries( $listing_ids );
 			$results['inquiries'] = count( $inquiry_ids );
 		}
 
@@ -490,7 +494,7 @@ final class DemoDataPage {
 		}
 
 		// Get updated counts.
-		$tracker       = DemoDataTracker::get_instance();
+		$tracker        = DemoDataTracker::get_instance();
 		$updated_counts = $tracker->count_demo_data();
 
 		/**
@@ -502,11 +506,13 @@ final class DemoDataPage {
 		 */
 		do_action( 'apd_after_generate_demo_data', $results );
 
-		wp_send_json_success( [
-			'message' => __( 'Demo data generated successfully!', 'all-purpose-directory' ),
-			'created' => $results,
-			'counts'  => $updated_counts,
-		] );
+		wp_send_json_success(
+			[
+				'message' => __( 'Demo data generated successfully!', 'all-purpose-directory' ),
+				'created' => $results,
+				'counts'  => $updated_counts,
+			]
+		);
 	}
 
 	/**
@@ -533,11 +539,13 @@ final class DemoDataPage {
 		// Get updated counts (should all be 0).
 		$updated_counts = $tracker->count_demo_data();
 
-		wp_send_json_success( [
-			'message' => __( 'All demo data has been deleted.', 'all-purpose-directory' ),
-			'deleted' => $deleted,
-			'counts'  => $updated_counts,
-		] );
+		wp_send_json_success(
+			[
+				'message' => __( 'All demo data has been deleted.', 'all-purpose-directory' ),
+				'deleted' => $deleted,
+				'counts'  => $updated_counts,
+			]
+		);
 	}
 
 	/**

@@ -136,11 +136,13 @@ class RatingCalculator {
 	 */
 	public function calculate( int $listing_id ): array {
 		// Get all approved reviews for the listing.
-		$reviews = get_comments( [
-			'post_id' => $listing_id,
-			'type'    => ReviewManager::COMMENT_TYPE,
-			'status'  => 'approve',
-		] );
+		$reviews = get_comments(
+			[
+				'post_id' => $listing_id,
+				'type'    => ReviewManager::COMMENT_TYPE,
+				'status'  => 'approve',
+			]
+		);
 
 		$count        = 0;
 		$total        = 0;
@@ -151,9 +153,9 @@ class RatingCalculator {
 			$rating = (int) get_comment_meta( $review->comment_ID, ReviewManager::META_RATING, true );
 
 			if ( $rating >= 1 && $rating <= $star_count ) {
-				$count++;
+				++$count;
 				$total += $rating;
-				$distribution[ $rating ]++;
+				++$distribution[ $rating ];
 			}
 		}
 
@@ -276,19 +278,21 @@ class RatingCalculator {
 	 * @return int Number of listings processed.
 	 */
 	public function recalculate_all(): int {
-		$listings = get_posts( [
-			'post_type'      => 'apd_listing',
-			'post_status'    => 'any',
-			'posts_per_page' => -1,
-			'fields'         => 'ids',
-			'no_found_rows'  => true, // Performance: skip counting total rows.
-		] );
+		$listings = get_posts(
+			[
+				'post_type'      => 'apd_listing',
+				'post_status'    => 'any',
+				'posts_per_page' => -1,
+				'fields'         => 'ids',
+				'no_found_rows'  => true, // Performance: skip counting total rows.
+			]
+		);
 
 		$count = 0;
 
 		foreach ( $listings as $listing_id ) {
 			$this->calculate( $listing_id );
-			$count++;
+			++$count;
 		}
 
 		/**
@@ -519,8 +523,8 @@ class RatingCalculator {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param int   $comment_id Review (comment) ID.
-	 * @param int   $listing_id Listing post ID.
+	 * @param int $comment_id Review (comment) ID.
+	 * @param int $listing_id Listing post ID.
 	 * @return void
 	 */
 	public function on_review_change( int $comment_id, int $listing_id ): void {

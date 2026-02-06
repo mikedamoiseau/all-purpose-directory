@@ -36,13 +36,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 <p>
 	<?php
 	printf(
-		/* translators: %d: number of days */
-		esc_html( _n(
-			'Your listing will expire in %d day.',
-			'Your listing will expire in %d days.',
-			$days_left,
-			'all-purpose-directory'
-		) ),
+		esc_html(
+			/* translators: %d: number of days until listing expires */
+			_n(
+				'Your listing will expire in %d day.',
+				'Your listing will expire in %d days.',
+				$days_left,
+				'all-purpose-directory'
+			)
+		),
 		(int) $days_left
 	);
 	?>

@@ -89,27 +89,33 @@ class ContactHandler {
 	public function handle_ajax(): void {
 		// Verify nonce.
 		if ( ! $this->verify_nonce() ) {
-			wp_send_json_error( [
-				'message' => __( 'Security check failed. Please refresh and try again.', 'all-purpose-directory' ),
-				'code'    => 'nonce_failed',
-			] );
+			wp_send_json_error(
+				[
+					'message' => __( 'Security check failed. Please refresh and try again.', 'all-purpose-directory' ),
+					'code'    => 'nonce_failed',
+				]
+			);
 			return;
 		}
 
 		$result = $this->process();
 
 		if ( is_wp_error( $result ) ) {
-			wp_send_json_error( [
-				'message' => $result->get_error_message(),
-				'code'    => $result->get_error_code(),
-				'errors'  => $result->get_error_messages(),
-			] );
+			wp_send_json_error(
+				[
+					'message' => $result->get_error_message(),
+					'code'    => $result->get_error_code(),
+					'errors'  => $result->get_error_messages(),
+				]
+			);
 			return;
 		}
 
-		wp_send_json_success( [
-			'message' => __( 'Your message has been sent successfully!', 'all-purpose-directory' ),
-		] );
+		wp_send_json_success(
+			[
+				'message' => __( 'Your message has been sent successfully!', 'all-purpose-directory' ),
+			]
+		);
 	}
 
 	/**
@@ -142,7 +148,7 @@ class ContactHandler {
 
 		// Check listing can receive contact.
 		$listing_id = (int) $data['listing_id'];
-		$form = new ContactForm();
+		$form       = new ContactForm();
 
 		if ( ! $form->can_receive_contact( $listing_id ) ) {
 			return new \WP_Error(
@@ -153,7 +159,7 @@ class ContactHandler {
 
 		// Get listing and owner.
 		$listing = get_post( $listing_id );
-		$owner = get_userdata( $listing->post_author );
+		$owner   = get_userdata( $listing->post_author );
 
 		/**
 		 * Fires before sending contact message.
@@ -191,9 +197,12 @@ class ContactHandler {
 	/**
 	 * Get sanitized form data.
 	 *
+	 * Nonce verification is done in handle_ajax() and handle_form() before this method is called.
+	 *
 	 * @return array
 	 */
 	public function get_sanitized_data(): array {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified in handle_ajax/handle_form.
 		return [
 			'listing_id'      => isset( $_POST['listing_id'] ) ? absint( $_POST['listing_id'] ) : 0,
 			'contact_name'    => isset( $_POST['contact_name'] ) ? sanitize_text_field( wp_unslash( $_POST['contact_name'] ) ) : '',
@@ -202,6 +211,7 @@ class ContactHandler {
 			'contact_subject' => isset( $_POST['contact_subject'] ) ? sanitize_text_field( wp_unslash( $_POST['contact_subject'] ) ) : '',
 			'contact_message' => isset( $_POST['contact_message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['contact_message'] ) ) : '',
 		];
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 	}
 
 	/**

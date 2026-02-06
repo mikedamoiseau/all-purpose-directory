@@ -37,7 +37,10 @@ do_action( 'apd_before_single_listing' );
 	do_action( 'apd_single_wrapper_start' );
 	?>
 
-	<?php while ( have_posts() ) : the_post(); ?>
+	<?php
+	while ( have_posts() ) :
+		the_post();
+		?>
 
 		<?php
 		$listing_id = get_the_ID();
@@ -52,19 +55,23 @@ do_action( 'apd_before_single_listing' );
 		 * @param array $data       Single listing data.
 		 * @param int   $listing_id The listing post ID.
 		 */
-		$listing_data = apply_filters( 'apd_single_listing_data', [
-			'listing_id'    => $listing_id,
-			'title'         => get_the_title(),
-			'permalink'     => get_permalink(),
-			'content'       => get_the_content(),
-			'excerpt'       => get_the_excerpt(),
-			'categories'    => $categories,
-			'tags'          => $tags,
-			'has_thumbnail' => has_post_thumbnail(),
-			'author_id'     => get_post_field( 'post_author', $listing_id ),
-			'post_date'     => get_the_date(),
-			'modified_date' => get_the_modified_date(),
-		], $listing_id );
+		$listing_data = apply_filters(
+			'apd_single_listing_data',
+			[
+				'listing_id'    => $listing_id,
+				'title'         => get_the_title(),
+				'permalink'     => get_permalink(),
+				'content'       => get_the_content(),
+				'excerpt'       => get_the_excerpt(),
+				'categories'    => $categories,
+				'tags'          => $tags,
+				'has_thumbnail' => has_post_thumbnail(),
+				'author_id'     => get_post_field( 'post_author', $listing_id ),
+				'post_date'     => get_the_date(),
+				'modified_date' => get_the_modified_date(),
+			],
+			$listing_id
+		);
 		?>
 
 		<article id="listing-<?php echo esc_attr( $listing_id ); ?>" <?php post_class( 'apd-single-listing' ); ?>>
@@ -90,8 +97,8 @@ do_action( 'apd_before_single_listing' );
 							$color = apd_get_category_color( $category );
 							?>
 							<a href="<?php echo esc_url( get_term_link( $category ) ); ?>"
-							   class="apd-single-listing__category"
-							   <?php echo $color ? 'style="--apd-category-color:' . esc_attr( $color ) . '"' : ''; ?>>
+								class="apd-single-listing__category"
+								<?php echo $color ? 'style="--apd-category-color:' . esc_attr( $color ) . '"' : ''; ?>>
 								<?php if ( $icon ) : ?>
 									<span class="dashicons <?php echo esc_attr( $icon ); ?>" aria-hidden="true"></span>
 								<?php endif; ?>

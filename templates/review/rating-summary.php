@@ -38,10 +38,13 @@ $calculator = \APD\Review\RatingCalculator::get_instance();
 			<div class="apd-rating-summary__stars">
 				<?php
 				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Output is escaped in render_stars method.
-				echo $calculator->render_stars( $average, [
-					'size'   => 'medium',
-					'inline' => true,
-				] );
+				echo $calculator->render_stars(
+					$average,
+					[
+						'size'   => 'medium',
+						'inline' => true,
+					]
+				);
 				?>
 			</div>
 
@@ -61,7 +64,10 @@ $calculator = \APD\Review\RatingCalculator::get_instance();
 	<div class="apd-rating-summary__distribution" role="list" aria-label="<?php esc_attr_e( 'Rating breakdown', 'all-purpose-directory' ); ?>">
 		<?php for ( $stars = $star_count; $stars >= 1; $stars-- ) : ?>
 			<?php
-			$data       = $distribution[ $stars ] ?? [ 'count' => 0, 'percentage' => 0 ];
+			$data       = $distribution[ $stars ] ?? [
+				'count'      => 0,
+				'percentage' => 0,
+			];
 			$star_label = $stars === 1
 				/* translators: %d: number of stars (singular) */
 				? sprintf( __( '%d star', 'all-purpose-directory' ), $stars )

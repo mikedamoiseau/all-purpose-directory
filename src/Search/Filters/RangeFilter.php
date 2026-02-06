@@ -37,17 +37,17 @@ class RangeFilter extends AbstractFilter {
 	 */
 	public function __construct( array $config = [] ) {
 		$defaults = [
-			'name'             => '',
-			'label'            => '',
-			'source'           => 'field',
-			'source_key'       => '',
-			'min'              => null,
-			'max'              => null,
-			'step'             => 1,
-			'min_placeholder'  => __( 'Min', 'all-purpose-directory' ),
-			'max_placeholder'  => __( 'Max', 'all-purpose-directory' ),
-			'prefix'           => '',
-			'suffix'           => '',
+			'name'            => '',
+			'label'           => '',
+			'source'          => 'field',
+			'source_key'      => '',
+			'min'             => null,
+			'max'             => null,
+			'step'            => 1,
+			'min_placeholder' => __( 'Min', 'all-purpose-directory' ),
+			'max_placeholder' => __( 'Max', 'all-purpose-directory' ),
+			'prefix'          => '',
+			'suffix'          => '',
 		];
 
 		parent::__construct( wp_parse_args( $config, $defaults ) );

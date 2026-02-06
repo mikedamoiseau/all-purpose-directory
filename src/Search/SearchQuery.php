@@ -275,11 +275,9 @@ final class SearchQuery {
 		$like_keyword          = '%' . $wpdb->esc_like( $keyword ) . '%';
 
 		// Build the meta search condition.
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$meta_condition = $wpdb->prepare(
-			"(apd_pm.meta_key IN ($meta_key_placeholders) AND apd_pm.meta_value LIKE %s)",
-			array_merge( $this->searchable_meta_keys, [ $like_keyword ] )
-		);
+		// $meta_key_placeholders is a string of %s placeholders generated above.
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $meta_key_placeholders contains safe %s placeholders.
+		$meta_condition = $wpdb->prepare( "(apd_pm.meta_key IN ($meta_key_placeholders) AND apd_pm.meta_value LIKE %s)", array_merge( $this->searchable_meta_keys, [ $like_keyword ] ) );
 
 		// Find and modify the existing search condition to include meta.
 		// WordPress adds: AND (((post_title LIKE '%keyword%') OR (post_excerpt LIKE '%keyword%') OR (post_content LIKE '%keyword%')))
@@ -291,7 +289,7 @@ final class SearchQuery {
 				")) OR ($meta_condition))",
 				$original_search
 			);
-			$where = str_replace( $original_search, $modified_search, $where );
+			$where           = str_replace( $original_search, $modified_search, $where );
 		}
 
 		return $where;

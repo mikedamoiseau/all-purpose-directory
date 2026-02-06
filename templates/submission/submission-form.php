@@ -235,12 +235,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<?php if ( $config['show_categories'] && ! empty( $categories ) ) : ?>
 		<div class="apd-submission-form__section apd-submission-form__section--categories">
 			<?php
-			apd_get_template( 'submission/category-selector.php', [
-				'categories'          => $categories,
-				'category_options'    => $category_options,
-				'selected_categories' => $selected_categories,
-				'errors'              => $errors['listing_categories'] ?? [],
-			] );
+			apd_get_template(
+				'submission/category-selector.php',
+				[
+					'categories'          => $categories,
+					'category_options'    => $category_options,
+					'selected_categories' => $selected_categories,
+					'errors'              => $errors['listing_categories'] ?? [],
+				]
+			);
 			?>
 		</div>
 	<?php endif; ?>
@@ -248,11 +251,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<?php if ( $config['show_tags'] && ! empty( $tags ) ) : ?>
 		<div class="apd-submission-form__section apd-submission-form__section--tags">
 			<?php
-			apd_get_template( 'submission/tag-selector.php', [
-				'tags'          => $tags,
-				'selected_tags' => $selected_tags,
-				'errors'        => $errors['listing_tags'] ?? [],
-			] );
+			apd_get_template(
+				'submission/tag-selector.php',
+				[
+					'tags'          => $tags,
+					'selected_tags' => $selected_tags,
+					'errors'        => $errors['listing_tags'] ?? [],
+				]
+			);
 			?>
 		</div>
 	<?php endif; ?>
@@ -272,10 +278,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<?php if ( $config['show_featured_image'] ) : ?>
 		<div class="apd-submission-form__section apd-submission-form__section--image">
 			<?php
-			apd_get_template( 'submission/image-upload.php', [
-				'featured_image_id' => $featured_image_id,
-				'errors'            => $errors['featured_image'] ?? [],
-			] );
+			apd_get_template(
+				'submission/image-upload.php',
+				[
+					'featured_image_id' => $featured_image_id,
+					'errors'            => $errors['featured_image'] ?? [],
+				]
+			);
 			?>
 		</div>
 	<?php endif; ?>

@@ -192,17 +192,41 @@ final class ReviewContent {
 	public static function generate_rating( string $bias = 'positive' ): int {
 		// Define weight distributions.
 		$distributions = [
-			'positive' => [ 1 => 2, 2 => 5, 3 => 10, 4 => 35, 5 => 48 ],   // Most reviews 4-5 stars.
-			'negative' => [ 1 => 30, 2 => 35, 3 => 20, 4 => 10, 5 => 5 ],  // Most reviews 1-2 stars.
-			'neutral'  => [ 1 => 10, 2 => 15, 3 => 50, 4 => 15, 5 => 10 ], // Most reviews 3 stars.
-			'mixed'    => [ 1 => 15, 2 => 15, 3 => 20, 4 => 25, 5 => 25 ], // Even distribution.
+			'positive' => [
+				1 => 2,
+				2 => 5,
+				3 => 10,
+				4 => 35,
+				5 => 48,
+			],   // Most reviews 4-5 stars.
+			'negative' => [
+				1 => 30,
+				2 => 35,
+				3 => 20,
+				4 => 10,
+				5 => 5,
+			],  // Most reviews 1-2 stars.
+			'neutral'  => [
+				1 => 10,
+				2 => 15,
+				3 => 50,
+				4 => 15,
+				5 => 10,
+			], // Most reviews 3 stars.
+			'mixed'    => [
+				1 => 15,
+				2 => 15,
+				3 => 20,
+				4 => 25,
+				5 => 25,
+			], // Even distribution.
 		];
 
 		$weights = $distributions[ $bias ] ?? $distributions['positive'];
 
 		// Create weighted random selection.
-		$total  = array_sum( $weights );
-		$random = wp_rand( 1, $total );
+		$total      = array_sum( $weights );
+		$random     = wp_rand( 1, $total );
 		$cumulative = 0;
 
 		foreach ( $weights as $rating => $weight ) {
@@ -248,12 +272,51 @@ final class ReviewContent {
 	 */
 	public static function generate_reviewer_name(): string {
 		$first_names = [
-			'James', 'John', 'Robert', 'Michael', 'William', 'David', 'Richard', 'Joseph',
-			'Thomas', 'Charles', 'Mary', 'Patricia', 'Jennifer', 'Linda', 'Elizabeth',
-			'Barbara', 'Susan', 'Jessica', 'Sarah', 'Karen', 'Emma', 'Olivia', 'Ava',
-			'Isabella', 'Sophia', 'Mia', 'Charlotte', 'Amelia', 'Harper', 'Evelyn',
-			'Liam', 'Noah', 'Oliver', 'Elijah', 'Lucas', 'Mason', 'Logan', 'Alexander',
-			'Ethan', 'Jacob', 'Michael', 'Daniel', 'Henry', 'Jackson', 'Sebastian',
+			'James',
+			'John',
+			'Robert',
+			'Michael',
+			'William',
+			'David',
+			'Richard',
+			'Joseph',
+			'Thomas',
+			'Charles',
+			'Mary',
+			'Patricia',
+			'Jennifer',
+			'Linda',
+			'Elizabeth',
+			'Barbara',
+			'Susan',
+			'Jessica',
+			'Sarah',
+			'Karen',
+			'Emma',
+			'Olivia',
+			'Ava',
+			'Isabella',
+			'Sophia',
+			'Mia',
+			'Charlotte',
+			'Amelia',
+			'Harper',
+			'Evelyn',
+			'Liam',
+			'Noah',
+			'Oliver',
+			'Elijah',
+			'Lucas',
+			'Mason',
+			'Logan',
+			'Alexander',
+			'Ethan',
+			'Jacob',
+			'Michael',
+			'Daniel',
+			'Henry',
+			'Jackson',
+			'Sebastian',
 		];
 
 		$last_initials = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';

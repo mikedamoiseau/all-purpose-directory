@@ -127,9 +127,9 @@ class SubmissionHandler {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array<string, mixed>   $config          Optional. Configuration options.
-	 * @param FieldRegistry|null     $field_registry  Optional. Field registry instance.
-	 * @param FieldValidator|null    $field_validator Optional. Field validator instance.
+	 * @param array<string, mixed> $config          Optional. Configuration options.
+	 * @param FieldRegistry|null   $field_registry  Optional. Field registry instance.
+	 * @param FieldValidator|null  $field_validator Optional. Field validator instance.
 	 */
 	public function __construct(
 		array $config = [],
@@ -401,8 +401,9 @@ class SubmissionHandler {
 			$data['featured_image'] = absint( $_POST['featured_image'] );
 		}
 
-		// Terms accepted.
-		$data['terms_accepted'] = isset( $_POST['terms_accepted'] ) && $_POST['terms_accepted'];
+		// Terms accepted (checkbox, sanitized as boolean).
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- Boolean checkbox value.
+		$data['terms_accepted'] = ! empty( $_POST['terms_accepted'] );
 
 		// Redirect URL.
 		if ( isset( $_POST['apd_redirect'] ) ) {
@@ -433,9 +434,11 @@ class SubmissionHandler {
 	 */
 	private function collect_custom_field_data(): array {
 		$values = [];
-		$fields = $this->field_registry->get_fields( [
-			'admin_only' => false,
-		] );
+		$fields = $this->field_registry->get_fields(
+			[
+				'admin_only' => false,
+			]
+		);
 
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified earlier.
 
@@ -470,10 +473,11 @@ class SubmissionHandler {
 	 * @return int Listing ID or 0 for new.
 	 */
 	private function get_listing_id(): int {
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified earlier.
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified in process().
 		if ( isset( $_POST['apd_listing_id'] ) ) {
 			return absint( $_POST['apd_listing_id'] );
 		}
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 		return 0;
 	}
@@ -593,6 +597,7 @@ class SubmissionHandler {
 	 */
 	private function handle_featured_image_upload(): int|WP_Error {
 		// Check if a file was uploaded.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in process().
 		if ( empty( $_FILES['featured_image_file'] ) || empty( $_FILES['featured_image_file']['name'] ) ) {
 			// Check if required.
 			if ( $this->config['require_featured_image'] ) {
@@ -608,7 +613,7 @@ class SubmissionHandler {
 		}
 
 		// Get file info.
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- File data.
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput,WordPress.Security.NonceVerification.Missing -- File data, nonce verified in process().
 		$file = $_FILES['featured_image_file'];
 
 		// Validate file type.
@@ -868,10 +873,12 @@ class SubmissionHandler {
 		if ( $image_id > 0 ) {
 			set_post_thumbnail( $listing_id, $image_id );
 			// Update attachment to be attached to the listing.
-			wp_update_post( [
-				'ID'          => $image_id,
-				'post_parent' => $listing_id,
-			] );
+			wp_update_post(
+				[
+					'ID'          => $image_id,
+					'post_parent' => $listing_id,
+				]
+			);
 			return;
 		}
 
@@ -971,11 +978,15 @@ Review the listing: %4$s',
 		 * @param array $email      The email data (to, subject, message).
 		 * @param int   $listing_id The listing ID.
 		 */
-		$email = apply_filters( 'apd_submission_admin_notification', [
-			'to'      => $admin_email,
-			'subject' => $subject,
-			'message' => $message,
-		], $listing_id );
+		$email = apply_filters(
+			'apd_submission_admin_notification',
+			[
+				'to'      => $admin_email,
+				'subject' => $subject,
+				'message' => $message,
+			],
+			$listing_id
+		);
 
 		wp_mail( $email['to'], $email['subject'], $email['message'] );
 	}
@@ -1121,6 +1132,7 @@ Review the listing: %4$s',
 		 * @param array         $post_data The $_POST data.
 		 * @param int           $user_id   The current user ID.
 		 */
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in process().
 		$custom_check = apply_filters( 'apd_submission_spam_check', true, $_POST, get_current_user_id() );
 
 		if ( is_wp_error( $custom_check ) ) {

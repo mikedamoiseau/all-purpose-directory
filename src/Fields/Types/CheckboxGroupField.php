@@ -93,9 +93,9 @@ class CheckboxGroupField extends AbstractFieldType {
 
 		$index = 0;
 		foreach ( $options as $option_value => $option_label ) {
-			$option_id   = $field_id . '-' . $index;
-			$is_checked  = in_array( (string) $option_value, $checked_values, true );
-			$checked     = $is_checked ? ' checked="checked"' : '';
+			$option_id  = $field_id . '-' . $index;
+			$is_checked = in_array( (string) $option_value, $checked_values, true );
+			$checked    = $is_checked ? ' checked="checked"' : '';
 
 			$html .= '<label class="apd-checkbox-group-item">';
 			$html .= sprintf(

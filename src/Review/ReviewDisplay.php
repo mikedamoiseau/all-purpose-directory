@@ -156,20 +156,23 @@ class ReviewDisplay {
 
 		// Get reviews for current page.
 		$offset  = ( $current_page - 1 ) * $args['per_page'];
-		$reviews = $manager->get_listing_reviews( $listing_id, [
-			'number' => $args['per_page'],
-			'offset' => $offset,
-		] );
+		$reviews = $manager->get_listing_reviews(
+			$listing_id,
+			[
+				'number' => $args['per_page'],
+				'offset' => $offset,
+			]
+		);
 
 		// Build template data.
 		$template_data = [
-			'listing_id'      => $listing_id,
-			'review_count'    => $review_count,
-			'current_page'    => $current_page,
-			'total_pages'     => $reviews['pages'],
-			'reviews'         => $reviews['reviews'],
-			'args'            => $args,
-			'has_reviews'     => $review_count > 0,
+			'listing_id'   => $listing_id,
+			'review_count' => $review_count,
+			'current_page' => $current_page,
+			'total_pages'  => $reviews['pages'],
+			'reviews'      => $reviews['reviews'],
+			'args'         => $args,
+			'has_reviews'  => $review_count > 0,
 		];
 
 		/**
@@ -205,7 +208,7 @@ class ReviewDisplay {
 		// Calculate percentages for distribution bars.
 		$distribution_data = [];
 		for ( $i = $star_count; $i >= 1; $i-- ) {
-			$star_count_val               = $distribution[ $i ] ?? 0;
+			$star_count_val          = $distribution[ $i ] ?? 0;
 			$distribution_data[ $i ] = [
 				'count'      => $star_count_val,
 				'percentage' => $count > 0 ? round( ( $star_count_val / $count ) * 100 ) : 0,
@@ -262,9 +265,12 @@ class ReviewDisplay {
 
 		if ( empty( $reviews['reviews'] ) ) {
 			ob_start();
-			\apd_get_template( 'review/reviews-empty.php', [
-				'listing_id' => $listing_id,
-			] );
+			\apd_get_template(
+				'review/reviews-empty.php',
+				[
+					'listing_id' => $listing_id,
+				]
+			);
 			return ob_get_clean();
 		}
 
@@ -397,13 +403,17 @@ class ReviewDisplay {
 		$average = $calculator->get_average( $listing_id );
 
 		// Render compact star rating.
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Output is escaped in render_stars method.
-		echo $calculator->render_stars( $average, [
-			'size'         => 'small',
-			'show_count'   => true,
-			'show_average' => true,
-			'count'        => $count,
-		] );
+		// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped -- Output escaped in render_stars().
+		echo $calculator->render_stars(
+			$average,
+			[
+				'size'         => 'small',
+				'show_count'   => true,
+				'show_average' => true,
+				'count'        => $count,
+			]
+		);
+		// phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**

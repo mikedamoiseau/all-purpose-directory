@@ -88,12 +88,15 @@ class DateRangeField extends AbstractFieldType {
 		}
 
 		// Start date attributes.
-		$start_attrs = array_merge( $common_attrs, [
-			'type'  => 'date',
-			'id'    => $field_id . '-start',
-			'name'  => $field_name . '[start]',
-			'value' => $value['start'],
-		] );
+		$start_attrs = array_merge(
+			$common_attrs,
+			[
+				'type'  => 'date',
+				'id'    => $field_id . '-start',
+				'name'  => $field_name . '[start]',
+				'value' => $value['start'],
+			]
+		);
 
 		if ( $is_required ) {
 			$start_attrs['required']      = true;
@@ -101,12 +104,15 @@ class DateRangeField extends AbstractFieldType {
 		}
 
 		// End date attributes.
-		$end_attrs = array_merge( $common_attrs, [
-			'type'  => 'date',
-			'id'    => $field_id . '-end',
-			'name'  => $field_name . '[end]',
-			'value' => $value['end'],
-		] );
+		$end_attrs = array_merge(
+			$common_attrs,
+			[
+				'type'  => 'date',
+				'id'    => $field_id . '-end',
+				'name'  => $field_name . '[end]',
+				'value' => $value['end'],
+			]
+		);
 
 		if ( $is_required ) {
 			$end_attrs['required']      = true;

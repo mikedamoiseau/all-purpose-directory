@@ -284,24 +284,60 @@ final class BlockManager {
 			'tags'           => $tag_options,
 			'archiveUrl'     => get_post_type_archive_link( 'apd_listing' ) ?: '',
 			'viewOptions'    => [
-				[ 'value' => 'grid', 'label' => __( 'Grid', 'all-purpose-directory' ) ],
-				[ 'value' => 'list', 'label' => __( 'List', 'all-purpose-directory' ) ],
+				[
+					'value' => 'grid',
+					'label' => __( 'Grid', 'all-purpose-directory' ),
+				],
+				[
+					'value' => 'list',
+					'label' => __( 'List', 'all-purpose-directory' ),
+				],
 			],
 			'layoutOptions'  => [
-				[ 'value' => 'horizontal', 'label' => __( 'Horizontal', 'all-purpose-directory' ) ],
-				[ 'value' => 'vertical', 'label' => __( 'Vertical', 'all-purpose-directory' ) ],
-				[ 'value' => 'inline', 'label' => __( 'Inline', 'all-purpose-directory' ) ],
+				[
+					'value' => 'horizontal',
+					'label' => __( 'Horizontal', 'all-purpose-directory' ),
+				],
+				[
+					'value' => 'vertical',
+					'label' => __( 'Vertical', 'all-purpose-directory' ),
+				],
+				[
+					'value' => 'inline',
+					'label' => __( 'Inline', 'all-purpose-directory' ),
+				],
 			],
 			'orderbyOptions' => [
-				[ 'value' => 'date', 'label' => __( 'Date', 'all-purpose-directory' ) ],
-				[ 'value' => 'title', 'label' => __( 'Title', 'all-purpose-directory' ) ],
-				[ 'value' => 'modified', 'label' => __( 'Modified', 'all-purpose-directory' ) ],
-				[ 'value' => 'rand', 'label' => __( 'Random', 'all-purpose-directory' ) ],
-				[ 'value' => 'views', 'label' => __( 'Views', 'all-purpose-directory' ) ],
+				[
+					'value' => 'date',
+					'label' => __( 'Date', 'all-purpose-directory' ),
+				],
+				[
+					'value' => 'title',
+					'label' => __( 'Title', 'all-purpose-directory' ),
+				],
+				[
+					'value' => 'modified',
+					'label' => __( 'Modified', 'all-purpose-directory' ),
+				],
+				[
+					'value' => 'rand',
+					'label' => __( 'Random', 'all-purpose-directory' ),
+				],
+				[
+					'value' => 'views',
+					'label' => __( 'Views', 'all-purpose-directory' ),
+				],
 			],
 			'orderOptions'   => [
-				[ 'value' => 'DESC', 'label' => __( 'Descending', 'all-purpose-directory' ) ],
-				[ 'value' => 'ASC', 'label' => __( 'Ascending', 'all-purpose-directory' ) ],
+				[
+					'value' => 'DESC',
+					'label' => __( 'Descending', 'all-purpose-directory' ),
+				],
+				[
+					'value' => 'ASC',
+					'label' => __( 'Ascending', 'all-purpose-directory' ),
+				],
 			],
 		];
 

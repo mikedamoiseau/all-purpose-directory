@@ -46,16 +46,16 @@ final class SearchFormShortcode extends AbstractShortcode {
 	 * @var array<string, mixed>
 	 */
 	protected array $defaults = [
-		'filters'         => '',
-		'show_keyword'    => 'true',
-		'show_category'   => 'true',
-		'show_tag'        => 'false',
-		'show_submit'     => 'true',
-		'submit_text'     => '',
-		'action'          => '',
-		'layout'          => 'horizontal',
-		'show_active'     => 'false',
-		'class'           => '',
+		'filters'       => '',
+		'show_keyword'  => 'true',
+		'show_category' => 'true',
+		'show_tag'      => 'false',
+		'show_submit'   => 'true',
+		'submit_text'   => '',
+		'action'        => '',
+		'layout'        => 'horizontal',
+		'show_active'   => 'false',
+		'class'         => '',
 	];
 
 	/**
@@ -64,52 +64,52 @@ final class SearchFormShortcode extends AbstractShortcode {
 	 * @var array<string, array>
 	 */
 	protected array $attribute_docs = [
-		'filters'         => [
+		'filters'       => [
 			'type'        => 'string',
 			'description' => 'Specific filter names to show (comma-separated).',
 			'default'     => '',
 		],
-		'show_keyword'    => [
+		'show_keyword'  => [
 			'type'        => 'boolean',
 			'description' => 'Show keyword search field.',
 			'default'     => 'true',
 		],
-		'show_category'   => [
+		'show_category' => [
 			'type'        => 'boolean',
 			'description' => 'Show category filter.',
 			'default'     => 'true',
 		],
-		'show_tag'        => [
+		'show_tag'      => [
 			'type'        => 'boolean',
 			'description' => 'Show tag filter.',
 			'default'     => 'false',
 		],
-		'show_submit'     => [
+		'show_submit'   => [
 			'type'        => 'boolean',
 			'description' => 'Show submit button.',
 			'default'     => 'true',
 		],
-		'submit_text'     => [
+		'submit_text'   => [
 			'type'        => 'string',
 			'description' => 'Submit button text.',
 			'default'     => 'Search',
 		],
-		'action'          => [
+		'action'        => [
 			'type'        => 'string',
 			'description' => 'Form action URL (defaults to listings archive).',
 			'default'     => '',
 		],
-		'layout'          => [
+		'layout'        => [
 			'type'        => 'slug',
 			'description' => 'Form layout: horizontal, vertical, or inline.',
 			'default'     => 'horizontal',
 		],
-		'show_active'     => [
+		'show_active'   => [
 			'type'        => 'boolean',
 			'description' => 'Show active filters below form.',
 			'default'     => 'false',
 		],
-		'class'           => [
+		'class'         => [
 			'type'        => 'string',
 			'description' => 'Additional CSS classes.',
 			'default'     => '',

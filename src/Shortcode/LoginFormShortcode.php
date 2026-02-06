@@ -44,16 +44,16 @@ final class LoginFormShortcode extends AbstractShortcode {
 	 * @var array<string, mixed>
 	 */
 	protected array $defaults = [
-		'redirect'        => '',
-		'label_username'  => '',
-		'label_password'  => '',
-		'label_remember'  => '',
-		'label_log_in'    => '',
-		'show_remember'   => 'true',
-		'show_register'   => 'true',
+		'redirect'           => '',
+		'label_username'     => '',
+		'label_password'     => '',
+		'label_remember'     => '',
+		'label_log_in'       => '',
+		'show_remember'      => 'true',
+		'show_register'      => 'true',
 		'show_lost_password' => 'true',
-		'logged_in_message' => '',
-		'class'           => '',
+		'logged_in_message'  => '',
+		'class'              => '',
 	];
 
 	/**
@@ -62,37 +62,37 @@ final class LoginFormShortcode extends AbstractShortcode {
 	 * @var array<string, array>
 	 */
 	protected array $attribute_docs = [
-		'redirect'        => [
+		'redirect'           => [
 			'type'        => 'string',
 			'description' => 'URL to redirect to after login.',
 			'default'     => 'current page',
 		],
-		'label_username'  => [
+		'label_username'     => [
 			'type'        => 'string',
 			'description' => 'Label for username field.',
 			'default'     => 'Username or Email Address',
 		],
-		'label_password'  => [
+		'label_password'     => [
 			'type'        => 'string',
 			'description' => 'Label for password field.',
 			'default'     => 'Password',
 		],
-		'label_remember'  => [
+		'label_remember'     => [
 			'type'        => 'string',
 			'description' => 'Label for remember me checkbox.',
 			'default'     => 'Remember Me',
 		],
-		'label_log_in'    => [
+		'label_log_in'       => [
 			'type'        => 'string',
 			'description' => 'Text for login button.',
 			'default'     => 'Log In',
 		],
-		'show_remember'   => [
+		'show_remember'      => [
 			'type'        => 'boolean',
 			'description' => 'Show remember me checkbox.',
 			'default'     => 'true',
 		],
-		'show_register'   => [
+		'show_register'      => [
 			'type'        => 'boolean',
 			'description' => 'Show registration link.',
 			'default'     => 'true',
@@ -102,12 +102,12 @@ final class LoginFormShortcode extends AbstractShortcode {
 			'description' => 'Show lost password link.',
 			'default'     => 'true',
 		],
-		'logged_in_message' => [
+		'logged_in_message'  => [
 			'type'        => 'string',
 			'description' => 'Message to show when user is logged in.',
 			'default'     => '',
 		],
-		'class'           => [
+		'class'              => [
 			'type'        => 'string',
 			'description' => 'Additional CSS classes.',
 			'default'     => '',
@@ -195,13 +195,13 @@ final class LoginFormShortcode extends AbstractShortcode {
 	 */
 	private function build_form_args( array $atts ): array {
 		$args = [
-			'echo'           => false,
-			'remember'       => $atts['show_remember'],
-			'form_id'        => 'apd-login-form',
-			'id_username'    => 'apd-user-login',
-			'id_password'    => 'apd-user-pass',
-			'id_remember'    => 'apd-remember-me',
-			'id_submit'      => 'apd-login-submit',
+			'echo'        => false,
+			'remember'    => $atts['show_remember'],
+			'form_id'     => 'apd-login-form',
+			'id_username' => 'apd-user-login',
+			'id_password' => 'apd-user-pass',
+			'id_remember' => 'apd-remember-me',
+			'id_submit'   => 'apd-login-submit',
 		];
 
 		// Redirect URL.

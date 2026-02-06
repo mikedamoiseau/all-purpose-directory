@@ -111,7 +111,7 @@ class ReviewsEndpoint {
 					'callback'            => [ $this, 'delete_review' ],
 					'permission_callback' => [ $this, 'permission_delete_review' ],
 					'args'                => [
-						'id' => [
+						'id'    => [
 							'description' => __( 'Review ID.', 'all-purpose-directory' ),
 							'type'        => 'integer',
 							'required'    => true,
@@ -529,8 +529,8 @@ class ReviewsEndpoint {
 			'review_count' => $total,
 		];
 
-		$response = $this->controller->create_paginated_response( $items, $total, $page, $per_page );
-		$data     = $response->get_data();
+		$response               = $this->controller->create_paginated_response( $items, $total, $page, $per_page );
+		$data                   = $response->get_data();
 		$data['listing_rating'] = $rating_data;
 		$response->set_data( $data );
 

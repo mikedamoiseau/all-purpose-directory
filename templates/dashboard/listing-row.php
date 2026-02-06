@@ -32,7 +32,17 @@ $edit_url   = $my_listings->get_edit_url( $listing_id );
 		<td class="apd-listing-row__image">
 			<?php if ( has_post_thumbnail( $listing_id ) ) : ?>
 				<a href="<?php echo esc_url( $edit_url ?: get_permalink( $listing_id ) ); ?>" class="apd-listing-row__thumbnail-link">
-					<?php echo get_the_post_thumbnail( $listing_id, 'thumbnail', [ 'class' => 'apd-listing-row__thumbnail', 'loading' => 'lazy', 'decoding' => 'async' ] ); ?>
+					<?php
+					echo get_the_post_thumbnail(
+						$listing_id,
+						'thumbnail',
+						[
+							'class'    => 'apd-listing-row__thumbnail',
+							'loading'  => 'lazy',
+							'decoding' => 'async',
+						]
+					);
+					?>
 				</a>
 			<?php else : ?>
 				<div class="apd-listing-row__thumbnail-placeholder">

@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
-    exit;
+	exit;
 }
 
 // Plugin version.
@@ -48,7 +48,7 @@ define( 'APD_MIN_PHP_VERSION', '8.0' );
  * Load Composer autoloader.
  */
 if ( file_exists( APD_PLUGIN_DIR . 'vendor/autoload.php' ) ) {
-    require_once APD_PLUGIN_DIR . 'vendor/autoload.php';
+	require_once APD_PLUGIN_DIR . 'vendor/autoload.php';
 }
 
 /**
@@ -64,20 +64,20 @@ require_once APD_PLUGIN_DIR . 'includes/demo-data-functions.php';
  * @return void
  */
 function apd_init(): void {
-    // Check PHP version.
-    if ( version_compare( PHP_VERSION, APD_MIN_PHP_VERSION, '<' ) ) {
-        add_action( 'admin_notices', 'apd_php_version_notice' );
-        return;
-    }
+	// Check PHP version.
+	if ( version_compare( PHP_VERSION, APD_MIN_PHP_VERSION, '<' ) ) {
+		add_action( 'admin_notices', 'apd_php_version_notice' );
+		return;
+	}
 
-    // Check WordPress version.
-    if ( version_compare( get_bloginfo( 'version' ), APD_MIN_WP_VERSION, '<' ) ) {
-        add_action( 'admin_notices', 'apd_wp_version_notice' );
-        return;
-    }
+	// Check WordPress version.
+	if ( version_compare( get_bloginfo( 'version' ), APD_MIN_WP_VERSION, '<' ) ) {
+		add_action( 'admin_notices', 'apd_wp_version_notice' );
+		return;
+	}
 
-    // Boot the plugin.
-    \APD\Core\Plugin::get_instance();
+	// Boot the plugin.
+	\APD\Core\Plugin::get_instance();
 }
 add_action( 'plugins_loaded', 'apd_init' );
 
@@ -87,14 +87,14 @@ add_action( 'plugins_loaded', 'apd_init' );
  * @return void
  */
 function apd_php_version_notice(): void {
-    $message = sprintf(
-        /* translators: 1: Required PHP version, 2: Current PHP version */
-        __( 'All Purpose Directory requires PHP %1$s or higher. You are running PHP %2$s.', 'all-purpose-directory' ),
-        APD_MIN_PHP_VERSION,
-        PHP_VERSION
-    );
+	$message = sprintf(
+		/* translators: 1: Required PHP version, 2: Current PHP version */
+		__( 'All Purpose Directory requires PHP %1$s or higher. You are running PHP %2$s.', 'all-purpose-directory' ),
+		APD_MIN_PHP_VERSION,
+		PHP_VERSION
+	);
 
-    printf( '<div class="notice notice-error"><p>%s</p></div>', esc_html( $message ) );
+	printf( '<div class="notice notice-error"><p>%s</p></div>', esc_html( $message ) );
 }
 
 /**
@@ -103,14 +103,14 @@ function apd_php_version_notice(): void {
  * @return void
  */
 function apd_wp_version_notice(): void {
-    $message = sprintf(
-        /* translators: 1: Required WordPress version, 2: Current WordPress version */
-        __( 'All Purpose Directory requires WordPress %1$s or higher. You are running WordPress %2$s.', 'all-purpose-directory' ),
-        APD_MIN_WP_VERSION,
-        get_bloginfo( 'version' )
-    );
+	$message = sprintf(
+		/* translators: 1: Required WordPress version, 2: Current WordPress version */
+		__( 'All Purpose Directory requires WordPress %1$s or higher. You are running WordPress %2$s.', 'all-purpose-directory' ),
+		APD_MIN_WP_VERSION,
+		get_bloginfo( 'version' )
+	);
 
-    printf( '<div class="notice notice-error"><p>%s</p></div>', esc_html( $message ) );
+	printf( '<div class="notice notice-error"><p>%s</p></div>', esc_html( $message ) );
 }
 
 /**
@@ -119,11 +119,11 @@ function apd_wp_version_notice(): void {
  * @return void
  */
 function apd_activate(): void {
-    if ( file_exists( APD_PLUGIN_DIR . 'vendor/autoload.php' ) ) {
-        require_once APD_PLUGIN_DIR . 'vendor/autoload.php';
-    }
+	if ( file_exists( APD_PLUGIN_DIR . 'vendor/autoload.php' ) ) {
+		require_once APD_PLUGIN_DIR . 'vendor/autoload.php';
+	}
 
-    \APD\Core\Activator::activate();
+	\APD\Core\Activator::activate();
 }
 register_activation_hook( __FILE__, 'apd_activate' );
 
@@ -133,6 +133,6 @@ register_activation_hook( __FILE__, 'apd_activate' );
  * @return void
  */
 function apd_deactivate(): void {
-    \APD\Core\Deactivator::deactivate();
+	\APD\Core\Deactivator::deactivate();
 }
 register_deactivation_hook( __FILE__, 'apd_deactivate' );

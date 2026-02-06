@@ -95,7 +95,7 @@ class InquiriesEndpoint {
 					'callback'            => [ $this, 'delete_inquiry' ],
 					'permission_callback' => [ $this, 'permission_view_inquiry' ],
 					'args'                => [
-						'id' => [
+						'id'    => [
 							'description' => __( 'Inquiry ID.', 'all-purpose-directory' ),
 							'type'        => 'integer',
 							'required'    => true,
@@ -405,8 +405,8 @@ class InquiriesEndpoint {
 		}
 
 		// Add unread count to response.
-		$response = $this->controller->create_paginated_response( $items, $total, $page, $per_page );
-		$data     = $response->get_data();
+		$response             = $this->controller->create_paginated_response( $items, $total, $page, $per_page );
+		$data                 = $response->get_data();
 		$data['unread_count'] = apd_get_user_inquiry_count( $user_id, 'unread' );
 		$response->set_data( $data );
 

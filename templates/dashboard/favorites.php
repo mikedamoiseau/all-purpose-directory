@@ -76,11 +76,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 				$listing_id = get_the_ID();
 				$template   = $view_mode === 'grid' ? 'listing-card' : 'listing-card-list';
 
-				apd_get_template_part( $template, null, [
-					'listing_id'   => $listing_id,
-					'current_view' => $view_mode,
-					'show_favorite' => true,
-				] );
+				apd_get_template_part(
+					$template,
+					null,
+					[
+						'listing_id'    => $listing_id,
+						'current_view'  => $view_mode,
+						'show_favorite' => true,
+					]
+				);
 			endwhile;
 			wp_reset_postdata();
 			?>
@@ -89,20 +93,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<?php if ( $max_pages > 1 ) : ?>
 			<nav class="apd-favorites__pagination" aria-label="<?php esc_attr_e( 'Favorites pagination', 'all-purpose-directory' ); ?>">
 				<?php
-				$pagination = paginate_links( [
-					'base'      => add_query_arg( 'fav_page', '%#%' ),
-					'format'    => '',
-					'current'   => $paged,
-					'total'     => $max_pages,
-					'prev_text' => sprintf(
-						'<span class="screen-reader-text">%s</span><span aria-hidden="true">&laquo;</span>',
-						esc_html__( 'Previous page', 'all-purpose-directory' )
-					),
-					'next_text' => sprintf(
-						'<span class="screen-reader-text">%s</span><span aria-hidden="true">&raquo;</span>',
-						esc_html__( 'Next page', 'all-purpose-directory' )
-					),
-				] );
+				$pagination = paginate_links(
+					[
+						'base'      => add_query_arg( 'fav_page', '%#%' ),
+						'format'    => '',
+						'current'   => $paged,
+						'total'     => $max_pages,
+						'prev_text' => sprintf(
+							'<span class="screen-reader-text">%s</span><span aria-hidden="true">&laquo;</span>',
+							esc_html__( 'Previous page', 'all-purpose-directory' )
+						),
+						'next_text' => sprintf(
+							'<span class="screen-reader-text">%s</span><span aria-hidden="true">&raquo;</span>',
+							esc_html__( 'Next page', 'all-purpose-directory' )
+						),
+					]
+				);
 
 				if ( $pagination ) {
 					echo '<div class="apd-pagination__links">' . wp_kses_post( $pagination ) . '</div>';

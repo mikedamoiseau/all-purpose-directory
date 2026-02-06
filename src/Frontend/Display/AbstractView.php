@@ -282,11 +282,14 @@ abstract class AbstractView implements ViewInterface {
 	 * @return string Rendered HTML.
 	 */
 	public function renderListing( int $listing_id, array $args = [] ): string {
-		$template_args = wp_parse_args( $args, [
-			'listing_id'   => $listing_id,
-			'current_view' => $this->type,
-			'view_config'  => $this->config,
-		] );
+		$template_args = wp_parse_args(
+			$args,
+			[
+				'listing_id'   => $listing_id,
+				'current_view' => $this->type,
+				'view_config'  => $this->config,
+			]
+		);
 
 		/**
 		 * Filter the template arguments.
@@ -313,10 +316,10 @@ abstract class AbstractView implements ViewInterface {
 	 */
 	public function renderListings( \WP_Query|array $listings, array $args = [] ): string {
 		$defaults = [
-			'show_container' => true,
+			'show_container'  => true,
 			'show_no_results' => true,
 		];
-		$args = wp_parse_args( $args, $defaults );
+		$args     = wp_parse_args( $args, $defaults );
 
 		// Normalize listings to array of IDs.
 		$listing_ids = $this->normalizeListings( $listings );

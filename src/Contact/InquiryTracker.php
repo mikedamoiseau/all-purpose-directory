@@ -37,12 +37,12 @@ class InquiryTracker {
 	/**
 	 * Meta keys.
 	 */
-	public const META_LISTING_ID = '_apd_inquiry_listing_id';
-	public const META_SENDER_NAME = '_apd_inquiry_sender_name';
+	public const META_LISTING_ID   = '_apd_inquiry_listing_id';
+	public const META_SENDER_NAME  = '_apd_inquiry_sender_name';
 	public const META_SENDER_EMAIL = '_apd_inquiry_sender_email';
 	public const META_SENDER_PHONE = '_apd_inquiry_sender_phone';
-	public const META_SUBJECT = '_apd_inquiry_subject';
-	public const META_READ = '_apd_inquiry_read';
+	public const META_SUBJECT      = '_apd_inquiry_subject';
+	public const META_READ         = '_apd_inquiry_read';
 
 	/**
 	 * Listing meta key for inquiry count.
@@ -104,18 +104,18 @@ class InquiryTracker {
 		];
 
 		$args = [
-			'labels'              => $labels,
-			'public'              => false,
-			'publicly_queryable'  => false,
-			'show_ui'             => false,
-			'show_in_menu'        => false,
-			'query_var'           => false,
-			'rewrite'             => false,
-			'capability_type'     => 'post',
-			'has_archive'         => false,
-			'hierarchical'        => false,
-			'supports'            => [ 'title', 'editor', 'author' ],
-			'show_in_rest'        => false,
+			'labels'             => $labels,
+			'public'             => false,
+			'publicly_queryable' => false,
+			'show_ui'            => false,
+			'show_in_menu'       => false,
+			'query_var'          => false,
+			'rewrite'            => false,
+			'capability_type'    => 'post',
+			'has_archive'        => false,
+			'hierarchical'       => false,
+			'supports'           => [ 'title', 'editor', 'author' ],
+			'show_in_rest'       => false,
 		];
 
 		/**
@@ -152,14 +152,16 @@ class InquiryTracker {
 			return false;
 		}
 
-		$inquiry_id = $this->save_inquiry( [
-			'listing_id'   => $listing->ID,
-			'sender_name'  => $data['contact_name'] ?? '',
-			'sender_email' => $data['contact_email'] ?? '',
-			'sender_phone' => $data['contact_phone'] ?? '',
-			'subject'      => $data['contact_subject'] ?? '',
-			'message'      => $data['contact_message'] ?? '',
-		] );
+		$inquiry_id = $this->save_inquiry(
+			[
+				'listing_id'   => $listing->ID,
+				'sender_name'  => $data['contact_name'] ?? '',
+				'sender_email' => $data['contact_email'] ?? '',
+				'sender_phone' => $data['contact_phone'] ?? '',
+				'subject'      => $data['contact_subject'] ?? '',
+				'message'      => $data['contact_message'] ?? '',
+			]
+		);
 
 		if ( $inquiry_id ) {
 			// Update listing inquiry count.
@@ -197,7 +199,7 @@ class InquiryTracker {
 			return false;
 		}
 
-		$sender_name = sanitize_text_field( $data['sender_name'] ?? '' );
+		$sender_name  = sanitize_text_field( $data['sender_name'] ?? '' );
 		$sender_email = sanitize_email( $data['sender_email'] ?? '' );
 
 		// Create inquiry post.
@@ -443,7 +445,7 @@ class InquiryTracker {
 	 */
 	public function format_inquiry( \WP_Post $post ): array {
 		$listing_id = (int) get_post_meta( $post->ID, self::META_LISTING_ID, true );
-		$listing = get_post( $listing_id );
+		$listing    = get_post( $listing_id );
 
 		return [
 			'id'             => $post->ID,
@@ -563,7 +565,7 @@ class InquiryTracker {
 	 */
 	public function increment_listing_count( int $listing_id ): int {
 		$count = $this->get_listing_inquiry_count( $listing_id );
-		$count++;
+		++$count;
 		update_post_meta( $listing_id, self::LISTING_INQUIRY_COUNT, $count );
 		return $count;
 	}
@@ -588,18 +590,20 @@ class InquiryTracker {
 	 * @return int Recalculated count.
 	 */
 	public function recalculate_listing_count( int $listing_id ): int {
-		$query = new \WP_Query( [
-			'post_type'      => self::POST_TYPE,
-			'posts_per_page' => -1,
-			'fields'         => 'ids',
-			'meta_query'     => [
-				[
-					'key'   => self::META_LISTING_ID,
-					'value' => $listing_id,
-					'type'  => 'NUMERIC',
+		$query = new \WP_Query(
+			[
+				'post_type'      => self::POST_TYPE,
+				'posts_per_page' => -1,
+				'fields'         => 'ids',
+				'meta_query'     => [
+					[
+						'key'   => self::META_LISTING_ID,
+						'value' => $listing_id,
+						'type'  => 'NUMERIC',
+					],
 				],
-			],
-		] );
+			]
+		);
 
 		$count = $query->found_posts;
 		update_post_meta( $listing_id, self::LISTING_INQUIRY_COUNT, $count );

@@ -220,11 +220,11 @@ class ReviewManager {
 
 		// Prepare comment data.
 		$comment_data = [
-			'comment_post_ID'      => $listing_id,
-			'comment_content'      => wp_kses_post( $data['content'] ),
-			'comment_type'         => self::COMMENT_TYPE,
-			'comment_approved'     => $this->get_default_status(),
-			'user_id'              => $user_id,
+			'comment_post_ID'  => $listing_id,
+			'comment_content'  => wp_kses_post( $data['content'] ),
+			'comment_type'     => self::COMMENT_TYPE,
+			'comment_approved' => $this->get_default_status(),
+			'user_id'          => $user_id,
 		];
 
 		// Handle guest reviews.
@@ -556,13 +556,15 @@ class ReviewManager {
 			return null;
 		}
 
-		$comments = get_comments( [
-			'post_id' => $listing_id,
-			'user_id' => $user_id,
-			'type'    => self::COMMENT_TYPE,
-			'number'  => 1,
-			'status'  => 'all',
-		] );
+		$comments = get_comments(
+			[
+				'post_id' => $listing_id,
+				'user_id' => $user_id,
+				'type'    => self::COMMENT_TYPE,
+				'number'  => 1,
+				'status'  => 'all',
+			]
+		);
 
 		if ( empty( $comments ) ) {
 			return null;
@@ -585,13 +587,15 @@ class ReviewManager {
 			return false;
 		}
 
-		$count = get_comments( [
-			'post_id' => $listing_id,
-			'user_id' => $user_id,
-			'type'    => self::COMMENT_TYPE,
-			'count'   => true,
-			'status'  => 'all',
-		] );
+		$count = get_comments(
+			[
+				'post_id' => $listing_id,
+				'user_id' => $user_id,
+				'type'    => self::COMMENT_TYPE,
+				'count'   => true,
+				'status'  => 'all',
+			]
+		);
 
 		return $count > 0;
 	}
@@ -606,12 +610,14 @@ class ReviewManager {
 	 * @return int Review count.
 	 */
 	public function get_review_count( int $listing_id, string $status = 'approved' ): int {
-		$count = get_comments( [
-			'post_id' => $listing_id,
-			'type'    => self::COMMENT_TYPE,
-			'status'  => $this->translate_status( $status ),
-			'count'   => true,
-		] );
+		$count = get_comments(
+			[
+				'post_id' => $listing_id,
+				'type'    => self::COMMENT_TYPE,
+				'status'  => $this->translate_status( $status ),
+				'count'   => true,
+			]
+		);
 
 		return (int) $count;
 	}
@@ -726,8 +732,8 @@ class ReviewManager {
 	 * @return true|\WP_Error True if valid, WP_Error on failure.
 	 */
 	private function validate_review_data( array $data, int $listing_id ): true|\WP_Error {
-		$errors    = new \WP_Error();
-		$user_id   = $data['user_id'] ?? get_current_user_id();
+		$errors       = new \WP_Error();
+		$user_id      = $data['user_id'] ?? get_current_user_id();
 		$is_logged_in = $user_id > 0;
 
 		// Check login requirement.

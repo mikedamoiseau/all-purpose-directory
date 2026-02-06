@@ -169,12 +169,14 @@ class MyListings {
 		$order   = $this->get_order_filter();
 		$paged   = $this->get_current_page();
 
-		$listings = $this->get_listings( [
-			'status'  => $status,
-			'orderby' => $orderby,
-			'order'   => $order,
-			'paged'   => $paged,
-		] );
+		$listings = $this->get_listings(
+			[
+				'status'  => $status,
+				'orderby' => $orderby,
+				'order'   => $order,
+				'paged'   => $paged,
+			]
+		);
 
 		$args = [
 			'my_listings' => $this,
@@ -599,10 +601,13 @@ class MyListings {
 		 */
 		do_action( 'apd_before_change_listing_status', $listing_id, $status, $old_status, $user_id ?? $this->user_id );
 
-		$result = wp_update_post( [
-			'ID'          => $listing_id,
-			'post_status' => $status,
-		], true );
+		$result = wp_update_post(
+			[
+				'ID'          => $listing_id,
+				'post_status' => $status,
+			],
+			true
+		);
 
 		if ( ! is_wp_error( $result ) ) {
 			/**
@@ -696,11 +701,13 @@ class MyListings {
 	 * @return string Action URL with nonce.
 	 */
 	public function get_action_url( int $listing_id, string $action ): string {
-		return add_query_arg( [
-			'apd_action' => $action,
-			'listing_id' => $listing_id,
-			'_apd_nonce' => wp_create_nonce( self::NONCE_ACTION ),
-		] );
+		return add_query_arg(
+			[
+				'apd_action' => $action,
+				'listing_id' => $listing_id,
+				'_apd_nonce' => wp_create_nonce( self::NONCE_ACTION ),
+			]
+		);
 	}
 
 	/**

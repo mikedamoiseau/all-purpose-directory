@@ -59,23 +59,23 @@ class SubmissionForm {
 	 * @var array<string, mixed>
 	 */
 	private const DEFAULTS = [
-		'redirect'            => '',
-		'show_title'          => true,
-		'show_content'        => true,
-		'show_excerpt'        => false,
-		'show_categories'     => true,
-		'show_tags'           => true,
-		'show_featured_image' => true,
-		'show_terms'          => false,
-		'terms_text'          => '',
-		'terms_link'          => '',
-		'terms_required'      => true,
-		'submit_text'         => '',
-		'class'               => '',
-		'listing_id'          => 0,
-		'submitted_values'    => [],
-		'nonce_action'        => 'apd_submit_listing',
-		'nonce_name'          => 'apd_submission_nonce',
+		'redirect'               => '',
+		'show_title'             => true,
+		'show_content'           => true,
+		'show_excerpt'           => false,
+		'show_categories'        => true,
+		'show_tags'              => true,
+		'show_featured_image'    => true,
+		'show_terms'             => false,
+		'terms_text'             => '',
+		'terms_link'             => '',
+		'terms_required'         => true,
+		'submit_text'            => '',
+		'class'                  => '',
+		'listing_id'             => 0,
+		'submitted_values'       => [],
+		'nonce_action'           => 'apd_submit_listing',
+		'nonce_name'             => 'apd_submission_nonce',
 		'enable_spam_protection' => true,
 	];
 
@@ -91,9 +91,9 @@ class SubmissionForm {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array<string, mixed>   $config         Form configuration.
-	 * @param FieldRegistry|null     $field_registry Optional. Field registry instance.
-	 * @param FieldRenderer|null     $field_renderer Optional. Field renderer instance.
+	 * @param array<string, mixed> $config         Form configuration.
+	 * @param FieldRegistry|null   $field_registry Optional. Field registry instance.
+	 * @param FieldRenderer|null   $field_renderer Optional. Field renderer instance.
 	 */
 	public function __construct(
 		array $config = [],
@@ -200,11 +200,13 @@ class SubmissionForm {
 	 * @return array<string, array<string, mixed>> Fields keyed by name.
 	 */
 	public function get_submission_fields(): array {
-		$all_fields = $this->field_registry->get_fields( [
-			'orderby'    => 'priority',
-			'order'      => 'ASC',
-			'admin_only' => false,
-		] );
+		$all_fields = $this->field_registry->get_fields(
+			[
+				'orderby'    => 'priority',
+				'order'      => 'ASC',
+				'admin_only' => false,
+			]
+		);
 
 		/**
 		 * Filter the fields to show in the submission form.
@@ -435,12 +437,14 @@ class SubmissionForm {
 	 * @return \WP_Term[] Array of category terms.
 	 */
 	public function get_categories(): array {
-		$terms = get_terms( [
-			'taxonomy'   => 'apd_category',
-			'hide_empty' => false,
-			'orderby'    => 'name',
-			'order'      => 'ASC',
-		] );
+		$terms = get_terms(
+			[
+				'taxonomy'   => 'apd_category',
+				'hide_empty' => false,
+				'orderby'    => 'name',
+				'order'      => 'ASC',
+			]
+		);
 
 		if ( is_wp_error( $terms ) ) {
 			return [];
@@ -457,12 +461,14 @@ class SubmissionForm {
 	 * @return \WP_Term[] Array of tag terms.
 	 */
 	public function get_tags(): array {
-		$terms = get_terms( [
-			'taxonomy'   => 'apd_tag',
-			'hide_empty' => false,
-			'orderby'    => 'name',
-			'order'      => 'ASC',
-		] );
+		$terms = get_terms(
+			[
+				'taxonomy'   => 'apd_tag',
+				'hide_empty' => false,
+				'orderby'    => 'name',
+				'order'      => 'ASC',
+			]
+		);
 
 		if ( is_wp_error( $terms ) ) {
 			return [];
@@ -482,13 +488,15 @@ class SubmissionForm {
 	 */
 	public function get_category_options( int $parent_id = 0, int $depth = 0 ): array {
 		$options = [];
-		$terms   = get_terms( [
-			'taxonomy'   => 'apd_category',
-			'hide_empty' => false,
-			'parent'     => $parent_id,
-			'orderby'    => 'name',
-			'order'      => 'ASC',
-		] );
+		$terms   = get_terms(
+			[
+				'taxonomy'   => 'apd_category',
+				'hide_empty' => false,
+				'parent'     => $parent_id,
+				'orderby'    => 'name',
+				'order'      => 'ASC',
+			]
+		);
 
 		if ( is_wp_error( $terms ) ) {
 			return $options;

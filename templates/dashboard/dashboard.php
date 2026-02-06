@@ -45,10 +45,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<?php esc_html_e( 'Dashboard Statistics', 'all-purpose-directory' ); ?>
 			</h2>
 			<?php
-			apd_get_template( 'dashboard/stats.php', [
-				'stats'   => $stats,
-				'user_id' => $user_id,
-			] );
+			apd_get_template(
+				'dashboard/stats.php',
+				[
+					'stats'   => $stats,
+					'user_id' => $user_id,
+				]
+			);
 			?>
 		</section>
 	<?php endif; ?>
@@ -56,11 +59,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<div class="apd-dashboard__main">
 		<nav class="apd-dashboard__navigation" aria-label="<?php esc_attr_e( 'Dashboard navigation', 'all-purpose-directory' ); ?>">
 			<?php
-			apd_get_template( 'dashboard/navigation.php', [
-				'tabs'        => $tabs,
-				'current_tab' => $current_tab,
-				'dashboard'   => $dashboard,
-			] );
+			apd_get_template(
+				'dashboard/navigation.php',
+				[
+					'tabs'        => $tabs,
+					'current_tab' => $current_tab,
+					'dashboard'   => $dashboard,
+				]
+			);
 			?>
 		</nav>
 

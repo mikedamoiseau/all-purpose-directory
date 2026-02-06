@@ -163,10 +163,12 @@ class FavoritesPage {
 
 		$paged     = $this->get_current_page();
 		$view_mode = $this->get_view_mode();
-		$favorites = $this->get_favorites( [
-			'paged'    => $paged,
-			'per_page' => $this->config['per_page'],
-		] );
+		$favorites = $this->get_favorites(
+			[
+				'paged'    => $paged,
+				'per_page' => $this->config['per_page'],
+			]
+		);
 
 		$args = [
 			'favorites_page' => $this,
@@ -216,11 +218,13 @@ class FavoritesPage {
 
 		// Return empty query if no favorites.
 		if ( empty( $favorite_ids ) ) {
-			return new \WP_Query( [
-				'post_type'      => PostType::POST_TYPE,
-				'post__in'       => [ 0 ], // Force empty result.
-				'posts_per_page' => 1,
-			] );
+			return new \WP_Query(
+				[
+					'post_type'      => PostType::POST_TYPE,
+					'post__in'       => [ 0 ], // Force empty result.
+					'posts_per_page' => 1,
+				]
+			);
 		}
 
 		$query_args = [
@@ -341,10 +345,12 @@ class FavoritesPage {
 	 * @return string View mode URL.
 	 */
 	public function get_view_mode_url( string $view_mode ): string {
-		return add_query_arg( [
-			'view'     => $view_mode,
-			'fav_page' => 1, // Reset to page 1 when changing view.
-		] );
+		return add_query_arg(
+			[
+				'view'     => $view_mode,
+				'fav_page' => 1, // Reset to page 1 when changing view.
+			]
+		);
 	}
 
 	/**

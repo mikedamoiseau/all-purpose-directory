@@ -35,12 +35,12 @@ class ContactForm {
 	 * @var array
 	 */
 	private array $config = [
-		'show_phone'      => true,
-		'phone_required'  => false,
-		'show_subject'    => false,
-		'subject_required' => false,
+		'show_phone'         => true,
+		'phone_required'     => false,
+		'show_subject'       => false,
+		'subject_required'   => false,
 		'min_message_length' => 10,
-		'class'           => '',
+		'class'              => '',
 	];
 
 	/**
@@ -292,6 +292,7 @@ class ContactForm {
 	 * @return void
 	 */
 	public function render( ?int $listing_id = null ): void {
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped in get_html().
 		echo $this->get_html( $listing_id );
 	}
 
@@ -318,7 +319,7 @@ class ContactForm {
 
 		// Get listing owner.
 		$owner_id = (int) $listing->post_author;
-		$owner = get_userdata( $owner_id );
+		$owner    = get_userdata( $owner_id );
 
 		if ( ! $owner ) {
 			return '';
@@ -332,16 +333,21 @@ class ContactForm {
 		 * @param int         $listing_id Listing ID.
 		 * @param ContactForm $form    ContactForm instance.
 		 */
-		$args = apply_filters( 'apd_contact_form_args', [
-			'form'        => $this,
-			'listing_id'  => $this->listing_id,
-			'listing'     => $listing,
-			'owner'       => $owner,
-			'errors'      => $this->errors,
-			'values'      => $this->values,
-			'nonce_action' => self::NONCE_ACTION,
-			'nonce_name'  => self::NONCE_NAME,
-		], $this->listing_id, $this );
+		$args = apply_filters(
+			'apd_contact_form_args',
+			[
+				'form'         => $this,
+				'listing_id'   => $this->listing_id,
+				'listing'      => $listing,
+				'owner'        => $owner,
+				'errors'       => $this->errors,
+				'values'       => $this->values,
+				'nonce_action' => self::NONCE_ACTION,
+				'nonce_name'   => self::NONCE_NAME,
+			],
+			$this->listing_id,
+			$this
+		);
 
 		ob_start();
 

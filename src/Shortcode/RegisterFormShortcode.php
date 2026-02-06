@@ -44,10 +44,10 @@ final class RegisterFormShortcode extends AbstractShortcode {
 	 * @var array<string, mixed>
 	 */
 	protected array $defaults = [
-		'redirect'        => '',
-		'show_login'      => 'true',
+		'redirect'          => '',
+		'show_login'        => 'true',
 		'logged_in_message' => '',
-		'class'           => '',
+		'class'             => '',
 	];
 
 	/**
@@ -56,12 +56,12 @@ final class RegisterFormShortcode extends AbstractShortcode {
 	 * @var array<string, array>
 	 */
 	protected array $attribute_docs = [
-		'redirect'        => [
+		'redirect'          => [
 			'type'        => 'string',
 			'description' => 'URL to redirect to after registration.',
 			'default'     => 'current page',
 		],
-		'show_login'      => [
+		'show_login'        => [
 			'type'        => 'boolean',
 			'description' => 'Show link to login page.',
 			'default'     => 'true',
@@ -71,7 +71,7 @@ final class RegisterFormShortcode extends AbstractShortcode {
 			'description' => 'Message to show when user is logged in.',
 			'default'     => '',
 		],
-		'class'           => [
+		'class'             => [
 			'type'        => 'string',
 			'description' => 'Additional CSS classes.',
 			'default'     => '',
@@ -119,7 +119,7 @@ final class RegisterFormShortcode extends AbstractShortcode {
 		}
 
 		// Handle form submission.
-		$errors = $this->process_registration();
+		$errors  = $this->process_registration();
 		$success = false;
 
 		if ( is_array( $errors ) && empty( $errors ) ) {
@@ -198,12 +198,12 @@ final class RegisterFormShortcode extends AbstractShortcode {
 					<span class="apd-required">*</span>
 				</label>
 				<input type="text"
-					   name="apd_register_username"
-					   id="apd-register-username"
-					   class="apd-form-input"
-					   value="<?php echo esc_attr( $username ); ?>"
-					   required
-					   autocomplete="username">
+						name="apd_register_username"
+						id="apd-register-username"
+						class="apd-form-input"
+						value="<?php echo esc_attr( $username ); ?>"
+						required
+						autocomplete="username">
 			</div>
 
 			<div class="apd-form-field">
@@ -212,12 +212,12 @@ final class RegisterFormShortcode extends AbstractShortcode {
 					<span class="apd-required">*</span>
 				</label>
 				<input type="email"
-					   name="apd_register_email"
-					   id="apd-register-email"
-					   class="apd-form-input"
-					   value="<?php echo esc_attr( $email ); ?>"
-					   required
-					   autocomplete="email">
+						name="apd_register_email"
+						id="apd-register-email"
+						class="apd-form-input"
+						value="<?php echo esc_attr( $email ); ?>"
+						required
+						autocomplete="email">
 			</div>
 
 			<p class="apd-form-note">
@@ -260,7 +260,7 @@ final class RegisterFormShortcode extends AbstractShortcode {
 
 		// Verify nonce.
 		if ( ! isset( $_POST['apd_register_nonce'] ) ||
-			 ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['apd_register_nonce'] ) ), 'apd_register_user' ) ) {
+			! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['apd_register_nonce'] ) ), 'apd_register_user' ) ) {
 			return [ __( 'Security check failed. Please try again.', 'all-purpose-directory' ) ];
 		}
 

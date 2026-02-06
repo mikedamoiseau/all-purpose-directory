@@ -138,8 +138,8 @@ class MultiSelectField extends AbstractFieldType {
 		$values = is_array( $value ) ? $value : [];
 
 		// Check all values exist in options.
-		$options      = $field['options'] ?? [];
-		$option_keys  = array_map( 'strval', array_keys( $options ) );
+		$options       = $field['options'] ?? [];
+		$option_keys   = array_map( 'strval', array_keys( $options ) );
 		$string_values = array_map( 'strval', $values );
 
 		foreach ( $string_values as $selected_value ) {
@@ -190,7 +190,7 @@ class MultiSelectField extends AbstractFieldType {
 		$labels  = [];
 
 		foreach ( $values as $selected_value ) {
-			$label = $options[ (string) $selected_value ] ?? (string) $selected_value;
+			$label    = $options[ (string) $selected_value ] ?? (string) $selected_value;
 			$labels[] = $label;
 		}
 

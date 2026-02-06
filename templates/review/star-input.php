@@ -66,7 +66,8 @@ $star_count      = $star_count ?? 5;
 		<?php if ( $selected_rating > 0 ) : ?>
 			<span class="apd-star-input__selected-text">
 				<?php
-				echo esc_html( $selected_rating === 1
+				echo esc_html(
+					$selected_rating === 1
 					/* translators: %d: number of stars (singular) */
 					? sprintf( __( '%d star selected', 'all-purpose-directory' ), $selected_rating )
 					/* translators: %d: number of stars (plural) */

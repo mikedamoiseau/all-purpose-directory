@@ -259,7 +259,7 @@ final class Settings {
 		add_settings_section(
 			$section_id,
 			__( 'General Settings', 'all-purpose-directory' ),
-			function() {
+			function () {
 				echo '<p>' . esc_html__( 'Configure general plugin settings.', 'all-purpose-directory' ) . '</p>';
 			},
 			$page
@@ -303,12 +303,12 @@ final class Settings {
 			[
 				'field'       => 'date_format',
 				'options'     => [
-					'default'  => __( 'WordPress Default', 'all-purpose-directory' ),
-					'Y-m-d'    => 'YYYY-MM-DD (2024-01-15)',
-					'm/d/Y'    => 'MM/DD/YYYY (01/15/2024)',
-					'd/m/Y'    => 'DD/MM/YYYY (15/01/2024)',
-					'F j, Y'   => 'Month Day, Year (January 15, 2024)',
-					'j F Y'    => 'Day Month Year (15 January 2024)',
+					'default' => __( 'WordPress Default', 'all-purpose-directory' ),
+					'Y-m-d'   => 'YYYY-MM-DD (2024-01-15)',
+					'm/d/Y'   => 'MM/DD/YYYY (01/15/2024)',
+					'd/m/Y'   => 'DD/MM/YYYY (15/01/2024)',
+					'F j, Y'  => 'Month Day, Year (January 15, 2024)',
+					'j F Y'   => 'Day Month Year (15 January 2024)',
 				],
 				'description' => __( 'Date format for listing dates.', 'all-purpose-directory' ),
 			]
@@ -345,7 +345,7 @@ final class Settings {
 		add_settings_section(
 			$section_id,
 			__( 'Listing Settings', 'all-purpose-directory' ),
-			function() {
+			function () {
 				echo '<p>' . esc_html__( 'Configure listing display and behavior.', 'all-purpose-directory' ) . '</p>';
 			},
 			$page
@@ -401,7 +401,7 @@ final class Settings {
 		add_settings_section(
 			$features_section,
 			__( 'Features', 'all-purpose-directory' ),
-			function() {
+			function () {
 				echo '<p>' . esc_html__( 'Enable or disable listing features.', 'all-purpose-directory' ) . '</p>';
 			},
 			$page
@@ -414,8 +414,8 @@ final class Settings {
 			$page,
 			$features_section,
 			[
-				'field'       => 'enable_reviews',
-				'label'       => __( 'Allow users to leave reviews on listings.', 'all-purpose-directory' ),
+				'field' => 'enable_reviews',
+				'label' => __( 'Allow users to leave reviews on listings.', 'all-purpose-directory' ),
 			]
 		);
 
@@ -426,8 +426,8 @@ final class Settings {
 			$page,
 			$features_section,
 			[
-				'field'       => 'enable_favorites',
-				'label'       => __( 'Allow users to save listings to favorites.', 'all-purpose-directory' ),
+				'field' => 'enable_favorites',
+				'label' => __( 'Allow users to save listings to favorites.', 'all-purpose-directory' ),
 			]
 		);
 
@@ -438,8 +438,8 @@ final class Settings {
 			$page,
 			$features_section,
 			[
-				'field'       => 'enable_contact_form',
-				'label'       => __( 'Show contact form on listing pages.', 'all-purpose-directory' ),
+				'field' => 'enable_contact_form',
+				'label' => __( 'Show contact form on listing pages.', 'all-purpose-directory' ),
 			]
 		);
 	}
@@ -458,7 +458,7 @@ final class Settings {
 		add_settings_section(
 			$section_id,
 			__( 'Submission Settings', 'all-purpose-directory' ),
-			function() {
+			function () {
 				echo '<p>' . esc_html__( 'Configure frontend listing submission settings.', 'all-purpose-directory' ) . '</p>';
 			},
 			$page
@@ -500,8 +500,8 @@ final class Settings {
 			$page,
 			$section_id,
 			[
-				'field'       => 'guest_submission',
-				'label'       => __( 'Allow guests to submit listings with email address.', 'all-purpose-directory' ),
+				'field' => 'guest_submission',
+				'label' => __( 'Allow guests to submit listings with email address.', 'all-purpose-directory' ),
 			]
 		);
 
@@ -549,7 +549,7 @@ final class Settings {
 		add_settings_section(
 			$section_id,
 			__( 'Display Settings', 'all-purpose-directory' ),
-			function() {
+			function () {
 				echo '<p>' . esc_html__( 'Configure how listings are displayed.', 'all-purpose-directory' ) . '</p>';
 			},
 			$page
@@ -593,7 +593,7 @@ final class Settings {
 		add_settings_section(
 			$elements_section,
 			__( 'Card Elements', 'all-purpose-directory' ),
-			function() {
+			function () {
 				echo '<p>' . esc_html__( 'Choose which elements to show on listing cards.', 'all-purpose-directory' ) . '</p>';
 			},
 			$page
@@ -664,7 +664,7 @@ final class Settings {
 		add_settings_section(
 			$layout_section,
 			__( 'Layout', 'all-purpose-directory' ),
-			function() {
+			function () {
 				echo '<p>' . esc_html__( 'Configure page layouts.', 'all-purpose-directory' ) . '</p>';
 			},
 			$page
@@ -713,7 +713,7 @@ final class Settings {
 		add_settings_section(
 			$section_id,
 			__( 'Email Settings', 'all-purpose-directory' ),
-			function() {
+			function () {
 				echo '<p>' . esc_html__( 'Configure email sender information.', 'all-purpose-directory' ) . '</p>';
 			},
 			$page
@@ -760,7 +760,7 @@ final class Settings {
 		add_settings_section(
 			$notifications_section,
 			__( 'Email Notifications', 'all-purpose-directory' ),
-			function() {
+			function () {
 				echo '<p>' . esc_html__( 'Enable or disable email notifications.', 'all-purpose-directory' ) . '</p>';
 			},
 			$page
@@ -853,7 +853,7 @@ final class Settings {
 		add_settings_section(
 			$section_id,
 			__( 'Advanced Settings', 'all-purpose-directory' ),
-			function() {
+			function () {
 				echo '<p>' . esc_html__( 'Advanced configuration options.', 'all-purpose-directory' ) . '</p>';
 			},
 			$page
@@ -1055,14 +1055,17 @@ final class Settings {
 		$field = sanitize_key( $args['field'] );
 		$value = $this->get( $field );
 
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_dropdown_pages handles escaping internally.
-		wp_dropdown_pages( [
-			'name'              => self::OPTION_NAME . '[' . $field . ']',
-			'id'                => $field,
-			'selected'          => (int) $value,
-			'show_option_none'  => __( '— Select Page —', 'all-purpose-directory' ),
-			'option_none_value' => 0,
-		] );
+		// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_dropdown_pages handles escaping internally.
+		wp_dropdown_pages(
+			[
+				'name'              => self::OPTION_NAME . '[' . $field . ']',
+				'id'                => $field,
+				'selected'          => (int) $value,
+				'show_option_none'  => __( '— Select Page —', 'all-purpose-directory' ),
+				'option_none_value' => 0,
+			]
+		);
+		// phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped
 
 		if ( ! empty( $args['description'] ) ) {
 			printf( '<p class="description">%s</p>', esc_html( $args['description'] ) );
@@ -1106,10 +1109,10 @@ final class Settings {
 	 * @return void
 	 */
 	public function render_roles_field( array $args ): void {
-		$field         = $args['field'];
-		$selected      = $this->get( $field, [] );
-		$who_can       = $this->get( 'who_can_submit' );
-		$hidden_class  = $who_can !== 'specific_roles' ? 'hidden' : '';
+		$field          = $args['field'];
+		$selected       = $this->get( $field, [] );
+		$who_can        = $this->get( 'who_can_submit' );
+		$hidden_class   = $who_can !== 'specific_roles' ? 'hidden' : '';
 		$editable_roles = wp_roles()->roles;
 
 		printf(
@@ -1313,8 +1316,8 @@ final class Settings {
 				}
 				?>
 				<a href="<?php echo esc_url( $tab_url ); ?>"
-				   class="<?php echo esc_attr( $classes ); ?>"
-				   <?php echo $is_active ? 'aria-current="page"' : ''; ?>>
+					class="<?php echo esc_attr( $classes ); ?>"
+					<?php echo $is_active ? 'aria-current="page"' : ''; ?>>
 					<?php echo esc_html( $tab['label'] ); ?>
 				</a>
 			<?php endforeach; ?>

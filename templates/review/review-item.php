@@ -71,10 +71,13 @@ $star_label = $review['rating'] === 1
 		<div class="apd-review-item__rating" aria-label="<?php echo esc_attr( $star_label ); ?>">
 			<?php
 			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Output is escaped in render_stars method.
-			echo $calculator->render_stars( (float) $review['rating'], [
-				'size'   => 'small',
-				'inline' => true,
-			] );
+			echo $calculator->render_stars(
+				(float) $review['rating'],
+				[
+					'size'   => 'small',
+					'inline' => true,
+				]
+			);
 			?>
 		</div>
 

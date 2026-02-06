@@ -19,10 +19,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$has_errors    = ! empty( $errors );
-$has_image     = $featured_image_id > 0;
-$image_url     = '';
-$image_alt     = '';
+$has_errors = ! empty( $errors );
+$has_image  = $featured_image_id > 0;
+$image_url  = '';
+$image_alt  = '';
 
 if ( $has_image ) {
 	$image_url = wp_get_attachment_image_url( $featured_image_id, 'medium' );

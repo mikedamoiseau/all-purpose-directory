@@ -93,7 +93,7 @@ class CheckboxField extends AbstractFieldType {
 			$attributes = array_merge( $attributes, $field['attributes'] );
 		}
 
-		$html = '<label class="apd-checkbox-label">';
+		$html  = '<label class="apd-checkbox-label">';
 		$html .= sprintf(
 			'<input %s%s>',
 			$this->buildAttributes( $attributes ),

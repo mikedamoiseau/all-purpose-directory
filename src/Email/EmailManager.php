@@ -44,14 +44,14 @@ class EmailManager {
 	 * @var array
 	 */
 	private array $config = [
-		'from_name'       => '',
-		'from_email'      => '',
-		'admin_email'     => '',
-		'content_type'    => 'text/html',
-		'charset'         => 'UTF-8',
-		'enable_html'     => true,
-		'use_templates'   => true,
-		'notifications'   => [
+		'from_name'     => '',
+		'from_email'    => '',
+		'admin_email'   => '',
+		'content_type'  => 'text/html',
+		'charset'       => 'UTF-8',
+		'enable_html'   => true,
+		'use_templates' => true,
+		'notifications' => [
 			'listing_submitted' => true,
 			'listing_approved'  => true,
 			'listing_rejected'  => true,
@@ -117,25 +117,40 @@ class EmailManager {
 	 */
 	private function register_default_placeholders(): void {
 		// Site placeholders.
-		$this->register_placeholder( 'site_name', function () {
-			return get_bloginfo( 'name' );
-		} );
+		$this->register_placeholder(
+			'site_name',
+			function () {
+				return get_bloginfo( 'name' );
+			}
+		);
 
-		$this->register_placeholder( 'site_url', function () {
-			return home_url();
-		} );
+		$this->register_placeholder(
+			'site_url',
+			function () {
+				return home_url();
+			}
+		);
 
-		$this->register_placeholder( 'admin_email', function () {
-			return $this->get_admin_email();
-		} );
+		$this->register_placeholder(
+			'admin_email',
+			function () {
+				return $this->get_admin_email();
+			}
+		);
 
-		$this->register_placeholder( 'current_date', function () {
-			return wp_date( get_option( 'date_format' ) );
-		} );
+		$this->register_placeholder(
+			'current_date',
+			function () {
+				return wp_date( get_option( 'date_format' ) );
+			}
+		);
 
-		$this->register_placeholder( 'current_time', function () {
-			return wp_date( get_option( 'time_format' ) );
-		} );
+		$this->register_placeholder(
+			'current_time',
+			function () {
+				return wp_date( get_option( 'time_format' ) );
+			}
+		);
 	}
 
 	/**

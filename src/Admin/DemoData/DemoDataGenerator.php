@@ -124,15 +124,17 @@ final class DemoDataGenerator {
 				$email     = $username . '@example.com';
 			}
 
-			$user_id = wp_insert_user( [
-				'user_login'   => $username,
-				'user_email'   => $email,
-				'user_pass'    => wp_generate_password( 16 ),
-				'first_name'   => $first_name,
-				'last_name'    => $last_name,
-				'display_name' => "{$first_name} {$last_name}",
-				'role'         => $role,
-			] );
+			$user_id = wp_insert_user(
+				[
+					'user_login'   => $username,
+					'user_email'   => $email,
+					'user_pass'    => wp_generate_password( 16 ),
+					'first_name'   => $first_name,
+					'last_name'    => $last_name,
+					'display_name' => "{$first_name} {$last_name}",
+					'role'         => $role,
+				]
+			);
 
 			if ( ! is_wp_error( $user_id ) ) {
 				$this->tracker->mark_user_as_demo( $user_id );
@@ -170,7 +172,7 @@ final class DemoDataGenerator {
 			$parent_id = $this->create_category( $slug, $category, 0 );
 
 			if ( $parent_id ) {
-				$term_ids[]                   = $parent_id;
+				$term_ids[]                  = $parent_id;
 				$this->category_ids[ $slug ] = $parent_id;
 
 				// Create child categories.
@@ -178,7 +180,7 @@ final class DemoDataGenerator {
 					foreach ( $category['children'] as $child_slug => $child_data ) {
 						$child_id = $this->create_category( $child_slug, $child_data, $parent_id );
 						if ( $child_id ) {
-							$term_ids[]                         = $child_id;
+							$term_ids[]                        = $child_id;
 							$this->category_ids[ $child_slug ] = $child_id;
 						}
 					}
@@ -395,8 +397,8 @@ final class DemoDataGenerator {
 			"Welcome to {business}, your destination for {service} in {city}. We've been proudly serving our community with dedication and excellence. Our experienced team is committed to providing you with the best possible experience. Stop by and discover why our customers keep coming back!",
 			"{business} offers exceptional {service} in the heart of {neighborhood}. Our mission is to exceed your expectations with every visit. Whether you're a first-time visitor or a long-time customer, we treat everyone like family. Experience the difference today!",
 			"At {business}, we believe in quality above all else. Located in {city}, {state}, we've built our reputation on outstanding {service} and genuine customer care. Our dedicated staff is here to make every interaction memorable. We look forward to serving you!",
-			"Discover {business} - where quality meets convenience in {neighborhood}. Our commitment to excellence has made us a trusted name in {service}. From our welcoming atmosphere to our attention to detail, everything we do is designed with you in mind.",
-			"{business} has been a cornerstone of the {city} community. We take pride in offering top-notch {service} with a personal touch. Our team is passionate about what we do, and it shows in every customer interaction. Come see what sets us apart!",
+			'Discover {business} - where quality meets convenience in {neighborhood}. Our commitment to excellence has made us a trusted name in {service}. From our welcoming atmosphere to our attention to detail, everything we do is designed with you in mind.',
+			'{business} has been a cornerstone of the {city} community. We take pride in offering top-notch {service} with a personal touch. Our team is passionate about what we do, and it shows in every customer interaction. Come see what sets us apart!',
 		];
 
 		$template = $templates[ array_rand( $templates ) ];
@@ -547,12 +549,12 @@ final class DemoDataGenerator {
 				$available_users = array_diff( $user_ids, $reviewers_used );
 				if ( empty( $available_users ) ) {
 					// All users have reviewed, use anonymous reviewer.
-					$user_id      = 0;
-					$reviewer_name = ReviewContent::generate_reviewer_name();
+					$user_id        = 0;
+					$reviewer_name  = ReviewContent::generate_reviewer_name();
 					$reviewer_email = strtolower( str_replace( [ ' ', '.' ], '', $reviewer_name ) ) . '@example.com';
 				} else {
 					$user_id = $available_users[ array_rand( $available_users ) ];
-					$user = get_userdata( $user_id );
+					$user    = get_userdata( $user_id );
 					if ( $user ) {
 						$reviewer_name  = $user->display_name;
 						$reviewer_email = $user->user_email;
@@ -695,10 +697,10 @@ final class DemoDataGenerator {
 					'post_status'  => 'publish',
 					'post_date'    => $inquiry_date,
 					'meta_input'   => [
-						'_apd_listing_id'  => $listing_id,
-						'_apd_sender_name' => $sender_name,
+						'_apd_listing_id'   => $listing_id,
+						'_apd_sender_name'  => $sender_name,
 						'_apd_sender_email' => $sender_email,
-						'_apd_read'        => wp_rand( 0, 1 ) ? '1' : '',
+						'_apd_read'         => wp_rand( 0, 1 ) ? '1' : '',
 					],
 				];
 
@@ -764,8 +766,8 @@ final class DemoDataGenerator {
 	 * @return string Selected option.
 	 */
 	private function weighted_random( array $options ): string {
-		$total  = array_sum( $options );
-		$random = wp_rand( 1, $total );
+		$total      = array_sum( $options );
+		$random     = wp_rand( 1, $total );
 		$cumulative = 0;
 
 		foreach ( $options as $option => $weight ) {

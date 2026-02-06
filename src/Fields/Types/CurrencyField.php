@@ -70,11 +70,11 @@ class CurrencyField extends AbstractFieldType {
 	 * @return string The rendered HTML.
 	 */
 	public function render( array $field, mixed $value ): string {
-		$attributes      = $this->getCommonAttributes( $field );
-		$precision       = (int) ( $field['precision'] ?? 2 );
-		$symbol          = $field['currency_symbol'] ?? '$';
-		$position        = $field['currency_position'] ?? 'before';
-		$allow_negative  = ! empty( $field['allow_negative'] );
+		$attributes     = $this->getCommonAttributes( $field );
+		$precision      = (int) ( $field['precision'] ?? 2 );
+		$symbol         = $field['currency_symbol'] ?? '$';
+		$position       = $field['currency_position'] ?? 'before';
+		$allow_negative = ! empty( $field['allow_negative'] );
 
 		// Add currency-specific attributes.
 		if ( isset( $field['min'] ) ) {

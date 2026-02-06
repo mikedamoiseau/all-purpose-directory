@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
-    exit;
+	exit;
 }
 
 /**
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return \APD\Core\Plugin
  */
 function apd(): \APD\Core\Plugin {
-    return \APD\Core\Plugin::get_instance();
+	return \APD\Core\Plugin::get_instance();
 }
 
 /**
@@ -29,9 +29,9 @@ function apd(): \APD\Core\Plugin {
  * @return mixed
  */
 function apd_get_option( string $key, mixed $default = null ): mixed {
-    $options = get_option( 'apd_settings', [] );
+	$options = get_option( 'apd_settings', [] );
 
-    return $options[ $key ] ?? $default;
+	return $options[ $key ] ?? $default;
 }
 
 /**
@@ -40,7 +40,7 @@ function apd_get_option( string $key, mixed $default = null ): mixed {
  * @return bool
  */
 function apd_current_user_can_manage_listings(): bool {
-    return current_user_can( 'edit_apd_listings' );
+	return current_user_can( 'edit_apd_listings' );
 }
 
 /**
@@ -49,7 +49,7 @@ function apd_current_user_can_manage_listings(): bool {
  * @return string
  */
 function apd_get_listing_post_type(): string {
-    return 'apd_listing';
+	return 'apd_listing';
 }
 
 /**
@@ -58,7 +58,7 @@ function apd_get_listing_post_type(): string {
  * @return string
  */
 function apd_get_category_taxonomy(): string {
-    return 'apd_category';
+	return 'apd_category';
 }
 
 /**
@@ -67,7 +67,7 @@ function apd_get_category_taxonomy(): string {
  * @return string
  */
 function apd_get_tag_taxonomy(): string {
-    return 'apd_tag';
+	return 'apd_tag';
 }
 
 /**
@@ -77,13 +77,13 @@ function apd_get_tag_taxonomy(): string {
  * @return bool
  */
 function apd_is_listing( int|\WP_Post|null $post = null ): bool {
-    $post = get_post( $post );
+	$post = get_post( $post );
 
-    if ( ! $post ) {
-        return false;
-    }
+	if ( ! $post ) {
+		return false;
+	}
 
-    return $post->post_type === apd_get_listing_post_type();
+	return $post->post_type === apd_get_listing_post_type();
 }
 
 /**
@@ -95,9 +95,9 @@ function apd_is_listing( int|\WP_Post|null $post = null ): bool {
  * @return mixed
  */
 function apd_get_listing_meta( int $listing_id, string $key, mixed $default = '' ): mixed {
-    $value = get_post_meta( $listing_id, "_apd_{$key}", true );
+	$value = get_post_meta( $listing_id, "_apd_{$key}", true );
 
-    return $value !== '' ? $value : $default;
+	return $value !== '' ? $value : $default;
 }
 
 /**
@@ -109,7 +109,7 @@ function apd_get_listing_meta( int $listing_id, string $key, mixed $default = ''
  * @return int|bool
  */
 function apd_update_listing_meta( int $listing_id, string $key, mixed $value ): int|bool {
-    return update_post_meta( $listing_id, "_apd_{$key}", $value );
+	return update_post_meta( $listing_id, "_apd_{$key}", $value );
 }
 
 /**
@@ -120,7 +120,7 @@ function apd_update_listing_meta( int $listing_id, string $key, mixed $value ): 
  * @return bool
  */
 function apd_delete_listing_meta( int $listing_id, string $key ): bool {
-    return delete_post_meta( $listing_id, "_apd_{$key}" );
+	return delete_post_meta( $listing_id, "_apd_{$key}" );
 }
 
 /**
@@ -131,15 +131,15 @@ function apd_delete_listing_meta( int $listing_id, string $key ): bool {
  * @return void
  */
 function apd_log( mixed $message, string $level = 'debug' ): void {
-    if ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) {
-        return;
-    }
+	if ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) {
+		return;
+	}
 
-    if ( is_array( $message ) || is_object( $message ) ) {
-        $message = print_r( $message, true );
-    }
+	if ( is_array( $message ) || is_object( $message ) ) {
+		$message = print_r( $message, true );
+	}
 
-    error_log( sprintf( '[APD %s] %s', strtoupper( $level ), $message ) );
+	error_log( sprintf( '[APD %s] %s', strtoupper( $level ), $message ) );
 }
 
 /**
@@ -149,13 +149,13 @@ function apd_log( mixed $message, string $level = 'debug' ): void {
  * @return \WP_Term[] Array of WP_Term objects, or empty array if none.
  */
 function apd_get_listing_categories( int $listing_id ): array {
-    $terms = get_the_terms( $listing_id, apd_get_category_taxonomy() );
+	$terms = get_the_terms( $listing_id, apd_get_category_taxonomy() );
 
-    if ( is_wp_error( $terms ) || empty( $terms ) ) {
-        return [];
-    }
+	if ( is_wp_error( $terms ) || empty( $terms ) ) {
+		return [];
+	}
 
-    return $terms;
+	return $terms;
 }
 
 /**
@@ -165,13 +165,13 @@ function apd_get_listing_categories( int $listing_id ): array {
  * @return \WP_Term[] Array of WP_Term objects, or empty array if none.
  */
 function apd_get_listing_tags( int $listing_id ): array {
-    $terms = get_the_terms( $listing_id, apd_get_tag_taxonomy() );
+	$terms = get_the_terms( $listing_id, apd_get_tag_taxonomy() );
 
-    if ( is_wp_error( $terms ) || empty( $terms ) ) {
-        return [];
-    }
+	if ( is_wp_error( $terms ) || empty( $terms ) ) {
+		return [];
+	}
 
-    return $terms;
+	return $terms;
 }
 
 /**
@@ -182,27 +182,27 @@ function apd_get_listing_tags( int $listing_id ): array {
  * @return \WP_Post[] Array of WP_Post objects.
  */
 function apd_get_category_listings( int $category_id, array $args = [] ): array {
-    $defaults = [
-        'post_type'      => apd_get_listing_post_type(),
-        'post_status'    => 'publish',
-        'posts_per_page' => -1,
-        'tax_query'      => [
-            [
-                'taxonomy' => apd_get_category_taxonomy(),
-                'field'    => 'term_id',
-                'terms'    => $category_id,
-            ],
-        ],
-    ];
+	$defaults = [
+		'post_type'      => apd_get_listing_post_type(),
+		'post_status'    => 'publish',
+		'posts_per_page' => -1,
+		'tax_query'      => [
+			[
+				'taxonomy' => apd_get_category_taxonomy(),
+				'field'    => 'term_id',
+				'terms'    => $category_id,
+			],
+		],
+	];
 
-    $query_args = wp_parse_args( $args, $defaults );
+	$query_args = wp_parse_args( $args, $defaults );
 
-    // Allow filtering the query args.
-    $query_args = apply_filters( 'apd_category_listings_query_args', $query_args, $category_id );
+	// Allow filtering the query args.
+	$query_args = apply_filters( 'apd_category_listings_query_args', $query_args, $category_id );
 
-    $query = new \WP_Query( $query_args );
+	$query = new \WP_Query( $query_args );
 
-    return $query->posts;
+	return $query->posts;
 }
 
 /**
@@ -212,25 +212,25 @@ function apd_get_category_listings( int $category_id, array $args = [] ): array 
  * @return \WP_Term[] Array of WP_Term objects with 'count' property.
  */
 function apd_get_categories_with_count( array $args = [] ): array {
-    $defaults = [
-        'taxonomy'   => apd_get_category_taxonomy(),
-        'hide_empty' => false,
-        'orderby'    => 'name',
-        'order'      => 'ASC',
-    ];
+	$defaults = [
+		'taxonomy'   => apd_get_category_taxonomy(),
+		'hide_empty' => false,
+		'orderby'    => 'name',
+		'order'      => 'ASC',
+	];
 
-    $query_args = wp_parse_args( $args, $defaults );
+	$query_args = wp_parse_args( $args, $defaults );
 
-    // Allow filtering the query args.
-    $query_args = apply_filters( 'apd_categories_with_count_args', $query_args );
+	// Allow filtering the query args.
+	$query_args = apply_filters( 'apd_categories_with_count_args', $query_args );
 
-    $terms = get_terms( $query_args );
+	$terms = get_terms( $query_args );
 
-    if ( is_wp_error( $terms ) ) {
-        return [];
-    }
+	if ( is_wp_error( $terms ) ) {
+		return [];
+	}
 
-    return $terms;
+	return $terms;
 }
 
 /**
@@ -240,9 +240,9 @@ function apd_get_categories_with_count( array $args = [] ): array {
  * @return string Dashicon class or empty string.
  */
 function apd_get_category_icon( int|\WP_Term $category ): string {
-    $term_id = $category instanceof \WP_Term ? $category->term_id : $category;
+	$term_id = $category instanceof \WP_Term ? $category->term_id : $category;
 
-    return \APD\Taxonomy\CategoryTaxonomy::get_icon( $term_id );
+	return \APD\Taxonomy\CategoryTaxonomy::get_icon( $term_id );
 }
 
 /**
@@ -252,9 +252,9 @@ function apd_get_category_icon( int|\WP_Term $category ): string {
  * @return string Hex color or empty string.
  */
 function apd_get_category_color( int|\WP_Term $category ): string {
-    $term_id = $category instanceof \WP_Term ? $category->term_id : $category;
+	$term_id = $category instanceof \WP_Term ? $category->term_id : $category;
 
-    return \APD\Taxonomy\CategoryTaxonomy::get_color( $term_id );
+	return \APD\Taxonomy\CategoryTaxonomy::get_color( $term_id );
 }
 
 // ============================================================================
@@ -269,7 +269,7 @@ function apd_get_category_color( int|\WP_Term $category ): string {
  * @return \APD\Fields\FieldRegistry
  */
 function apd_field_registry(): \APD\Fields\FieldRegistry {
-    return \APD\Fields\FieldRegistry::get_instance();
+	return \APD\Fields\FieldRegistry::get_instance();
 }
 
 /**
@@ -294,7 +294,7 @@ function apd_field_registry(): \APD\Fields\FieldRegistry {
  * @return bool True if registered successfully.
  */
 function apd_register_field( string $name, array $config = [] ): bool {
-    return apd_field_registry()->register_field( $name, $config );
+	return apd_field_registry()->register_field( $name, $config );
 }
 
 /**
@@ -306,7 +306,7 @@ function apd_register_field( string $name, array $config = [] ): bool {
  * @return bool True if unregistered successfully.
  */
 function apd_unregister_field( string $name ): bool {
-    return apd_field_registry()->unregister_field( $name );
+	return apd_field_registry()->unregister_field( $name );
 }
 
 /**
@@ -318,7 +318,7 @@ function apd_unregister_field( string $name ): bool {
  * @return array|null Field configuration or null if not found.
  */
 function apd_get_field( string $name ): ?array {
-    return apd_field_registry()->get_field( $name );
+	return apd_field_registry()->get_field( $name );
 }
 
 /**
@@ -336,7 +336,7 @@ function apd_get_field( string $name ): ?array {
  * @return array Array of field configurations keyed by name.
  */
 function apd_get_fields( array $args = [] ): array {
-    return apd_field_registry()->get_fields( $args );
+	return apd_field_registry()->get_fields( $args );
 }
 
 /**
@@ -348,7 +348,7 @@ function apd_get_fields( array $args = [] ): array {
  * @return bool True if registered.
  */
 function apd_has_field( string $name ): bool {
-    return apd_field_registry()->has_field( $name );
+	return apd_field_registry()->has_field( $name );
 }
 
 /**
@@ -360,7 +360,7 @@ function apd_has_field( string $name ): bool {
  * @return bool True if registered successfully.
  */
 function apd_register_field_type( \APD\Contracts\FieldTypeInterface $field_type ): bool {
-    return apd_field_registry()->register_field_type( $field_type );
+	return apd_field_registry()->register_field_type( $field_type );
 }
 
 /**
@@ -372,7 +372,7 @@ function apd_register_field_type( \APD\Contracts\FieldTypeInterface $field_type 
  * @return \APD\Contracts\FieldTypeInterface|null Field type handler or null.
  */
 function apd_get_field_type( string $type ): ?\APD\Contracts\FieldTypeInterface {
-    return apd_field_registry()->get_field_type( $type );
+	return apd_field_registry()->get_field_type( $type );
 }
 
 /**
@@ -384,7 +384,7 @@ function apd_get_field_type( string $type ): ?\APD\Contracts\FieldTypeInterface 
  * @return string The meta key (prefixed with _apd_).
  */
 function apd_get_field_meta_key( string $field_name ): string {
-    return apd_field_registry()->get_meta_key( $field_name );
+	return apd_field_registry()->get_meta_key( $field_name );
 }
 
 /**
@@ -401,38 +401,38 @@ function apd_get_field_meta_key( string $field_name ): string {
  * @return mixed The field value.
  */
 function apd_get_listing_field( int $listing_id, string $field_name, mixed $default = '' ): mixed {
-    $field = apd_get_field( $field_name );
+	$field = apd_get_field( $field_name );
 
-    if ( $field === null ) {
-        // Field not registered, fall back to direct meta retrieval.
-        return apd_get_listing_meta( $listing_id, $field_name, $default );
-    }
+	if ( $field === null ) {
+		// Field not registered, fall back to direct meta retrieval.
+		return apd_get_listing_meta( $listing_id, $field_name, $default );
+	}
 
-    $meta_key = apd_get_field_meta_key( $field_name );
-    $value    = get_post_meta( $listing_id, $meta_key, true );
+	$meta_key = apd_get_field_meta_key( $field_name );
+	$value    = get_post_meta( $listing_id, $meta_key, true );
 
-    // Use field default if no value stored.
-    if ( $value === '' || $value === null ) {
-        $value = $field['default'] ?? $default;
-    }
+	// Use field default if no value stored.
+	if ( $value === '' || $value === null ) {
+		$value = $field['default'] ?? $default;
+	}
 
-    // Apply field type transformation if available.
-    $field_type = apd_get_field_type( $field['type'] );
-    if ( $field_type !== null ) {
-        $value = $field_type->prepareValueFromStorage( $value );
-    }
+	// Apply field type transformation if available.
+	$field_type = apd_get_field_type( $field['type'] );
+	if ( $field_type !== null ) {
+		$value = $field_type->prepareValueFromStorage( $value );
+	}
 
-    /**
-     * Filter the listing field value.
-     *
-     * @since 1.0.0
-     *
-     * @param mixed  $value      The field value.
-     * @param int    $listing_id Listing post ID.
-     * @param string $field_name Field name.
-     * @param array  $field      Field configuration.
-     */
-    return apply_filters( 'apd_listing_field_value', $value, $listing_id, $field_name, $field );
+	/**
+	 * Filter the listing field value.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param mixed  $value      The field value.
+	 * @param int    $listing_id Listing post ID.
+	 * @param string $field_name Field name.
+	 * @param array  $field      Field configuration.
+	 */
+	return apply_filters( 'apd_listing_field_value', $value, $listing_id, $field_name, $field );
 }
 
 /**
@@ -449,32 +449,32 @@ function apd_get_listing_field( int $listing_id, string $field_name, mixed $defa
  * @return int|bool Meta ID on success, false on failure.
  */
 function apd_set_listing_field( int $listing_id, string $field_name, mixed $value ): int|bool {
-    $field = apd_get_field( $field_name );
+	$field = apd_get_field( $field_name );
 
-    if ( $field !== null ) {
-        // Apply field type sanitization and transformation.
-        $field_type = apd_get_field_type( $field['type'] );
-        if ( $field_type !== null ) {
-            $value = $field_type->sanitize( $value );
-            $value = $field_type->prepareValueForStorage( $value );
-        }
-    }
+	if ( $field !== null ) {
+		// Apply field type sanitization and transformation.
+		$field_type = apd_get_field_type( $field['type'] );
+		if ( $field_type !== null ) {
+			$value = $field_type->sanitize( $value );
+			$value = $field_type->prepareValueForStorage( $value );
+		}
+	}
 
-    $meta_key = apd_get_field_meta_key( $field_name );
+	$meta_key = apd_get_field_meta_key( $field_name );
 
-    /**
-     * Filter the value before saving to post meta.
-     *
-     * @since 1.0.0
-     *
-     * @param mixed  $value      The value to save.
-     * @param int    $listing_id Listing post ID.
-     * @param string $field_name Field name.
-     * @param array  $field      Field configuration (or null if not registered).
-     */
-    $value = apply_filters( 'apd_set_listing_field_value', $value, $listing_id, $field_name, $field );
+	/**
+	 * Filter the value before saving to post meta.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param mixed  $value      The value to save.
+	 * @param int    $listing_id Listing post ID.
+	 * @param string $field_name Field name.
+	 * @param array  $field      Field configuration (or null if not registered).
+	 */
+	$value = apply_filters( 'apd_set_listing_field_value', $value, $listing_id, $field_name, $field );
 
-    return update_post_meta( $listing_id, $meta_key, $value );
+	return update_post_meta( $listing_id, $meta_key, $value );
 }
 
 // ============================================================================
@@ -489,13 +489,13 @@ function apd_set_listing_field( int $listing_id, string $field_name, mixed $valu
  * @return \APD\Fields\FieldRenderer
  */
 function apd_field_renderer(): \APD\Fields\FieldRenderer {
-    static $renderer = null;
+	static $renderer = null;
 
-    if ( $renderer === null ) {
-        $renderer = new \APD\Fields\FieldRenderer();
-    }
+	if ( $renderer === null ) {
+		$renderer = new \APD\Fields\FieldRenderer();
+	}
 
-    return $renderer;
+	return $renderer;
 }
 
 /**
@@ -510,9 +510,9 @@ function apd_field_renderer(): \APD\Fields\FieldRenderer {
  * @return string Rendered HTML.
  */
 function apd_render_field( string $field_name, mixed $value = null, string $context = 'admin', int $listing_id = 0 ): string {
-    return apd_field_renderer()
-        ->set_context( $context )
-        ->render_field( $field_name, $value, $listing_id );
+	return apd_field_renderer()
+		->set_context( $context )
+		->render_field( $field_name, $value, $listing_id );
 }
 
 /**
@@ -527,9 +527,9 @@ function apd_render_field( string $field_name, mixed $value = null, string $cont
  * @return string Rendered HTML.
  */
 function apd_render_fields( array $values = [], array $args = [], string $context = 'admin', int $listing_id = 0 ): string {
-    return apd_field_renderer()
-        ->set_context( $context )
-        ->render_fields( $values, $args, $listing_id );
+	return apd_field_renderer()
+		->set_context( $context )
+		->render_fields( $values, $args, $listing_id );
 }
 
 /**
@@ -542,7 +542,7 @@ function apd_render_fields( array $values = [], array $args = [], string $contex
  * @return string Rendered HTML.
  */
 function apd_render_admin_fields( int $listing_id, array $args = [] ): string {
-    return apd_field_renderer()->render_admin_fields( $listing_id, $args );
+	return apd_field_renderer()->render_admin_fields( $listing_id, $args );
 }
 
 /**
@@ -555,7 +555,7 @@ function apd_render_admin_fields( int $listing_id, array $args = [] ): string {
  * @return string Rendered HTML.
  */
 function apd_render_frontend_fields( int $listing_id = 0, array $args = [] ): string {
-    return apd_field_renderer()->render_frontend_fields( $listing_id, $args );
+	return apd_field_renderer()->render_frontend_fields( $listing_id, $args );
 }
 
 /**
@@ -568,7 +568,7 @@ function apd_render_frontend_fields( int $listing_id = 0, array $args = [] ): st
  * @return string Rendered HTML.
  */
 function apd_render_display_fields( int $listing_id, array $args = [] ): string {
-    return apd_field_renderer()->render_display_fields( $listing_id, $args );
+	return apd_field_renderer()->render_display_fields( $listing_id, $args );
 }
 
 /**
@@ -587,7 +587,7 @@ function apd_render_display_fields( int $listing_id, array $args = [] ): string 
  * @return void
  */
 function apd_register_field_group( string $group_id, array $config ): void {
-    apd_field_renderer()->register_group( $group_id, $config );
+	apd_field_renderer()->register_group( $group_id, $config );
 }
 
 /**
@@ -599,7 +599,7 @@ function apd_register_field_group( string $group_id, array $config ): void {
  * @return void
  */
 function apd_unregister_field_group( string $group_id ): void {
-    apd_field_renderer()->unregister_group( $group_id );
+	apd_field_renderer()->unregister_group( $group_id );
 }
 
 /**
@@ -611,7 +611,7 @@ function apd_unregister_field_group( string $group_id ): void {
  * @return void
  */
 function apd_set_field_errors( array|\WP_Error $errors ): void {
-    apd_field_renderer()->set_errors( $errors );
+	apd_field_renderer()->set_errors( $errors );
 }
 
 /**
@@ -622,7 +622,7 @@ function apd_set_field_errors( array|\WP_Error $errors ): void {
  * @return void
  */
 function apd_clear_field_errors(): void {
-    apd_field_renderer()->clear_errors();
+	apd_field_renderer()->clear_errors();
 }
 
 // ============================================================================
@@ -637,13 +637,13 @@ function apd_clear_field_errors(): void {
  * @return \APD\Fields\FieldValidator
  */
 function apd_field_validator(): \APD\Fields\FieldValidator {
-    static $validator = null;
+	static $validator = null;
 
-    if ( $validator === null ) {
-        $validator = new \APD\Fields\FieldValidator();
-    }
+	if ( $validator === null ) {
+		$validator = new \APD\Fields\FieldValidator();
+	}
 
-    return $validator;
+	return $validator;
 }
 
 /**
@@ -657,7 +657,7 @@ function apd_field_validator(): \APD\Fields\FieldValidator {
  * @return bool|\WP_Error True if valid, WP_Error on failure.
  */
 function apd_validate_field( string $field_name, mixed $value, bool $sanitize = true ): bool|\WP_Error {
-    return apd_field_validator()->validate_field( $field_name, $value, $sanitize );
+	return apd_field_validator()->validate_field( $field_name, $value, $sanitize );
 }
 
 /**
@@ -674,7 +674,7 @@ function apd_validate_field( string $field_name, mixed $value, bool $sanitize = 
  * @return bool|\WP_Error True if all valid, WP_Error with all errors on failure.
  */
 function apd_validate_fields( array $values, array $args = [] ): bool|\WP_Error {
-    return apd_field_validator()->validate_fields( $values, $args );
+	return apd_field_validator()->validate_fields( $values, $args );
 }
 
 /**
@@ -687,7 +687,7 @@ function apd_validate_fields( array $values, array $args = [] ): bool|\WP_Error 
  * @return mixed The sanitized value.
  */
 function apd_sanitize_field( string $field_name, mixed $value ): mixed {
-    return apd_field_validator()->sanitize_field( $field_name, $value );
+	return apd_field_validator()->sanitize_field( $field_name, $value );
 }
 
 /**
@@ -703,7 +703,7 @@ function apd_sanitize_field( string $field_name, mixed $value ): mixed {
  * @return array Sanitized values.
  */
 function apd_sanitize_fields( array $values, array $args = [] ): array {
-    return apd_field_validator()->sanitize_fields( $values, $args );
+	return apd_field_validator()->sanitize_fields( $values, $args );
 }
 
 /**
@@ -716,7 +716,7 @@ function apd_sanitize_fields( array $values, array $args = [] ): array {
  * @return array{valid: bool, values: array, errors: \WP_Error|null}
  */
 function apd_process_fields( array $values, array $args = [] ): array {
-    return apd_field_validator()->process_fields( $values, $args );
+	return apd_field_validator()->process_fields( $values, $args );
 }
 
 // ============================================================================
@@ -731,7 +731,7 @@ function apd_process_fields( array $values, array $args = [] ): array {
  * @return \APD\Search\FilterRegistry
  */
 function apd_filter_registry(): \APD\Search\FilterRegistry {
-    return \APD\Search\FilterRegistry::get_instance();
+	return \APD\Search\FilterRegistry::get_instance();
 }
 
 /**
@@ -743,7 +743,7 @@ function apd_filter_registry(): \APD\Search\FilterRegistry {
  * @return bool True if registered successfully.
  */
 function apd_register_filter( \APD\Contracts\FilterInterface $filter ): bool {
-    return apd_filter_registry()->register_filter( $filter );
+	return apd_filter_registry()->register_filter( $filter );
 }
 
 /**
@@ -755,7 +755,7 @@ function apd_register_filter( \APD\Contracts\FilterInterface $filter ): bool {
  * @return bool True if unregistered successfully.
  */
 function apd_unregister_filter( string $name ): bool {
-    return apd_filter_registry()->unregister_filter( $name );
+	return apd_filter_registry()->unregister_filter( $name );
 }
 
 /**
@@ -767,7 +767,7 @@ function apd_unregister_filter( string $name ): bool {
  * @return \APD\Contracts\FilterInterface|null Filter instance or null.
  */
 function apd_get_filter( string $name ): ?\APD\Contracts\FilterInterface {
-    return apd_filter_registry()->get_filter( $name );
+	return apd_filter_registry()->get_filter( $name );
 }
 
 /**
@@ -784,7 +784,7 @@ function apd_get_filter( string $name ): ?\APD\Contracts\FilterInterface {
  * @return array Array of filter instances keyed by name.
  */
 function apd_get_filters( array $args = [] ): array {
-    return apd_filter_registry()->get_filters( $args );
+	return apd_filter_registry()->get_filters( $args );
 }
 
 /**
@@ -796,7 +796,7 @@ function apd_get_filters( array $args = [] ): array {
  * @return bool True if registered.
  */
 function apd_has_filter( string $name ): bool {
-    return apd_filter_registry()->has_filter( $name );
+	return apd_filter_registry()->has_filter( $name );
 }
 
 // ============================================================================
@@ -811,13 +811,13 @@ function apd_has_filter( string $name ): bool {
  * @return \APD\Search\SearchQuery
  */
 function apd_search_query(): \APD\Search\SearchQuery {
-    static $search_query = null;
+	static $search_query = null;
 
-    if ( $search_query === null ) {
-        $search_query = new \APD\Search\SearchQuery();
-    }
+	if ( $search_query === null ) {
+		$search_query = new \APD\Search\SearchQuery();
+	}
 
-    return $search_query;
+	return $search_query;
 }
 
 /**
@@ -831,7 +831,7 @@ function apd_search_query(): \APD\Search\SearchQuery {
  * @return \WP_Query The query result.
  */
 function apd_get_filtered_listings( array $args = [] ): \WP_Query {
-    return apd_search_query()->get_filtered_listings( $args );
+	return apd_search_query()->get_filtered_listings( $args );
 }
 
 /**
@@ -842,7 +842,7 @@ function apd_get_filtered_listings( array $args = [] ): \WP_Query {
  * @return array Orderby options with labels.
  */
 function apd_get_orderby_options(): array {
-    return apd_search_query()->get_orderby_options();
+	return apd_search_query()->get_orderby_options();
 }
 
 // ============================================================================
@@ -857,13 +857,13 @@ function apd_get_orderby_options(): array {
  * @return \APD\Search\FilterRenderer
  */
 function apd_filter_renderer(): \APD\Search\FilterRenderer {
-    static $renderer = null;
+	static $renderer = null;
 
-    if ( $renderer === null ) {
-        $renderer = new \APD\Search\FilterRenderer();
-    }
+	if ( $renderer === null ) {
+		$renderer = new \APD\Search\FilterRenderer();
+	}
 
-    return $renderer;
+	return $renderer;
 }
 
 /**
@@ -883,7 +883,7 @@ function apd_filter_renderer(): \APD\Search\FilterRenderer {
  * @return string The rendered form HTML.
  */
 function apd_render_search_form( array $args = [] ): string {
-    return apd_filter_renderer()->render_search_form( $args );
+	return apd_filter_renderer()->render_search_form( $args );
 }
 
 /**
@@ -896,7 +896,7 @@ function apd_render_search_form( array $args = [] ): string {
  * @return string The rendered filter HTML.
  */
 function apd_render_filter( string $name, ?array $request = null ): string {
-    return apd_filter_renderer()->render_filter( $name, $request );
+	return apd_filter_renderer()->render_filter( $name, $request );
 }
 
 /**
@@ -908,7 +908,7 @@ function apd_render_filter( string $name, ?array $request = null ): string {
  * @return string The rendered HTML.
  */
 function apd_render_active_filters( ?array $request = null ): string {
-    return apd_filter_renderer()->render_active_filters( $request );
+	return apd_filter_renderer()->render_active_filters( $request );
 }
 
 /**
@@ -920,7 +920,7 @@ function apd_render_active_filters( ?array $request = null ): string {
  * @return string The rendered HTML.
  */
 function apd_render_no_results( array $args = [] ): string {
-    return apd_filter_renderer()->render_no_results( $args );
+	return apd_filter_renderer()->render_no_results( $args );
 }
 
 // ============================================================================
@@ -935,7 +935,7 @@ function apd_render_no_results( array $args = [] ): string {
  * @return \APD\Core\Template
  */
 function apd_template(): \APD\Core\Template {
-    return \APD\Core\Template::get_instance();
+	return \APD\Core\Template::get_instance();
 }
 
 /**
@@ -951,7 +951,7 @@ function apd_template(): \APD\Core\Template {
  * @return string|false Full path to template file or false if not found.
  */
 function apd_locate_template( string $template_name ): string|false {
-    return apd_template()->locate_template( $template_name );
+	return apd_template()->locate_template( $template_name );
 }
 
 /**
@@ -968,7 +968,7 @@ function apd_locate_template( string $template_name ): string|false {
  * @return void
  */
 function apd_get_template( string $template_name, array $args = [], bool $require_once = false ): void {
-    apd_template()->get_template( $template_name, $args, $require_once );
+	apd_template()->get_template( $template_name, $args, $require_once );
 }
 
 /**
@@ -981,7 +981,7 @@ function apd_get_template( string $template_name, array $args = [], bool $requir
  * @return string The template HTML.
  */
 function apd_get_template_html( string $template_name, array $args = [] ): string {
-    return apd_template()->get_template_html( $template_name, $args );
+	return apd_template()->get_template_html( $template_name, $args );
 }
 
 /**
@@ -1006,7 +1006,7 @@ function apd_get_template_html( string $template_name, array $args = [] ): strin
  * @return void
  */
 function apd_get_template_part( string $slug, ?string $name = null, array $args = [] ): void {
-    apd_template()->get_template_part( $slug, $name, $args );
+	apd_template()->get_template_part( $slug, $name, $args );
 }
 
 /**
@@ -1020,7 +1020,7 @@ function apd_get_template_part( string $slug, ?string $name = null, array $args 
  * @return string The template HTML.
  */
 function apd_get_template_part_html( string $slug, ?string $name = null, array $args = [] ): string {
-    return apd_template()->get_template_part_html( $slug, $name, $args );
+	return apd_template()->get_template_part_html( $slug, $name, $args );
 }
 
 /**
@@ -1032,7 +1032,7 @@ function apd_get_template_part_html( string $slug, ?string $name = null, array $
  * @return bool True if template exists.
  */
 function apd_template_exists( string $template_name ): bool {
-    return apd_template()->template_exists( $template_name );
+	return apd_template()->template_exists( $template_name );
 }
 
 /**
@@ -1044,7 +1044,7 @@ function apd_template_exists( string $template_name ): bool {
  * @return bool True if template is overridden in theme.
  */
 function apd_is_template_overridden( string $template_name ): bool {
-    return apd_template()->is_template_overridden( $template_name );
+	return apd_template()->is_template_overridden( $template_name );
 }
 
 /**
@@ -1055,7 +1055,7 @@ function apd_is_template_overridden( string $template_name ): bool {
  * @return string Plugin template path.
  */
 function apd_get_plugin_template_path(): string {
-    return apd_template()->get_plugin_template_path();
+	return apd_template()->get_plugin_template_path();
 }
 
 /**
@@ -1066,7 +1066,7 @@ function apd_get_plugin_template_path(): string {
  * @return string Theme template directory (e.g., 'all-purpose-directory/').
  */
 function apd_get_theme_template_dir(): string {
-    return apd_template()->get_theme_template_dir();
+	return apd_template()->get_theme_template_dir();
 }
 
 // ============================================================================
@@ -1081,13 +1081,13 @@ function apd_get_theme_template_dir(): string {
  * @return \APD\Core\TemplateLoader
  */
 function apd_template_loader(): \APD\Core\TemplateLoader {
-    static $loader = null;
+	static $loader = null;
 
-    if ( $loader === null ) {
-        $loader = new \APD\Core\TemplateLoader();
-    }
+	if ( $loader === null ) {
+		$loader = new \APD\Core\TemplateLoader();
+	}
 
-    return $loader;
+	return $loader;
 }
 
 /**
@@ -1098,7 +1098,7 @@ function apd_template_loader(): \APD\Core\TemplateLoader {
  * @return string View mode ('grid' or 'list').
  */
 function apd_get_current_view(): string {
-    return apd_template_loader()->get_current_view();
+	return apd_template_loader()->get_current_view();
 }
 
 /**
@@ -1109,7 +1109,7 @@ function apd_get_current_view(): string {
  * @return int Number of columns (2, 3, or 4).
  */
 function apd_get_grid_columns(): int {
-    return apd_template_loader()->get_grid_columns();
+	return apd_template_loader()->get_grid_columns();
 }
 
 /**
@@ -1121,7 +1121,7 @@ function apd_get_grid_columns(): int {
  * @return string URL with view parameter.
  */
 function apd_get_view_url( string $view ): string {
-    return apd_template_loader()->get_view_url( $view );
+	return apd_template_loader()->get_view_url( $view );
 }
 
 /**
@@ -1132,7 +1132,7 @@ function apd_get_view_url( string $view ): string {
  * @return string The HTML for the view switcher.
  */
 function apd_render_view_switcher(): string {
-    return apd_template_loader()->render_view_switcher();
+	return apd_template_loader()->render_view_switcher();
 }
 
 /**
@@ -1144,7 +1144,7 @@ function apd_render_view_switcher(): string {
  * @return string The HTML for the results count.
  */
 function apd_render_results_count( ?\WP_Query $query = null ): string {
-    return apd_template_loader()->render_results_count( $query );
+	return apd_template_loader()->render_results_count( $query );
 }
 
 /**
@@ -1156,7 +1156,7 @@ function apd_render_results_count( ?\WP_Query $query = null ): string {
  * @return string The pagination HTML.
  */
 function apd_render_pagination( ?\WP_Query $query = null ): string {
-    return apd_template_loader()->render_pagination( $query );
+	return apd_template_loader()->render_pagination( $query );
 }
 
 /**
@@ -1167,7 +1167,7 @@ function apd_render_pagination( ?\WP_Query $query = null ): string {
  * @return string The archive title.
  */
 function apd_get_archive_title(): string {
-    return apd_template_loader()->get_archive_title();
+	return apd_template_loader()->get_archive_title();
 }
 
 /**
@@ -1178,7 +1178,7 @@ function apd_get_archive_title(): string {
  * @return string The archive description.
  */
 function apd_get_archive_description(): string {
-    return apd_template_loader()->get_archive_description();
+	return apd_template_loader()->get_archive_description();
 }
 
 // ============================================================================
@@ -1199,74 +1199,74 @@ function apd_get_archive_description(): string {
  * @return \WP_Post[] Array of related listing posts.
  */
 function apd_get_related_listings( int $listing_id, int $limit = 4, array $args = [] ): array {
-    $categories = apd_get_listing_categories( $listing_id );
-    $tags       = apd_get_listing_tags( $listing_id );
+	$categories = apd_get_listing_categories( $listing_id );
+	$tags       = apd_get_listing_tags( $listing_id );
 
-    // If no categories or tags, return empty.
-    if ( empty( $categories ) && empty( $tags ) ) {
-        return [];
-    }
+	// If no categories or tags, return empty.
+	if ( empty( $categories ) && empty( $tags ) ) {
+		return [];
+	}
 
-    $category_ids = array_map( fn( $term ) => $term->term_id, $categories );
-    $tag_ids      = array_map( fn( $term ) => $term->term_id, $tags );
+	$category_ids = array_map( fn( $term ) => $term->term_id, $categories );
+	$tag_ids      = array_map( fn( $term ) => $term->term_id, $tags );
 
-    // Build tax query.
-    $tax_query = [
-        'relation' => 'OR',
-    ];
+	// Build tax query.
+	$tax_query = [
+		'relation' => 'OR',
+	];
 
-    if ( ! empty( $category_ids ) ) {
-        $tax_query[] = [
-            'taxonomy' => apd_get_category_taxonomy(),
-            'field'    => 'term_id',
-            'terms'    => $category_ids,
-        ];
-    }
+	if ( ! empty( $category_ids ) ) {
+		$tax_query[] = [
+			'taxonomy' => apd_get_category_taxonomy(),
+			'field'    => 'term_id',
+			'terms'    => $category_ids,
+		];
+	}
 
-    if ( ! empty( $tag_ids ) ) {
-        $tax_query[] = [
-            'taxonomy' => apd_get_tag_taxonomy(),
-            'field'    => 'term_id',
-            'terms'    => $tag_ids,
-        ];
-    }
+	if ( ! empty( $tag_ids ) ) {
+		$tax_query[] = [
+			'taxonomy' => apd_get_tag_taxonomy(),
+			'field'    => 'term_id',
+			'terms'    => $tag_ids,
+		];
+	}
 
-    $defaults = [
-        'post_type'           => apd_get_listing_post_type(),
-        'post_status'         => 'publish',
-        'posts_per_page'      => $limit,
-        'post__not_in'        => [ $listing_id ],
-        'ignore_sticky_posts' => true,
-        'orderby'             => 'rand',
-        'tax_query'           => $tax_query, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
-        'no_found_rows'       => true, // Performance: skip counting total rows.
-    ];
+	$defaults = [
+		'post_type'           => apd_get_listing_post_type(),
+		'post_status'         => 'publish',
+		'posts_per_page'      => $limit,
+		'post__not_in'        => [ $listing_id ],
+		'ignore_sticky_posts' => true,
+		'orderby'             => 'rand',
+		'tax_query'           => $tax_query, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+		'no_found_rows'       => true, // Performance: skip counting total rows.
+	];
 
-    $query_args = wp_parse_args( $args, $defaults );
+	$query_args = wp_parse_args( $args, $defaults );
 
-    /**
-     * Filter the related listings query arguments.
-     *
-     * @since 1.0.0
-     *
-     * @param array $query_args The query arguments.
-     * @param int   $listing_id The current listing ID.
-     * @param int   $limit      The limit of related listings.
-     */
-    $query_args = apply_filters( 'apd_related_listings_args', $query_args, $listing_id, $limit );
+	/**
+	 * Filter the related listings query arguments.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $query_args The query arguments.
+	 * @param int   $listing_id The current listing ID.
+	 * @param int   $limit      The limit of related listings.
+	 */
+	$query_args = apply_filters( 'apd_related_listings_args', $query_args, $listing_id, $limit );
 
-    $query = new \WP_Query( $query_args );
+	$query = new \WP_Query( $query_args );
 
-    /**
-     * Filter the related listings.
-     *
-     * @since 1.0.0
-     *
-     * @param \WP_Post[] $posts      The related posts.
-     * @param int        $listing_id The current listing ID.
-     * @param int        $limit      The limit of related listings.
-     */
-    return apply_filters( 'apd_related_listings', $query->posts, $listing_id, $limit );
+	/**
+	 * Filter the related listings.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param \WP_Post[] $posts      The related posts.
+	 * @param int        $listing_id The current listing ID.
+	 * @param int        $limit      The limit of related listings.
+	 */
+	return apply_filters( 'apd_related_listings', $query->posts, $listing_id, $limit );
 }
 
 /**
@@ -1278,7 +1278,7 @@ function apd_get_related_listings( int $listing_id, int $limit = 4, array $args 
  * @return int View count.
  */
 function apd_get_listing_views( int $listing_id ): int {
-    return absint( get_post_meta( $listing_id, '_apd_views_count', true ) );
+	return absint( get_post_meta( $listing_id, '_apd_views_count', true ) );
 }
 
 /**
@@ -1290,20 +1290,20 @@ function apd_get_listing_views( int $listing_id ): int {
  * @return int The new view count.
  */
 function apd_increment_listing_views( int $listing_id ): int {
-    $views = apd_get_listing_views( $listing_id ) + 1;
-    update_post_meta( $listing_id, '_apd_views_count', $views );
+	$views = apd_get_listing_views( $listing_id ) + 1;
+	update_post_meta( $listing_id, '_apd_views_count', $views );
 
-    /**
-     * Fires after a listing's view count is incremented.
-     *
-     * @since 1.0.0
-     *
-     * @param int $listing_id The listing post ID.
-     * @param int $views      The new view count.
-     */
-    do_action( 'apd_listing_viewed', $listing_id, $views );
+	/**
+	 * Fires after a listing's view count is incremented.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int $listing_id The listing post ID.
+	 * @param int $views      The new view count.
+	 */
+	do_action( 'apd_listing_viewed', $listing_id, $views );
 
-    return $views;
+	return $views;
 }
 
 // ============================================================================
@@ -1318,7 +1318,7 @@ function apd_increment_listing_views( int $listing_id ): int {
  * @return \APD\Frontend\Display\ViewRegistry
  */
 function apd_view_registry(): \APD\Frontend\Display\ViewRegistry {
-    return \APD\Frontend\Display\ViewRegistry::get_instance();
+	return \APD\Frontend\Display\ViewRegistry::get_instance();
 }
 
 /**
@@ -1330,7 +1330,7 @@ function apd_view_registry(): \APD\Frontend\Display\ViewRegistry {
  * @return bool True if registered successfully.
  */
 function apd_register_view( \APD\Contracts\ViewInterface $view ): bool {
-    return apd_view_registry()->register_view( $view );
+	return apd_view_registry()->register_view( $view );
 }
 
 /**
@@ -1342,7 +1342,7 @@ function apd_register_view( \APD\Contracts\ViewInterface $view ): bool {
  * @return bool True if unregistered successfully.
  */
 function apd_unregister_view( string $type ): bool {
-    return apd_view_registry()->unregister_view( $type );
+	return apd_view_registry()->unregister_view( $type );
 }
 
 /**
@@ -1354,7 +1354,7 @@ function apd_unregister_view( string $type ): bool {
  * @return \APD\Contracts\ViewInterface|null View instance or null.
  */
 function apd_get_view( string $type ): ?\APD\Contracts\ViewInterface {
-    return apd_view_registry()->get_view( $type );
+	return apd_view_registry()->get_view( $type );
 }
 
 /**
@@ -1365,7 +1365,7 @@ function apd_get_view( string $type ): ?\APD\Contracts\ViewInterface {
  * @return array<string, \APD\Contracts\ViewInterface> Array of views.
  */
 function apd_get_views(): array {
-    return apd_view_registry()->get_views();
+	return apd_view_registry()->get_views();
 }
 
 /**
@@ -1377,7 +1377,7 @@ function apd_get_views(): array {
  * @return bool True if registered.
  */
 function apd_has_view( string $type ): bool {
-    return apd_view_registry()->has_view( $type );
+	return apd_view_registry()->has_view( $type );
 }
 
 /**
@@ -1390,7 +1390,7 @@ function apd_has_view( string $type ): bool {
  * @return \APD\Contracts\ViewInterface|null View instance or null.
  */
 function apd_create_view( string $type, array $config = [] ): ?\APD\Contracts\ViewInterface {
-    return apd_view_registry()->create_view( $type, $config );
+	return apd_view_registry()->create_view( $type, $config );
 }
 
 /**
@@ -1401,7 +1401,7 @@ function apd_create_view( string $type, array $config = [] ): ?\APD\Contracts\Vi
  * @return array<string, string> Type => label mapping.
  */
 function apd_get_view_options(): array {
-    return apd_view_registry()->get_view_options();
+	return apd_view_registry()->get_view_options();
 }
 
 /**
@@ -1413,7 +1413,7 @@ function apd_get_view_options(): array {
  * @return \APD\Frontend\Display\GridView
  */
 function apd_grid_view( array $config = [] ): \APD\Frontend\Display\GridView {
-    return new \APD\Frontend\Display\GridView( $config );
+	return new \APD\Frontend\Display\GridView( $config );
 }
 
 /**
@@ -1425,7 +1425,7 @@ function apd_grid_view( array $config = [] ): \APD\Frontend\Display\GridView {
  * @return \APD\Frontend\Display\ListView
  */
 function apd_list_view( array $config = [] ): \APD\Frontend\Display\ListView {
-    return new \APD\Frontend\Display\ListView( $config );
+	return new \APD\Frontend\Display\ListView( $config );
 }
 
 /**
@@ -1448,21 +1448,29 @@ function apd_list_view( array $config = [] ): \APD\Frontend\Display\ListView {
  * @return string Rendered HTML.
  */
 function apd_render_grid( \WP_Query|array $listings, array $args = [] ): string {
-    // Extract view config from args.
-    $config = [];
-    $config_keys = [
-        'columns', 'show_image', 'show_excerpt', 'excerpt_length',
-        'show_category', 'show_badge', 'show_price', 'show_rating',
-        'show_favorite', 'show_view_details', 'image_size',
-    ];
-    foreach ( $config_keys as $key ) {
-        if ( isset( $args[ $key ] ) ) {
-            $config[ $key ] = $args[ $key ];
-        }
-    }
+	// Extract view config from args.
+	$config      = [];
+	$config_keys = [
+		'columns',
+		'show_image',
+		'show_excerpt',
+		'excerpt_length',
+		'show_category',
+		'show_badge',
+		'show_price',
+		'show_rating',
+		'show_favorite',
+		'show_view_details',
+		'image_size',
+	];
+	foreach ( $config_keys as $key ) {
+		if ( isset( $args[ $key ] ) ) {
+			$config[ $key ] = $args[ $key ];
+		}
+	}
 
-    $view = apd_grid_view( $config );
-    return $view->renderListings( $listings, $args );
+	$view = apd_grid_view( $config );
+	return $view->renderListings( $listings, $args );
 }
 
 /**
@@ -1487,21 +1495,31 @@ function apd_render_grid( \WP_Query|array $listings, array $args = [] ): string 
  * @return string Rendered HTML.
  */
 function apd_render_list( \WP_Query|array $listings, array $args = [] ): string {
-    // Extract view config from args.
-    $config = [];
-    $config_keys = [
-        'show_image', 'show_excerpt', 'excerpt_length', 'show_category',
-        'show_tags', 'max_tags', 'show_date', 'show_price', 'show_rating',
-        'show_favorite', 'show_view_details', 'image_size', 'image_width',
-    ];
-    foreach ( $config_keys as $key ) {
-        if ( isset( $args[ $key ] ) ) {
-            $config[ $key ] = $args[ $key ];
-        }
-    }
+	// Extract view config from args.
+	$config      = [];
+	$config_keys = [
+		'show_image',
+		'show_excerpt',
+		'excerpt_length',
+		'show_category',
+		'show_tags',
+		'max_tags',
+		'show_date',
+		'show_price',
+		'show_rating',
+		'show_favorite',
+		'show_view_details',
+		'image_size',
+		'image_width',
+	];
+	foreach ( $config_keys as $key ) {
+		if ( isset( $args[ $key ] ) ) {
+			$config[ $key ] = $args[ $key ];
+		}
+	}
 
-    $view = apd_list_view( $config );
-    return $view->renderListings( $listings, $args );
+	$view = apd_list_view( $config );
+	return $view->renderListings( $listings, $args );
 }
 
 /**
@@ -1515,14 +1533,14 @@ function apd_render_list( \WP_Query|array $listings, array $args = [] ): string 
  * @return string Rendered HTML.
  */
 function apd_render_listings( \WP_Query|array $listings, string $view_type = 'grid', array $args = [] ): string {
-    $view = apd_create_view( $view_type, $args );
+	$view = apd_create_view( $view_type, $args );
 
-    if ( $view === null ) {
-        // Fall back to grid view.
-        $view = apd_grid_view( $args );
-    }
+	if ( $view === null ) {
+		// Fall back to grid view.
+		$view = apd_grid_view( $args );
+	}
 
-    return $view->renderListings( $listings, $args );
+	return $view->renderListings( $listings, $args );
 }
 
 // ============================================================================
@@ -1537,7 +1555,7 @@ function apd_render_listings( \WP_Query|array $listings, string $view_type = 'gr
  * @return \APD\Shortcode\ShortcodeManager
  */
 function apd_shortcode_manager(): \APD\Shortcode\ShortcodeManager {
-    return \APD\Shortcode\ShortcodeManager::get_instance();
+	return \APD\Shortcode\ShortcodeManager::get_instance();
 }
 
 /**
@@ -1549,7 +1567,7 @@ function apd_shortcode_manager(): \APD\Shortcode\ShortcodeManager {
  * @return \APD\Shortcode\AbstractShortcode|null
  */
 function apd_get_shortcode( string $tag ): ?\APD\Shortcode\AbstractShortcode {
-    return apd_shortcode_manager()->get( $tag );
+	return apd_shortcode_manager()->get( $tag );
 }
 
 /**
@@ -1561,7 +1579,7 @@ function apd_get_shortcode( string $tag ): ?\APD\Shortcode\AbstractShortcode {
  * @return bool
  */
 function apd_has_shortcode( string $tag ): bool {
-    return apd_shortcode_manager()->has( $tag );
+	return apd_shortcode_manager()->has( $tag );
 }
 
 /**
@@ -1572,7 +1590,7 @@ function apd_has_shortcode( string $tag ): bool {
  * @return array<string, \APD\Shortcode\AbstractShortcode>
  */
 function apd_get_shortcodes(): array {
-    return apd_shortcode_manager()->get_all();
+	return apd_shortcode_manager()->get_all();
 }
 
 /**
@@ -1583,7 +1601,7 @@ function apd_get_shortcodes(): array {
  * @return array<string, array>
  */
 function apd_get_shortcode_docs(): array {
-    return apd_shortcode_manager()->get_documentation();
+	return apd_shortcode_manager()->get_documentation();
 }
 
 // =============================================================================
@@ -1598,7 +1616,7 @@ function apd_get_shortcode_docs(): array {
  * @return \APD\Blocks\BlockManager
  */
 function apd_block_manager(): \APD\Blocks\BlockManager {
-    return \APD\Blocks\BlockManager::get_instance();
+	return \APD\Blocks\BlockManager::get_instance();
 }
 
 /**
@@ -1610,7 +1628,7 @@ function apd_block_manager(): \APD\Blocks\BlockManager {
  * @return \APD\Blocks\AbstractBlock|null
  */
 function apd_get_block( string $name ): ?\APD\Blocks\AbstractBlock {
-    return apd_block_manager()->get( $name );
+	return apd_block_manager()->get( $name );
 }
 
 /**
@@ -1622,7 +1640,7 @@ function apd_get_block( string $name ): ?\APD\Blocks\AbstractBlock {
  * @return bool
  */
 function apd_has_block( string $name ): bool {
-    return apd_block_manager()->has( $name );
+	return apd_block_manager()->has( $name );
 }
 
 /**
@@ -1633,7 +1651,7 @@ function apd_has_block( string $name ): bool {
  * @return array<string, \APD\Blocks\AbstractBlock>
  */
 function apd_get_blocks(): array {
-    return apd_block_manager()->get_all();
+	return apd_block_manager()->get_all();
 }
 
 // ============================================================================
@@ -1664,7 +1682,7 @@ function apd_get_blocks(): array {
  * @return \APD\Frontend\Submission\SubmissionForm
  */
 function apd_submission_form( array $config = [] ): \APD\Frontend\Submission\SubmissionForm {
-    return new \APD\Frontend\Submission\SubmissionForm( $config );
+	return new \APD\Frontend\Submission\SubmissionForm( $config );
 }
 
 /**
@@ -1676,8 +1694,8 @@ function apd_submission_form( array $config = [] ): \APD\Frontend\Submission\Sub
  * @return string Rendered form HTML.
  */
 function apd_render_submission_form( array $config = [] ): string {
-    $form = apd_submission_form( $config );
-    return $form->render();
+	$form = apd_submission_form( $config );
+	return $form->render();
 }
 
 /**
@@ -1692,8 +1710,8 @@ function apd_render_submission_form( array $config = [] ): string {
  * @return array<string, array<string, mixed>> Fields keyed by name.
  */
 function apd_get_submission_fields( int $listing_id = 0 ): array {
-    $form = apd_submission_form( [ 'listing_id' => $listing_id ] );
-    return $form->get_submission_fields();
+	$form = apd_submission_form( [ 'listing_id' => $listing_id ] );
+	return $form->get_submission_fields();
 }
 
 /**
@@ -1709,26 +1727,26 @@ function apd_get_submission_fields( int $listing_id = 0 ): array {
  * @return bool True on success.
  */
 function apd_set_submission_errors( array|\WP_Error $errors, int $user_id = 0 ): bool {
-    if ( $user_id <= 0 ) {
-        $user_id = get_current_user_id();
-    }
+	if ( $user_id <= 0 ) {
+		$user_id = get_current_user_id();
+	}
 
-    if ( $user_id <= 0 ) {
-        return false;
-    }
+	if ( $user_id <= 0 ) {
+		return false;
+	}
 
-    $error_array = [];
+	$error_array = [];
 
-    if ( is_wp_error( $errors ) ) {
-        foreach ( $errors->get_error_codes() as $code ) {
-            $error_array[ $code ] = $errors->get_error_messages( $code );
-        }
-    } else {
-        $error_array = $errors;
-    }
+	if ( is_wp_error( $errors ) ) {
+		foreach ( $errors->get_error_codes() as $code ) {
+			$error_array[ $code ] = $errors->get_error_messages( $code );
+		}
+	} else {
+		$error_array = $errors;
+	}
 
-    $transient_key = 'apd_submission_errors_' . $user_id;
-    return set_transient( $transient_key, $error_array, 5 * MINUTE_IN_SECONDS );
+	$transient_key = 'apd_submission_errors_' . $user_id;
+	return set_transient( $transient_key, $error_array, 5 * MINUTE_IN_SECONDS );
 }
 
 /**
@@ -1744,16 +1762,16 @@ function apd_set_submission_errors( array|\WP_Error $errors, int $user_id = 0 ):
  * @return bool True on success.
  */
 function apd_set_submission_values( array $values, int $user_id = 0 ): bool {
-    if ( $user_id <= 0 ) {
-        $user_id = get_current_user_id();
-    }
+	if ( $user_id <= 0 ) {
+		$user_id = get_current_user_id();
+	}
 
-    if ( $user_id <= 0 ) {
-        return false;
-    }
+	if ( $user_id <= 0 ) {
+		return false;
+	}
 
-    $transient_key = 'apd_submission_values_' . $user_id;
-    return set_transient( $transient_key, $values, 5 * MINUTE_IN_SECONDS );
+	$transient_key = 'apd_submission_values_' . $user_id;
+	return set_transient( $transient_key, $values, 5 * MINUTE_IN_SECONDS );
 }
 
 // ============================================================================
@@ -1779,13 +1797,13 @@ function apd_set_submission_values( array $values, int $user_id = 0 ): bool {
  * @return \APD\Frontend\Submission\SubmissionHandler
  */
 function apd_submission_handler( array $config = [] ): \APD\Frontend\Submission\SubmissionHandler {
-    static $handler = null;
+	static $handler = null;
 
-    if ( $handler === null || ! empty( $config ) ) {
-        $handler = new \APD\Frontend\Submission\SubmissionHandler( $config );
-    }
+	if ( $handler === null || ! empty( $config ) ) {
+		$handler = new \APD\Frontend\Submission\SubmissionHandler( $config );
+	}
 
-    return $handler;
+	return $handler;
 }
 
 /**
@@ -1810,86 +1828,86 @@ function apd_submission_handler( array $config = [] ): \APD\Frontend\Submission\
  * @return int|\WP_Error     The listing ID on success, WP_Error on failure.
  */
 function apd_process_submission( array $data, int $listing_id = 0 ): int|\WP_Error {
-    $errors = new \WP_Error();
+	$errors = new \WP_Error();
 
-    // Validate required data.
-    if ( empty( $data['listing_title'] ) ) {
-        $errors->add( 'listing_title', __( 'Listing title is required.', 'all-purpose-directory' ) );
-    }
+	// Validate required data.
+	if ( empty( $data['listing_title'] ) ) {
+		$errors->add( 'listing_title', __( 'Listing title is required.', 'all-purpose-directory' ) );
+	}
 
-    if ( empty( $data['listing_content'] ) ) {
-        $errors->add( 'listing_content', __( 'Listing description is required.', 'all-purpose-directory' ) );
-    }
+	if ( empty( $data['listing_content'] ) ) {
+		$errors->add( 'listing_content', __( 'Listing description is required.', 'all-purpose-directory' ) );
+	}
 
-    if ( $errors->has_errors() ) {
-        return $errors;
-    }
+	if ( $errors->has_errors() ) {
+		return $errors;
+	}
 
-    // Prepare post data.
-    $post_data = [
-        'post_type'    => 'apd_listing',
-        'post_title'   => sanitize_text_field( $data['listing_title'] ),
-        'post_content' => wp_kses_post( $data['listing_content'] ),
-        'post_excerpt' => isset( $data['listing_excerpt'] ) ? sanitize_textarea_field( $data['listing_excerpt'] ) : '',
-        'post_status'  => $data['post_status'] ?? apd_get_default_listing_status(),
-    ];
+	// Prepare post data.
+	$post_data = [
+		'post_type'    => 'apd_listing',
+		'post_title'   => sanitize_text_field( $data['listing_title'] ),
+		'post_content' => wp_kses_post( $data['listing_content'] ),
+		'post_excerpt' => isset( $data['listing_excerpt'] ) ? sanitize_textarea_field( $data['listing_excerpt'] ) : '',
+		'post_status'  => $data['post_status'] ?? apd_get_default_listing_status(),
+	];
 
-    // Set author.
-    if ( ! empty( $data['post_author'] ) ) {
-        $post_data['post_author'] = absint( $data['post_author'] );
-    } elseif ( $listing_id === 0 ) {
-        $post_data['post_author'] = get_current_user_id();
-    }
+	// Set author.
+	if ( ! empty( $data['post_author'] ) ) {
+		$post_data['post_author'] = absint( $data['post_author'] );
+	} elseif ( $listing_id === 0 ) {
+		$post_data['post_author'] = get_current_user_id();
+	}
 
-    // Create or update.
-    if ( $listing_id > 0 ) {
-        $post_data['ID'] = $listing_id;
-        $result = wp_update_post( $post_data, true );
-    } else {
-        $result = wp_insert_post( $post_data, true );
-    }
+	// Create or update.
+	if ( $listing_id > 0 ) {
+		$post_data['ID'] = $listing_id;
+		$result          = wp_update_post( $post_data, true );
+	} else {
+		$result = wp_insert_post( $post_data, true );
+	}
 
-    if ( is_wp_error( $result ) ) {
-        return $result;
-    }
+	if ( is_wp_error( $result ) ) {
+		return $result;
+	}
 
-    $listing_id = $result;
+	$listing_id = $result;
 
-    // Assign categories.
-    if ( ! empty( $data['listing_categories'] ) ) {
-        wp_set_object_terms( $listing_id, array_map( 'absint', $data['listing_categories'] ), 'apd_category' );
-    }
+	// Assign categories.
+	if ( ! empty( $data['listing_categories'] ) ) {
+		wp_set_object_terms( $listing_id, array_map( 'absint', $data['listing_categories'] ), 'apd_category' );
+	}
 
-    // Assign tags.
-    if ( ! empty( $data['listing_tags'] ) ) {
-        wp_set_object_terms( $listing_id, array_map( 'absint', $data['listing_tags'] ), 'apd_tag' );
-    }
+	// Assign tags.
+	if ( ! empty( $data['listing_tags'] ) ) {
+		wp_set_object_terms( $listing_id, array_map( 'absint', $data['listing_tags'] ), 'apd_tag' );
+	}
 
-    // Set featured image.
-    if ( ! empty( $data['featured_image'] ) ) {
-        set_post_thumbnail( $listing_id, absint( $data['featured_image'] ) );
-    }
+	// Set featured image.
+	if ( ! empty( $data['featured_image'] ) ) {
+		set_post_thumbnail( $listing_id, absint( $data['featured_image'] ) );
+	}
 
-    // Save custom fields.
-    if ( ! empty( $data['custom_fields'] ) && is_array( $data['custom_fields'] ) ) {
-        $processed = apd_process_fields( $data['custom_fields'] );
-        foreach ( $processed['values'] as $field_name => $value ) {
-            apd_set_listing_field( $listing_id, $field_name, $value );
-        }
-    }
+	// Save custom fields.
+	if ( ! empty( $data['custom_fields'] ) && is_array( $data['custom_fields'] ) ) {
+		$processed = apd_process_fields( $data['custom_fields'] );
+		foreach ( $processed['values'] as $field_name => $value ) {
+			apd_set_listing_field( $listing_id, $field_name, $value );
+		}
+	}
 
-    /**
-     * Fires after a listing has been processed programmatically.
-     *
-     * @since 1.0.0
-     *
-     * @param int   $listing_id The listing ID.
-     * @param array $data       The submitted data.
-     * @param bool  $is_update  Whether this was an update.
-     */
-    do_action( 'apd_listing_processed', $listing_id, $data, $listing_id === $result );
+	/**
+	 * Fires after a listing has been processed programmatically.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int   $listing_id The listing ID.
+	 * @param array $data       The submitted data.
+	 * @param bool  $is_update  Whether this was an update.
+	 */
+	do_action( 'apd_listing_processed', $listing_id, $data, $listing_id === $result );
 
-    return $listing_id;
+	return $listing_id;
 }
 
 /**
@@ -1900,15 +1918,15 @@ function apd_process_submission( array $data, int $listing_id = 0 ): int|\WP_Err
  * @return string Default status (publish, pending, draft).
  */
 function apd_get_default_listing_status(): string {
-    /**
-     * Filter the default status for new listing submissions.
-     *
-     * @since 1.0.0
-     *
-     * @param string $status  The default status.
-     * @param int    $user_id The current user ID.
-     */
-    return apply_filters( 'apd_default_listing_status', 'pending', get_current_user_id() );
+	/**
+	 * Filter the default status for new listing submissions.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $status  The default status.
+	 * @param int    $user_id The current user ID.
+	 */
+	return apply_filters( 'apd_default_listing_status', 'pending', get_current_user_id() );
 }
 
 /**
@@ -1923,48 +1941,48 @@ function apd_get_default_listing_status(): string {
  * @return bool True if user can edit the listing.
  */
 function apd_user_can_edit_listing( int $listing_id, ?int $user_id = null ): bool {
-    if ( $user_id === null ) {
-        $user_id = get_current_user_id();
-    }
+	if ( $user_id === null ) {
+		$user_id = get_current_user_id();
+	}
 
-    if ( $user_id <= 0 ) {
-        return false;
-    }
+	if ( $user_id <= 0 ) {
+		return false;
+	}
 
-    $post = get_post( $listing_id );
+	$post = get_post( $listing_id );
 
-    if ( ! $post || $post->post_type !== apd_get_listing_post_type() ) {
-        return false;
-    }
+	if ( ! $post || $post->post_type !== apd_get_listing_post_type() ) {
+		return false;
+	}
 
-    // Check if user is the author.
-    if ( (int) $post->post_author === $user_id ) {
-        return true;
-    }
+	// Check if user is the author.
+	if ( (int) $post->post_author === $user_id ) {
+		return true;
+	}
 
-    // Check if user has capability to edit others' listings.
-    if ( user_can( $user_id, 'edit_others_apd_listings' ) ) {
-        return true;
-    }
+	// Check if user has capability to edit others' listings.
+	if ( user_can( $user_id, 'edit_others_apd_listings' ) ) {
+		return true;
+	}
 
-    // Check specific post capability.
-    if ( user_can( $user_id, 'edit_apd_listing', $listing_id ) ) {
-        return true;
-    }
+	// Check specific post capability.
+	if ( user_can( $user_id, 'edit_apd_listing', $listing_id ) ) {
+		return true;
+	}
 
-    /**
-     * Filter whether the user can edit this listing.
-     *
-     * Use this filter for custom permission logic, such as
-     * allowing specific roles or subscription-based access.
-     *
-     * @since 1.0.0
-     *
-     * @param bool $can_edit   Whether user can edit. Default false.
-     * @param int  $listing_id The listing ID.
-     * @param int  $user_id    The user ID.
-     */
-    return apply_filters( 'apd_user_can_edit_listing', false, $listing_id, $user_id );
+	/**
+	 * Filter whether the user can edit this listing.
+	 *
+	 * Use this filter for custom permission logic, such as
+	 * allowing specific roles or subscription-based access.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param bool $can_edit   Whether user can edit. Default false.
+	 * @param int  $listing_id The listing ID.
+	 * @param int  $user_id    The user ID.
+	 */
+	return apply_filters( 'apd_user_can_edit_listing', false, $listing_id, $user_id );
 }
 
 /**
@@ -1978,55 +1996,57 @@ function apd_user_can_edit_listing( int $listing_id, ?int $user_id = null ): boo
  * @return string The edit URL, or empty string if no submission page found.
  */
 function apd_get_edit_listing_url( int $listing_id, string $submission_url = '' ): string {
-    if ( $listing_id <= 0 ) {
-        return '';
-    }
+	if ( $listing_id <= 0 ) {
+		return '';
+	}
 
-    // If no submission URL provided, try to find the submission page.
-    if ( empty( $submission_url ) ) {
-        /**
-         * Filter the default submission page URL.
-         *
-         * Use this to specify the page URL that contains the submission form.
-         *
-         * @since 1.0.0
-         *
-         * @param string $url        The submission page URL.
-         * @param int    $listing_id The listing ID being edited.
-         */
-        $submission_url = apply_filters( 'apd_submission_page_url', '', $listing_id );
+	// If no submission URL provided, try to find the submission page.
+	if ( empty( $submission_url ) ) {
+		/**
+		 * Filter the default submission page URL.
+		 *
+		 * Use this to specify the page URL that contains the submission form.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param string $url        The submission page URL.
+		 * @param int    $listing_id The listing ID being edited.
+		 */
+		$submission_url = apply_filters( 'apd_submission_page_url', '', $listing_id );
 
-        if ( empty( $submission_url ) ) {
-            // Try to find a page with the shortcode.
-            $pages = get_pages( [
-                'post_status' => 'publish',
-                'number'      => 1,
-                's'           => '[apd_submission_form',
-            ] );
+		if ( empty( $submission_url ) ) {
+			// Try to find a page with the shortcode.
+			$pages = get_pages(
+				[
+					'post_status' => 'publish',
+					'number'      => 1,
+					's'           => '[apd_submission_form',
+				]
+			);
 
-            if ( ! empty( $pages ) ) {
-                $submission_url = get_permalink( $pages[0]->ID );
-            }
-        }
-    }
+			if ( ! empty( $pages ) ) {
+				$submission_url = get_permalink( $pages[0]->ID );
+			}
+		}
+	}
 
-    if ( empty( $submission_url ) ) {
-        return '';
-    }
+	if ( empty( $submission_url ) ) {
+		return '';
+	}
 
-    /**
-     * Filter the edit listing URL.
-     *
-     * @since 1.0.0
-     *
-     * @param string $url        The edit URL.
-     * @param int    $listing_id The listing ID.
-     */
-    return apply_filters(
-        'apd_edit_listing_url',
-        add_query_arg( 'edit_listing', $listing_id, $submission_url ),
-        $listing_id
-    );
+	/**
+	 * Filter the edit listing URL.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $url        The edit URL.
+	 * @param int    $listing_id The listing ID.
+	 */
+	return apply_filters(
+		'apd_edit_listing_url',
+		add_query_arg( 'edit_listing', $listing_id, $submission_url ),
+		$listing_id
+	);
 }
 
 /**
@@ -2040,7 +2060,7 @@ function apd_get_edit_listing_url( int $listing_id, string $submission_url = '' 
  */
 function apd_is_edit_mode(): bool {
     // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Just checking for mode.
-    return isset( $_GET['edit_listing'] ) && absint( $_GET['edit_listing'] ) > 0;
+	return isset( $_GET['edit_listing'] ) && absint( $_GET['edit_listing'] ) > 0;
 }
 
 /**
@@ -2052,7 +2072,7 @@ function apd_is_edit_mode(): bool {
  */
 function apd_get_edit_listing_id(): int {
     // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Just getting listing ID.
-    return isset( $_GET['edit_listing'] ) ? absint( $_GET['edit_listing'] ) : 0;
+	return isset( $_GET['edit_listing'] ) ? absint( $_GET['edit_listing'] ) : 0;
 }
 
 /**
@@ -2067,7 +2087,7 @@ function apd_get_edit_listing_id(): int {
  */
 function apd_is_submission_success(): bool {
     // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Just checking for success state.
-    return isset( $_GET['apd_submission'] ) && $_GET['apd_submission'] === 'success';
+	return isset( $_GET['apd_submission'] ) && $_GET['apd_submission'] === 'success';
 }
 
 /**
@@ -2079,7 +2099,7 @@ function apd_is_submission_success(): bool {
  */
 function apd_get_submitted_listing_id(): int {
     // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Just getting listing ID.
-    return isset( $_GET['listing_id'] ) ? absint( $_GET['listing_id'] ) : 0;
+	return isset( $_GET['listing_id'] ) ? absint( $_GET['listing_id'] ) : 0;
 }
 
 /**
@@ -2093,32 +2113,32 @@ function apd_get_submitted_listing_id(): int {
  * @return string The success message HTML.
  */
 function apd_render_submission_success( int $listing_id = 0, string $submit_url = '', bool $is_update = false ): string {
-    if ( $listing_id <= 0 ) {
-        $listing_id = apd_get_submitted_listing_id();
-    }
+	if ( $listing_id <= 0 ) {
+		$listing_id = apd_get_submitted_listing_id();
+	}
 
-    $post = get_post( $listing_id );
+	$post = get_post( $listing_id );
 
-    $args = [
-        'listing_id'  => $listing_id,
-        'listing_url' => $post && $post->post_status === 'publish' ? get_permalink( $listing_id ) : '',
-        'status'      => $post ? $post->post_status : 'pending',
-        'title'       => $post ? $post->post_title : '',
-        'submit_url'  => $submit_url,
-        'is_update'   => $is_update,
-    ];
+	$args = [
+		'listing_id'  => $listing_id,
+		'listing_url' => $post && $post->post_status === 'publish' ? get_permalink( $listing_id ) : '',
+		'status'      => $post ? $post->post_status : 'pending',
+		'title'       => $post ? $post->post_title : '',
+		'submit_url'  => $submit_url,
+		'is_update'   => $is_update,
+	];
 
-    /**
-     * Filter the submission success template arguments.
-     *
-     * @since 1.0.0
-     *
-     * @param array $args       Template arguments.
-     * @param int   $listing_id The listing ID.
-     */
-    $args = apply_filters( 'apd_submission_success_args', $args, $listing_id );
+	/**
+	 * Filter the submission success template arguments.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $args       Template arguments.
+	 * @param int   $listing_id The listing ID.
+	 */
+	$args = apply_filters( 'apd_submission_success_args', $args, $listing_id );
 
-    return apd_get_template_html( 'submission/submission-success.php', $args );
+	return apd_get_template_html( 'submission/submission-success.php', $args );
 }
 
 // ============================================================================
@@ -2135,14 +2155,14 @@ function apd_render_submission_success( int $listing_id = 0, string $submit_url 
  * @return int Maximum submissions allowed.
  */
 function apd_get_submission_rate_limit(): int {
-    /**
-     * Filter the submission rate limit.
-     *
-     * @since 1.0.0
-     *
-     * @param int $limit Maximum submissions allowed. Default 5.
-     */
-    return apply_filters( 'apd_submission_rate_limit', 5 );
+	/**
+	 * Filter the submission rate limit.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int $limit Maximum submissions allowed. Default 5.
+	 */
+	return apply_filters( 'apd_submission_rate_limit', 5 );
 }
 
 /**
@@ -2155,14 +2175,14 @@ function apd_get_submission_rate_limit(): int {
  * @return int Time period in seconds.
  */
 function apd_get_submission_rate_period(): int {
-    /**
-     * Filter the submission rate limit time period.
-     *
-     * @since 1.0.0
-     *
-     * @param int $period Time period in seconds. Default 3600 (1 hour).
-     */
-    return apply_filters( 'apd_submission_rate_period', HOUR_IN_SECONDS );
+	/**
+	 * Filter the submission rate limit time period.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int $period Time period in seconds. Default 3600 (1 hour).
+	 */
+	return apply_filters( 'apd_submission_rate_period', HOUR_IN_SECONDS );
 }
 
 /**
@@ -2174,11 +2194,11 @@ function apd_get_submission_rate_period(): int {
  * @return bool True if within limit, false if rate limited.
  */
 function apd_check_submission_rate_limit( string $identifier ): bool {
-    $limit         = apd_get_submission_rate_limit();
-    $transient_key = 'apd_submission_count_' . $identifier;
-    $count         = (int) get_transient( $transient_key );
+	$limit         = apd_get_submission_rate_limit();
+	$transient_key = 'apd_submission_count_' . $identifier;
+	$count         = (int) get_transient( $transient_key );
 
-    return $count < $limit;
+	return $count < $limit;
 }
 
 /**
@@ -2190,9 +2210,9 @@ function apd_check_submission_rate_limit( string $identifier ): bool {
  * @return int Current submission count.
  */
 function apd_get_submission_count( string $identifier ): int {
-    $transient_key = 'apd_submission_count_' . $identifier;
+	$transient_key = 'apd_submission_count_' . $identifier;
 
-    return (int) get_transient( $transient_key );
+	return (int) get_transient( $transient_key );
 }
 
 /**
@@ -2204,14 +2224,14 @@ function apd_get_submission_count( string $identifier ): int {
  * @return int New submission count.
  */
 function apd_increment_submission_count( string $identifier ): int {
-    $period        = apd_get_submission_rate_period();
-    $transient_key = 'apd_submission_count_' . $identifier;
-    $count         = (int) get_transient( $transient_key );
-    $new_count     = $count + 1;
+	$period        = apd_get_submission_rate_period();
+	$transient_key = 'apd_submission_count_' . $identifier;
+	$count         = (int) get_transient( $transient_key );
+	$new_count     = $count + 1;
 
-    set_transient( $transient_key, $new_count, $period );
+	set_transient( $transient_key, $new_count, $period );
 
-    return $new_count;
+	return $new_count;
 }
 
 /**
@@ -2225,9 +2245,9 @@ function apd_increment_submission_count( string $identifier ): int {
  * @return bool True on success.
  */
 function apd_reset_submission_count( string $identifier ): bool {
-    $transient_key = 'apd_submission_count_' . $identifier;
+	$transient_key = 'apd_submission_count_' . $identifier;
 
-    return delete_transient( $transient_key );
+	return delete_transient( $transient_key );
 }
 
 /**
@@ -2238,17 +2258,17 @@ function apd_reset_submission_count( string $identifier ): bool {
  * @return string Rate limit identifier.
  */
 function apd_get_rate_limit_identifier(): string {
-    $user_id = get_current_user_id();
+	$user_id = get_current_user_id();
 
-    if ( $user_id > 0 ) {
-        return 'user_' . $user_id;
-    }
+	if ( $user_id > 0 ) {
+		return 'user_' . $user_id;
+	}
 
-    // Use IP address for guests.
-    $ip = apd_get_client_ip();
+	// Use IP address for guests.
+	$ip = apd_get_client_ip();
 
-    // Hash the IP for privacy and to create a safe transient key.
-    return 'ip_' . md5( $ip );
+	// Hash the IP for privacy and to create a safe transient key.
+	return 'ip_' . md5( $ip );
 }
 
 /**
@@ -2259,31 +2279,31 @@ function apd_get_rate_limit_identifier(): string {
  * @return string Client IP address.
  */
 function apd_get_client_ip(): string {
-    $ip = '';
+	$ip = '';
 
-    // Check for proxy headers first.
-    $headers = [
-        'HTTP_CF_CONNECTING_IP', // Cloudflare.
-        'HTTP_X_FORWARDED_FOR',
-        'HTTP_X_REAL_IP',
-        'REMOTE_ADDR',
-    ];
+	// Check for proxy headers first.
+	$headers = [
+		'HTTP_CF_CONNECTING_IP', // Cloudflare.
+		'HTTP_X_FORWARDED_FOR',
+		'HTTP_X_REAL_IP',
+		'REMOTE_ADDR',
+	];
 
-    foreach ( $headers as $header ) {
-        if ( ! empty( $_SERVER[ $header ] ) ) {
-            // Take the first IP if comma-separated.
-            $ip = strtok( sanitize_text_field( wp_unslash( $_SERVER[ $header ] ) ), ',' );
-            break;
-        }
-    }
+	foreach ( $headers as $header ) {
+		if ( ! empty( $_SERVER[ $header ] ) ) {
+			// Take the first IP if comma-separated.
+			$ip = strtok( sanitize_text_field( wp_unslash( $_SERVER[ $header ] ) ), ',' );
+			break;
+		}
+	}
 
-    // Validate the IP.
-    $ip = trim( (string) $ip );
-    if ( filter_var( $ip, FILTER_VALIDATE_IP ) ) {
-        return $ip;
-    }
+	// Validate the IP.
+	$ip = trim( (string) $ip );
+	if ( filter_var( $ip, FILTER_VALIDATE_IP ) ) {
+		return $ip;
+	}
 
-    return '0.0.0.0';
+	return '0.0.0.0';
 }
 
 /**
@@ -2298,77 +2318,77 @@ function apd_get_client_ip(): string {
  * @return bool|WP_Error True if not spam, WP_Error if spam detected.
  */
 function apd_is_submission_spam( array $post_data = [] ): bool|\WP_Error {
-    if ( empty( $post_data ) ) {
+	if ( empty( $post_data ) ) {
         // phpcs:ignore WordPress.Security.NonceVerification.Missing
-        $post_data = $_POST;
-    }
+		$post_data = $_POST;
+	}
 
-    $user_id = get_current_user_id();
+	$user_id = get_current_user_id();
 
-    /**
-     * Filter whether to bypass spam protection entirely.
-     *
-     * @since 1.0.0
-     *
-     * @param bool $bypass  Whether to bypass. Default false.
-     * @param int  $user_id The current user ID.
-     */
-    $bypass = apply_filters( 'apd_bypass_spam_protection', false, $user_id );
+	/**
+	 * Filter whether to bypass spam protection entirely.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param bool $bypass  Whether to bypass. Default false.
+	 * @param int  $user_id The current user ID.
+	 */
+	$bypass = apply_filters( 'apd_bypass_spam_protection', false, $user_id );
 
-    if ( $bypass ) {
-        return true;
-    }
+	if ( $bypass ) {
+		return true;
+	}
 
-    // Check honeypot.
-    $honeypot_field = apply_filters( 'apd_honeypot_field_name', 'website_url' );
-    if ( isset( $post_data[ $honeypot_field ] ) && ! hash_equals( '', (string) $post_data[ $honeypot_field ] ) ) {
-        return new \WP_Error(
-            'submission_failed',
-            __( 'Submission failed. Please try again.', 'all-purpose-directory' )
-        );
-    }
+	// Check honeypot.
+	$honeypot_field = apply_filters( 'apd_honeypot_field_name', 'website_url' );
+	if ( isset( $post_data[ $honeypot_field ] ) && ! hash_equals( '', (string) $post_data[ $honeypot_field ] ) ) {
+		return new \WP_Error(
+			'submission_failed',
+			__( 'Submission failed. Please try again.', 'all-purpose-directory' )
+		);
+	}
 
-    // Check timing.
-    if ( isset( $post_data['apd_form_token'] ) ) {
-        $decoded = base64_decode( (string) $post_data['apd_form_token'], true );
-        if ( $decoded !== false ) {
-            $form_load_time = (int) $decoded;
-            $current_time   = time();
+	// Check timing.
+	if ( isset( $post_data['apd_form_token'] ) ) {
+		$decoded = base64_decode( (string) $post_data['apd_form_token'], true );
+		if ( $decoded !== false ) {
+			$form_load_time = (int) $decoded;
+			$current_time   = time();
 
-            // Check if timestamp is valid.
-            if ( $form_load_time <= $current_time && $form_load_time >= ( $current_time - DAY_IN_SECONDS ) ) {
-                $elapsed  = $current_time - $form_load_time;
-                $min_time = apply_filters( 'apd_submission_min_time', 3 );
+			// Check if timestamp is valid.
+			if ( $form_load_time <= $current_time && $form_load_time >= ( $current_time - DAY_IN_SECONDS ) ) {
+				$elapsed  = $current_time - $form_load_time;
+				$min_time = apply_filters( 'apd_submission_min_time', 3 );
 
-                if ( $elapsed < $min_time ) {
-                    return new \WP_Error(
-                        'submission_failed',
-                        __( 'Submission failed. Please try again.', 'all-purpose-directory' )
-                    );
-                }
-            }
-        }
-    }
+				if ( $elapsed < $min_time ) {
+					return new \WP_Error(
+						'submission_failed',
+						__( 'Submission failed. Please try again.', 'all-purpose-directory' )
+					);
+				}
+			}
+		}
+	}
 
-    // Check rate limit.
-    $identifier = apd_get_rate_limit_identifier();
-    if ( ! apd_check_submission_rate_limit( $identifier ) ) {
-        return new \WP_Error(
-            'rate_limited',
-            __( 'You have submitted too many listings. Please try again later.', 'all-purpose-directory' )
-        );
-    }
+	// Check rate limit.
+	$identifier = apd_get_rate_limit_identifier();
+	if ( ! apd_check_submission_rate_limit( $identifier ) ) {
+		return new \WP_Error(
+			'rate_limited',
+			__( 'You have submitted too many listings. Please try again later.', 'all-purpose-directory' )
+		);
+	}
 
-    /**
-     * Filter to run custom spam checks.
-     *
-     * @since 1.0.0
-     *
-     * @param bool|WP_Error $result    Current result. True if passed.
-     * @param array         $post_data The POST data.
-     * @param int           $user_id   The current user ID.
-     */
-    return apply_filters( 'apd_submission_spam_check', true, $post_data, $user_id );
+	/**
+	 * Filter to run custom spam checks.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param bool|WP_Error $result    Current result. True if passed.
+	 * @param array         $post_data The POST data.
+	 * @param int           $user_id   The current user ID.
+	 */
+	return apply_filters( 'apd_submission_spam_check', true, $post_data, $user_id );
 }
 
 /**
@@ -2379,14 +2399,14 @@ function apd_is_submission_spam( array $post_data = [] ): bool|\WP_Error {
  * @return int Minimum seconds before submission is allowed.
  */
 function apd_get_submission_min_time(): int {
-    /**
-     * Filter the minimum time required for form submission.
-     *
-     * @since 1.0.0
-     *
-     * @param int $min_time Minimum seconds before submission is allowed. Default 3.
-     */
-    return apply_filters( 'apd_submission_min_time', 3 );
+	/**
+	 * Filter the minimum time required for form submission.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int $min_time Minimum seconds before submission is allowed. Default 3.
+	 */
+	return apply_filters( 'apd_submission_min_time', 3 );
 }
 
 /**
@@ -2397,14 +2417,14 @@ function apd_get_submission_min_time(): int {
  * @return string The honeypot field name.
  */
 function apd_get_honeypot_field_name(): string {
-    /**
-     * Filter the honeypot field name.
-     *
-     * @since 1.0.0
-     *
-     * @param string $field_name The honeypot field name.
-     */
-    return apply_filters( 'apd_honeypot_field_name', 'website_url' );
+	/**
+	 * Filter the honeypot field name.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $field_name The honeypot field name.
+	 */
+	return apply_filters( 'apd_honeypot_field_name', 'website_url' );
 }
 
 // ============================================================================
@@ -2420,7 +2440,7 @@ function apd_get_honeypot_field_name(): string {
  * @return \APD\Frontend\Dashboard\Dashboard
  */
 function apd_dashboard( array $config = [] ): \APD\Frontend\Dashboard\Dashboard {
-    return \APD\Frontend\Dashboard\Dashboard::get_instance( $config );
+	return \APD\Frontend\Dashboard\Dashboard::get_instance( $config );
 }
 
 /**
@@ -2435,8 +2455,8 @@ function apd_dashboard( array $config = [] ): \APD\Frontend\Dashboard\Dashboard 
  * @return string Rendered dashboard HTML.
  */
 function apd_render_dashboard( array $config = [] ): string {
-    $dashboard = new \APD\Frontend\Dashboard\Dashboard( $config );
-    return $dashboard->render();
+	$dashboard = new \APD\Frontend\Dashboard\Dashboard( $config );
+	return $dashboard->render();
 }
 
 /**
@@ -2449,31 +2469,33 @@ function apd_render_dashboard( array $config = [] ): string {
  * @return string Dashboard URL.
  */
 function apd_get_dashboard_url(): string {
-    /**
-     * Filter the dashboard page URL.
-     *
-     * Use this to specify the page URL that contains the dashboard.
-     *
-     * @since 1.0.0
-     *
-     * @param string $url The dashboard page URL.
-     */
-    $url = apply_filters( 'apd_dashboard_url', '' );
+	/**
+	 * Filter the dashboard page URL.
+	 *
+	 * Use this to specify the page URL that contains the dashboard.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $url The dashboard page URL.
+	 */
+	$url = apply_filters( 'apd_dashboard_url', '' );
 
-    if ( empty( $url ) ) {
-        // Try to find a page with the shortcode.
-        $pages = get_pages( [
-            'post_status' => 'publish',
-            'number'      => 1,
-            's'           => '[apd_dashboard',
-        ] );
+	if ( empty( $url ) ) {
+		// Try to find a page with the shortcode.
+		$pages = get_pages(
+			[
+				'post_status' => 'publish',
+				'number'      => 1,
+				's'           => '[apd_dashboard',
+			]
+		);
 
-        if ( ! empty( $pages ) ) {
-            $url = get_permalink( $pages[0]->ID );
-        }
-    }
+		if ( ! empty( $pages ) ) {
+			$url = get_permalink( $pages[0]->ID );
+		}
+	}
 
-    return $url ?: '';
+	return $url ?: '';
 }
 
 /**
@@ -2485,17 +2507,17 @@ function apd_get_dashboard_url(): string {
  * @return string Tab URL.
  */
 function apd_get_dashboard_tab_url( string $tab ): string {
-    $base_url = apd_get_dashboard_url();
+	$base_url = apd_get_dashboard_url();
 
-    if ( empty( $base_url ) ) {
-        return '';
-    }
+	if ( empty( $base_url ) ) {
+		return '';
+	}
 
-    if ( $tab === \APD\Frontend\Dashboard\Dashboard::DEFAULT_TAB ) {
-        return $base_url;
-    }
+	if ( $tab === \APD\Frontend\Dashboard\Dashboard::DEFAULT_TAB ) {
+		return $base_url;
+	}
 
-    return add_query_arg( \APD\Frontend\Dashboard\Dashboard::TAB_PARAM, $tab, $base_url );
+	return add_query_arg( \APD\Frontend\Dashboard\Dashboard::TAB_PARAM, $tab, $base_url );
 }
 
 /**
@@ -2515,8 +2537,8 @@ function apd_get_dashboard_tab_url( string $tab ): string {
  *                            - views: Total views across all listings.
  */
 function apd_get_user_listing_stats( int $user_id = 0 ): array {
-    $dashboard = apd_dashboard();
-    return $dashboard->get_user_stats( $user_id );
+	$dashboard = apd_dashboard();
+	return $dashboard->get_user_stats( $user_id );
 }
 
 /**
@@ -2530,22 +2552,24 @@ function apd_get_user_listing_stats( int $user_id = 0 ): array {
  * @return int Listing count.
  */
 function apd_get_user_listings_count( int $user_id, string $status = 'any' ): int {
-    if ( $user_id <= 0 ) {
-        return 0;
-    }
+	if ( $user_id <= 0 ) {
+		return 0;
+	}
 
-    $post_status = $status === 'any' ? [ 'publish', 'pending', 'draft', 'expired' ] : $status;
+	$post_status = $status === 'any' ? [ 'publish', 'pending', 'draft', 'expired' ] : $status;
 
-    $query = new \WP_Query( [
-        'post_type'      => 'apd_listing',
-        'post_status'    => $post_status,
-        'author'         => $user_id,
-        'posts_per_page' => -1,
-        'fields'         => 'ids',
-        'no_found_rows'  => true,
-    ] );
+	$query = new \WP_Query(
+		[
+			'post_type'      => 'apd_listing',
+			'post_status'    => $post_status,
+			'author'         => $user_id,
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+			'no_found_rows'  => true,
+		]
+	);
 
-    return $query->post_count;
+	return $query->post_count;
 }
 
 /**
@@ -2556,17 +2580,17 @@ function apd_get_user_listings_count( int $user_id, string $status = 'any' ): in
  * @return bool True if on dashboard page.
  */
 function apd_is_dashboard(): bool {
-    if ( ! is_page() ) {
-        return false;
-    }
+	if ( ! is_page() ) {
+		return false;
+	}
 
-    $post = get_post();
+	$post = get_post();
 
-    if ( ! $post ) {
-        return false;
-    }
+	if ( ! $post ) {
+		return false;
+	}
 
-    return has_shortcode( $post->post_content, 'apd_dashboard' );
+	return has_shortcode( $post->post_content, 'apd_dashboard' );
 }
 
 /**
@@ -2577,12 +2601,12 @@ function apd_is_dashboard(): bool {
  * @return string Current tab slug or empty string if not on dashboard.
  */
 function apd_get_current_dashboard_tab(): string {
-    if ( ! apd_is_dashboard() ) {
-        return '';
-    }
+	if ( ! apd_is_dashboard() ) {
+		return '';
+	}
 
-    $dashboard = apd_dashboard();
-    return $dashboard->get_current_tab();
+	$dashboard = apd_dashboard();
+	return $dashboard->get_current_tab();
 }
 
 // ============================================================================
@@ -2598,7 +2622,7 @@ function apd_get_current_dashboard_tab(): string {
  * @return \APD\Frontend\Dashboard\MyListings
  */
 function apd_my_listings( array $config = [] ): \APD\Frontend\Dashboard\MyListings {
-    return \APD\Frontend\Dashboard\MyListings::get_instance( $config );
+	return \APD\Frontend\Dashboard\MyListings::get_instance( $config );
 }
 
 /**
@@ -2616,19 +2640,19 @@ function apd_my_listings( array $config = [] ): \APD\Frontend\Dashboard\MyListin
  * @return \WP_Query Query result.
  */
 function apd_get_user_listings( int $user_id = 0, array $args = [] ): \WP_Query {
-    if ( $user_id <= 0 ) {
-        $user_id = get_current_user_id();
-    }
+	if ( $user_id <= 0 ) {
+		$user_id = get_current_user_id();
+	}
 
-    if ( $user_id <= 0 ) {
-        // Return empty query.
-        return new \WP_Query( [ 'post__in' => [ 0 ] ] );
-    }
+	if ( $user_id <= 0 ) {
+		// Return empty query.
+		return new \WP_Query( [ 'post__in' => [ 0 ] ] );
+	}
 
-    $my_listings = apd_my_listings();
-    $my_listings->set_user_id( $user_id );
+	$my_listings = apd_my_listings();
+	$my_listings->set_user_id( $user_id );
 
-    return $my_listings->get_listings( $args );
+	return $my_listings->get_listings( $args );
 }
 
 /**
@@ -2642,18 +2666,18 @@ function apd_get_user_listings( int $user_id = 0, array $args = [] ): \WP_Query 
  * @return bool True on success, false on failure.
  */
 function apd_delete_user_listing( int $listing_id, ?int $user_id = null, bool $permanent = false ): bool {
-    if ( $user_id === null ) {
-        $user_id = get_current_user_id();
-    }
+	if ( $user_id === null ) {
+		$user_id = get_current_user_id();
+	}
 
-    $my_listings = apd_my_listings();
-    $my_listings->set_user_id( $user_id );
+	$my_listings = apd_my_listings();
+	$my_listings->set_user_id( $user_id );
 
-    if ( $permanent ) {
-        return $my_listings->delete_listing( $listing_id, $user_id );
-    }
+	if ( $permanent ) {
+		return $my_listings->delete_listing( $listing_id, $user_id );
+	}
 
-    return $my_listings->trash_listing( $listing_id, $user_id );
+	return $my_listings->trash_listing( $listing_id, $user_id );
 }
 
 /**
@@ -2666,14 +2690,14 @@ function apd_delete_user_listing( int $listing_id, ?int $user_id = null, bool $p
  * @return bool True if user can delete, false otherwise.
  */
 function apd_can_delete_listing( int $listing_id, ?int $user_id = null ): bool {
-    if ( $user_id === null ) {
-        $user_id = get_current_user_id();
-    }
+	if ( $user_id === null ) {
+		$user_id = get_current_user_id();
+	}
 
-    $my_listings = apd_my_listings();
-    $my_listings->set_user_id( $user_id );
+	$my_listings = apd_my_listings();
+	$my_listings->set_user_id( $user_id );
 
-    return $my_listings->can_delete_listing( $listing_id, $user_id );
+	return $my_listings->can_delete_listing( $listing_id, $user_id );
 }
 
 /**
@@ -2687,14 +2711,14 @@ function apd_can_delete_listing( int $listing_id, ?int $user_id = null ): bool {
  * @return bool True on success, false on failure.
  */
 function apd_update_user_listing_status( int $listing_id, string $status, ?int $user_id = null ): bool {
-    if ( $user_id === null ) {
-        $user_id = get_current_user_id();
-    }
+	if ( $user_id === null ) {
+		$user_id = get_current_user_id();
+	}
 
-    $my_listings = apd_my_listings();
-    $my_listings->set_user_id( $user_id );
+	$my_listings = apd_my_listings();
+	$my_listings->set_user_id( $user_id );
 
-    return $my_listings->update_listing_status( $listing_id, $status, $user_id );
+	return $my_listings->update_listing_status( $listing_id, $status, $user_id );
 }
 
 // ============================================================================
@@ -2710,7 +2734,7 @@ function apd_update_user_listing_status( int $listing_id, string $status, ?int $
  * @return \APD\Frontend\Dashboard\Profile
  */
 function apd_profile( array $config = [] ): \APD\Frontend\Dashboard\Profile {
-    return \APD\Frontend\Dashboard\Profile::get_instance( $config );
+	return \APD\Frontend\Dashboard\Profile::get_instance( $config );
 }
 
 /**
@@ -2734,12 +2758,12 @@ function apd_profile( array $config = [] ): \APD\Frontend\Dashboard\Profile {
  *                              - social: (array) Social media links.
  */
 function apd_get_user_profile_data( int $user_id = 0 ): array {
-    if ( $user_id <= 0 ) {
-        $user_id = get_current_user_id();
-    }
+	if ( $user_id <= 0 ) {
+		$user_id = get_current_user_id();
+	}
 
-    $profile = apd_profile();
-    return $profile->get_user_data( $user_id );
+	$profile = apd_profile();
+	return $profile->get_user_data( $user_id );
 }
 
 /**
@@ -2763,25 +2787,25 @@ function apd_get_user_profile_data( int $user_id = 0 ): array {
  * @return true|\WP_Error True on success, WP_Error on failure.
  */
 function apd_save_user_profile( array $data, ?int $user_id = null ): true|\WP_Error {
-    if ( $user_id === null ) {
-        $user_id = get_current_user_id();
-    }
+	if ( $user_id === null ) {
+		$user_id = get_current_user_id();
+	}
 
-    if ( $user_id <= 0 ) {
-        return new \WP_Error( 'invalid_user', __( 'Invalid user ID.', 'all-purpose-directory' ) );
-    }
+	if ( $user_id <= 0 ) {
+		return new \WP_Error( 'invalid_user', __( 'Invalid user ID.', 'all-purpose-directory' ) );
+	}
 
-    $profile = apd_profile();
-    $profile->set_user_id( $user_id );
+	$profile = apd_profile();
+	$profile->set_user_id( $user_id );
 
-    // Validate the data.
-    $validation = $profile->validate_profile( $data );
+	// Validate the data.
+	$validation = $profile->validate_profile( $data );
 
-    if ( is_wp_error( $validation ) ) {
-        return $validation;
-    }
+	if ( is_wp_error( $validation ) ) {
+		return $validation;
+	}
 
-    return $profile->save_profile( $data );
+	return $profile->save_profile( $data );
 }
 
 /**
@@ -2796,16 +2820,16 @@ function apd_save_user_profile( array $data, ?int $user_id = null ): true|\WP_Er
  * @return string Avatar URL.
  */
 function apd_get_user_avatar_url( int $user_id = 0, int $size = 96 ): string {
-    if ( $user_id <= 0 ) {
-        $user_id = get_current_user_id();
-    }
+	if ( $user_id <= 0 ) {
+		$user_id = get_current_user_id();
+	}
 
-    if ( $user_id <= 0 ) {
-        return '';
-    }
+	if ( $user_id <= 0 ) {
+		return '';
+	}
 
-    $profile = apd_profile();
-    return $profile->get_avatar_url( $user_id, $size );
+	$profile = apd_profile();
+	return $profile->get_avatar_url( $user_id, $size );
 }
 
 /**
@@ -2819,16 +2843,16 @@ function apd_get_user_avatar_url( int $user_id = 0, int $size = 96 ): string {
  * @return array<string, string> Social links keyed by platform (facebook, twitter, linkedin, instagram).
  */
 function apd_get_user_social_links( int $user_id = 0 ): array {
-    if ( $user_id <= 0 ) {
-        $user_id = get_current_user_id();
-    }
+	if ( $user_id <= 0 ) {
+		$user_id = get_current_user_id();
+	}
 
-    if ( $user_id <= 0 ) {
-        return [];
-    }
+	if ( $user_id <= 0 ) {
+		return [];
+	}
 
-    $profile = apd_profile();
-    return $profile->get_social_links( $user_id );
+	$profile = apd_profile();
+	return $profile->get_social_links( $user_id );
 }
 
 /**
@@ -2840,16 +2864,16 @@ function apd_get_user_social_links( int $user_id = 0 ): array {
  * @return bool True if user has a custom avatar.
  */
 function apd_user_has_custom_avatar( int $user_id = 0 ): bool {
-    if ( $user_id <= 0 ) {
-        $user_id = get_current_user_id();
-    }
+	if ( $user_id <= 0 ) {
+		$user_id = get_current_user_id();
+	}
 
-    if ( $user_id <= 0 ) {
-        return false;
-    }
+	if ( $user_id <= 0 ) {
+		return false;
+	}
 
-    $profile = apd_profile();
-    return $profile->has_custom_avatar( $user_id );
+	$profile = apd_profile();
+	return $profile->has_custom_avatar( $user_id );
 }
 
 // ============================================================================
@@ -2864,7 +2888,7 @@ function apd_user_has_custom_avatar( int $user_id = 0 ): bool {
  * @return \APD\User\Favorites
  */
 function apd_favorites(): \APD\User\Favorites {
-    return \APD\User\Favorites::get_instance();
+	return \APD\User\Favorites::get_instance();
 }
 
 /**
@@ -2877,7 +2901,7 @@ function apd_favorites(): \APD\User\Favorites {
  * @return bool True if added successfully.
  */
 function apd_add_favorite( int $listing_id, ?int $user_id = null ): bool {
-    return apd_favorites()->add( $listing_id, $user_id );
+	return apd_favorites()->add( $listing_id, $user_id );
 }
 
 /**
@@ -2890,7 +2914,7 @@ function apd_add_favorite( int $listing_id, ?int $user_id = null ): bool {
  * @return bool True if removed successfully.
  */
 function apd_remove_favorite( int $listing_id, ?int $user_id = null ): bool {
-    return apd_favorites()->remove( $listing_id, $user_id );
+	return apd_favorites()->remove( $listing_id, $user_id );
 }
 
 /**
@@ -2903,7 +2927,7 @@ function apd_remove_favorite( int $listing_id, ?int $user_id = null ): bool {
  * @return bool|null The new state (true = favorited, false = unfavorited), null on error.
  */
 function apd_toggle_favorite( int $listing_id, ?int $user_id = null ): ?bool {
-    return apd_favorites()->toggle( $listing_id, $user_id );
+	return apd_favorites()->toggle( $listing_id, $user_id );
 }
 
 /**
@@ -2916,7 +2940,7 @@ function apd_toggle_favorite( int $listing_id, ?int $user_id = null ): ?bool {
  * @return bool True if listing is favorited.
  */
 function apd_is_favorite( int $listing_id, ?int $user_id = null ): bool {
-    return apd_favorites()->is_favorite( $listing_id, $user_id );
+	return apd_favorites()->is_favorite( $listing_id, $user_id );
 }
 
 /**
@@ -2928,7 +2952,7 @@ function apd_is_favorite( int $listing_id, ?int $user_id = null ): bool {
  * @return int[] Array of listing IDs.
  */
 function apd_get_user_favorites( ?int $user_id = null ): array {
-    return apd_favorites()->get_favorites( $user_id );
+	return apd_favorites()->get_favorites( $user_id );
 }
 
 /**
@@ -2940,7 +2964,7 @@ function apd_get_user_favorites( ?int $user_id = null ): array {
  * @return int Favorites count.
  */
 function apd_get_favorites_count( ?int $user_id = null ): int {
-    return apd_favorites()->get_count( $user_id );
+	return apd_favorites()->get_count( $user_id );
 }
 
 /**
@@ -2952,7 +2976,7 @@ function apd_get_favorites_count( ?int $user_id = null ): int {
  * @return int Favorite count.
  */
 function apd_get_listing_favorites_count( int $listing_id ): int {
-    return apd_favorites()->get_listing_favorite_count( $listing_id );
+	return apd_favorites()->get_listing_favorite_count( $listing_id );
 }
 
 /**
@@ -2963,7 +2987,7 @@ function apd_get_listing_favorites_count( int $listing_id ): int {
  * @return bool True if login is required.
  */
 function apd_favorites_require_login(): bool {
-    return apd_favorites()->requires_login();
+	return apd_favorites()->requires_login();
 }
 
 /**
@@ -2975,7 +2999,7 @@ function apd_favorites_require_login(): bool {
  * @return bool True on success.
  */
 function apd_clear_favorites( ?int $user_id = null ): bool {
-    return apd_favorites()->clear( $user_id );
+	return apd_favorites()->clear( $user_id );
 }
 
 /**
@@ -2988,35 +3012,35 @@ function apd_clear_favorites( ?int $user_id = null ): bool {
  * @return \WP_Post[] Array of listing posts.
  */
 function apd_get_favorite_listings( ?int $user_id = null, array $args = [] ): array {
-    $favorite_ids = apd_get_user_favorites( $user_id );
+	$favorite_ids = apd_get_user_favorites( $user_id );
 
-    if ( empty( $favorite_ids ) ) {
-        return [];
-    }
+	if ( empty( $favorite_ids ) ) {
+		return [];
+	}
 
-    $defaults = [
-        'post_type'      => 'apd_listing',
-        'post_status'    => 'publish',
-        'post__in'       => $favorite_ids,
-        'orderby'        => 'post__in',
-        'posts_per_page' => -1,
-    ];
+	$defaults = [
+		'post_type'      => 'apd_listing',
+		'post_status'    => 'publish',
+		'post__in'       => $favorite_ids,
+		'orderby'        => 'post__in',
+		'posts_per_page' => -1,
+	];
 
-    $query_args = wp_parse_args( $args, $defaults );
+	$query_args = wp_parse_args( $args, $defaults );
 
-    /**
-     * Filter the favorite listings query arguments.
-     *
-     * @since 1.0.0
-     *
-     * @param array $query_args Query arguments.
-     * @param int[] $favorite_ids Favorite listing IDs.
-     */
-    $query_args = apply_filters( 'apd_favorite_listings_query_args', $query_args, $favorite_ids );
+	/**
+	 * Filter the favorite listings query arguments.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $query_args Query arguments.
+	 * @param int[] $favorite_ids Favorite listing IDs.
+	 */
+	$query_args = apply_filters( 'apd_favorite_listings_query_args', $query_args, $favorite_ids );
 
-    $query = new \WP_Query( $query_args );
+	$query = new \WP_Query( $query_args );
 
-    return $query->posts;
+	return $query->posts;
 }
 
 /**
@@ -3027,7 +3051,7 @@ function apd_get_favorite_listings( ?int $user_id = null, array $args = [] ): ar
  * @return \APD\User\FavoriteToggle
  */
 function apd_favorite_toggle(): \APD\User\FavoriteToggle {
-    return \APD\User\FavoriteToggle::get_instance();
+	return \APD\User\FavoriteToggle::get_instance();
 }
 
 /**
@@ -3046,7 +3070,7 @@ function apd_favorite_toggle(): \APD\User\FavoriteToggle {
  * @return void
  */
 function apd_render_favorite_button( int $listing_id, array $args = [] ): void {
-    apd_favorite_toggle()->render_button( $listing_id, $args );
+	apd_favorite_toggle()->render_button( $listing_id, $args );
 }
 
 /**
@@ -3065,7 +3089,7 @@ function apd_render_favorite_button( int $listing_id, array $args = [] ): void {
  * @return string Button HTML.
  */
 function apd_get_favorite_button( int $listing_id, array $args = [] ): string {
-    return apd_favorite_toggle()->get_button( $listing_id, $args );
+	return apd_favorite_toggle()->get_button( $listing_id, $args );
 }
 
 /**
@@ -3077,7 +3101,7 @@ function apd_get_favorite_button( int $listing_id, array $args = [] ): string {
  * @return \APD\Frontend\Dashboard\FavoritesPage
  */
 function apd_favorites_page( array $config = [] ): \APD\Frontend\Dashboard\FavoritesPage {
-    return \APD\Frontend\Dashboard\FavoritesPage::get_instance( $config );
+	return \APD\Frontend\Dashboard\FavoritesPage::get_instance( $config );
 }
 
 /**
@@ -3095,9 +3119,9 @@ function apd_favorites_page( array $config = [] ): \APD\Frontend\Dashboard\Favor
  * @return void
  */
 function apd_render_favorites_page( array $config = [] ): void {
-    $page = apd_favorites_page( $config );
+	$page = apd_favorites_page( $config );
     // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Output is escaped in template.
-    echo $page->render();
+	echo $page->render();
 }
 
 // ============================================================================
@@ -3112,7 +3136,7 @@ function apd_render_favorites_page( array $config = [] ): void {
  * @return \APD\Review\ReviewManager
  */
 function apd_review_manager(): \APD\Review\ReviewManager {
-    return \APD\Review\ReviewManager::get_instance();
+	return \APD\Review\ReviewManager::get_instance();
 }
 
 /**
@@ -3131,7 +3155,7 @@ function apd_review_manager(): \APD\Review\ReviewManager {
  * @return int|\WP_Error Review ID on success, WP_Error on failure.
  */
 function apd_create_review( int $listing_id, array $data ): int|\WP_Error {
-    return apd_review_manager()->create( $listing_id, $data );
+	return apd_review_manager()->create( $listing_id, $data );
 }
 
 /**
@@ -3143,7 +3167,7 @@ function apd_create_review( int $listing_id, array $data ): int|\WP_Error {
  * @return array|null Review data array or null if not found.
  */
 function apd_get_review( int $review_id ): ?array {
-    return apd_review_manager()->get( $review_id );
+	return apd_review_manager()->get( $review_id );
 }
 
 /**
@@ -3162,7 +3186,7 @@ function apd_get_review( int $review_id ): ?array {
  * @return array{reviews: array[], total: int, pages: int} Reviews data with pagination info.
  */
 function apd_get_listing_reviews( int $listing_id, array $args = [] ): array {
-    return apd_review_manager()->get_listing_reviews( $listing_id, $args );
+	return apd_review_manager()->get_listing_reviews( $listing_id, $args );
 }
 
 /**
@@ -3175,7 +3199,7 @@ function apd_get_listing_reviews( int $listing_id, array $args = [] ): array {
  * @return array|null Review data or null if not found.
  */
 function apd_get_user_review( int $listing_id, int $user_id ): ?array {
-    return apd_review_manager()->get_user_review( $listing_id, $user_id );
+	return apd_review_manager()->get_user_review( $listing_id, $user_id );
 }
 
 /**
@@ -3188,7 +3212,7 @@ function apd_get_user_review( int $listing_id, int $user_id ): ?array {
  * @return bool True if user has reviewed the listing.
  */
 function apd_has_user_reviewed( int $listing_id, int $user_id ): bool {
-    return apd_review_manager()->has_user_reviewed( $listing_id, $user_id );
+	return apd_review_manager()->has_user_reviewed( $listing_id, $user_id );
 }
 
 /**
@@ -3201,7 +3225,7 @@ function apd_has_user_reviewed( int $listing_id, int $user_id ): bool {
  * @return int Review count.
  */
 function apd_get_review_count( int $listing_id, string $status = 'approved' ): int {
-    return apd_review_manager()->get_review_count( $listing_id, $status );
+	return apd_review_manager()->get_review_count( $listing_id, $status );
 }
 
 /**
@@ -3214,7 +3238,7 @@ function apd_get_review_count( int $listing_id, string $status = 'approved' ): i
  * @return bool True on success, false on failure.
  */
 function apd_delete_review( int $review_id, bool $force_delete = false ): bool {
-    return apd_review_manager()->delete( $review_id, $force_delete );
+	return apd_review_manager()->delete( $review_id, $force_delete );
 }
 
 /**
@@ -3226,7 +3250,7 @@ function apd_delete_review( int $review_id, bool $force_delete = false ): bool {
  * @return bool True on success, false on failure.
  */
 function apd_approve_review( int $review_id ): bool {
-    return apd_review_manager()->approve( $review_id );
+	return apd_review_manager()->approve( $review_id );
 }
 
 /**
@@ -3237,7 +3261,7 @@ function apd_approve_review( int $review_id ): bool {
  * @return bool True if login is required.
  */
 function apd_reviews_require_login(): bool {
-    return apd_review_manager()->requires_login();
+	return apd_review_manager()->requires_login();
 }
 
 // ============================================================================
@@ -3252,7 +3276,7 @@ function apd_reviews_require_login(): bool {
  * @return \APD\Review\RatingCalculator
  */
 function apd_rating_calculator(): \APD\Review\RatingCalculator {
-    return \APD\Review\RatingCalculator::get_instance();
+	return \APD\Review\RatingCalculator::get_instance();
 }
 
 /**
@@ -3264,7 +3288,7 @@ function apd_rating_calculator(): \APD\Review\RatingCalculator {
  * @return float Average rating (0 if no ratings).
  */
 function apd_get_listing_rating( int $listing_id ): float {
-    return apd_rating_calculator()->get_average( $listing_id );
+	return apd_rating_calculator()->get_average( $listing_id );
 }
 
 /**
@@ -3276,7 +3300,7 @@ function apd_get_listing_rating( int $listing_id ): float {
  * @return int Number of ratings.
  */
 function apd_get_listing_rating_count( int $listing_id ): int {
-    return apd_rating_calculator()->get_count( $listing_id );
+	return apd_rating_calculator()->get_count( $listing_id );
 }
 
 /**
@@ -3290,7 +3314,7 @@ function apd_get_listing_rating_count( int $listing_id ): int {
  * @return array<int, int> Distribution array keyed by star rating.
  */
 function apd_get_rating_distribution( int $listing_id ): array {
-    return apd_rating_calculator()->get_distribution( $listing_id );
+	return apd_rating_calculator()->get_distribution( $listing_id );
 }
 
 /**
@@ -3309,7 +3333,7 @@ function apd_get_rating_distribution( int $listing_id ): array {
  */
 function apd_render_star_rating( float $rating, array $args = [] ): void {
     // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Output is escaped in render method.
-    echo apd_rating_calculator()->render_stars( $rating, $args );
+	echo apd_rating_calculator()->render_stars( $rating, $args );
 }
 
 /**
@@ -3322,7 +3346,7 @@ function apd_render_star_rating( float $rating, array $args = [] ): void {
  * @return string HTML output.
  */
 function apd_get_star_rating( float $rating, array $args = [] ): string {
-    return apd_rating_calculator()->render_stars( $rating, $args );
+	return apd_rating_calculator()->render_stars( $rating, $args );
 }
 
 /**
@@ -3338,7 +3362,7 @@ function apd_get_star_rating( float $rating, array $args = [] ): string {
  */
 function apd_render_listing_star_rating( int $listing_id, array $args = [] ): void {
     // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Output is escaped in render method.
-    echo apd_rating_calculator()->render_listing_stars( $listing_id, $args );
+	echo apd_rating_calculator()->render_listing_stars( $listing_id, $args );
 }
 
 /**
@@ -3353,7 +3377,7 @@ function apd_render_listing_star_rating( int $listing_id, array $args = [] ): vo
  * @return string HTML output.
  */
 function apd_get_listing_star_rating( int $listing_id, array $args = [] ): string {
-    return apd_rating_calculator()->render_listing_stars( $listing_id, $args );
+	return apd_rating_calculator()->render_listing_stars( $listing_id, $args );
 }
 
 /**
@@ -3365,7 +3389,7 @@ function apd_get_listing_star_rating( int $listing_id, array $args = [] ): strin
  * @return array{average: float, count: int, distribution: array<int, int>} Rating statistics.
  */
 function apd_recalculate_listing_rating( int $listing_id ): array {
-    return apd_rating_calculator()->recalculate( $listing_id );
+	return apd_rating_calculator()->recalculate( $listing_id );
 }
 
 /**
@@ -3379,7 +3403,7 @@ function apd_recalculate_listing_rating( int $listing_id ): array {
  * @return void
  */
 function apd_invalidate_listing_rating( int $listing_id ): void {
-    apd_rating_calculator()->invalidate( $listing_id );
+	apd_rating_calculator()->invalidate( $listing_id );
 }
 
 // ============================================================================
@@ -3394,7 +3418,7 @@ function apd_invalidate_listing_rating( int $listing_id ): void {
  * @return \APD\Review\ReviewForm
  */
 function apd_review_form(): \APD\Review\ReviewForm {
-    return \APD\Review\ReviewForm::get_instance();
+	return \APD\Review\ReviewForm::get_instance();
 }
 
 /**
@@ -3407,7 +3431,7 @@ function apd_review_form(): \APD\Review\ReviewForm {
  */
 function apd_render_review_form( int $listing_id ): void {
     // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Output is escaped in render method.
-    echo apd_review_form()->render( $listing_id );
+	echo apd_review_form()->render( $listing_id );
 }
 
 /**
@@ -3419,7 +3443,7 @@ function apd_render_review_form( int $listing_id ): void {
  * @return string HTML output.
  */
 function apd_get_review_form( int $listing_id ): string {
-    return apd_review_form()->render( $listing_id );
+	return apd_review_form()->render( $listing_id );
 }
 
 /**
@@ -3430,7 +3454,7 @@ function apd_get_review_form( int $listing_id ): string {
  * @return \APD\Review\ReviewHandler
  */
 function apd_review_handler(): \APD\Review\ReviewHandler {
-    return \APD\Review\ReviewHandler::get_instance();
+	return \APD\Review\ReviewHandler::get_instance();
 }
 
 /**
@@ -3444,13 +3468,13 @@ function apd_review_handler(): \APD\Review\ReviewHandler {
  * @return bool True if current user has reviewed the listing.
  */
 function apd_current_user_has_reviewed( int $listing_id ): bool {
-    $user_id = get_current_user_id();
+	$user_id = get_current_user_id();
 
-    if ( $user_id <= 0 ) {
-        return false;
-    }
+	if ( $user_id <= 0 ) {
+		return false;
+	}
 
-    return apd_has_user_reviewed( $listing_id, $user_id );
+	return apd_has_user_reviewed( $listing_id, $user_id );
 }
 
 /**
@@ -3464,13 +3488,13 @@ function apd_current_user_has_reviewed( int $listing_id ): bool {
  * @return array|null Review data or null if not found.
  */
 function apd_get_current_user_review( int $listing_id ): ?array {
-    $user_id = get_current_user_id();
+	$user_id = get_current_user_id();
 
-    if ( $user_id <= 0 ) {
-        return null;
-    }
+	if ( $user_id <= 0 ) {
+		return null;
+	}
 
-    return apd_get_user_review( $listing_id, $user_id );
+	return apd_get_user_review( $listing_id, $user_id );
 }
 
 /**
@@ -3486,7 +3510,7 @@ function apd_get_current_user_review( int $listing_id ): ?array {
  * @return bool|\WP_Error True on success, WP_Error on failure.
  */
 function apd_update_review( int $review_id, array $data ): bool|\WP_Error {
-    return apd_review_manager()->update( $review_id, $data );
+	return apd_review_manager()->update( $review_id, $data );
 }
 
 // ============================================================================
@@ -3501,7 +3525,7 @@ function apd_update_review( int $review_id, array $data ): bool|\WP_Error {
  * @return \APD\Review\ReviewDisplay
  */
 function apd_review_display(): \APD\Review\ReviewDisplay {
-    return \APD\Review\ReviewDisplay::get_instance();
+	return \APD\Review\ReviewDisplay::get_instance();
 }
 
 /**
@@ -3521,7 +3545,7 @@ function apd_review_display(): \APD\Review\ReviewDisplay {
  */
 function apd_render_reviews_section( int $listing_id, array $args = [] ): void {
     // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Output is escaped in render method.
-    echo apd_review_display()->render( $listing_id, $args );
+	echo apd_review_display()->render( $listing_id, $args );
 }
 
 /**
@@ -3534,7 +3558,7 @@ function apd_render_reviews_section( int $listing_id, array $args = [] ): void {
  * @return string HTML output.
  */
 function apd_get_reviews_section( int $listing_id, array $args = [] ): string {
-    return apd_review_display()->render( $listing_id, $args );
+	return apd_review_display()->render( $listing_id, $args );
 }
 
 /**
@@ -3549,7 +3573,7 @@ function apd_get_reviews_section( int $listing_id, array $args = [] ): string {
  */
 function apd_render_rating_summary( int $listing_id ): void {
     // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Output is escaped in render method.
-    echo apd_review_display()->render_summary( $listing_id );
+	echo apd_review_display()->render_summary( $listing_id );
 }
 
 /**
@@ -3561,7 +3585,7 @@ function apd_render_rating_summary( int $listing_id ): void {
  * @return string HTML output.
  */
 function apd_get_rating_summary( int $listing_id ): string {
-    return apd_review_display()->render_summary( $listing_id );
+	return apd_review_display()->render_summary( $listing_id );
 }
 
 /**
@@ -3579,7 +3603,7 @@ function apd_get_rating_summary( int $listing_id ): string {
  */
 function apd_render_reviews_list( int $listing_id, array $args = [] ): void {
     // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Output is escaped in render method.
-    echo apd_review_display()->render_reviews_list( $listing_id, $args );
+	echo apd_review_display()->render_reviews_list( $listing_id, $args );
 }
 
 /**
@@ -3592,7 +3616,7 @@ function apd_render_reviews_list( int $listing_id, array $args = [] ): void {
  * @return string HTML output.
  */
 function apd_get_reviews_list( int $listing_id, array $args = [] ): string {
-    return apd_review_display()->render_reviews_list( $listing_id, $args );
+	return apd_review_display()->render_reviews_list( $listing_id, $args );
 }
 
 // ============================================================================
@@ -3608,10 +3632,10 @@ function apd_get_reviews_list( int $listing_id, array $args = [] ): string {
  * @return \APD\Contact\ContactForm ContactForm instance.
  */
 function apd_contact_form( array $config = [] ): \APD\Contact\ContactForm {
-    if ( empty( $config ) ) {
-        return \APD\Contact\ContactForm::get_instance();
-    }
-    return new \APD\Contact\ContactForm( $config );
+	if ( empty( $config ) ) {
+		return \APD\Contact\ContactForm::get_instance();
+	}
+	return new \APD\Contact\ContactForm( $config );
 }
 
 /**
@@ -3623,10 +3647,10 @@ function apd_contact_form( array $config = [] ): \APD\Contact\ContactForm {
  * @return \APD\Contact\ContactHandler ContactHandler instance.
  */
 function apd_contact_handler( array $config = [] ): \APD\Contact\ContactHandler {
-    if ( empty( $config ) ) {
-        return \APD\Contact\ContactHandler::get_instance();
-    }
-    return new \APD\Contact\ContactHandler( $config );
+	if ( empty( $config ) ) {
+		return \APD\Contact\ContactHandler::get_instance();
+	}
+	return new \APD\Contact\ContactHandler( $config );
 }
 
 /**
@@ -3640,7 +3664,7 @@ function apd_contact_handler( array $config = [] ): \APD\Contact\ContactHandler 
  */
 function apd_render_contact_form( int $listing_id, array $config = [] ): void {
     // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Output is escaped in template.
-    echo apd_get_contact_form( $listing_id, $config );
+	echo apd_get_contact_form( $listing_id, $config );
 }
 
 /**
@@ -3653,8 +3677,8 @@ function apd_render_contact_form( int $listing_id, array $config = [] ): void {
  * @return string HTML output.
  */
 function apd_get_contact_form( int $listing_id, array $config = [] ): string {
-    $form = apd_contact_form( $config );
-    return $form->get_html( $listing_id );
+	$form = apd_contact_form( $config );
+	return $form->get_html( $listing_id );
 }
 
 /**
@@ -3666,7 +3690,7 @@ function apd_get_contact_form( int $listing_id, array $config = [] ): string {
  * @return bool True if listing can receive messages.
  */
 function apd_can_receive_contact( int $listing_id ): bool {
-    return apd_contact_form()->can_receive_contact( $listing_id );
+	return apd_contact_form()->can_receive_contact( $listing_id );
 }
 
 /**
@@ -3679,18 +3703,19 @@ function apd_can_receive_contact( int $listing_id ): bool {
  * @return true|\WP_Error True on success, WP_Error on failure.
  */
 function apd_process_contact( array $data, array $config = [] ): bool|\WP_Error {
-    $handler = apd_contact_handler( $config );
+	$handler = apd_contact_handler( $config );
 
-    // Manually set $_POST for the handler.
-    $original_post = $_POST;
-    $_POST = $data;
+	// Manually set $_POST for the handler.
+	// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Intentional programmatic use.
+	$original_post = $_POST;
+	$_POST         = $data;
 
-    $result = $handler->process();
+	$result = $handler->process();
 
-    // Restore $_POST.
-    $_POST = $original_post;
+	// Restore $_POST.
+	$_POST = $original_post;
 
-    return $result;
+	return $result;
 }
 
 /**
@@ -3698,24 +3723,24 @@ function apd_process_contact( array $data, array $config = [] ): bool|\WP_Error 
  *
  * @since 1.0.0
  *
- * @param int    $listing_id Listing post ID.
- * @param array  $data       Contact data (contact_name, contact_email, contact_message, etc.).
- * @param array  $config     Handler configuration.
+ * @param int   $listing_id Listing post ID.
+ * @param array $data       Contact data (contact_name, contact_email, contact_message, etc.).
+ * @param array $config     Handler configuration.
  * @return bool True on success, false on failure.
  */
 function apd_send_contact_email( int $listing_id, array $data, array $config = [] ): bool {
-    $listing = get_post( $listing_id );
-    if ( ! $listing || 'apd_listing' !== $listing->post_type ) {
-        return false;
-    }
+	$listing = get_post( $listing_id );
+	if ( ! $listing || 'apd_listing' !== $listing->post_type ) {
+		return false;
+	}
 
-    $owner = get_userdata( $listing->post_author );
-    if ( ! $owner ) {
-        return false;
-    }
+	$owner = get_userdata( $listing->post_author );
+	if ( ! $owner ) {
+		return false;
+	}
 
-    $handler = apd_contact_handler( $config );
-    return $handler->send_email( $data, $listing, $owner );
+	$handler = apd_contact_handler( $config );
+	return $handler->send_email( $data, $listing, $owner );
 }
 
 // =============================================================================
@@ -3730,7 +3755,7 @@ function apd_send_contact_email( int $listing_id, array $data, array $config = [
  * @return \APD\Contact\InquiryTracker InquiryTracker instance.
  */
 function apd_inquiry_tracker(): \APD\Contact\InquiryTracker {
-    return \APD\Contact\InquiryTracker::get_instance();
+	return \APD\Contact\InquiryTracker::get_instance();
 }
 
 /**
@@ -3744,7 +3769,7 @@ function apd_inquiry_tracker(): \APD\Contact\InquiryTracker {
  * @return int|false Inquiry ID on success, false on failure.
  */
 function apd_log_inquiry( array $data, \WP_Post $listing, \WP_User $owner ): int|false {
-    return apd_inquiry_tracker()->log_inquiry( $data, $listing, $owner );
+	return apd_inquiry_tracker()->log_inquiry( $data, $listing, $owner );
 }
 
 /**
@@ -3756,7 +3781,7 @@ function apd_log_inquiry( array $data, \WP_Post $listing, \WP_User $owner ): int
  * @return int|false Inquiry ID on success, false on failure.
  */
 function apd_save_inquiry( array $data ): int|false {
-    return apd_inquiry_tracker()->save_inquiry( $data );
+	return apd_inquiry_tracker()->save_inquiry( $data );
 }
 
 /**
@@ -3768,7 +3793,7 @@ function apd_save_inquiry( array $data ): int|false {
  * @return array|null Inquiry data or null if not found.
  */
 function apd_get_inquiry( int $inquiry_id ): ?array {
-    return apd_inquiry_tracker()->get_inquiry( $inquiry_id );
+	return apd_inquiry_tracker()->get_inquiry( $inquiry_id );
 }
 
 /**
@@ -3781,7 +3806,7 @@ function apd_get_inquiry( int $inquiry_id ): ?array {
  * @return array Array of inquiry data.
  */
 function apd_get_listing_inquiries( int $listing_id, array $args = [] ): array {
-    return apd_inquiry_tracker()->get_listing_inquiries( $listing_id, $args );
+	return apd_inquiry_tracker()->get_listing_inquiries( $listing_id, $args );
 }
 
 /**
@@ -3794,10 +3819,10 @@ function apd_get_listing_inquiries( int $listing_id, array $args = [] ): array {
  * @return array Array of inquiry data.
  */
 function apd_get_user_inquiries( int $user_id = 0, array $args = [] ): array {
-    if ( $user_id <= 0 ) {
-        $user_id = get_current_user_id();
-    }
-    return apd_inquiry_tracker()->get_user_inquiries( $user_id, $args );
+	if ( $user_id <= 0 ) {
+		$user_id = get_current_user_id();
+	}
+	return apd_inquiry_tracker()->get_user_inquiries( $user_id, $args );
 }
 
 /**
@@ -3809,7 +3834,7 @@ function apd_get_user_inquiries( int $user_id = 0, array $args = [] ): array {
  * @return int Inquiry count.
  */
 function apd_get_listing_inquiry_count( int $listing_id ): int {
-    return apd_inquiry_tracker()->get_listing_inquiry_count( $listing_id );
+	return apd_inquiry_tracker()->get_listing_inquiry_count( $listing_id );
 }
 
 /**
@@ -3822,10 +3847,10 @@ function apd_get_listing_inquiry_count( int $listing_id ): int {
  * @return int Inquiry count.
  */
 function apd_get_user_inquiry_count( int $user_id = 0, string $status = 'all' ): int {
-    if ( $user_id <= 0 ) {
-        $user_id = get_current_user_id();
-    }
-    return apd_inquiry_tracker()->count_user_inquiries( $user_id, $status );
+	if ( $user_id <= 0 ) {
+		$user_id = get_current_user_id();
+	}
+	return apd_inquiry_tracker()->count_user_inquiries( $user_id, $status );
 }
 
 /**
@@ -3837,7 +3862,7 @@ function apd_get_user_inquiry_count( int $user_id = 0, string $status = 'all' ):
  * @return bool True on success.
  */
 function apd_mark_inquiry_read( int $inquiry_id ): bool {
-    return apd_inquiry_tracker()->mark_as_read( $inquiry_id );
+	return apd_inquiry_tracker()->mark_as_read( $inquiry_id );
 }
 
 /**
@@ -3849,7 +3874,7 @@ function apd_mark_inquiry_read( int $inquiry_id ): bool {
  * @return bool True on success.
  */
 function apd_mark_inquiry_unread( int $inquiry_id ): bool {
-    return apd_inquiry_tracker()->mark_as_unread( $inquiry_id );
+	return apd_inquiry_tracker()->mark_as_unread( $inquiry_id );
 }
 
 /**
@@ -3862,7 +3887,7 @@ function apd_mark_inquiry_unread( int $inquiry_id ): bool {
  * @return bool True on success.
  */
 function apd_delete_inquiry( int $inquiry_id, bool $force_delete = false ): bool {
-    return apd_inquiry_tracker()->delete_inquiry( $inquiry_id, $force_delete );
+	return apd_inquiry_tracker()->delete_inquiry( $inquiry_id, $force_delete );
 }
 
 /**
@@ -3875,10 +3900,10 @@ function apd_delete_inquiry( int $inquiry_id, bool $force_delete = false ): bool
  * @return bool True if user can view.
  */
 function apd_can_view_inquiry( int $inquiry_id, int $user_id = 0 ): bool {
-    if ( $user_id <= 0 ) {
-        $user_id = get_current_user_id();
-    }
-    return apd_inquiry_tracker()->can_user_view( $inquiry_id, $user_id );
+	if ( $user_id <= 0 ) {
+		$user_id = get_current_user_id();
+	}
+	return apd_inquiry_tracker()->can_user_view( $inquiry_id, $user_id );
 }
 
 /**
@@ -3890,7 +3915,7 @@ function apd_can_view_inquiry( int $inquiry_id, int $user_id = 0 ): bool {
  * @return int Recalculated count.
  */
 function apd_recalculate_listing_inquiry_count( int $listing_id ): int {
-    return apd_inquiry_tracker()->recalculate_listing_count( $listing_id );
+	return apd_inquiry_tracker()->recalculate_listing_count( $listing_id );
 }
 
 // -----------------------------------------------------------------------------
@@ -3905,7 +3930,7 @@ function apd_recalculate_listing_inquiry_count( int $listing_id ): int {
  * @return \APD\Email\EmailManager
  */
 function apd_email_manager(): \APD\Email\EmailManager {
-    return \APD\Email\EmailManager::get_instance();
+	return \APD\Email\EmailManager::get_instance();
 }
 
 /**
@@ -3922,14 +3947,14 @@ function apd_email_manager(): \APD\Email\EmailManager {
  * @return bool True if email was sent successfully.
  */
 function apd_send_email(
-    string $to,
-    string $subject,
-    string $message,
-    array $headers = [],
-    array $context = [],
-    array $attachments = []
+	string $to,
+	string $subject,
+	string $message,
+	array $headers = [],
+	array $context = [],
+	array $attachments = []
 ): bool {
-    return apd_email_manager()->send( $to, $subject, $message, $headers, $context, $attachments );
+	return apd_email_manager()->send( $to, $subject, $message, $headers, $context, $attachments );
 }
 
 /**
@@ -3941,7 +3966,7 @@ function apd_send_email(
  * @return bool True if email was sent successfully.
  */
 function apd_send_listing_submitted_email( int $listing_id ): bool {
-    return apd_email_manager()->send_listing_submitted( $listing_id );
+	return apd_email_manager()->send_listing_submitted( $listing_id );
 }
 
 /**
@@ -3953,7 +3978,7 @@ function apd_send_listing_submitted_email( int $listing_id ): bool {
  * @return bool True if email was sent successfully.
  */
 function apd_send_listing_approved_email( int $listing_id ): bool {
-    return apd_email_manager()->send_listing_approved( $listing_id );
+	return apd_email_manager()->send_listing_approved( $listing_id );
 }
 
 /**
@@ -3966,7 +3991,7 @@ function apd_send_listing_approved_email( int $listing_id ): bool {
  * @return bool True if email was sent successfully.
  */
 function apd_send_listing_rejected_email( int $listing_id, string $reason = '' ): bool {
-    return apd_email_manager()->send_listing_rejected( $listing_id, $reason );
+	return apd_email_manager()->send_listing_rejected( $listing_id, $reason );
 }
 
 /**
@@ -3979,7 +4004,7 @@ function apd_send_listing_rejected_email( int $listing_id, string $reason = '' )
  * @return bool True if email was sent successfully.
  */
 function apd_send_listing_expiring_email( int $listing_id, int $days_left = 7 ): bool {
-    return apd_email_manager()->send_listing_expiring( $listing_id, $days_left );
+	return apd_email_manager()->send_listing_expiring( $listing_id, $days_left );
 }
 
 /**
@@ -3991,7 +4016,7 @@ function apd_send_listing_expiring_email( int $listing_id, int $days_left = 7 ):
  * @return bool True if email was sent successfully.
  */
 function apd_send_listing_expired_email( int $listing_id ): bool {
-    return apd_email_manager()->send_listing_expired( $listing_id );
+	return apd_email_manager()->send_listing_expired( $listing_id );
 }
 
 /**
@@ -4003,7 +4028,7 @@ function apd_send_listing_expired_email( int $listing_id ): bool {
  * @return bool True if email was sent successfully.
  */
 function apd_send_new_review_email( int $review_id ): bool {
-    return apd_email_manager()->send_new_review( $review_id );
+	return apd_email_manager()->send_new_review( $review_id );
 }
 
 /**
@@ -4016,7 +4041,7 @@ function apd_send_new_review_email( int $review_id ): bool {
  * @return bool True if email was sent successfully.
  */
 function apd_send_new_inquiry_email( int $listing_id, array $inquiry ): bool {
-    return apd_email_manager()->send_new_inquiry( $listing_id, $inquiry );
+	return apd_email_manager()->send_new_inquiry( $listing_id, $inquiry );
 }
 
 /**
@@ -4028,7 +4053,7 @@ function apd_send_new_inquiry_email( int $listing_id, array $inquiry ): bool {
  * @return bool True if enabled.
  */
 function apd_is_email_notification_enabled( string $type ): bool {
-    return apd_email_manager()->is_notification_enabled( $type );
+	return apd_email_manager()->is_notification_enabled( $type );
 }
 
 /**
@@ -4041,7 +4066,7 @@ function apd_is_email_notification_enabled( string $type ): bool {
  * @return void
  */
 function apd_set_email_notification_enabled( string $type, bool $enabled ): void {
-    apd_email_manager()->set_notification_enabled( $type, $enabled );
+	apd_email_manager()->set_notification_enabled( $type, $enabled );
 }
 
 /**
@@ -4054,7 +4079,7 @@ function apd_set_email_notification_enabled( string $type, bool $enabled ): void
  * @return void
  */
 function apd_register_email_placeholder( string $name, callable $callback ): void {
-    apd_email_manager()->register_placeholder( $name, $callback );
+	apd_email_manager()->register_placeholder( $name, $callback );
 }
 
 /**
@@ -4067,7 +4092,7 @@ function apd_register_email_placeholder( string $name, callable $callback ): voi
  * @return string Processed text.
  */
 function apd_replace_email_placeholders( string $text, array $context = [] ): string {
-    return apd_email_manager()->replace_placeholders( $text, $context );
+	return apd_email_manager()->replace_placeholders( $text, $context );
 }
 
 /**
@@ -4079,7 +4104,7 @@ function apd_replace_email_placeholders( string $text, array $context = [] ): st
  * @return array Context array with listing data.
  */
 function apd_get_email_listing_context( int|\WP_Post $listing ): array {
-    return apd_email_manager()->get_listing_context( $listing );
+	return apd_email_manager()->get_listing_context( $listing );
 }
 
 /**
@@ -4091,7 +4116,7 @@ function apd_get_email_listing_context( int|\WP_Post $listing ): array {
  * @return array Context array with user data.
  */
 function apd_get_email_user_context( int|\WP_User $user ): array {
-    return apd_email_manager()->get_user_context( $user );
+	return apd_email_manager()->get_user_context( $user );
 }
 
 /**
@@ -4103,7 +4128,7 @@ function apd_get_email_user_context( int|\WP_User $user ): array {
  * @return array Context array with review data.
  */
 function apd_get_email_review_context( int|\WP_Comment $review ): array {
-    return apd_email_manager()->get_review_context( $review );
+	return apd_email_manager()->get_review_context( $review );
 }
 
 /**
@@ -4114,7 +4139,7 @@ function apd_get_email_review_context( int|\WP_Comment $review ): array {
  * @return string Admin email address.
  */
 function apd_get_notification_admin_email(): string {
-    return apd_email_manager()->get_admin_email();
+	return apd_email_manager()->get_admin_email();
 }
 
 /**
@@ -4125,7 +4150,7 @@ function apd_get_notification_admin_email(): string {
  * @return string From name.
  */
 function apd_get_email_from_name(): string {
-    return apd_email_manager()->get_from_name();
+	return apd_email_manager()->get_from_name();
 }
 
 /**
@@ -4136,7 +4161,7 @@ function apd_get_email_from_name(): string {
  * @return string From email address.
  */
 function apd_get_email_from_email(): string {
-    return apd_email_manager()->get_from_email();
+	return apd_email_manager()->get_from_email();
 }
 
 // =============================================================================
@@ -4151,7 +4176,7 @@ function apd_get_email_from_email(): string {
  * @return \APD\Admin\Settings
  */
 function apd_settings(): \APD\Admin\Settings {
-    return \APD\Admin\Settings::get_instance();
+	return \APD\Admin\Settings::get_instance();
 }
 
 /**
@@ -4164,7 +4189,7 @@ function apd_settings(): \APD\Admin\Settings {
  * @return mixed
  */
 function apd_get_setting( string $key, mixed $default = null ): mixed {
-    return apd_settings()->get( $key, $default );
+	return apd_settings()->get( $key, $default );
 }
 
 /**
@@ -4177,7 +4202,7 @@ function apd_get_setting( string $key, mixed $default = null ): mixed {
  * @return bool True if updated, false otherwise.
  */
 function apd_set_setting( string $key, mixed $value ): bool {
-    return apd_settings()->set( $key, $value );
+	return apd_settings()->set( $key, $value );
 }
 
 /**
@@ -4188,7 +4213,7 @@ function apd_set_setting( string $key, mixed $value ): bool {
  * @return array<string, mixed> All settings.
  */
 function apd_get_all_settings(): array {
-    return apd_settings()->get_all();
+	return apd_settings()->get_all();
 }
 
 /**
@@ -4199,7 +4224,7 @@ function apd_get_all_settings(): array {
  * @return array<string, mixed> Default settings.
  */
 function apd_get_default_settings(): array {
-    return apd_settings()->get_defaults();
+	return apd_settings()->get_defaults();
 }
 
 /**
@@ -4211,7 +4236,7 @@ function apd_get_default_settings(): array {
  * @return string Settings page URL.
  */
 function apd_get_settings_url( string $tab = '' ): string {
-    return apd_settings()->get_settings_url( $tab );
+	return apd_settings()->get_settings_url( $tab );
 }
 
 /**
@@ -4222,7 +4247,7 @@ function apd_get_settings_url( string $tab = '' ): string {
  * @return bool True if reviews are enabled.
  */
 function apd_reviews_enabled(): bool {
-    return (bool) apd_get_setting( 'enable_reviews', true );
+	return (bool) apd_get_setting( 'enable_reviews', true );
 }
 
 /**
@@ -4233,7 +4258,7 @@ function apd_reviews_enabled(): bool {
  * @return bool True if favorites are enabled.
  */
 function apd_favorites_enabled(): bool {
-    return (bool) apd_get_setting( 'enable_favorites', true );
+	return (bool) apd_get_setting( 'enable_favorites', true );
 }
 
 /**
@@ -4244,7 +4269,7 @@ function apd_favorites_enabled(): bool {
  * @return bool True if contact form is enabled.
  */
 function apd_contact_form_enabled(): bool {
-    return (bool) apd_get_setting( 'enable_contact_form', true );
+	return (bool) apd_get_setting( 'enable_contact_form', true );
 }
 
 /**
@@ -4255,7 +4280,7 @@ function apd_contact_form_enabled(): bool {
  * @return int Number of listings per page.
  */
 function apd_get_listings_per_page(): int {
-    return (int) apd_get_setting( 'listings_per_page', 12 );
+	return (int) apd_get_setting( 'listings_per_page', 12 );
 }
 
 /**
@@ -4266,7 +4291,7 @@ function apd_get_listings_per_page(): int {
  * @return string View type (grid or list).
  */
 function apd_get_default_view(): string {
-    return apd_get_setting( 'default_view', 'grid' );
+	return apd_get_setting( 'default_view', 'grid' );
 }
 
 /**
@@ -4277,7 +4302,7 @@ function apd_get_default_view(): string {
  * @return int Number of columns (2-4).
  */
 function apd_get_default_grid_columns(): int {
-    return (int) apd_get_setting( 'grid_columns', 3 );
+	return (int) apd_get_setting( 'grid_columns', 3 );
 }
 
 /**
@@ -4288,7 +4313,7 @@ function apd_get_default_grid_columns(): int {
  * @return string Currency symbol.
  */
 function apd_get_currency_symbol(): string {
-    return apd_get_setting( 'currency_symbol', '$' );
+	return apd_get_setting( 'currency_symbol', '$' );
 }
 
 /**
@@ -4299,7 +4324,7 @@ function apd_get_currency_symbol(): string {
  * @return string Currency position (before or after).
  */
 function apd_get_currency_position(): string {
-    return apd_get_setting( 'currency_position', 'before' );
+	return apd_get_setting( 'currency_position', 'before' );
 }
 
 /**
@@ -4311,15 +4336,15 @@ function apd_get_currency_position(): string {
  * @return string Formatted price with currency.
  */
 function apd_format_price( float|int|string $amount ): string {
-    $symbol   = apd_get_currency_symbol();
-    $position = apd_get_currency_position();
-    $amount   = number_format( (float) $amount, 2 );
+	$symbol   = apd_get_currency_symbol();
+	$position = apd_get_currency_position();
+	$amount   = number_format( (float) $amount, 2 );
 
-    if ( $position === 'after' ) {
-        return $amount . $symbol;
-    }
+	if ( $position === 'after' ) {
+		return $amount . $symbol;
+	}
 
-    return $symbol . $amount;
+	return $symbol . $amount;
 }
 
 /**
@@ -4330,7 +4355,7 @@ function apd_format_price( float|int|string $amount ): string {
  * @return string Distance unit (km or miles).
  */
 function apd_get_distance_unit(): string {
-    return apd_get_setting( 'distance_unit', 'km' );
+	return apd_get_setting( 'distance_unit', 'km' );
 }
 
 /**
@@ -4341,7 +4366,7 @@ function apd_get_distance_unit(): string {
  * @return bool True if debug mode is enabled.
  */
 function apd_is_debug_mode(): bool {
-    return (bool) apd_get_setting( 'debug_mode', false );
+	return (bool) apd_get_setting( 'debug_mode', false );
 }
 
 /**
@@ -4354,18 +4379,18 @@ function apd_is_debug_mode(): bool {
  * @return void
  */
 function apd_debug_log( string $message, array $context = [] ): void {
-    if ( ! apd_is_debug_mode() ) {
-        return;
-    }
+	if ( ! apd_is_debug_mode() ) {
+		return;
+	}
 
-    $log_message = '[APD Debug] ' . $message;
+	$log_message = '[APD Debug] ' . $message;
 
-    if ( ! empty( $context ) ) {
-        $log_message .= ' | Context: ' . wp_json_encode( $context );
-    }
+	if ( ! empty( $context ) ) {
+		$log_message .= ' | Context: ' . wp_json_encode( $context );
+	}
 
     // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-    error_log( $log_message );
+	error_log( $log_message );
 }
 
 // =============================================================================
@@ -4380,7 +4405,7 @@ function apd_debug_log( string $message, array $context = [] ): void {
  * @return \APD\Api\RestController
  */
 function apd_rest_controller(): \APD\Api\RestController {
-    return \APD\Api\RestController::get_instance();
+	return \APD\Api\RestController::get_instance();
 }
 
 /**
@@ -4391,7 +4416,7 @@ function apd_rest_controller(): \APD\Api\RestController {
  * @return string The namespace (e.g., 'apd/v1').
  */
 function apd_get_rest_namespace(): string {
-    return \APD\Api\RestController::NAMESPACE;
+	return \APD\Api\RestController::NAMESPACE;
 }
 
 /**
@@ -4405,7 +4430,7 @@ function apd_get_rest_namespace(): string {
  * @return string Full REST URL.
  */
 function apd_get_rest_url( string $route = '' ): string {
-    return apd_rest_controller()->get_rest_url( $route );
+	return apd_rest_controller()->get_rest_url( $route );
 }
 
 /**
@@ -4421,7 +4446,7 @@ function apd_get_rest_url( string $route = '' ): string {
  * @return void
  */
 function apd_register_rest_endpoint( string $name, object $endpoint ): void {
-    apd_rest_controller()->register_endpoint( $name, $endpoint );
+	apd_rest_controller()->register_endpoint( $name, $endpoint );
 }
 
 /**
@@ -4433,7 +4458,7 @@ function apd_register_rest_endpoint( string $name, object $endpoint ): void {
  * @return bool True if removed, false if not found.
  */
 function apd_unregister_rest_endpoint( string $name ): bool {
-    return apd_rest_controller()->unregister_endpoint( $name );
+	return apd_rest_controller()->unregister_endpoint( $name );
 }
 
 /**
@@ -4445,7 +4470,7 @@ function apd_unregister_rest_endpoint( string $name ): bool {
  * @return bool True if registered, false otherwise.
  */
 function apd_has_rest_endpoint( string $name ): bool {
-    return apd_rest_controller()->has_endpoint( $name );
+	return apd_rest_controller()->has_endpoint( $name );
 }
 
 /**
@@ -4457,7 +4482,7 @@ function apd_has_rest_endpoint( string $name ): bool {
  * @return object|null Endpoint controller or null if not found.
  */
 function apd_get_rest_endpoint( string $name ): ?object {
-    return apd_rest_controller()->get_endpoint( $name );
+	return apd_rest_controller()->get_endpoint( $name );
 }
 
 /**
@@ -4473,7 +4498,7 @@ function apd_get_rest_endpoint( string $name ): ?object {
  * @return \WP_REST_Response
  */
 function apd_rest_response( mixed $data, int $status = 200, array $headers = [] ): \WP_REST_Response {
-    return apd_rest_controller()->create_response( $data, $status, $headers );
+	return apd_rest_controller()->create_response( $data, $status, $headers );
 }
 
 /**
@@ -4490,7 +4515,7 @@ function apd_rest_response( mixed $data, int $status = 200, array $headers = [] 
  * @return \WP_Error
  */
 function apd_rest_error( string $code, string $message, int $status = 400, array $data = [] ): \WP_Error {
-    return apd_rest_controller()->create_error( $code, $message, $status, $data );
+	return apd_rest_controller()->create_error( $code, $message, $status, $data );
 }
 
 /**
@@ -4508,19 +4533,19 @@ function apd_rest_error( string $code, string $message, int $status = 400, array
  * @return \WP_REST_Response
  */
 function apd_rest_paginated_response(
-    array $items,
-    int $total,
-    int $page,
-    int $per_page,
-    array $extra_data = []
+	array $items,
+	int $total,
+	int $page,
+	int $per_page,
+	array $extra_data = []
 ): \WP_REST_Response {
-    return apd_rest_controller()->create_paginated_response(
-        $items,
-        $total,
-        $page,
-        $per_page,
-        $extra_data
-    );
+	return apd_rest_controller()->create_paginated_response(
+		$items,
+		$total,
+		$page,
+		$per_page,
+		$extra_data
+	);
 }
 
 // ============================================================================
@@ -4535,7 +4560,7 @@ function apd_rest_paginated_response(
  * @return \APD\Core\Performance
  */
 function apd_performance(): \APD\Core\Performance {
-    return \APD\Core\Performance::get_instance();
+	return \APD\Core\Performance::get_instance();
 }
 
 /**
@@ -4552,7 +4577,7 @@ function apd_performance(): \APD\Core\Performance {
  * @return mixed Cached or generated value.
  */
 function apd_cache_remember( string $key, callable $callback, int $expiration = HOUR_IN_SECONDS ): mixed {
-    return apd_performance()->remember( $key, $callback, $expiration );
+	return apd_performance()->remember( $key, $callback, $expiration );
 }
 
 /**
@@ -4564,7 +4589,7 @@ function apd_cache_remember( string $key, callable $callback, int $expiration = 
  * @return mixed|false Cached value or false if not found.
  */
 function apd_cache_get( string $key ): mixed {
-    return apd_performance()->get( $key );
+	return apd_performance()->get( $key );
 }
 
 /**
@@ -4578,7 +4603,7 @@ function apd_cache_get( string $key ): mixed {
  * @return bool True on success.
  */
 function apd_cache_set( string $key, mixed $value, int $expiration = HOUR_IN_SECONDS ): bool {
-    return apd_performance()->set( $key, $value, $expiration );
+	return apd_performance()->set( $key, $value, $expiration );
 }
 
 /**
@@ -4590,7 +4615,7 @@ function apd_cache_set( string $key, mixed $value, int $expiration = HOUR_IN_SEC
  * @return bool True on success.
  */
 function apd_cache_delete( string $key ): bool {
-    return apd_performance()->delete( $key );
+	return apd_performance()->delete( $key );
 }
 
 /**
@@ -4603,7 +4628,7 @@ function apd_cache_delete( string $key ): bool {
  * @return int Number of deleted cache entries.
  */
 function apd_cache_clear_all(): int {
-    return apd_performance()->clear_all();
+	return apd_performance()->clear_all();
 }
 
 /**
@@ -4617,7 +4642,7 @@ function apd_cache_clear_all(): int {
  * @return array Array of WP_Term objects.
  */
 function apd_get_cached_categories( array $args = [] ): array {
-    return apd_performance()->get_categories_with_counts( $args );
+	return apd_performance()->get_categories_with_counts( $args );
 }
 
 /**
@@ -4634,7 +4659,7 @@ function apd_get_cached_categories( array $args = [] ): array {
  * @return array Array of WP_Post objects.
  */
 function apd_get_cached_related_listings( int $listing_id, int $limit = 4, array $args = [] ): array {
-    return apd_performance()->get_related_listings( $listing_id, $limit, $args );
+	return apd_performance()->get_related_listings( $listing_id, $limit, $args );
 }
 
 /**
@@ -4649,7 +4674,7 @@ function apd_get_cached_related_listings( int $listing_id, int $limit = 4, array
  * @return array Dashboard stats array with keys: listings, views, favorites.
  */
 function apd_get_cached_dashboard_stats( int $user_id ): array {
-    return apd_performance()->get_dashboard_stats( $user_id );
+	return apd_performance()->get_dashboard_stats( $user_id );
 }
 
 /**
@@ -4665,7 +4690,7 @@ function apd_get_cached_dashboard_stats( int $user_id ): array {
  * @return array Array of WP_Post objects.
  */
 function apd_get_popular_listings( int $limit = 10, array $args = [] ): array {
-    return apd_performance()->get_popular_listings( $limit, $args );
+	return apd_performance()->get_popular_listings( $limit, $args );
 }
 
 /**
@@ -4678,5 +4703,5 @@ function apd_get_popular_listings( int $limit = 10, array $args = [] ): array {
  * @return void
  */
 function apd_invalidate_category_cache(): void {
-    apd_performance()->invalidate_category_cache();
+	apd_performance()->invalidate_category_cache();
 }

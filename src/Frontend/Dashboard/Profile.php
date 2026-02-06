@@ -80,9 +80,9 @@ class Profile {
 	 * @var array<string, mixed>
 	 */
 	private const DEFAULTS = [
-		'show_avatar'  => true,
-		'show_social'  => true,
-		'avatar_size'  => 150,
+		'show_avatar' => true,
+		'show_social' => true,
+		'avatar_size' => 150,
 	];
 
 	/**
@@ -628,7 +628,7 @@ class Profile {
 		$links = [];
 
 		foreach ( self::SOCIAL_PLATFORMS as $platform ) {
-			$value = get_user_meta( $user_id, '_apd_social_' . $platform, true );
+			$value              = get_user_meta( $user_id, '_apd_social_' . $platform, true );
 			$links[ $platform ] = is_string( $value ) ? $value : '';
 		}
 

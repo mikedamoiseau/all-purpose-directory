@@ -200,7 +200,7 @@ class GalleryField extends AbstractFieldType {
 		$image_url = $image_src[0];
 		$image_alt = get_post_meta( $attachment_id, '_wp_attachment_image_alt', true );
 
-		$html = sprintf(
+		$html  = sprintf(
 			'<div class="apd-gallery-item" data-id="%d" draggable="true">',
 			$attachment_id
 		);

@@ -163,10 +163,13 @@ class ReviewHandler {
 		}
 
 		// Success - redirect with message.
-		$redirect_url = add_query_arg( [
-			'apd_review' => 'success',
-			'review_id'  => $result,
-		], wp_get_referer() ?: home_url() );
+		$redirect_url = add_query_arg(
+			[
+				'apd_review' => 'success',
+				'review_id'  => $result,
+			],
+			wp_get_referer() ?: home_url()
+		);
 
 		wp_safe_redirect( $redirect_url );
 		exit;
@@ -182,9 +185,12 @@ class ReviewHandler {
 	public function handle_ajax_submit(): void {
 		// Verify nonce.
 		if ( ! check_ajax_referer( ReviewForm::NONCE_ACTION, 'nonce', false ) ) {
-			wp_send_json_error( [
-				'message' => __( 'Security check failed. Please refresh the page and try again.', 'all-purpose-directory' ),
-			], 403 );
+			wp_send_json_error(
+				[
+					'message' => __( 'Security check failed. Please refresh the page and try again.', 'all-purpose-directory' ),
+				],
+				403
+			);
 		}
 
 		// Process the submission.
@@ -203,17 +209,23 @@ class ReviewHandler {
 
 		// Check if guest reviews are allowed.
 		if ( $manager->requires_login() ) {
-			wp_send_json_error( [
-				'message'       => __( 'You must be logged in to submit a review.', 'all-purpose-directory' ),
-				'login_required' => true,
-			], 401 );
+			wp_send_json_error(
+				[
+					'message'        => __( 'You must be logged in to submit a review.', 'all-purpose-directory' ),
+					'login_required' => true,
+				],
+				401
+			);
 		}
 
 		// Verify nonce.
 		if ( ! check_ajax_referer( ReviewForm::NONCE_ACTION, 'nonce', false ) ) {
-			wp_send_json_error( [
-				'message' => __( 'Security check failed. Please refresh the page and try again.', 'all-purpose-directory' ),
-			], 403 );
+			wp_send_json_error(
+				[
+					'message' => __( 'Security check failed. Please refresh the page and try again.', 'all-purpose-directory' ),
+				],
+				403
+			);
 		}
 
 		// Process the submission.
@@ -235,26 +247,32 @@ class ReviewHandler {
 		$validation = $this->validate( $data );
 
 		if ( is_wp_error( $validation ) ) {
-			wp_send_json_error( [
-				'message' => $validation->get_error_message(),
-				'errors'  => $validation->get_error_messages(),
-			], 400 );
+			wp_send_json_error(
+				[
+					'message' => $validation->get_error_message(),
+					'errors'  => $validation->get_error_messages(),
+				],
+				400
+			);
 		}
 
 		// Process the review.
 		$result = $this->process_review( $data );
 
 		if ( is_wp_error( $result ) ) {
-			wp_send_json_error( [
-				'message' => $result->get_error_message(),
-			], 400 );
+			wp_send_json_error(
+				[
+					'message' => $result->get_error_message(),
+				],
+				400
+			);
 		}
 
 		// Get the created/updated review.
 		$review = ReviewManager::get_instance()->get( $result );
 
 		// Determine success message.
-		$is_update = ! empty( $data['review_id'] );
+		$is_update  = ! empty( $data['review_id'] );
 		$is_pending = $review && $review['status'] === 'pending';
 
 		$message = $is_update
@@ -277,13 +295,15 @@ class ReviewHandler {
 		 */
 		$message = apply_filters( 'apd_review_success_message', $message, $result, $data, $is_update );
 
-		wp_send_json_success( [
-			'message'    => $message,
-			'review_id'  => $result,
-			'is_update'  => $is_update,
-			'is_pending' => $is_pending,
-			'review'     => $review,
-		] );
+		wp_send_json_success(
+			[
+				'message'    => $message,
+				'review_id'  => $result,
+				'is_update'  => $is_update,
+				'is_pending' => $is_pending,
+				'review'     => $review,
+			]
+		);
 	}
 
 	/**
@@ -318,11 +338,14 @@ class ReviewHandler {
 				);
 			}
 
-			$result = $manager->update( $review_id, [
-				'rating'  => $data['rating'],
-				'title'   => $data['title'] ?? '',
-				'content' => $data['content'],
-			] );
+			$result = $manager->update(
+				$review_id,
+				[
+					'rating'  => $data['rating'],
+					'title'   => $data['title'] ?? '',
+					'content' => $data['content'],
+				]
+			);
 
 			if ( is_wp_error( $result ) ) {
 				return $result;

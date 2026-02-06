@@ -52,8 +52,8 @@ if ( $end_page - $start_page < 4 ) {
 		<li class="apd-reviews-pagination__item apd-reviews-pagination__item--prev">
 			<?php if ( $current_page > 1 ) : ?>
 				<a href="<?php echo esc_url( $display->build_pagination_url( $base_url, $current_page - 1 ) . '#reviews' ); ?>"
-				   class="apd-reviews-pagination__link"
-				   aria-label="<?php esc_attr_e( 'Previous page of reviews', 'all-purpose-directory' ); ?>">
+					class="apd-reviews-pagination__link"
+					aria-label="<?php esc_attr_e( 'Previous page of reviews', 'all-purpose-directory' ); ?>">
 					<span class="dashicons dashicons-arrow-left-alt2" aria-hidden="true"></span>
 					<span class="apd-reviews-pagination__prev-text"><?php esc_html_e( 'Previous', 'all-purpose-directory' ); ?></span>
 				</a>
@@ -69,8 +69,8 @@ if ( $end_page - $start_page < 4 ) {
 		<?php if ( $start_page > 1 ) : ?>
 			<li class="apd-reviews-pagination__item">
 				<a href="<?php echo esc_url( $display->build_pagination_url( $base_url, 1 ) . '#reviews' ); ?>"
-				   class="apd-reviews-pagination__link apd-reviews-pagination__link--number"
-				   aria-label="<?php esc_attr_e( 'Page 1', 'all-purpose-directory' ); ?>">
+					class="apd-reviews-pagination__link apd-reviews-pagination__link--number"
+					aria-label="<?php esc_attr_e( 'Page 1', 'all-purpose-directory' ); ?>">
 					1
 				</a>
 			</li>
@@ -86,16 +86,18 @@ if ( $end_page - $start_page < 4 ) {
 			<li class="apd-reviews-pagination__item">
 				<?php if ( $page === $current_page ) : ?>
 					<span class="apd-reviews-pagination__link apd-reviews-pagination__link--number apd-reviews-pagination__link--current"
-						  aria-current="page">
+							aria-current="page">
 						<?php echo esc_html( $page ); ?>
 					</span>
 				<?php else : ?>
 					<a href="<?php echo esc_url( $display->build_pagination_url( $base_url, $page ) . '#reviews' ); ?>"
-					   class="apd-reviews-pagination__link apd-reviews-pagination__link--number"
-					   aria-label="<?php
-						   /* translators: %d: Page number */
-						   echo esc_attr( sprintf( __( 'Page %d', 'all-purpose-directory' ), $page ) );
-					   ?>">
+						class="apd-reviews-pagination__link apd-reviews-pagination__link--number"
+						aria-label="
+						<?php
+							/* translators: %d: Page number */
+							echo esc_attr( sprintf( __( 'Page %d', 'all-purpose-directory' ), $page ) );
+						?>
+						">
 						<?php echo esc_html( $page ); ?>
 					</a>
 				<?php endif; ?>
@@ -111,11 +113,13 @@ if ( $end_page - $start_page < 4 ) {
 			<?php endif; ?>
 			<li class="apd-reviews-pagination__item">
 				<a href="<?php echo esc_url( $display->build_pagination_url( $base_url, $total_pages ) . '#reviews' ); ?>"
-				   class="apd-reviews-pagination__link apd-reviews-pagination__link--number"
-				   aria-label="<?php
-					   /* translators: %d: Page number */
-					   echo esc_attr( sprintf( __( 'Page %d', 'all-purpose-directory' ), $total_pages ) );
-				   ?>">
+					class="apd-reviews-pagination__link apd-reviews-pagination__link--number"
+					aria-label="
+					<?php
+						/* translators: %d: Page number */
+						echo esc_attr( sprintf( __( 'Page %d', 'all-purpose-directory' ), $total_pages ) );
+					?>
+					">
 					<?php echo esc_html( $total_pages ); ?>
 				</a>
 			</li>
@@ -125,8 +129,8 @@ if ( $end_page - $start_page < 4 ) {
 		<li class="apd-reviews-pagination__item apd-reviews-pagination__item--next">
 			<?php if ( $current_page < $total_pages ) : ?>
 				<a href="<?php echo esc_url( $display->build_pagination_url( $base_url, $current_page + 1 ) . '#reviews' ); ?>"
-				   class="apd-reviews-pagination__link"
-				   aria-label="<?php esc_attr_e( 'Next page of reviews', 'all-purpose-directory' ); ?>">
+					class="apd-reviews-pagination__link"
+					aria-label="<?php esc_attr_e( 'Next page of reviews', 'all-purpose-directory' ); ?>">
 					<span class="apd-reviews-pagination__next-text"><?php esc_html_e( 'Next', 'all-purpose-directory' ); ?></span>
 					<span class="dashicons dashicons-arrow-right-alt2" aria-hidden="true"></span>
 				</a>

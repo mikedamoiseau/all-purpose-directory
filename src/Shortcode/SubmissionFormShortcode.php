@@ -275,10 +275,11 @@ final class SubmissionFormShortcode extends AbstractShortcode {
 		}
 
 		// Check URL parameter.
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Just getting listing ID.
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Just getting listing ID from URL.
 		if ( isset( $_GET['edit_listing'] ) ) {
 			return absint( $_GET['edit_listing'] );
 		}
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 		return 0;
 	}

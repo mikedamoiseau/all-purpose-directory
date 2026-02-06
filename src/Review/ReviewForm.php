@@ -48,12 +48,12 @@ class ReviewForm {
 	 * @var array<string, mixed>
 	 */
 	private const DEFAULTS = [
-		'show_title'           => true,
-		'title_required'       => false,
-		'min_content_length'   => 10,
-		'ajax_enabled'         => true,
-		'show_guidelines'      => true,
-		'guidelines_text'      => '',
+		'show_title'         => true,
+		'title_required'     => false,
+		'min_content_length' => 10,
+		'ajax_enabled'       => true,
+		'show_guidelines'    => true,
+		'guidelines_text'    => '',
 	];
 
 	/**
@@ -183,11 +183,11 @@ class ReviewForm {
 			return '';
 		}
 
-		$user_id      = get_current_user_id();
-		$is_logged_in = $user_id > 0;
-		$user_review  = $this->get_user_review( $listing_id );
-		$is_edit_mode = $user_review !== null;
-		$manager      = ReviewManager::get_instance();
+		$user_id        = get_current_user_id();
+		$is_logged_in   = $user_id > 0;
+		$user_review    = $this->get_user_review( $listing_id );
+		$is_edit_mode   = $user_review !== null;
+		$manager        = ReviewManager::get_instance();
 		$requires_login = $manager->requires_login();
 
 		// Build template data.
@@ -209,9 +209,9 @@ class ReviewForm {
 
 		// If logged in, get user info.
 		if ( $is_logged_in ) {
-			$user                            = get_userdata( $user_id );
-			$template_data['user_name']      = $user ? $user->display_name : '';
-			$template_data['user_email']     = $user ? $user->user_email : '';
+			$user                        = get_userdata( $user_id );
+			$template_data['user_name']  = $user ? $user->display_name : '';
+			$template_data['user_email'] = $user ? $user->user_email : '';
 		}
 
 		// Get existing rating/content for edit mode.
@@ -253,10 +253,13 @@ class ReviewForm {
 	public function render_star_input( int $selected_rating = 0, int $star_count = 5 ): string {
 		ob_start();
 
-		\apd_get_template( 'review/star-input.php', [
-			'selected_rating' => $selected_rating,
-			'star_count'      => $star_count,
-		] );
+		\apd_get_template(
+			'review/star-input.php',
+			[
+				'selected_rating' => $selected_rating,
+				'star_count'      => $star_count,
+			]
+		);
 
 		return ob_get_clean();
 	}
@@ -408,21 +411,24 @@ class ReviewForm {
 	 */
 	public function add_script_data( array $data ): array {
 		$data['reviewNonce'] = wp_create_nonce( self::NONCE_ACTION );
-		$data['i18n']        = array_merge( $data['i18n'] ?? [], [
-			'reviewSubmitting'       => __( 'Submitting review...', 'all-purpose-directory' ),
-			'reviewSubmitted'        => __( 'Thank you for your review!', 'all-purpose-directory' ),
-			'reviewUpdated'          => __( 'Your review has been updated.', 'all-purpose-directory' ),
-			'reviewError'            => __( 'Failed to submit review. Please try again.', 'all-purpose-directory' ),
-			'ratingRequired'         => __( 'Please select a rating.', 'all-purpose-directory' ),
-			/* translators: %d: Minimum number of characters required for review */
-			'reviewTooShort'         => __( 'Your review is too short. Please write at least %d characters.', 'all-purpose-directory' ),
-			'reviewPending'          => __( 'Your review has been submitted and is pending approval.', 'all-purpose-directory' ),
-			'selectRating'           => __( 'Select a rating', 'all-purpose-directory' ),
-			/* translators: %d: Star rating number (singular) */
-			'starLabel'              => __( '%d star', 'all-purpose-directory' ),
-			/* translators: %d: Star rating number (plural) */
-			'starsLabel'             => __( '%d stars', 'all-purpose-directory' ),
-		] );
+		$data['i18n']        = array_merge(
+			$data['i18n'] ?? [],
+			[
+				'reviewSubmitting' => __( 'Submitting review...', 'all-purpose-directory' ),
+				'reviewSubmitted'  => __( 'Thank you for your review!', 'all-purpose-directory' ),
+				'reviewUpdated'    => __( 'Your review has been updated.', 'all-purpose-directory' ),
+				'reviewError'      => __( 'Failed to submit review. Please try again.', 'all-purpose-directory' ),
+				'ratingRequired'   => __( 'Please select a rating.', 'all-purpose-directory' ),
+				/* translators: %d: Minimum number of characters required for review */
+				'reviewTooShort'   => __( 'Your review is too short. Please write at least %d characters.', 'all-purpose-directory' ),
+				'reviewPending'    => __( 'Your review has been submitted and is pending approval.', 'all-purpose-directory' ),
+				'selectRating'     => __( 'Select a rating', 'all-purpose-directory' ),
+				/* translators: %d: Star rating number (singular) */
+				'starLabel'        => __( '%d star', 'all-purpose-directory' ),
+				/* translators: %d: Star rating number (plural) */
+				'starsLabel'       => __( '%d stars', 'all-purpose-directory' ),
+			]
+		);
 
 		return $data;
 	}

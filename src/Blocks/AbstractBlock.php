@@ -192,8 +192,8 @@ abstract class AbstractBlock {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array    $attributes Block attributes.
-	 * @param string   $content    Block content.
+	 * @param array     $attributes Block attributes.
+	 * @param string    $content    Block content.
 	 * @param \WP_Block $block      Block instance.
 	 * @return string Rendered block HTML.
 	 */
@@ -260,8 +260,8 @@ abstract class AbstractBlock {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array    $attributes Block attributes.
-	 * @param string   $content    Block content.
+	 * @param array     $attributes Block attributes.
+	 * @param string    $content    Block content.
 	 * @param \WP_Block $block      Block instance.
 	 * @return string Block output HTML.
 	 */

@@ -44,20 +44,20 @@ final class CategoriesShortcode extends AbstractShortcode {
 	 * @var array<string, mixed>
 	 */
 	protected array $defaults = [
-		'layout'       => 'grid',
-		'columns'      => 4,
-		'count'        => 0,
-		'parent'       => '',
-		'include'      => '',
-		'exclude'      => '',
-		'hide_empty'   => 'true',
-		'orderby'      => 'name',
-		'order'        => 'ASC',
-		'show_count'   => 'true',
-		'show_icon'    => 'true',
-		'show_image'   => 'false',
+		'layout'           => 'grid',
+		'columns'          => 4,
+		'count'            => 0,
+		'parent'           => '',
+		'include'          => '',
+		'exclude'          => '',
+		'hide_empty'       => 'true',
+		'orderby'          => 'name',
+		'order'            => 'ASC',
+		'show_count'       => 'true',
+		'show_icon'        => 'true',
+		'show_image'       => 'false',
 		'show_description' => 'false',
-		'class'        => '',
+		'class'            => '',
 	];
 
 	/**
@@ -66,62 +66,62 @@ final class CategoriesShortcode extends AbstractShortcode {
 	 * @var array<string, array>
 	 */
 	protected array $attribute_docs = [
-		'layout'       => [
+		'layout'           => [
 			'type'        => 'slug',
 			'description' => 'Display layout: grid or list.',
 			'default'     => 'grid',
 		],
-		'columns'      => [
+		'columns'          => [
 			'type'        => 'integer',
 			'description' => 'Number of columns for grid layout (2-6).',
 			'default'     => 4,
 		],
-		'count'        => [
+		'count'            => [
 			'type'        => 'integer',
 			'description' => 'Number of categories to show (0 = all).',
 			'default'     => 0,
 		],
-		'parent'       => [
+		'parent'           => [
 			'type'        => 'integer',
 			'description' => 'Parent category ID (0 for top-level only).',
 			'default'     => '',
 		],
-		'include'      => [
+		'include'          => [
 			'type'        => 'ids',
 			'description' => 'Category IDs to include (comma-separated).',
 			'default'     => '',
 		],
-		'exclude'      => [
+		'exclude'          => [
 			'type'        => 'ids',
 			'description' => 'Category IDs to exclude (comma-separated).',
 			'default'     => '',
 		],
-		'hide_empty'   => [
+		'hide_empty'       => [
 			'type'        => 'boolean',
 			'description' => 'Hide categories with no listings.',
 			'default'     => 'true',
 		],
-		'orderby'      => [
+		'orderby'          => [
 			'type'        => 'slug',
 			'description' => 'Order by: name, count, id, slug.',
 			'default'     => 'name',
 		],
-		'order'        => [
+		'order'            => [
 			'type'        => 'slug',
 			'description' => 'Sort order: ASC or DESC.',
 			'default'     => 'ASC',
 		],
-		'show_count'   => [
+		'show_count'       => [
 			'type'        => 'boolean',
 			'description' => 'Show listing count per category.',
 			'default'     => 'true',
 		],
-		'show_icon'    => [
+		'show_icon'        => [
 			'type'        => 'boolean',
 			'description' => 'Show category icons.',
 			'default'     => 'true',
 		],
-		'show_image'   => [
+		'show_image'       => [
 			'type'        => 'boolean',
 			'description' => 'Show category images (if set).',
 			'default'     => 'false',
@@ -131,7 +131,7 @@ final class CategoriesShortcode extends AbstractShortcode {
 			'description' => 'Show category descriptions.',
 			'default'     => 'false',
 		],
-		'class'        => [
+		'class'            => [
 			'type'        => 'string',
 			'description' => 'Additional CSS classes.',
 			'default'     => '',
@@ -312,8 +312,8 @@ final class CategoriesShortcode extends AbstractShortcode {
 	 * @return void
 	 */
 	private function render_category_card( \WP_Term $category, array $atts ): void {
-		$link = get_term_link( $category );
-		$icon = $atts['show_icon'] ? \apd_get_category_icon( $category ) : '';
+		$link  = get_term_link( $category );
+		$icon  = $atts['show_icon'] ? \apd_get_category_icon( $category ) : '';
 		$color = \apd_get_category_color( $category );
 
 		$card_style = '';

@@ -246,33 +246,25 @@ final class ReviewModeration {
 		$paged = isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1;
 
 		// Get reviews.
-		$reviews_data = $this->get_reviews( [
-			'status'     => $current_status,
-			'listing_id' => $current_listing,
-			'rating'     => $current_rating,
-			'search'     => $search,
-			'paged'      => $paged,
-		] );
+		$reviews_data = $this->get_reviews(
+			[
+				'status'     => $current_status,
+				'listing_id' => $current_listing,
+				'rating'     => $current_rating,
+				'search'     => $search,
+				'paged'      => $paged,
+			]
+		);
 
-		$reviews    = $reviews_data['reviews'];
-		$total      = $reviews_data['total'];
+		$reviews     = $reviews_data['reviews'];
+		$total       = $reviews_data['total'];
 		$total_pages = $reviews_data['pages'];
 
 		// Get counts for status tabs.
 		$counts = $this->get_status_counts();
 
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Rendered HTML is escaped.
-		echo $this->render_page_content(
-			$reviews,
-			$counts,
-			$current_status,
-			$current_listing,
-			$current_rating,
-			$search,
-			$paged,
-			$total,
-			$total_pages
-		);
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped in render_page_content().
+		echo $this->render_page_content( $reviews, $counts, $current_status, $current_listing, $current_rating, $search, $paged, $total, $total_pages );
 	}
 
 	/**
@@ -485,8 +477,8 @@ final class ReviewModeration {
 				continue;
 			}
 
-			$url    = $status === 'all' ? $base_url : add_query_arg( 'status', $status, $base_url );
-			$class  = $current_status === $status ? 'current' : '';
+			$url   = $status === 'all' ? $base_url : add_query_arg( 'status', $status, $base_url );
+			$class = $current_status === $status ? 'current' : '';
 
 			$items[] = sprintf(
 				'<li class="%s"><a href="%s" class="%s">%s <span class="count">(%s)</span></a></li>',
@@ -511,9 +503,9 @@ final class ReviewModeration {
 	 * @return string HTML for the row.
 	 */
 	private function render_review_row( array $review, string $current_status ): string {
-		$listing      = get_post( $review['listing_id'] );
+		$listing       = get_post( $review['listing_id'] );
 		$listing_title = $listing ? $listing->post_title : __( '(Deleted)', 'all-purpose-directory' );
-		$listing_url  = $listing ? get_edit_post_link( $listing->ID ) : '';
+		$listing_url   = $listing ? get_edit_post_link( $listing->ID ) : '';
 
 		$row_class = 'review-' . $review['id'];
 		if ( $review['status'] === 'pending' ) {
@@ -578,7 +570,7 @@ final class ReviewModeration {
 		) . '">';
 
 		for ( $i = 1; $i <= 5; $i++ ) {
-			$class = $i <= $rating ? 'dashicons-star-filled' : 'dashicons-star-empty';
+			$class   = $i <= $rating ? 'dashicons-star-filled' : 'dashicons-star-empty';
 			$output .= '<span class="dashicons ' . $class . '" aria-hidden="true"></span>';
 		}
 
@@ -622,12 +614,12 @@ final class ReviewModeration {
 	 * @return string HTML for row actions.
 	 */
 	private function render_row_actions( array $review, string $current_status ): string {
-		$actions = [];
+		$actions  = [];
 		$base_url = admin_url( 'edit.php?post_type=apd_listing&page=' . self::PAGE_SLUG );
 
 		// Approve action (for pending/spam/trash).
 		if ( $review['status'] !== 'approved' ) {
-			$approve_url = wp_nonce_url(
+			$approve_url        = wp_nonce_url(
 				add_query_arg(
 					[
 						'action'    => 'approve',
@@ -649,7 +641,7 @@ final class ReviewModeration {
 
 		// Unapprove action (for approved).
 		if ( $review['status'] === 'approved' ) {
-			$unapprove_url = wp_nonce_url(
+			$unapprove_url        = wp_nonce_url(
 				add_query_arg(
 					[
 						'action'    => 'unapprove',
@@ -671,7 +663,7 @@ final class ReviewModeration {
 
 		// Spam action (for non-spam).
 		if ( $review['status'] !== 'spam' && $review['status'] !== 'trash' ) {
-			$spam_url = wp_nonce_url(
+			$spam_url        = wp_nonce_url(
 				add_query_arg(
 					[
 						'action'    => 'spam',
@@ -693,7 +685,7 @@ final class ReviewModeration {
 
 		// Trash action (for non-trash).
 		if ( $review['status'] !== 'trash' ) {
-			$trash_url = wp_nonce_url(
+			$trash_url        = wp_nonce_url(
 				add_query_arg(
 					[
 						'action'    => 'trash',
@@ -715,7 +707,7 @@ final class ReviewModeration {
 
 		// Restore action (for trash).
 		if ( $review['status'] === 'trash' ) {
-			$restore_url = wp_nonce_url(
+			$restore_url        = wp_nonce_url(
 				add_query_arg(
 					[
 						'action'    => 'restore',
@@ -735,7 +727,7 @@ final class ReviewModeration {
 			);
 
 			// Permanent delete.
-			$delete_url = wp_nonce_url(
+			$delete_url        = wp_nonce_url(
 				add_query_arg(
 					[
 						'action'    => 'delete',
@@ -789,7 +781,7 @@ final class ReviewModeration {
 			'trash'    => __( 'Trash', 'all-purpose-directory' ),
 		];
 
-		$output = '<label for="filter-by-status" class="screen-reader-text">' .
+		$output  = '<label for="filter-by-status" class="screen-reader-text">' .
 			esc_html__( 'Filter by status', 'all-purpose-directory' ) . '</label>';
 		$output .= '<select name="status" id="filter-by-status">';
 
@@ -816,20 +808,22 @@ final class ReviewModeration {
 	 * @return string HTML for the filter.
 	 */
 	private function render_listing_filter( int $current_listing ): string {
-		$listings = get_posts( [
-			'post_type'      => 'apd_listing',
-			'posts_per_page' => 100,
-			'orderby'        => 'title',
-			'order'          => 'ASC',
-			'post_status'    => 'any',
-			'no_found_rows'  => true, // Performance: skip counting total rows.
-		] );
+		$listings = get_posts(
+			[
+				'post_type'      => 'apd_listing',
+				'posts_per_page' => 100,
+				'orderby'        => 'title',
+				'order'          => 'ASC',
+				'post_status'    => 'any',
+				'no_found_rows'  => true, // Performance: skip counting total rows.
+			]
+		);
 
 		if ( empty( $listings ) ) {
 			return '';
 		}
 
-		$output = '<label for="filter-by-listing" class="screen-reader-text">' .
+		$output  = '<label for="filter-by-listing" class="screen-reader-text">' .
 			esc_html__( 'Filter by listing', 'all-purpose-directory' ) . '</label>';
 		$output .= '<select name="listing_id" id="filter-by-listing">';
 		$output .= '<option value="">' . esc_html__( 'All Listings', 'all-purpose-directory' ) . '</option>';
@@ -857,7 +851,7 @@ final class ReviewModeration {
 	 * @return string HTML for the filter.
 	 */
 	private function render_rating_filter( int $current_rating ): string {
-		$output = '<label for="filter-by-rating" class="screen-reader-text">' .
+		$output  = '<label for="filter-by-rating" class="screen-reader-text">' .
 			esc_html__( 'Filter by rating', 'all-purpose-directory' ) . '</label>';
 		$output .= '<select name="rating" id="filter-by-rating">';
 		$output .= '<option value="">' . esc_html__( 'All Ratings', 'all-purpose-directory' ) . '</option>';
@@ -902,7 +896,7 @@ final class ReviewModeration {
 				) . '</span></div>';
 		}
 
-		$output = '<div class="tablenav-pages">';
+		$output  = '<div class="tablenav-pages">';
 		$output .= '<span class="displaying-num">' . sprintf(
 			/* translators: %s: Number of items */
 			_n( '%s item', '%s items', $total_items, 'all-purpose-directory' ),
@@ -980,7 +974,7 @@ final class ReviewModeration {
 		$count = isset( $_GET['count'] ) ? absint( $_GET['count'] ) : 0;
 
 		$messages = [
-			'approved' => sprintf(
+			'approved'   => sprintf(
 				/* translators: %d: Number of reviews */
 				_n( '%d review approved.', '%d reviews approved.', $count, 'all-purpose-directory' ),
 				$count
@@ -990,22 +984,22 @@ final class ReviewModeration {
 				_n( '%d review unapproved.', '%d reviews unapproved.', $count, 'all-purpose-directory' ),
 				$count
 			),
-			'spammed' => sprintf(
+			'spammed'    => sprintf(
 				/* translators: %d: Number of reviews */
 				_n( '%d review marked as spam.', '%d reviews marked as spam.', $count, 'all-purpose-directory' ),
 				$count
 			),
-			'trashed' => sprintf(
+			'trashed'    => sprintf(
 				/* translators: %d: Number of reviews */
 				_n( '%d review moved to trash.', '%d reviews moved to trash.', $count, 'all-purpose-directory' ),
 				$count
 			),
-			'restored' => sprintf(
+			'restored'   => sprintf(
 				/* translators: %d: Number of reviews */
 				_n( '%d review restored.', '%d reviews restored.', $count, 'all-purpose-directory' ),
 				$count
 			),
-			'deleted' => sprintf(
+			'deleted'    => sprintf(
 				/* translators: %d: Number of reviews */
 				_n( '%d review permanently deleted.', '%d reviews permanently deleted.', $count, 'all-purpose-directory' ),
 				$count
@@ -1042,6 +1036,7 @@ final class ReviewModeration {
 		}
 
 		// Handle bulk action.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified inside handle_bulk_action.
 		if ( isset( $_POST[ self::NONCE_NAME ] ) ) {
 			$this->handle_bulk_action();
 		}
@@ -1055,7 +1050,7 @@ final class ReviewModeration {
 	 * @return void
 	 */
 	private function handle_single_action(): void {
-		$action = isset( $_GET['action'] ) ? sanitize_key( $_GET['action'] ) : '';
+		$action    = isset( $_GET['action'] ) ? sanitize_key( $_GET['action'] ) : '';
 		$review_id = isset( $_GET['review_id'] ) ? absint( $_GET['review_id'] ) : 0;
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$status = isset( $_GET['status'] ) ? sanitize_key( $_GET['status'] ) : 'all';
@@ -1132,7 +1127,7 @@ final class ReviewModeration {
 
 		foreach ( $review_ids as $review_id ) {
 			if ( $this->process_action( $action, $review_id ) ) {
-				$success_count++;
+				++$success_count;
 			}
 		}
 
@@ -1234,11 +1229,11 @@ final class ReviewModeration {
 		$args = wp_parse_args( $args, $defaults );
 
 		$query_args = [
-			'type'   => ReviewManager::COMMENT_TYPE,
-			'number' => self::PER_PAGE,
-			'offset' => ( $args['paged'] - 1 ) * self::PER_PAGE,
+			'type'    => ReviewManager::COMMENT_TYPE,
+			'number'  => self::PER_PAGE,
+			'offset'  => ( $args['paged'] - 1 ) * self::PER_PAGE,
 			'orderby' => 'comment_date',
-			'order'  => 'DESC',
+			'order'   => 'DESC',
 		];
 
 		// Handle status.
@@ -1307,11 +1302,13 @@ final class ReviewModeration {
 	 * @return int Pending review count.
 	 */
 	public function get_pending_count(): int {
-		return (int) get_comments( [
-			'type'   => ReviewManager::COMMENT_TYPE,
-			'status' => 'hold',
-			'count'  => true,
-		] );
+		return (int) get_comments(
+			[
+				'type'   => ReviewManager::COMMENT_TYPE,
+				'status' => 'hold',
+				'count'  => true,
+			]
+		);
 	}
 
 	/**
@@ -1333,11 +1330,13 @@ final class ReviewModeration {
 		$counts = [];
 
 		foreach ( $statuses as $key => $wp_status ) {
-			$counts[ $key ] = (int) get_comments( [
-				'type'   => ReviewManager::COMMENT_TYPE,
-				'status' => $wp_status,
-				'count'  => true,
-			] );
+			$counts[ $key ] = (int) get_comments(
+				[
+					'type'   => ReviewManager::COMMENT_TYPE,
+					'status' => $wp_status,
+					'count'  => true,
+				]
+			);
 		}
 
 		return $counts;

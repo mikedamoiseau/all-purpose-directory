@@ -31,77 +31,39 @@ class PluginTest extends UnitTestCase {
 	}
 
 	/**
-	 * Test load_textdomain calls load_plugin_textdomain with correct arguments.
+	 * Test load_textdomain method exists and is callable.
+	 *
+	 * Since WordPress 4.6, translations for WordPress.org hosted plugins are
+	 * loaded automatically. The load_textdomain method fires an action hook
+	 * that extensions can use to add custom translation loading.
 	 */
-	public function test_load_textdomain_calls_load_plugin_textdomain(): void {
-		Functions\expect( 'load_plugin_textdomain' )
-			->once()
-			->with(
-				'all-purpose-directory',
-				false,
-				'all-purpose-directory/languages'
-			)
-			->andReturn( true );
-
-		// Create a reflection to call the method directly.
+	public function test_load_textdomain_is_callable(): void {
 		$reflection = new \ReflectionClass( Plugin::class );
 		$method     = $reflection->getMethod( 'load_textdomain' );
 
-		// Create instance through reflection to avoid singleton issues.
 		$instance = $reflection->newInstanceWithoutConstructor();
+
+		// Should execute without errors.
 		$method->invoke( $instance );
+
+		$this->assertTrue( true );
 	}
 
 	/**
-	 * Test load_textdomain uses correct text domain string.
+	 * Test load_textdomain does not call load_plugin_textdomain.
+	 *
+	 * Since WordPress 4.6, translations for WordPress.org hosted plugins are
+	 * loaded automatically. We don't call load_plugin_textdomain directly.
 	 */
-	public function test_load_textdomain_uses_correct_domain(): void {
-		$called_domain = null;
-
-		Functions\when( 'load_plugin_textdomain' )->alias(
-			function ( $domain, $deprecated, $path ) use ( &$called_domain ) {
-				$called_domain = $domain;
-				return true;
-			}
-		);
+	public function test_load_textdomain_not_called_directly(): void {
+		// load_plugin_textdomain should never be called directly.
+		Functions\expect( 'load_plugin_textdomain' )->never();
 
 		$reflection = new \ReflectionClass( Plugin::class );
 		$method     = $reflection->getMethod( 'load_textdomain' );
 
 		$instance = $reflection->newInstanceWithoutConstructor();
 		$method->invoke( $instance );
-
-		$this->assertSame(
-			'all-purpose-directory',
-			$called_domain,
-			'Text domain should be all-purpose-directory'
-		);
-	}
-
-	/**
-	 * Test load_textdomain uses correct languages path.
-	 */
-	public function test_load_textdomain_uses_correct_path(): void {
-		$called_path = null;
-
-		Functions\when( 'load_plugin_textdomain' )->alias(
-			function ( $domain, $deprecated, $path ) use ( &$called_path ) {
-				$called_path = $path;
-				return true;
-			}
-		);
-
-		$reflection = new \ReflectionClass( Plugin::class );
-		$method     = $reflection->getMethod( 'load_textdomain' );
-
-		$instance = $reflection->newInstanceWithoutConstructor();
-		$method->invoke( $instance );
-
-		$this->assertSame(
-			'all-purpose-directory/languages',
-			$called_path,
-			'Languages path should be all-purpose-directory/languages'
-		);
 	}
 
 	/**

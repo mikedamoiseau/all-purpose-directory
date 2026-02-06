@@ -311,7 +311,7 @@ final class TemplateLoader {
 		$grid_url     = $this->get_view_url( 'grid' );
 		$list_url     = $this->get_view_url( 'list' );
 
-		$output  = '<div class="apd-view-switcher" role="group" aria-label="' . esc_attr__( 'View mode', 'all-purpose-directory' ) . '">';
+		$output = '<div class="apd-view-switcher" role="group" aria-label="' . esc_attr__( 'View mode', 'all-purpose-directory' ) . '">';
 
 		// Grid button.
 		$grid_class = 'apd-view-switcher__btn apd-view-switcher__btn--grid';
@@ -358,8 +358,8 @@ final class TemplateLoader {
 			$query = $wp_query;
 		}
 
-		$total = $query->found_posts;
-		$paged = max( 1, $query->get( 'paged' ) );
+		$total    = $query->found_posts;
+		$paged    = max( 1, $query->get( 'paged' ) );
 		$per_page = $query->get( 'posts_per_page' );
 
 		if ( $per_page < 0 ) {

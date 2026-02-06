@@ -252,7 +252,7 @@ class TaxonomiesEndpoint {
 		}
 
 		// Get total count for pagination.
-		$count_args  = $args;
+		$count_args = $args;
 		unset( $count_args['number'], $count_args['offset'] );
 		$count_args['count'] = true;
 		$total               = (int) get_terms( $count_args );

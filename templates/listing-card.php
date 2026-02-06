@@ -45,15 +45,19 @@ $thumbnail_url = $has_thumbnail ? get_the_post_thumbnail_url( $listing_id, 'medi
  * @param array $data       Listing card data.
  * @param int   $listing_id The listing post ID.
  */
-$card_data = apply_filters( 'apd_listing_card_data', [
-	'listing_id'    => $listing_id,
-	'title'         => $title,
-	'permalink'     => $permalink,
-	'excerpt'       => $excerpt,
-	'categories'    => $categories,
-	'has_thumbnail' => $has_thumbnail,
-	'thumbnail_url' => $thumbnail_url,
-], $listing_id );
+$card_data = apply_filters(
+	'apd_listing_card_data',
+	[
+		'listing_id'    => $listing_id,
+		'title'         => $title,
+		'permalink'     => $permalink,
+		'excerpt'       => $excerpt,
+		'categories'    => $categories,
+		'has_thumbnail' => $has_thumbnail,
+		'thumbnail_url' => $thumbnail_url,
+	],
+	$listing_id
+);
 
 // Build card classes.
 $card_classes = [
@@ -92,7 +96,16 @@ $card_classes = apply_filters( 'apd_listing_card_classes', $card_classes, $listi
 	<?php if ( $card_data['has_thumbnail'] ) : ?>
 		<div class="apd-listing-card__image">
 			<a href="<?php echo esc_url( $card_data['permalink'] ); ?>" aria-hidden="true" tabindex="-1">
-				<?php echo get_the_post_thumbnail( $listing_id, 'medium', [ 'loading' => 'lazy', 'decoding' => 'async' ] ); ?>
+				<?php
+				echo get_the_post_thumbnail(
+					$listing_id,
+					'medium',
+					[
+						'loading'  => 'lazy',
+						'decoding' => 'async',
+					]
+				);
+				?>
 			</a>
 
 			<?php if ( ! empty( $card_data['categories'] ) ) : ?>

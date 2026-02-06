@@ -28,36 +28,41 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @param array<string, int>   $stats      Raw statistics.
  * @param int                  $user_id    User ID.
  */
-$stat_items = apply_filters( 'apd_dashboard_stat_items', [
-	'total'     => [
-		'label' => __( 'Total Listings', 'all-purpose-directory' ),
-		'icon'  => 'dashicons-list-view',
-		'value' => $stats['total'],
+$stat_items = apply_filters(
+	'apd_dashboard_stat_items',
+	[
+		'total'     => [
+			'label' => __( 'Total Listings', 'all-purpose-directory' ),
+			'icon'  => 'dashicons-list-view',
+			'value' => $stats['total'],
+		],
+		'published' => [
+			'label' => __( 'Published', 'all-purpose-directory' ),
+			'icon'  => 'dashicons-yes-alt',
+			'value' => $stats['published'],
+			'class' => 'apd-stat-card--success',
+		],
+		'pending'   => [
+			'label' => __( 'Pending Review', 'all-purpose-directory' ),
+			'icon'  => 'dashicons-clock',
+			'value' => $stats['pending'],
+			'class' => 'apd-stat-card--warning',
+		],
+		'draft'     => [
+			'label' => __( 'Drafts', 'all-purpose-directory' ),
+			'icon'  => 'dashicons-edit',
+			'value' => $stats['draft'],
+		],
+		'views'     => [
+			'label' => __( 'Total Views', 'all-purpose-directory' ),
+			'icon'  => 'dashicons-visibility',
+			'value' => $stats['views'],
+			'class' => 'apd-stat-card--info',
+		],
 	],
-	'published' => [
-		'label' => __( 'Published', 'all-purpose-directory' ),
-		'icon'  => 'dashicons-yes-alt',
-		'value' => $stats['published'],
-		'class' => 'apd-stat-card--success',
-	],
-	'pending'   => [
-		'label' => __( 'Pending Review', 'all-purpose-directory' ),
-		'icon'  => 'dashicons-clock',
-		'value' => $stats['pending'],
-		'class' => 'apd-stat-card--warning',
-	],
-	'draft'     => [
-		'label' => __( 'Drafts', 'all-purpose-directory' ),
-		'icon'  => 'dashicons-edit',
-		'value' => $stats['draft'],
-	],
-	'views'     => [
-		'label' => __( 'Total Views', 'all-purpose-directory' ),
-		'icon'  => 'dashicons-visibility',
-		'value' => $stats['views'],
-		'class' => 'apd-stat-card--info',
-	],
-], $stats, $user_id );
+	$stats,
+	$user_id
+);
 ?>
 
 <div class="apd-dashboard-stats">

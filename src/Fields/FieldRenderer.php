@@ -279,10 +279,10 @@ class FieldRenderer {
 	 * @return string Rendered HTML.
 	 */
 	private function render_field_input( array $field, FieldTypeInterface $field_type, mixed $value, int $listing_id ): string {
-		$field_name   = $field['name'];
-		$field_id     = 'apd-field-' . $field_name;
-		$is_admin     = $this->context === self::CONTEXT_ADMIN;
-		$has_errors   = ! empty( $this->errors[ $field_name ] );
+		$field_name    = $field['name'];
+		$field_id      = 'apd-field-' . $field_name;
+		$is_admin      = $this->context === self::CONTEXT_ADMIN;
+		$has_errors    = ! empty( $this->errors[ $field_name ] );
 		$wrapper_class = $is_admin ? 'apd-field apd-field--admin' : 'apd-field apd-field--frontend';
 
 		if ( $has_errors ) {
@@ -486,7 +486,10 @@ class FieldRenderer {
 			$field_names = $args['fields'];
 		} else {
 			// Get all fields for current context.
-			$query_args = [ 'orderby' => 'priority', 'order' => 'ASC' ];
+			$query_args = [
+				'orderby' => 'priority',
+				'order'   => 'ASC',
+			];
 
 			if ( $this->context === self::CONTEXT_FRONTEND ) {
 				$query_args['admin_only'] = false;
@@ -533,7 +536,7 @@ class FieldRenderer {
 		$grouped_fields = [];
 
 		foreach ( $groups as $group_id => $group ) {
-			$group_fields = $group['fields'] ?? [];
+			$group_fields   = $group['fields'] ?? [];
 			$grouped_fields = array_merge( $grouped_fields, $group_fields );
 
 			$group_html = $this->render_group( $group_id, $group, $values, $listing_id );
@@ -544,7 +547,7 @@ class FieldRenderer {
 		}
 
 		// Render ungrouped fields.
-		$all_field_names = array_keys( $this->registry->get_fields() );
+		$all_field_names  = array_keys( $this->registry->get_fields() );
 		$ungrouped_fields = array_diff( $all_field_names, $grouped_fields );
 
 		if ( ! empty( $ungrouped_fields ) ) {
@@ -579,9 +582,9 @@ class FieldRenderer {
 			return '';
 		}
 
-		$wrapper_class = 'apd-field-group';
+		$wrapper_class  = 'apd-field-group';
 		$is_collapsible = ! empty( $group['collapsible'] );
-		$is_collapsed = ! empty( $group['collapsed'] );
+		$is_collapsed   = ! empty( $group['collapsed'] );
 
 		if ( $is_collapsible ) {
 			$wrapper_class .= ' apd-field-group--collapsible';
@@ -810,13 +813,13 @@ class FieldRenderer {
 		// Exclude admin-only fields from display.
 		if ( empty( $args['fields'] ) ) {
 			$admin_only_fields = array_keys( $this->registry->get_admin_fields() );
-			$args['exclude'] = array_merge( $args['exclude'], $admin_only_fields );
+			$args['exclude']   = array_merge( $args['exclude'], $admin_only_fields );
 		}
 
 		// Get current field values.
 		$values = $this->get_listing_values( $listing_id );
 
-		$html = '<dl class="apd-field-display-list">';
+		$html  = '<dl class="apd-field-display-list">';
 		$html .= $this->render_fields( $values, $args, $listing_id );
 		$html .= '</dl>';
 

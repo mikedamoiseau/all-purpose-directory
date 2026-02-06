@@ -332,9 +332,9 @@ class FavoritesEndpoint {
 		if ( apd_is_favorite( $listing_id ) ) {
 			return $this->controller->create_response(
 				[
-					'success'    => true,
-					'message'    => __( 'Listing is already in favorites.', 'all-purpose-directory' ),
-					'listing_id' => $listing_id,
+					'success'     => true,
+					'message'     => __( 'Listing is already in favorites.', 'all-purpose-directory' ),
+					'listing_id'  => $listing_id,
 					'is_favorite' => true,
 				]
 			);

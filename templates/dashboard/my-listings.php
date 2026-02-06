@@ -139,11 +139,14 @@ $message = $my_listings->get_message();
 					<?php
 					while ( $listings->have_posts() ) :
 						$listings->the_post();
-						apd_get_template( 'dashboard/listing-row.php', [
-							'my_listings' => $my_listings,
-							'post'        => get_post(),
-							'config'      => $config,
-						] );
+						apd_get_template(
+							'dashboard/listing-row.php',
+							[
+								'my_listings' => $my_listings,
+								'post'        => get_post(),
+								'config'      => $config,
+							]
+						);
 					endwhile;
 					wp_reset_postdata();
 					?>
@@ -154,20 +157,22 @@ $message = $my_listings->get_message();
 		<?php if ( $max_pages > 1 ) : ?>
 			<nav class="apd-my-listings__pagination" aria-label="<?php esc_attr_e( 'Listings pagination', 'all-purpose-directory' ); ?>">
 				<?php
-				$pagination = paginate_links( [
-					'base'      => add_query_arg( 'paged', '%#%' ),
-					'format'    => '',
-					'current'   => $paged,
-					'total'     => $max_pages,
-					'prev_text' => sprintf(
-						'<span class="screen-reader-text">%s</span><span aria-hidden="true">&laquo;</span>',
-						esc_html__( 'Previous page', 'all-purpose-directory' )
-					),
-					'next_text' => sprintf(
-						'<span class="screen-reader-text">%s</span><span aria-hidden="true">&raquo;</span>',
-						esc_html__( 'Next page', 'all-purpose-directory' )
-					),
-				] );
+				$pagination = paginate_links(
+					[
+						'base'      => add_query_arg( 'paged', '%#%' ),
+						'format'    => '',
+						'current'   => $paged,
+						'total'     => $max_pages,
+						'prev_text' => sprintf(
+							'<span class="screen-reader-text">%s</span><span aria-hidden="true">&laquo;</span>',
+							esc_html__( 'Previous page', 'all-purpose-directory' )
+						),
+						'next_text' => sprintf(
+							'<span class="screen-reader-text">%s</span><span aria-hidden="true">&raquo;</span>',
+							esc_html__( 'Next page', 'all-purpose-directory' )
+						),
+					]
+				);
 
 				if ( $pagination ) {
 					echo '<div class="apd-pagination__links">' . wp_kses_post( $pagination ) . '</div>';

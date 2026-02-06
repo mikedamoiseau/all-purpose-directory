@@ -61,13 +61,18 @@ $has_avatar    = $profile->has_custom_avatar( $user_id );
 					<?php esc_html_e( 'Profile Photo', 'all-purpose-directory' ); ?>
 				</h3>
 
-				<?php apd_get_template( 'dashboard/profile-avatar.php', [
-					'profile'    => $profile,
-					'user_id'    => $user_id,
-					'avatar_url' => $avatar_url,
-					'has_avatar' => $has_avatar,
-					'config'     => $config,
-				] ); ?>
+				<?php
+				apd_get_template(
+					'dashboard/profile-avatar.php',
+					[
+						'profile'    => $profile,
+						'user_id'    => $user_id,
+						'avatar_url' => $avatar_url,
+						'has_avatar' => $has_avatar,
+						'config'     => $config,
+					]
+				);
+				?>
 			</div>
 		<?php endif; ?>
 

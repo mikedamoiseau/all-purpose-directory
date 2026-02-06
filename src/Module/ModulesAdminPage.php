@@ -162,7 +162,12 @@ final class ModulesAdminPage {
 		}
 
 		$registry = ModuleRegistry::get_instance();
-		$modules  = $registry->get_all( [ 'orderby' => 'name', 'order' => 'ASC' ] );
+		$modules  = $registry->get_all(
+			[
+				'orderby' => 'name',
+				'order'   => 'ASC',
+			]
+		);
 		$count    = $registry->count();
 
 		?>
@@ -229,8 +234,8 @@ final class ModulesAdminPage {
 		$icon = ! empty( $module['icon'] ) ? $module['icon'] : 'dashicons-admin-plugins';
 
 		// Check requirements.
-		$registry = ModuleRegistry::get_instance();
-		$unmet    = $registry->check_requirements( $module['requires'] ?? [] );
+		$registry     = ModuleRegistry::get_instance();
+		$unmet        = $registry->check_requirements( $module['requires'] ?? [] );
 		$has_warnings = ! empty( $unmet );
 
 		?>

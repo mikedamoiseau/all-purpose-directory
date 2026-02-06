@@ -43,14 +43,14 @@ class ImageOptimizationTest extends TestCase {
     public function test_listing_card_has_lazy_loading(): void {
         $source = file_get_contents( $this->templates_dir . '/listing-card.php' );
 
-        $this->assertStringContainsString(
-            "'loading' => 'lazy'",
+        $this->assertMatchesRegularExpression(
+            "/'loading'\s*=>\s*'lazy'/",
             $source,
             'listing-card.php should include loading="lazy" for thumbnails'
         );
 
-        $this->assertStringContainsString(
-            "'decoding' => 'async'",
+        $this->assertMatchesRegularExpression(
+            "/'decoding'\s*=>\s*'async'/",
             $source,
             'listing-card.php should include decoding="async" for thumbnails'
         );
@@ -64,14 +64,14 @@ class ImageOptimizationTest extends TestCase {
     public function test_listing_card_list_has_lazy_loading(): void {
         $source = file_get_contents( $this->templates_dir . '/listing-card-list.php' );
 
-        $this->assertStringContainsString(
-            "'loading' => 'lazy'",
+        $this->assertMatchesRegularExpression(
+            "/'loading'\s*=>\s*'lazy'/",
             $source,
             'listing-card-list.php should include loading="lazy" for thumbnails'
         );
 
-        $this->assertStringContainsString(
-            "'decoding' => 'async'",
+        $this->assertMatchesRegularExpression(
+            "/'decoding'\s*=>\s*'async'/",
             $source,
             'listing-card-list.php should include decoding="async" for thumbnails'
         );
@@ -85,14 +85,14 @@ class ImageOptimizationTest extends TestCase {
     public function test_dashboard_listing_row_has_lazy_loading(): void {
         $source = file_get_contents( $this->templates_dir . '/dashboard/listing-row.php' );
 
-        $this->assertStringContainsString(
-            "'loading' => 'lazy'",
+        $this->assertMatchesRegularExpression(
+            "/'loading'\s*=>\s*'lazy'/",
             $source,
             'dashboard/listing-row.php should include loading="lazy" for thumbnails'
         );
 
-        $this->assertStringContainsString(
-            "'decoding' => 'async'",
+        $this->assertMatchesRegularExpression(
+            "/'decoding'\s*=>\s*'async'/",
             $source,
             'dashboard/listing-row.php should include decoding="async" for thumbnails'
         );

@@ -232,7 +232,7 @@ abstract class AbstractShortcode {
 	 */
 	protected function sanitize_attribute( string $key, $value ) {
 		// Get attribute definition.
-		$doc = $this->attribute_docs[ $key ] ?? [];
+		$doc  = $this->attribute_docs[ $key ] ?? [];
 		$type = $doc['type'] ?? 'string';
 
 		switch ( $type ) {

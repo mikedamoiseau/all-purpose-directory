@@ -185,10 +185,10 @@ class FavoriteToggle {
 
 		wp_send_json_success(
 			[
-				'is_favorite'  => $new_state,
-				'count'        => $count,
-				'button_html'  => $button_html,
-				'message'      => $message,
+				'is_favorite' => $new_state,
+				'count'       => $count,
+				'button_html' => $button_html,
+				'message'     => $message,
 			]
 		);
 	}
@@ -423,9 +423,9 @@ class FavoriteToggle {
 	public function add_script_data( array $data ): array {
 		$favorites = Favorites::get_instance();
 
-		$data['favoriteNonce']   = wp_create_nonce( self::NONCE_ACTION );
-		$data['favoriteAction']  = self::AJAX_ACTION;
-		$data['requiresLogin']   = $favorites->requires_login();
+		$data['favoriteNonce']  = wp_create_nonce( self::NONCE_ACTION );
+		$data['favoriteAction'] = self::AJAX_ACTION;
+		$data['requiresLogin']  = $favorites->requires_login();
 
 		// Add i18n strings for favorites.
 		if ( ! isset( $data['i18n'] ) ) {

@@ -35,7 +35,7 @@ final class TagData {
 	 */
 	public static function get_tags(): array {
 		return [
-			'pet-friendly'         => [
+			'pet-friendly'          => [
 				'name'        => __( 'Pet Friendly', 'all-purpose-directory' ),
 				'description' => __( 'Welcomes pets', 'all-purpose-directory' ),
 			],
@@ -43,35 +43,35 @@ final class TagData {
 				'name'        => __( 'Wheelchair Accessible', 'all-purpose-directory' ),
 				'description' => __( 'Fully accessible', 'all-purpose-directory' ),
 			],
-			'free-wifi'            => [
+			'free-wifi'             => [
 				'name'        => __( 'Free WiFi', 'all-purpose-directory' ),
 				'description' => __( 'Complimentary WiFi', 'all-purpose-directory' ),
 			],
-			'parking-available'    => [
+			'parking-available'     => [
 				'name'        => __( 'Parking Available', 'all-purpose-directory' ),
 				'description' => __( 'On-site parking', 'all-purpose-directory' ),
 			],
-			'open-late'            => [
+			'open-late'             => [
 				'name'        => __( 'Open Late', 'all-purpose-directory' ),
 				'description' => __( 'Late night hours', 'all-purpose-directory' ),
 			],
-			'family-friendly'      => [
+			'family-friendly'       => [
 				'name'        => __( 'Family Friendly', 'all-purpose-directory' ),
 				'description' => __( 'Great for families', 'all-purpose-directory' ),
 			],
-			'outdoor-seating'      => [
+			'outdoor-seating'       => [
 				'name'        => __( 'Outdoor Seating', 'all-purpose-directory' ),
 				'description' => __( 'Patio or outdoor area', 'all-purpose-directory' ),
 			],
-			'delivery-available'   => [
+			'delivery-available'    => [
 				'name'        => __( 'Delivery Available', 'all-purpose-directory' ),
 				'description' => __( 'Offers delivery service', 'all-purpose-directory' ),
 			],
-			'accepts-credit-cards' => [
+			'accepts-credit-cards'  => [
 				'name'        => __( 'Accepts Credit Cards', 'all-purpose-directory' ),
 				'description' => __( 'Credit card payments accepted', 'all-purpose-directory' ),
 			],
-			'reservations'         => [
+			'reservations'          => [
 				'name'        => __( 'Reservations', 'all-purpose-directory' ),
 				'description' => __( 'Takes reservations', 'all-purpose-directory' ),
 			],

@@ -259,8 +259,8 @@ final class ListingsBlock extends AbstractBlock {
 
 		// Category filter.
 		if ( ! empty( $attributes['category'] ) ) {
-			$categories        = array_map( 'sanitize_key', explode( ',', $attributes['category'] ) );
-			$args['tax_query'] = $args['tax_query'] ?? [];
+			$categories          = array_map( 'sanitize_key', explode( ',', $attributes['category'] ) );
+			$args['tax_query']   = $args['tax_query'] ?? [];
 			$args['tax_query'][] = [
 				'taxonomy' => 'apd_category',
 				'field'    => 'slug',
@@ -270,8 +270,8 @@ final class ListingsBlock extends AbstractBlock {
 
 		// Tag filter.
 		if ( ! empty( $attributes['tag'] ) ) {
-			$tags              = array_map( 'sanitize_key', explode( ',', $attributes['tag'] ) );
-			$args['tax_query'] = $args['tax_query'] ?? [];
+			$tags                = array_map( 'sanitize_key', explode( ',', $attributes['tag'] ) );
+			$args['tax_query']   = $args['tax_query'] ?? [];
 			$args['tax_query'][] = [
 				'taxonomy' => 'apd_tag',
 				'field'    => 'slug',

@@ -167,7 +167,7 @@ final class FilterRenderer {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array<string, mixed>          $args    Render arguments.
+	 * @param array<string, mixed>           $args    Render arguments.
 	 * @param array<string, FilterInterface> $filters Filters to render.
 	 * @param array<string>                  $classes CSS classes.
 	 * @param array<string, mixed>           $request Request data for values.
@@ -313,9 +313,9 @@ final class FilterRenderer {
 	 * @return string The rendered HTML.
 	 */
 	public function render_orderby( array $request ): string {
-		$options  = $this->search_query->get_orderby_options();
-		$current  = $request['apd_orderby'] ?? 'date';
-		$order    = $request['apd_order'] ?? 'DESC';
+		$options = $this->search_query->get_orderby_options();
+		$current = $request['apd_orderby'] ?? 'date';
+		$order   = $request['apd_order'] ?? 'DESC';
 
 		$output  = '<div class="apd-search-form__orderby">';
 		$output .= sprintf(
@@ -409,7 +409,7 @@ final class FilterRenderer {
 	 * @since 1.0.0
 	 *
 	 * @param array<array{filter: FilterInterface, value: mixed}> $active_filters Active filters.
-	 * @param array<string, mixed>                                 $request        Request data.
+	 * @param array<string, mixed>                                $request        Request data.
 	 * @return string The HTML.
 	 */
 	private function build_active_filters( array $active_filters, array $request ): string {

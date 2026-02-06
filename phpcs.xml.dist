@@ -1,0 +1,156 @@
+<?xml version="1.0"?>
+<ruleset name="All Purpose Directory">
+    <description>Coding standards for All Purpose Directory WordPress plugin</description>
+
+    <!-- What to scan -->
+    <file>.</file>
+
+    <!-- Exclude paths -->
+    <exclude-pattern>/vendor/*</exclude-pattern>
+    <exclude-pattern>/node_modules/*</exclude-pattern>
+    <exclude-pattern>/tests/*</exclude-pattern>
+    <exclude-pattern>/assets/*</exclude-pattern>
+    <exclude-pattern>/languages/*</exclude-pattern>
+    <exclude-pattern>/research/*</exclude-pattern>
+    <exclude-pattern>/.github/*</exclude-pattern>
+
+    <!-- How to scan -->
+    <arg value="sp"/> <!-- Show sniff and progress -->
+    <arg name="basepath" value="."/>
+    <arg name="colors"/>
+    <arg name="extensions" value="php"/>
+    <arg name="parallel" value="8"/>
+
+    <!-- Rules: WordPress Coding Standards -->
+    <rule ref="WordPress">
+        <!-- Allow short array syntax -->
+        <exclude name="Universal.Arrays.DisallowShortArraySyntax"/>
+
+        <!-- Allow file names that don't match class names (PSR-4 autoloading) -->
+        <exclude name="WordPress.Files.FileName.InvalidClassFileName"/>
+        <exclude name="WordPress.Files.FileName.NotHyphenatedLowercase"/>
+
+        <!-- Allow short ternary -->
+        <exclude name="Universal.Operators.DisallowShortTernary"/>
+
+        <!-- We use namespaces and PSR-4 -->
+        <exclude name="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedNamespaceFound"/>
+
+        <!-- Our prefix "apd" is 3 chars, which WPCS considers too short. Exclude this check. -->
+        <exclude name="WordPress.NamingConventions.PrefixAllGlobals.ShortPrefixPassed"/>
+
+        <!-- Template variables are local, not global -->
+        <exclude name="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound"/>
+
+        <!-- Our functions/hooks are prefixed with apd_ which is valid but WPCS wants longer prefix -->
+        <exclude name="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound"/>
+        <exclude name="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound"/>
+        <exclude name="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound"/>
+
+        <!-- Yoda conditions are controversial and not required for WordPress.org -->
+        <exclude name="WordPress.PHP.YodaConditions.NotYoda"/>
+
+        <!-- Allow PSR-4 style method names in classes -->
+        <exclude name="WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid"/>
+
+        <!-- Allow 'default' as parameter name -->
+        <exclude name="Universal.NamingConventions.NoReservedKeywordParameterNames"/>
+    </rule>
+
+    <!-- Exclude template files from global prefix checks (variables are extracted from args) -->
+    <rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound">
+        <exclude-pattern>templates/*</exclude-pattern>
+    </rule>
+
+    <!-- Comments don't need periods at the end -->
+    <rule ref="Squiz.Commenting.InlineComment.InvalidEndChar">
+        <severity>0</severity>
+    </rule>
+
+    <!-- Comment formatting is not critical -->
+    <rule ref="Squiz.Commenting.BlockComment.HasEmptyLineBefore">
+        <severity>0</severity>
+    </rule>
+    <rule ref="Squiz.Commenting.BlockComment.NoEmptyLineBefore">
+        <severity>0</severity>
+    </rule>
+
+    <!-- Meta/tax queries are necessary for this plugin -->
+    <rule ref="WordPress.DB.SlowDBQuery">
+        <severity>0</severity>
+    </rule>
+
+    <!-- Interface methods may have unused parameters -->
+    <rule ref="Generic.CodeAnalysis.UnusedFunctionParameter">
+        <severity>0</severity>
+    </rule>
+
+    <!-- Custom capabilities are registered by the plugin -->
+    <rule ref="WordPress.WP.Capabilities.Unknown">
+        <severity>0</severity>
+    </rule>
+
+    <!-- Base64 encoding/decoding is used for safe data serialization -->
+    <rule ref="WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode">
+        <severity>0</severity>
+    </rule>
+    <rule ref="WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode">
+        <severity>0</severity>
+    </rule>
+
+    <!-- Loop size checks are acceptable in controlled situations -->
+    <rule ref="Squiz.PHP.DisallowSizeFunctionsInLoops.Found">
+        <severity>0</severity>
+    </rule>
+
+    <!-- Template variables like $error, $action, $status are local, not WP globals -->
+    <rule ref="WordPress.WP.GlobalVariablesOverride.Prohibited">
+        <exclude-pattern>templates/*</exclude-pattern>
+    </rule>
+
+    <!-- Direct DB queries for cleanup operations (uninstall, demo data deletion) are intentional -->
+    <rule ref="WordPress.DB.DirectDatabaseQuery.DirectQuery">
+        <exclude-pattern>uninstall.php</exclude-pattern>
+        <exclude-pattern>src/Admin/DemoData/*</exclude-pattern>
+    </rule>
+    <rule ref="WordPress.DB.DirectDatabaseQuery.NoCaching">
+        <exclude-pattern>uninstall.php</exclude-pattern>
+        <exclude-pattern>src/Admin/DemoData/*</exclude-pattern>
+    </rule>
+
+    <!-- Debug functions in apd_debug_log() are only called when debug mode enabled -->
+    <rule ref="WordPress.PHP.DevelopmentFunctions.error_log_error_log">
+        <exclude-pattern>includes/functions.php</exclude-pattern>
+    </rule>
+    <rule ref="WordPress.PHP.DevelopmentFunctions.error_log_print_r">
+        <exclude-pattern>includes/functions.php</exclude-pattern>
+    </rule>
+
+    <!-- Verify compatibility with PHP 8.0+ -->
+    <config name="testVersion" value="8.0-"/>
+    <rule ref="PHPCompatibilityWP"/>
+
+    <!-- Text domain for i18n -->
+    <config name="text_domain" value="all-purpose-directory"/>
+
+    <!-- Minimum supported WordPress version -->
+    <config name="minimum_wp_version" value="6.0"/>
+
+    <!-- Prefixes for global functions, classes, etc -->
+    <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+        <properties>
+            <property name="prefixes" type="array">
+                <element value="apd"/>
+                <element value="APD"/>
+                <element value="all_purpose_directory"/>
+            </property>
+        </properties>
+    </rule>
+
+    <!-- Allow some flexibility in hook naming -->
+    <rule ref="WordPress.NamingConventions.ValidHookName">
+        <properties>
+            <property name="additionalWordDelimiters" value="-/"/>
+        </properties>
+    </rule>
+</ruleset>

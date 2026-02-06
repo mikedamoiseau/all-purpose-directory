@@ -46,22 +46,22 @@ final class ListingsShortcode extends AbstractShortcode {
 	 * @var array<string, mixed>
 	 */
 	protected array $defaults = [
-		'view'           => 'grid',
-		'columns'        => 3,
-		'count'          => 12,
-		'category'       => '',
-		'tag'            => '',
-		'orderby'        => 'date',
-		'order'          => 'DESC',
-		'ids'            => '',
-		'exclude'        => '',
-		'author'         => '',
-		'show_image'     => 'true',
-		'show_excerpt'   => 'true',
-		'excerpt_length' => '',
-		'show_category'  => 'true',
+		'view'            => 'grid',
+		'columns'         => 3,
+		'count'           => 12,
+		'category'        => '',
+		'tag'             => '',
+		'orderby'         => 'date',
+		'order'           => 'DESC',
+		'ids'             => '',
+		'exclude'         => '',
+		'author'          => '',
+		'show_image'      => 'true',
+		'show_excerpt'    => 'true',
+		'excerpt_length'  => '',
+		'show_category'   => 'true',
 		'show_pagination' => 'true',
-		'class'          => '',
+		'class'           => '',
 	];
 
 	/**
@@ -70,72 +70,72 @@ final class ListingsShortcode extends AbstractShortcode {
 	 * @var array<string, array>
 	 */
 	protected array $attribute_docs = [
-		'view'           => [
+		'view'            => [
 			'type'        => 'slug',
 			'description' => 'Display view: grid or list.',
 			'default'     => 'grid',
 		],
-		'columns'        => [
+		'columns'         => [
 			'type'        => 'integer',
 			'description' => 'Number of columns for grid view (2-4).',
 			'default'     => 3,
 		],
-		'count'          => [
+		'count'           => [
 			'type'        => 'integer',
 			'description' => 'Number of listings to display.',
 			'default'     => 12,
 		],
-		'category'       => [
+		'category'        => [
 			'type'        => 'string',
 			'description' => 'Category slug(s) to filter by (comma-separated).',
 			'default'     => '',
 		],
-		'tag'            => [
+		'tag'             => [
 			'type'        => 'string',
 			'description' => 'Tag slug(s) to filter by (comma-separated).',
 			'default'     => '',
 		],
-		'orderby'        => [
+		'orderby'         => [
 			'type'        => 'slug',
 			'description' => 'Order by: date, title, modified, rand, views.',
 			'default'     => 'date',
 		],
-		'order'          => [
+		'order'           => [
 			'type'        => 'slug',
 			'description' => 'Sort order: ASC or DESC.',
 			'default'     => 'DESC',
 		],
-		'ids'            => [
+		'ids'             => [
 			'type'        => 'ids',
 			'description' => 'Specific listing IDs to display.',
 			'default'     => '',
 		],
-		'exclude'        => [
+		'exclude'         => [
 			'type'        => 'ids',
 			'description' => 'Listing IDs to exclude.',
 			'default'     => '',
 		],
-		'author'         => [
+		'author'          => [
 			'type'        => 'string',
 			'description' => 'Author ID or username.',
 			'default'     => '',
 		],
-		'show_image'     => [
+		'show_image'      => [
 			'type'        => 'boolean',
 			'description' => 'Show featured images.',
 			'default'     => 'true',
 		],
-		'show_excerpt'   => [
+		'show_excerpt'    => [
 			'type'        => 'boolean',
 			'description' => 'Show listing excerpts.',
 			'default'     => 'true',
 		],
-		'excerpt_length' => [
+		'excerpt_length'  => [
 			'type'        => 'integer',
 			'description' => 'Excerpt length in words.',
 			'default'     => '',
 		],
-		'show_category'  => [
+		'show_category'   => [
 			'type'        => 'boolean',
 			'description' => 'Show category badges.',
 			'default'     => 'true',
@@ -145,7 +145,7 @@ final class ListingsShortcode extends AbstractShortcode {
 			'description' => 'Show pagination links.',
 			'default'     => 'true',
 		],
-		'class'          => [
+		'class'           => [
 			'type'        => 'string',
 			'description' => 'Additional CSS classes.',
 			'default'     => '',
@@ -190,18 +190,20 @@ final class ListingsShortcode extends AbstractShortcode {
 		$query = new \WP_Query( $query_args );
 
 		// Get the view.
-		$view_type = $this->validate_view( $atts['view'] );
+		$view_type   = $this->validate_view( $atts['view'] );
 		$view_config = $this->build_view_config( $atts );
 
 		$registry = ViewRegistry::get_instance();
-		$view = $registry->create_view( $view_type, $view_config );
+		$view     = $registry->create_view( $view_type, $view_config );
 
 		if ( ! $view ) {
-			return $this->error( sprintf(
+			return $this->error(
+				sprintf(
 				/* translators: %s: View type */
-				__( 'Invalid view type: %s', 'all-purpose-directory' ),
-				$atts['view']
-			) );
+					__( 'Invalid view type: %s', 'all-purpose-directory' ),
+					$atts['view']
+				)
+			);
 		}
 
 		// Start output buffering.
@@ -276,7 +278,7 @@ final class ListingsShortcode extends AbstractShortcode {
 		// Specific IDs.
 		if ( ! empty( $atts['ids'] ) ) {
 			$args['post__in'] = $atts['ids'];
-			$args['orderby'] = 'post__in';
+			$args['orderby']  = 'post__in';
 		}
 
 		// Exclude IDs.
@@ -298,7 +300,7 @@ final class ListingsShortcode extends AbstractShortcode {
 
 		// Category filter.
 		if ( ! empty( $atts['category'] ) ) {
-			$categories = array_map( 'trim', explode( ',', $atts['category'] ) );
+			$categories          = array_map( 'trim', explode( ',', $atts['category'] ) );
 			$args['tax_query'][] = [
 				'taxonomy' => 'apd_category',
 				'field'    => 'slug',
@@ -308,7 +310,7 @@ final class ListingsShortcode extends AbstractShortcode {
 
 		// Tag filter.
 		if ( ! empty( $atts['tag'] ) ) {
-			$tags = array_map( 'trim', explode( ',', $atts['tag'] ) );
+			$tags                = array_map( 'trim', explode( ',', $atts['tag'] ) );
 			$args['tax_query'][] = [
 				'taxonomy' => 'apd_tag',
 				'field'    => 'slug',
@@ -324,12 +326,12 @@ final class ListingsShortcode extends AbstractShortcode {
 		// Order settings.
 		if ( empty( $atts['ids'] ) ) {
 			$args['orderby'] = $this->validate_orderby( $atts['orderby'] );
-			$args['order'] = strtoupper( $atts['order'] ) === 'ASC' ? 'ASC' : 'DESC';
+			$args['order']   = strtoupper( $atts['order'] ) === 'ASC' ? 'ASC' : 'DESC';
 
 			// Handle views orderby.
 			if ( $atts['orderby'] === 'views' ) {
 				$args['meta_key'] = '_apd_views_count';
-				$args['orderby'] = 'meta_value_num';
+				$args['orderby']  = 'meta_value_num';
 			}
 		}
 

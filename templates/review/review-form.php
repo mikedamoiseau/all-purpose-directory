@@ -174,10 +174,13 @@ do_action( 'apd_before_review_form', $listing_id );
 					$selected_rating = (int) $flash_data['rating'];
 				}
 
-				apd_get_template( 'review/star-input.php', [
-					'selected_rating' => $selected_rating,
-					'star_count'      => $star_count,
-				] );
+				apd_get_template(
+					'review/star-input.php',
+					[
+						'selected_rating' => $selected_rating,
+						'star_count'      => $star_count,
+					]
+				);
 				?>
 			</div>
 

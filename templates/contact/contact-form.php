@@ -19,7 +19,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$has_errors = ! empty( $errors );
+$has_errors   = ! empty( $errors );
 $form_classes = $form->get_css_classes();
 ?>
 
@@ -140,7 +140,7 @@ $form_classes = $form->get_css_classes();
 				printf(
 					/* translators: %d: minimum number of characters */
 					esc_html__( 'Minimum %d characters required.', 'all-purpose-directory' ),
-					$form->get_min_message_length()
+					(int) $form->get_min_message_length()
 				);
 				?>
 			</p>

@@ -251,8 +251,8 @@ final class GridView extends AbstractView {
 	 * @return string Rendered HTML with pagination.
 	 */
 	public function renderWithPagination( array $query_args = [], array $render_args = [] ): string {
-		$query  = $this->getListings( $query_args );
-		$output = $this->renderListings( $query, $render_args );
+		$query   = $this->getListings( $query_args );
+		$output  = $this->renderListings( $query, $render_args );
 		$output .= $this->renderPagination( $query );
 
 		return $output;
