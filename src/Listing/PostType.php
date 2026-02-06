@@ -37,6 +37,11 @@ final class PostType {
 	public const STATUS_EXPIRED = 'expired';
 
 	/**
+	 * Rejected status slug.
+	 */
+	public const STATUS_REJECTED = 'rejected';
+
+	/**
 	 * Register the listing post type.
 	 *
 	 * @return void
@@ -55,7 +60,9 @@ final class PostType {
 			self::STATUS_EXPIRED,
 			[
 				'label'                     => _x( 'Expired', 'post status', 'all-purpose-directory' ),
-				'public'                    => true,
+				'public'                    => false,
+				'internal'                  => false,
+				'protected'                 => true,
 				'exclude_from_search'       => true,
 				'show_in_admin_all_list'    => true,
 				'show_in_admin_status_list' => true,
@@ -63,6 +70,25 @@ final class PostType {
 				'label_count'               => _n_noop(
 					'Expired <span class="count">(%s)</span>',
 					'Expired <span class="count">(%s)</span>',
+					'all-purpose-directory'
+				),
+			]
+		);
+
+		register_post_status(
+			self::STATUS_REJECTED,
+			[
+				'label'                     => _x( 'Rejected', 'post status', 'all-purpose-directory' ),
+				'public'                    => false,
+				'internal'                  => false,
+				'protected'                 => true,
+				'exclude_from_search'       => true,
+				'show_in_admin_all_list'    => true,
+				'show_in_admin_status_list' => true,
+				/* translators: %s: Number of rejected listings */
+				'label_count'               => _n_noop(
+					'Rejected <span class="count">(%s)</span>',
+					'Rejected <span class="count">(%s)</span>',
 					'all-purpose-directory'
 				),
 			]
@@ -135,8 +161,7 @@ final class PostType {
 				'author',
 				'excerpt',
 			],
-			'show_in_rest'       => true,
-			'rest_base'          => 'apd_listing',
+			'show_in_rest'       => false,
 		];
 	}
 }

@@ -80,6 +80,15 @@ class FavoriteToggle {
 	}
 
 	/**
+	 * Reset singleton instance (for testing).
+	 *
+	 * @return void
+	 */
+	public static function reset_instance(): void {
+		self::$instance = null;
+	}
+
+	/**
 	 * Initialize the favorite toggle system.
 	 *
 	 * @since 1.0.0

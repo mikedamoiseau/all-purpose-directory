@@ -386,7 +386,7 @@
         },
 
         /**
-         * Set loading state.
+         * Set loading state with skeleton placeholders.
          *
          * @param {boolean} isLoading - Whether loading is in progress.
          */
@@ -401,6 +401,11 @@
                 results?.classList.add('apd-listings-results--loading');
                 results?.setAttribute('aria-busy', 'true');
 
+                // Insert skeleton placeholders.
+                if (results) {
+                    this.insertSkeletons(results);
+                }
+
                 if (this.elements.loadingIndicator) {
                     this.elements.loadingIndicator.setAttribute('aria-hidden', 'false');
                 }
@@ -409,9 +414,50 @@
                 results?.classList.remove('apd-listings-results--loading');
                 results?.setAttribute('aria-busy', 'false');
 
+                // Remove skeleton placeholders.
+                this.removeSkeletons();
+
                 if (this.elements.loadingIndicator) {
                     this.elements.loadingIndicator.setAttribute('aria-hidden', 'true');
                 }
+            }
+        },
+
+        /**
+         * Insert skeleton placeholder cards into the results area.
+         *
+         * @param {HTMLElement} container - The results container.
+         */
+        insertSkeletons: function(container) {
+            this.removeSkeletons();
+
+            var overlay = document.createElement('div');
+            overlay.className = 'apd-skeleton-overlay';
+            overlay.setAttribute('aria-hidden', 'true');
+
+            for (var i = 0; i < 6; i++) {
+                var card = document.createElement('div');
+                card.className = 'apd-skeleton-card';
+                card.innerHTML =
+                    '<div class="apd-skeleton apd-skeleton-card__image"></div>' +
+                    '<div class="apd-skeleton-card__body">' +
+                    '<div class="apd-skeleton apd-skeleton-card__title"></div>' +
+                    '<div class="apd-skeleton apd-skeleton-card__text"></div>' +
+                    '<div class="apd-skeleton apd-skeleton-card__text apd-skeleton-card__text--short"></div>' +
+                    '</div>';
+                overlay.appendChild(card);
+            }
+
+            container.appendChild(overlay);
+        },
+
+        /**
+         * Remove skeleton placeholders.
+         */
+        removeSkeletons: function() {
+            var existing = document.querySelector('.apd-skeleton-overlay');
+            if (existing) {
+                existing.parentNode.removeChild(existing);
             }
         },
 
@@ -1030,6 +1076,16 @@
         bindEvents: function() {
             // Handle action links with confirmation.
             document.addEventListener('click', this.handleActionClick.bind(this));
+
+            // Handle sort select navigation.
+            var sortSelect = this.elements.container.querySelector('.apd-my-listings__sort-select');
+            if (sortSelect) {
+                sortSelect.addEventListener('change', function() {
+                    if (this.value) {
+                        window.location.href = this.value;
+                    }
+                });
+            }
         },
 
         /**
@@ -1447,8 +1503,72 @@
                 detail: { message, type },
             }));
 
+            // Show visual toast.
+            this.showToast(message, type);
+
             // Announce to screen readers.
             this.announceToScreenReader(message);
+        },
+
+        /**
+         * Show a toast notification.
+         *
+         * @param {string} message - The message to show.
+         * @param {string} type - Toast type (success, error).
+         */
+        showToast: function(message, type) {
+            if (!message) {
+                return;
+            }
+
+            // Get or create toast container.
+            var container = document.getElementById('apd-toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'apd-toast-container';
+                container.className = 'apd-toast-container';
+                container.setAttribute('aria-live', 'polite');
+                document.body.appendChild(container);
+            }
+
+            // Create toast element.
+            var toast = document.createElement('div');
+            toast.className = 'apd-toast apd-toast--' + (type || 'success');
+            toast.setAttribute('role', 'status');
+
+            var icon = type === 'error' ? '\u2717' : '\u2713';
+            toast.innerHTML = '<span class="apd-toast__icon" aria-hidden="true">' + icon + '</span>' +
+                '<span class="apd-toast__message">' + this.escapeHtml(message) + '</span>';
+
+            container.appendChild(toast);
+
+            // Trigger enter animation on next frame.
+            requestAnimationFrame(function() {
+                toast.classList.add('apd-toast--visible');
+            });
+
+            // Auto-remove after 3 seconds.
+            setTimeout(function() {
+                toast.classList.remove('apd-toast--visible');
+                toast.classList.add('apd-toast--hiding');
+                setTimeout(function() {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 300);
+            }, 3000);
+        },
+
+        /**
+         * Escape HTML special characters.
+         *
+         * @param {string} str - String to escape.
+         * @returns {string} Escaped string.
+         */
+        escapeHtml: function(str) {
+            var div = document.createElement('div');
+            div.appendChild(document.createTextNode(str));
+            return div.innerHTML;
         },
 
         /**
@@ -1880,6 +2000,162 @@
     };
 
     /**
+     * APD Profile Module
+     *
+     * Handles profile form double-submit protection and unsaved changes warning.
+     */
+    const APDProfile = {
+
+        /**
+         * Cache for DOM elements.
+         */
+        elements: {
+            form: null,
+            submitBtn: null,
+        },
+
+        /**
+         * State tracking.
+         */
+        state: {
+            isSubmitting: false,
+            isDirty: false,
+            initialValues: null,
+        },
+
+        /**
+         * Initialize the profile module.
+         */
+        init: function() {
+            this.elements.form = document.querySelector('.apd-profile-form');
+            if (!this.elements.form) {
+                return;
+            }
+
+            this.elements.submitBtn = this.elements.form.querySelector('.apd-profile-form__submit');
+            if (!this.elements.submitBtn) {
+                return;
+            }
+
+            // Store initial form values for dirty checking.
+            this.initialValues = new FormData(this.elements.form);
+
+            this.elements.form.addEventListener('submit', this.handleSubmit.bind(this));
+            this.elements.form.addEventListener('input', this.handleChange.bind(this));
+            this.elements.form.addEventListener('change', this.handleChange.bind(this));
+            window.addEventListener('beforeunload', this.handleBeforeUnload.bind(this));
+        },
+
+        /**
+         * Handle form field changes to track dirty state.
+         */
+        handleChange: function() {
+            this.state.isDirty = true;
+        },
+
+        /**
+         * Handle beforeunload to warn about unsaved changes.
+         *
+         * @param {BeforeUnloadEvent} e - The beforeunload event.
+         */
+        handleBeforeUnload: function(e) {
+            if (this.state.isDirty && !this.state.isSubmitting) {
+                e.preventDefault();
+            }
+        },
+
+        /**
+         * Handle form submission - prevent double submit.
+         *
+         * @param {Event} e - Submit event.
+         */
+        handleSubmit: function(e) {
+            if (this.state.isSubmitting) {
+                e.preventDefault();
+                return;
+            }
+
+            this.state.isSubmitting = true;
+            this.state.isDirty = false;
+
+            var btn = this.elements.submitBtn;
+            var submittingText = btn.dataset.submittingText;
+
+            btn.disabled = true;
+            btn.setAttribute('aria-disabled', 'true');
+
+            if (submittingText) {
+                btn.dataset.originalText = btn.textContent;
+                btn.textContent = submittingText;
+            }
+        },
+    };
+
+    /**
+     * APD Character Counter
+     *
+     * Provides live character counts for textareas with minimum length requirements.
+     * Automatically finds `.apd-char-counter` elements and binds to the preceding textarea.
+     */
+    const APDCharCounter = {
+
+        /**
+         * Initialize all character counters on the page.
+         */
+        init: function() {
+            var counters = document.querySelectorAll('.apd-char-counter');
+            counters.forEach(this.bindCounter.bind(this));
+        },
+
+        /**
+         * Bind a single counter element to its textarea.
+         *
+         * @param {HTMLElement} counter - The counter paragraph element.
+         */
+        bindCounter: function(counter) {
+            var min = parseInt(counter.dataset.min, 10);
+            if (!min || min <= 0) {
+                return;
+            }
+
+            // Find the associated textarea: look for a textarea in the same parent field wrapper.
+            var field = counter.closest('.apd-review-form__field, .apd-field');
+            if (!field) {
+                return;
+            }
+
+            var textarea = field.querySelector('textarea');
+            if (!textarea) {
+                return;
+            }
+
+            var currentEl = counter.querySelector('.apd-char-counter__current');
+            if (!currentEl) {
+                return;
+            }
+
+            // Update on input.
+            var update = function() {
+                var len = textarea.value.length;
+                currentEl.textContent = len;
+
+                if (len >= min) {
+                    counter.classList.add('apd-char-counter--met');
+                    counter.classList.remove('apd-char-counter--unmet');
+                } else {
+                    counter.classList.remove('apd-char-counter--met');
+                    counter.classList.add('apd-char-counter--unmet');
+                }
+            };
+
+            textarea.addEventListener('input', update);
+
+            // Run once on init to handle pre-filled values.
+            update();
+        },
+    };
+
+    /**
      * Initialize on DOM ready.
      */
     document.addEventListener('DOMContentLoaded', function() {
@@ -1888,6 +2164,8 @@
         APDMyListings.init();
         APDFavorites.init();
         APDReviewForm.init();
+        APDProfile.init();
+        APDCharCounter.init();
     });
 
     // Expose to global scope for external access
@@ -1896,5 +2174,6 @@
     window.APDMyListings = APDMyListings;
     window.APDFavorites = APDFavorites;
     window.APDReviewForm = APDReviewForm;
+    window.APDProfile = APDProfile;
 
 })();

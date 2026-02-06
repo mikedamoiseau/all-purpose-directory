@@ -217,7 +217,7 @@ $has_avatar    = $profile->has_custom_avatar( $user_id );
 								<input type="url"
 									id="apd-social-<?php echo esc_attr( $platform ); ?>"
 									name="social_<?php echo esc_attr( $platform ); ?>"
-									value="<?php echo esc_attr( $user_data['social'][ $platform ] ); ?>"
+									value="<?php echo esc_attr( $user_data['social'][ $platform ] ?? '' ); ?>"
 									class="apd-field__text"
 									placeholder="https://">
 							</div>
@@ -229,7 +229,9 @@ $has_avatar    = $profile->has_custom_avatar( $user_id );
 
 		<!-- Submit Section -->
 		<div class="apd-profile-form__section apd-profile-form__section--actions">
-			<button type="submit" class="apd-button apd-button--primary apd-profile-form__submit">
+			<button type="submit"
+				class="apd-button apd-button--primary apd-profile-form__submit"
+				data-submitting-text="<?php esc_attr_e( 'Saving…', 'all-purpose-directory' ); ?>">
 				<?php esc_html_e( 'Save Profile', 'all-purpose-directory' ); ?>
 			</button>
 		</div>

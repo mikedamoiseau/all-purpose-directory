@@ -132,6 +132,11 @@ class Assets {
 			return true;
 		}
 
+		// Load on pages containing APD shortcodes or blocks.
+		if ( $this->current_post_has_apd_content() ) {
+			return true;
+		}
+
 		/**
 		 * Filter whether to load frontend assets.
 		 *
@@ -140,6 +145,56 @@ class Assets {
 		 * @param bool $should_load Whether to load assets.
 		 */
 		return apply_filters( 'apd_should_load_frontend_assets', false );
+	}
+
+	/**
+	 * Check if the current post/page contains APD shortcodes or blocks.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return bool
+	 */
+	private function current_post_has_apd_content(): bool {
+		global $post;
+
+		if ( ! $post instanceof \WP_Post ) {
+			return false;
+		}
+
+		$content = $post->post_content;
+
+		// Check for APD shortcodes.
+		$shortcodes = [
+			'apd_listings',
+			'apd_search_form',
+			'apd_categories',
+			'apd_submission_form',
+			'apd_dashboard',
+			'apd_favorites',
+			'apd_login_form',
+			'apd_register_form',
+		];
+
+		foreach ( $shortcodes as $shortcode ) {
+			if ( has_shortcode( $content, $shortcode ) ) {
+				return true;
+			}
+		}
+
+		// Check for APD blocks.
+		$blocks = [
+			'apd/listings',
+			'apd/search-form',
+			'apd/categories',
+		];
+
+		foreach ( $blocks as $block ) {
+			if ( has_block( $block, $post ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -189,15 +244,18 @@ class Assets {
 			'filterNonce' => wp_create_nonce( 'apd_filter_listings' ),
 			'archiveUrl'  => get_post_type_archive_link( 'apd_listing' ) ?: '',
 			'i18n'        => [
-				'loading'        => __( 'Loading...', 'all-purpose-directory' ),
-				'error'          => __( 'An error occurred. Please try again.', 'all-purpose-directory' ),
-				'noResults'      => __( 'No listings found.', 'all-purpose-directory' ),
-				'addFavorite'    => __( 'Add to favorites', 'all-purpose-directory' ),
-				'removeFavorite' => __( 'Remove from favorites', 'all-purpose-directory' ),
-				'filtering'      => __( 'Filtering listings...', 'all-purpose-directory' ),
+				'loading'            => __( 'Loading...', 'all-purpose-directory' ),
+				'error'              => __( 'An error occurred. Please try again.', 'all-purpose-directory' ),
+				'noResults'          => __( 'No listings found.', 'all-purpose-directory' ),
+				'addToFavorites'     => __( 'Add to favorites', 'all-purpose-directory' ),
+				'removeFromFavorites' => __( 'Remove from favorites', 'all-purpose-directory' ),
+				'favoriteAdded'      => __( 'Added to favorites', 'all-purpose-directory' ),
+				'favoriteRemoved'    => __( 'Removed from favorites', 'all-purpose-directory' ),
+				'favoriteError'      => __( 'Could not update favorites. Please try again.', 'all-purpose-directory' ),
+				'filtering'          => __( 'Filtering listings...', 'all-purpose-directory' ),
 				/* translators: %d: Number of listings found */
-				'resultsFound'   => __( '%d listings found', 'all-purpose-directory' ),
-				'oneResultFound' => __( '1 listing found', 'all-purpose-directory' ),
+				'resultsFound'       => __( '%d listings found', 'all-purpose-directory' ),
+				'oneResultFound'     => __( '1 listing found', 'all-purpose-directory' ),
 			],
 		];
 

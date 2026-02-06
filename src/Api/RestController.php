@@ -98,6 +98,15 @@ final class RestController {
 	}
 
 	/**
+	 * Prevent unserialization.
+	 *
+	 * @throws \Exception Always throws exception.
+	 */
+	public function __wakeup(): void {
+		throw new \Exception( 'Cannot unserialize singleton.' );
+	}
+
+	/**
 	 * Initialize the REST API controller.
 	 *
 	 * @since 1.0.0

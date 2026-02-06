@@ -69,6 +69,8 @@ final class FavoritesTest extends UnitTestCase {
 			'current_user_can'    => false,
 			'is_ssl'              => false,
 			'wp_json_encode'      => 'json_encode',
+			'metadata_exists'     => true,
+			'wp_cache_delete'     => true,
 		] );
 
 		$this->favorites = Favorites::get_instance();
@@ -95,17 +97,30 @@ final class FavoritesTest extends UnitTestCase {
 	}
 
 	/**
+	 * Set up a wpdb mock for atomic increment/decrement tests.
+	 *
+	 * @return void
+	 */
+	private function mock_wpdb_for_atomic_count(): void {
+		global $wpdb;
+		$wpdb            = Mockery::mock( 'wpdb' );
+		$wpdb->postmeta  = 'wp_postmeta';
+		$wpdb->shouldReceive( 'prepare' )->andReturn( 'prepared_query' );
+		$wpdb->shouldReceive( 'query' )->andReturn( 1 );
+	}
+
+	/**
 	 * Test add favorite for logged-in user.
 	 */
 	public function test_add_favorite_for_logged_in_user(): void {
+		$this->mock_wpdb_for_atomic_count();
+
 		$listing_id = 123;
 		$user_id    = 1;
 
 		// Mock user meta operations.
 		Functions\when( 'get_user_meta' )->justReturn( [] );
 		Functions\when( 'update_user_meta' )->justReturn( true );
-		Functions\when( 'get_post_meta' )->justReturn( 0 );
-		Functions\when( 'update_post_meta' )->justReturn( true );
 
 		$result = $this->favorites->add( $listing_id, $user_id );
 
@@ -116,14 +131,14 @@ final class FavoritesTest extends UnitTestCase {
 	 * Test add favorite fires hook.
 	 */
 	public function test_add_favorite_fires_hook(): void {
+		$this->mock_wpdb_for_atomic_count();
+
 		$listing_id = 123;
 		$user_id    = 1;
 		$hook_fired = false;
 
 		Functions\when( 'get_user_meta' )->justReturn( [] );
 		Functions\when( 'update_user_meta' )->justReturn( true );
-		Functions\when( 'get_post_meta' )->justReturn( 0 );
-		Functions\when( 'update_post_meta' )->justReturn( true );
 		Functions\when( 'do_action' )->alias(
 			function( $tag, ...$args ) use ( &$hook_fired, $listing_id, $user_id ) {
 				if ( $tag === 'apd_favorite_added' && $args[0] === $listing_id && $args[1] === $user_id ) {
@@ -196,14 +211,14 @@ final class FavoritesTest extends UnitTestCase {
 	 * Test remove favorite for logged-in user.
 	 */
 	public function test_remove_favorite_for_logged_in_user(): void {
+		$this->mock_wpdb_for_atomic_count();
+
 		$listing_id = 123;
 		$user_id    = 1;
 
 		// Has the listing in favorites.
 		Functions\when( 'get_user_meta' )->justReturn( [ 123, 456 ] );
 		Functions\when( 'update_user_meta' )->justReturn( true );
-		Functions\when( 'get_post_meta' )->justReturn( 5 );
-		Functions\when( 'update_post_meta' )->justReturn( true );
 
 		$result = $this->favorites->remove( $listing_id, $user_id );
 
@@ -214,14 +229,14 @@ final class FavoritesTest extends UnitTestCase {
 	 * Test remove favorite fires hook.
 	 */
 	public function test_remove_favorite_fires_hook(): void {
+		$this->mock_wpdb_for_atomic_count();
+
 		$listing_id = 123;
 		$user_id    = 1;
 		$hook_fired = false;
 
 		Functions\when( 'get_user_meta' )->justReturn( [ 123 ] );
 		Functions\when( 'update_user_meta' )->justReturn( true );
-		Functions\when( 'get_post_meta' )->justReturn( 1 );
-		Functions\when( 'update_post_meta' )->justReturn( true );
 		Functions\when( 'do_action' )->alias(
 			function( $tag, ...$args ) use ( &$hook_fired, $listing_id, $user_id ) {
 				if ( $tag === 'apd_favorite_removed' && $args[0] === $listing_id && $args[1] === $user_id ) {
@@ -254,13 +269,13 @@ final class FavoritesTest extends UnitTestCase {
 	 * Test toggle favorite adds when not favorited.
 	 */
 	public function test_toggle_adds_when_not_favorited(): void {
+		$this->mock_wpdb_for_atomic_count();
+
 		$listing_id = 123;
 		$user_id    = 1;
 
 		Functions\when( 'get_user_meta' )->justReturn( [] );
 		Functions\when( 'update_user_meta' )->justReturn( true );
-		Functions\when( 'get_post_meta' )->justReturn( 0 );
-		Functions\when( 'update_post_meta' )->justReturn( true );
 
 		$result = $this->favorites->toggle( $listing_id, $user_id );
 
@@ -271,6 +286,8 @@ final class FavoritesTest extends UnitTestCase {
 	 * Test toggle favorite removes when favorited.
 	 */
 	public function test_toggle_removes_when_favorited(): void {
+		$this->mock_wpdb_for_atomic_count();
+
 		$listing_id    = 123;
 		$user_id       = 1;
 		$call_count    = 0;
@@ -284,8 +301,6 @@ final class FavoritesTest extends UnitTestCase {
 			}
 		);
 		Functions\when( 'update_user_meta' )->justReturn( true );
-		Functions\when( 'get_post_meta' )->justReturn( 1 );
-		Functions\when( 'update_post_meta' )->justReturn( true );
 
 		$result = $this->favorites->toggle( $listing_id, $user_id );
 
@@ -406,10 +421,10 @@ final class FavoritesTest extends UnitTestCase {
 	 * Test clear removes all favorites.
 	 */
 	public function test_clear_removes_all_favorites(): void {
+		$this->mock_wpdb_for_atomic_count();
+
 		Functions\when( 'get_user_meta' )->justReturn( [ 123, 456 ] );
 		Functions\when( 'delete_user_meta' )->justReturn( true );
-		Functions\when( 'get_post_meta' )->justReturn( 1 );
-		Functions\when( 'update_post_meta' )->justReturn( true );
 
 		$result = $this->favorites->clear( 1 );
 
@@ -526,107 +541,133 @@ final class FavoritesTest extends UnitTestCase {
 	}
 
 	/**
-	 * Test add increments listing count.
+	 * Test add increments listing count atomically.
 	 */
 	public function test_add_increments_listing_count(): void {
-		$listing_id      = 123;
-		$initial_count   = 5;
-		$updated_count   = null;
+		global $wpdb;
+		$wpdb            = Mockery::mock( 'wpdb' );
+		$wpdb->postmeta  = 'wp_postmeta';
+
+		$listing_id    = 123;
+		$query_run     = false;
 
 		Functions\when( 'get_user_meta' )->justReturn( [] );
 		Functions\when( 'update_user_meta' )->justReturn( true );
-		Functions\when( 'get_post_meta' )->justReturn( $initial_count );
-		Functions\when( 'update_post_meta' )->alias(
-			function( $post_id, $key, $value ) use ( &$updated_count, $listing_id ) {
-				if ( $post_id === $listing_id && $key === Favorites::LISTING_META_KEY ) {
-					$updated_count = $value;
-				}
-				return true;
-			}
-		);
+
+		$wpdb->shouldReceive( 'prepare' )
+			->once()
+			->andReturnUsing( function() use ( &$query_run ) {
+				$query_run = true;
+				return 'UPDATE wp_postmeta SET meta_value = CAST(meta_value AS UNSIGNED) + 1 WHERE post_id = 123 AND meta_key = \'_apd_favorite_count\'';
+			} );
+
+		$wpdb->shouldReceive( 'query' )
+			->once()
+			->andReturn( 1 );
 
 		$this->favorites->add( $listing_id, 1 );
 
-		$this->assertSame( 6, $updated_count );
+		$this->assertTrue( $query_run, 'Atomic increment query should be executed' );
 	}
 
 	/**
-	 * Test remove decrements listing count.
+	 * Test remove decrements listing count atomically.
 	 */
 	public function test_remove_decrements_listing_count(): void {
-		$listing_id      = 123;
-		$initial_count   = 5;
-		$updated_count   = null;
+		global $wpdb;
+		$wpdb            = Mockery::mock( 'wpdb' );
+		$wpdb->postmeta  = 'wp_postmeta';
+
+		$listing_id  = 123;
+		$query_run   = false;
 
 		Functions\when( 'get_user_meta' )->justReturn( [ 123 ] );
 		Functions\when( 'update_user_meta' )->justReturn( true );
-		Functions\when( 'get_post_meta' )->justReturn( $initial_count );
-		Functions\when( 'update_post_meta' )->alias(
-			function( $post_id, $key, $value ) use ( &$updated_count, $listing_id ) {
-				if ( $post_id === $listing_id && $key === Favorites::LISTING_META_KEY ) {
-					$updated_count = $value;
-				}
-				return true;
-			}
-		);
+
+		$wpdb->shouldReceive( 'prepare' )
+			->once()
+			->andReturnUsing( function() use ( &$query_run ) {
+				$query_run = true;
+				return 'UPDATE wp_postmeta SET meta_value = GREATEST(CAST(meta_value AS UNSIGNED) - 1, 0) WHERE post_id = 123 AND meta_key = \'_apd_favorite_count\'';
+			} );
+
+		$wpdb->shouldReceive( 'query' )
+			->once()
+			->andReturn( 1 );
 
 		$this->favorites->remove( $listing_id, 1 );
 
-		$this->assertSame( 4, $updated_count );
+		$this->assertTrue( $query_run, 'Atomic decrement query should be executed' );
 	}
 
 	/**
-	 * Test remove does not decrement below zero.
+	 * Test remove uses GREATEST to prevent negative counts.
 	 */
 	public function test_remove_does_not_decrement_below_zero(): void {
-		$listing_id      = 123;
-		$updated_count   = null;
+		global $wpdb;
+		$wpdb            = Mockery::mock( 'wpdb' );
+		$wpdb->postmeta  = 'wp_postmeta';
+
+		$listing_id   = 123;
+		$sql_executed = null;
 
 		Functions\when( 'get_user_meta' )->justReturn( [ 123 ] );
 		Functions\when( 'update_user_meta' )->justReturn( true );
-		Functions\when( 'get_post_meta' )->justReturn( 0 );
-		Functions\when( 'update_post_meta' )->alias(
-			function( $post_id, $key, $value ) use ( &$updated_count, $listing_id ) {
-				if ( $post_id === $listing_id && $key === Favorites::LISTING_META_KEY ) {
-					$updated_count = $value;
-				}
-				return true;
-			}
-		);
+
+		$wpdb->shouldReceive( 'prepare' )
+			->once()
+			->andReturnUsing( function( $query ) use ( &$sql_executed ) {
+				$sql_executed = $query;
+				return 'prepared_query';
+			} );
+
+		$wpdb->shouldReceive( 'query' )
+			->once()
+			->andReturn( 1 );
 
 		$this->favorites->remove( $listing_id, 1 );
 
-		$this->assertSame( 0, $updated_count );
+		$this->assertStringContainsString( 'GREATEST', $sql_executed, 'SQL should use GREATEST to prevent negative counts' );
 	}
 
 	/**
-	 * Test clear decrements all listing counts.
+	 * Test clear decrements all listing counts atomically.
 	 */
 	public function test_clear_decrements_all_listing_counts(): void {
-		$favorites         = [ 123, 456 ];
-		$decremented       = [];
+		global $wpdb;
+		$wpdb            = Mockery::mock( 'wpdb' );
+		$wpdb->postmeta  = 'wp_postmeta';
+
+		$favorites       = [ 123, 456 ];
+		$queries_run     = 0;
 
 		Functions\when( 'get_user_meta' )->justReturn( $favorites );
 		Functions\when( 'delete_user_meta' )->justReturn( true );
-		Functions\when( 'get_post_meta' )->justReturn( 5 );
-		Functions\when( 'update_post_meta' )->alias(
-			function( $post_id, $key, $value ) use ( &$decremented ) {
-				if ( $key === Favorites::LISTING_META_KEY ) {
-					$decremented[ $post_id ] = $value;
-				}
-				return true;
-			}
-		);
+
+		$wpdb->shouldReceive( 'prepare' )
+			->twice()
+			->andReturnUsing( function() use ( &$queries_run ) {
+				++$queries_run;
+				return 'prepared_query';
+			} );
+
+		$wpdb->shouldReceive( 'query' )
+			->twice()
+			->andReturn( 1 );
 
 		$this->favorites->clear( 1 );
 
-		$this->assertSame( [ 123 => 4, 456 => 4 ], $decremented );
+		$this->assertSame( 2, $queries_run, 'Should run atomic decrement for each listing' );
 	}
 
 	/**
 	 * Test is_valid_listing checks post author for unpublished.
 	 */
 	public function test_validates_author_for_unpublished_listing(): void {
+		global $wpdb;
+		$wpdb            = Mockery::mock( 'wpdb' );
+		$wpdb->postmeta  = 'wp_postmeta';
+
 		$listing_id = 123;
 
 		// Draft listing owned by user 1.
@@ -643,8 +684,9 @@ final class FavoritesTest extends UnitTestCase {
 		Functions\when( 'get_current_user_id' )->justReturn( 1 );
 		Functions\when( 'get_user_meta' )->justReturn( [] );
 		Functions\when( 'update_user_meta' )->justReturn( true );
-		Functions\when( 'get_post_meta' )->justReturn( 0 );
-		Functions\when( 'update_post_meta' )->justReturn( true );
+
+		$wpdb->shouldReceive( 'prepare' )->once()->andReturn( 'prepared_query' );
+		$wpdb->shouldReceive( 'query' )->once()->andReturn( 1 );
 
 		// User 1 can add their own draft.
 		$result = $this->favorites->add( $listing_id, 1 );
@@ -680,6 +722,10 @@ final class FavoritesTest extends UnitTestCase {
 	 * Test editor can access unpublished listings.
 	 */
 	public function test_editor_can_access_unpublished_listings(): void {
+		global $wpdb;
+		$wpdb            = Mockery::mock( 'wpdb' );
+		$wpdb->postmeta  = 'wp_postmeta';
+
 		$listing_id = 123;
 
 		// Draft listing owned by user 2.
@@ -701,8 +747,9 @@ final class FavoritesTest extends UnitTestCase {
 		);
 		Functions\when( 'get_user_meta' )->justReturn( [] );
 		Functions\when( 'update_user_meta' )->justReturn( true );
-		Functions\when( 'get_post_meta' )->justReturn( 0 );
-		Functions\when( 'update_post_meta' )->justReturn( true );
+
+		$wpdb->shouldReceive( 'prepare' )->once()->andReturn( 'prepared_query' );
+		$wpdb->shouldReceive( 'query' )->once()->andReturn( 1 );
 
 		// Editor can add any listing.
 		$result = $this->favorites->add( $listing_id, 1 );

@@ -198,6 +198,12 @@ class ListingsEndpoint {
 
 		$query = new \WP_Query( $args );
 
+		// Prime the post meta cache to avoid N+1 queries when fetching field values.
+		if ( ! empty( $query->posts ) ) {
+			$post_ids = wp_list_pluck( $query->posts, 'ID' );
+			update_post_meta_cache( $post_ids );
+		}
+
 		$items = [];
 		foreach ( $query->posts as $post ) {
 			$items[] = $this->prepare_item_for_response( $post, $request );
@@ -329,6 +335,10 @@ class ListingsEndpoint {
 		// Handle featured image.
 		$featured_image = $request->get_param( 'featured_image' );
 		if ( ! empty( $featured_image ) ) {
+			$image_error = $this->validate_featured_image( absint( $featured_image ) );
+			if ( is_wp_error( $image_error ) ) {
+				return $image_error;
+			}
 			set_post_thumbnail( $listing_id, absint( $featured_image ) );
 		}
 
@@ -446,6 +456,10 @@ class ListingsEndpoint {
 			if ( empty( $featured_image ) ) {
 				delete_post_thumbnail( $listing_id );
 			} else {
+				$image_error = $this->validate_featured_image( absint( $featured_image ) );
+				if ( is_wp_error( $image_error ) ) {
+					return $image_error;
+				}
 				set_post_thumbnail( $listing_id, absint( $featured_image ) );
 			}
 		}
@@ -601,6 +615,49 @@ class ListingsEndpoint {
 		 * @param WP_REST_Request $request The REST request.
 		 */
 		return apply_filters( 'apd_rest_listing_data', $data, $listing, $request );
+	}
+
+	/**
+	 * Validate a featured image attachment ID.
+	 *
+	 * Ensures the attachment exists, is an image, and that the current user
+	 * is the author or an admin. Prevents IDOR where a user could assign
+	 * another user's private media as their listing's featured image.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int $attachment_id The attachment ID to validate.
+	 * @return true|WP_Error True if valid, WP_Error on failure.
+	 */
+	private function validate_featured_image( int $attachment_id ): true|WP_Error {
+		$attachment = get_post( $attachment_id );
+
+		if ( ! $attachment || $attachment->post_type !== 'attachment' ) {
+			return $this->controller->create_error(
+				'rest_invalid_featured_image',
+				__( 'Invalid featured image. The attachment does not exist.', 'all-purpose-directory' ),
+				400
+			);
+		}
+
+		if ( ! wp_attachment_is_image( $attachment_id ) ) {
+			return $this->controller->create_error(
+				'rest_invalid_featured_image',
+				__( 'Invalid featured image. The attachment is not an image.', 'all-purpose-directory' ),
+				400
+			);
+		}
+
+		// Allow if user is admin or the attachment author.
+		if ( ! current_user_can( 'manage_options' ) && (int) $attachment->post_author !== get_current_user_id() ) {
+			return $this->controller->create_error(
+				'rest_forbidden_featured_image',
+				__( 'You do not have permission to use this image.', 'all-purpose-directory' ),
+				403
+			);
+		}
+
+		return true;
 	}
 
 	/**

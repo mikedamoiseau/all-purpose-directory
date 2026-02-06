@@ -45,7 +45,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	method="post"
 	enctype="multipart/form-data"
 	data-validate="true"
-	novalidate
 	aria-label="<?php echo $listing_id > 0 ? esc_attr__( 'Edit listing', 'all-purpose-directory' ) : esc_attr__( 'Submit listing', 'all-purpose-directory' ); ?>">
 
 	<?php wp_nonce_field( $nonce_action, $nonce_name ); ?>
@@ -82,6 +81,49 @@ if ( ! defined( 'ABSPATH' ) ) {
 	do_action( 'apd_submission_form_start', $config, $listing_id );
 	?>
 
+	<?php
+	// Build progress steps from visible sections.
+	$progress_steps = [];
+	if ( $config['show_title'] || $config['show_content'] ) {
+		$progress_steps[] = [
+			'id'    => 'apd-section-basic',
+			'label' => __( 'Basic Info', 'all-purpose-directory' ),
+		];
+	}
+	if ( ! empty( $fields ) ) {
+		$progress_steps[] = [
+			'id'    => 'apd-section-details',
+			'label' => __( 'Details', 'all-purpose-directory' ),
+		];
+	}
+	if ( ( $config['show_categories'] && ! empty( $categories ) ) || ( $config['show_tags'] && ! empty( $tags ) ) ) {
+		$progress_steps[] = [
+			'id'    => 'apd-section-taxonomy',
+			'label' => __( 'Categories', 'all-purpose-directory' ),
+		];
+	}
+	if ( $config['show_featured_image'] ) {
+		$progress_steps[] = [
+			'id'    => 'apd-section-image',
+			'label' => __( 'Image', 'all-purpose-directory' ),
+		];
+	}
+	?>
+	<?php if ( count( $progress_steps ) > 1 ) : ?>
+		<nav class="apd-submission-progress" aria-label="<?php esc_attr_e( 'Form sections', 'all-purpose-directory' ); ?>">
+			<ol class="apd-submission-progress__steps">
+				<?php foreach ( $progress_steps as $step_index => $step ) : ?>
+					<li class="apd-submission-progress__step">
+						<a href="#<?php echo esc_attr( $step['id'] ); ?>" class="apd-submission-progress__link">
+							<span class="apd-submission-progress__number" aria-hidden="true"><?php echo absint( $step_index + 1 ); ?></span>
+							<span class="apd-submission-progress__label"><?php echo esc_html( $step['label'] ); ?></span>
+						</a>
+					</li>
+				<?php endforeach; ?>
+			</ol>
+		</nav>
+	<?php endif; ?>
+
 	<?php if ( $form->has_errors() ) : ?>
 		<div class="apd-submission-form__errors" role="alert">
 			<p class="apd-submission-form__errors-title">
@@ -98,7 +140,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<?php endif; ?>
 
 	<?php if ( $config['show_title'] ) : ?>
-		<div class="apd-submission-form__section apd-submission-form__section--basic">
+		<div id="apd-section-basic" class="apd-submission-form__section apd-submission-form__section--basic">
 			<div class="apd-field apd-field--frontend apd-field--required <?php echo isset( $errors['listing_title'] ) ? 'apd-field--has-error' : ''; ?>"
 				data-field-name="listing_title"
 				data-field-type="text">
@@ -209,7 +251,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	?>
 
 	<?php if ( ! empty( $fields ) ) : ?>
-		<div class="apd-submission-form__section apd-submission-form__section--custom-fields">
+		<div id="apd-section-details" class="apd-submission-form__section apd-submission-form__section--custom-fields">
 			<h3 class="apd-submission-form__section-title">
 				<?php esc_html_e( 'Additional Details', 'all-purpose-directory' ); ?>
 			</h3>
@@ -233,7 +275,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	?>
 
 	<?php if ( $config['show_categories'] && ! empty( $categories ) ) : ?>
-		<div class="apd-submission-form__section apd-submission-form__section--categories">
+		<div id="apd-section-taxonomy" class="apd-submission-form__section apd-submission-form__section--categories">
 			<?php
 			apd_get_template(
 				'submission/category-selector.php',
@@ -276,7 +318,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	?>
 
 	<?php if ( $config['show_featured_image'] ) : ?>
-		<div class="apd-submission-form__section apd-submission-form__section--image">
+		<div id="apd-section-image" class="apd-submission-form__section apd-submission-form__section--image">
 			<?php
 			apd_get_template(
 				'submission/image-upload.php',

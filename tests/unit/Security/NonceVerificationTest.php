@@ -34,7 +34,7 @@ class NonceVerificationTest extends SecurityTestCase {
             ->with('', ContactForm::NONCE_ACTION)
             ->andReturn(false);
 
-        $handler = new ContactHandler();
+        $handler = ContactHandler::get_instance();
         $result = $handler->verify_nonce();
 
         $this->assertFalse($result, 'Contact handler should reject missing nonce');
@@ -54,7 +54,7 @@ class NonceVerificationTest extends SecurityTestCase {
             ->with('valid_contact_nonce', ContactForm::NONCE_ACTION)
             ->andReturn(true);
 
-        $handler = new ContactHandler();
+        $handler = ContactHandler::get_instance();
         $result = $handler->verify_nonce();
 
         $this->assertTrue($result, 'Contact handler should accept valid nonce');
@@ -73,7 +73,7 @@ class NonceVerificationTest extends SecurityTestCase {
             ->with('invalid_nonce', ContactForm::NONCE_ACTION)
             ->andReturn(false);
 
-        $handler = new ContactHandler();
+        $handler = ContactHandler::get_instance();
         $result = $handler->verify_nonce();
 
         $this->assertFalse($result, 'Contact handler should reject invalid nonce');
@@ -92,7 +92,7 @@ class NonceVerificationTest extends SecurityTestCase {
             ->with('', ContactForm::NONCE_ACTION)
             ->andReturn(false);
 
-        $handler = new ContactHandler();
+        $handler = ContactHandler::get_instance();
         $result = $handler->verify_nonce();
 
         $this->assertFalse($result, 'Contact handler should reject empty nonce');
@@ -137,7 +137,7 @@ class NonceVerificationTest extends SecurityTestCase {
             ->with('fresh_nonce', ContactForm::NONCE_ACTION)
             ->andReturn(true);
 
-        $handler = new ContactHandler();
+        $handler = ContactHandler::get_instance();
         $result = $handler->verify_nonce();
 
         $this->assertTrue($result);
@@ -157,7 +157,7 @@ class NonceVerificationTest extends SecurityTestCase {
             ->with('older_nonce', ContactForm::NONCE_ACTION)
             ->andReturn(true);
 
-        $handler = new ContactHandler();
+        $handler = ContactHandler::get_instance();
         $result = $handler->verify_nonce();
 
         // Both 1 and 2 are truthy - the nonce is still valid
@@ -177,7 +177,7 @@ class NonceVerificationTest extends SecurityTestCase {
             ->with('nonce_for_different_action', ContactForm::NONCE_ACTION)
             ->andReturn(false);
 
-        $handler = new ContactHandler();
+        $handler = ContactHandler::get_instance();
         $result = $handler->verify_nonce();
 
         $this->assertFalse($result, 'Nonce from wrong action should fail');
@@ -198,7 +198,7 @@ class NonceVerificationTest extends SecurityTestCase {
             ->with('valid_nonce', ContactForm::NONCE_ACTION)  // Expect trimmed value
             ->andReturn(true);
 
-        $handler = new ContactHandler();
+        $handler = ContactHandler::get_instance();
         $result = $handler->verify_nonce();
 
         $this->assertTrue($result);
@@ -242,7 +242,7 @@ class NonceVerificationTest extends SecurityTestCase {
             ->with('alert("xss")valid_nonce', ContactForm::NONCE_ACTION)  // Tags stripped
             ->andReturn(false);  // This would fail verification anyway
 
-        $handler = new ContactHandler();
+        $handler = ContactHandler::get_instance();
         $result = $handler->verify_nonce();
 
         $this->assertFalse($result);
@@ -260,7 +260,7 @@ class NonceVerificationTest extends SecurityTestCase {
             ->with('', ContactForm::NONCE_ACTION)
             ->andReturn(false);
 
-        $handler = new ContactHandler();
+        $handler = ContactHandler::get_instance();
         $result = $handler->verify_nonce();
 
         $this->assertFalse($result, 'Missing nonce should fail verification');

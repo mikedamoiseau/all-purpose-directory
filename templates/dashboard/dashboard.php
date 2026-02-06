@@ -70,7 +70,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			?>
 		</nav>
 
-		<div class="apd-dashboard__content" role="tabpanel" aria-labelledby="apd-tab-<?php echo esc_attr( $current_tab ); ?>">
+		<div class="apd-dashboard__content">
 			<?php
 			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Content escaped in render method.
 			echo $dashboard->render_tab_content( $current_tab );

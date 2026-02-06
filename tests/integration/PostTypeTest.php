@@ -109,15 +109,17 @@ class PostTypeTest extends TestCase
     }
 
     /**
-     * Test post type shows in REST API.
+     * Test post type does not expose WP core REST API.
+     *
+     * The plugin provides its own REST API at apd/v1, so the core
+     * WP REST endpoint is disabled to prevent a dual API surface.
      */
-    public function testPostTypeShowsInRest(): void
+    public function testPostTypeHiddenFromCoreRest(): void
     {
         $post_type_object = get_post_type_object(PostType::POST_TYPE);
 
         $this->assertNotNull($post_type_object);
-        $this->assertTrue($post_type_object->show_in_rest);
-        $this->assertEquals('apd_listing', $post_type_object->rest_base);
+        $this->assertFalse($post_type_object->show_in_rest);
     }
 
     /**

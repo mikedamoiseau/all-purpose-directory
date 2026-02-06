@@ -99,6 +99,12 @@ class PerformanceTest extends TestCase {
     public function test_set_stores_in_caches(): void {
         $test_value = [ 'foo' => 'bar' ];
 
+        Functions\expect( 'get_option' )
+            ->andReturn( [] );
+
+        Functions\expect( 'update_option' )
+            ->andReturn( true );
+
         Functions\expect( 'wp_cache_set' )
             ->once()
             ->with( 'apd_cache_test_key', $test_value, 'apd', HOUR_IN_SECONDS )
@@ -220,6 +226,12 @@ class PerformanceTest extends TestCase {
             ->once()
             ->andReturn( false );
 
+        Functions\expect( 'get_option' )
+            ->andReturn( [] );
+
+        Functions\expect( 'update_option' )
+            ->andReturn( true );
+
         Functions\expect( 'wp_cache_set' )
             ->once()
             ->andReturn( true );
@@ -268,26 +280,20 @@ class PerformanceTest extends TestCase {
      * @return void
      */
     public function test_delete_pattern_removes_matching(): void {
-        global $wpdb;
-        $wpdb = \Mockery::mock( 'wpdb' );
-        $wpdb->options = 'wp_options';
+        // Populate the registry with matching and non-matching keys
+        $registry = [
+            'apd_cache_categories_abc' => true,
+            'apd_cache_categories_def' => true,
+            'apd_cache_popular_10'     => true,
+        ];
 
-        $wpdb->shouldReceive( 'esc_like' )
-            ->once()
-            ->andReturnUsing( function ( $text ) {
-                return $text;
-            } );
+        Functions\expect( 'get_option' )
+            ->with( 'apd_cache_key_registry', [] )
+            ->andReturn( $registry );
 
-        $wpdb->shouldReceive( 'prepare' )
+        Functions\expect( 'update_option' )
             ->once()
-            ->andReturn( "SELECT option_name FROM wp_options WHERE option_name LIKE '...'" );
-
-        $wpdb->shouldReceive( 'get_col' )
-            ->once()
-            ->andReturn( [
-                '_transient_apd_cache_categories_abc',
-                '_transient_apd_cache_categories_def',
-            ] );
+            ->andReturn( true );
 
         Functions\expect( 'delete_transient' )
             ->twice()
@@ -392,26 +398,18 @@ class PerformanceTest extends TestCase {
      * @return void
      */
     public function test_clear_all_clears_caches(): void {
-        global $wpdb;
-        $wpdb = \Mockery::mock( 'wpdb' );
-        $wpdb->options = 'wp_options';
+        $registry = [
+            'apd_cache_item1' => true,
+            'apd_cache_item2' => true,
+        ];
 
-        $wpdb->shouldReceive( 'esc_like' )
-            ->once()
-            ->andReturnUsing( function ( $text ) {
-                return $text;
-            } );
+        Functions\expect( 'get_option' )
+            ->with( 'apd_cache_key_registry', [] )
+            ->andReturn( $registry );
 
-        $wpdb->shouldReceive( 'prepare' )
+        Functions\expect( 'update_option' )
             ->once()
-            ->andReturn( 'SELECT ...' );
-
-        $wpdb->shouldReceive( 'get_col' )
-            ->once()
-            ->andReturn( [
-                '_transient_apd_cache_item1',
-                '_transient_apd_cache_item2',
-            ] );
+            ->andReturn( true );
 
         Functions\expect( 'delete_transient' )
             ->twice()
@@ -437,20 +435,8 @@ class PerformanceTest extends TestCase {
      * @return void
      */
     public function test_invalidate_category_cache_triggers_action(): void {
-        global $wpdb;
-        $wpdb = \Mockery::mock( 'wpdb' );
-        $wpdb->options = 'wp_options';
-
-        $wpdb->shouldReceive( 'esc_like' )
-            ->once()
-            ->andReturn( '_transient_apd_cache_categories_' );
-
-        $wpdb->shouldReceive( 'prepare' )
-            ->once()
-            ->andReturn( 'SELECT ...' );
-
-        $wpdb->shouldReceive( 'get_col' )
-            ->once()
+        Functions\expect( 'get_option' )
+            ->with( 'apd_cache_key_registry', [] )
             ->andReturn( [] );
 
         Functions\expect( 'do_action' )
@@ -470,6 +456,12 @@ class PerformanceTest extends TestCase {
      */
     public function test_set_with_custom_expiration(): void {
         $custom_expiration = 7200;
+
+        Functions\expect( 'get_option' )
+            ->andReturn( [] );
+
+        Functions\expect( 'update_option' )
+            ->andReturn( true );
 
         Functions\expect( 'wp_cache_set' )
             ->once()
@@ -597,6 +589,12 @@ class PerformanceHelperFunctionsTest extends TestCase {
      * @return void
      */
     public function test_apd_cache_set(): void {
+        Functions\expect( 'get_option' )
+            ->andReturn( [] );
+
+        Functions\expect( 'update_option' )
+            ->andReturn( true );
+
         Functions\expect( 'wp_cache_set' )
             ->once()
             ->andReturn( true );
@@ -635,20 +633,8 @@ class PerformanceHelperFunctionsTest extends TestCase {
      * @return void
      */
     public function test_apd_cache_clear_all(): void {
-        global $wpdb;
-        $wpdb = \Mockery::mock( 'wpdb' );
-        $wpdb->options = 'wp_options';
-
-        $wpdb->shouldReceive( 'esc_like' )
-            ->once()
-            ->andReturn( '_transient_apd_cache_' );
-
-        $wpdb->shouldReceive( 'prepare' )
-            ->once()
-            ->andReturn( 'SELECT ...' );
-
-        $wpdb->shouldReceive( 'get_col' )
-            ->once()
+        Functions\expect( 'get_option' )
+            ->with( 'apd_cache_key_registry', [] )
             ->andReturn( [] );
 
         Functions\expect( 'do_action' )
@@ -733,20 +719,8 @@ class PerformanceHelperFunctionsTest extends TestCase {
      * @return void
      */
     public function test_apd_invalidate_category_cache(): void {
-        global $wpdb;
-        $wpdb = \Mockery::mock( 'wpdb' );
-        $wpdb->options = 'wp_options';
-
-        $wpdb->shouldReceive( 'esc_like' )
-            ->once()
-            ->andReturn( '_transient_apd_cache_categories_' );
-
-        $wpdb->shouldReceive( 'prepare' )
-            ->once()
-            ->andReturn( 'SELECT ...' );
-
-        $wpdb->shouldReceive( 'get_col' )
-            ->once()
+        Functions\expect( 'get_option' )
+            ->with( 'apd_cache_key_registry', [] )
             ->andReturn( [] );
 
         Functions\expect( 'do_action' )

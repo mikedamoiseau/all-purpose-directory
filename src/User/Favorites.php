@@ -95,6 +95,15 @@ class Favorites {
 	}
 
 	/**
+	 * Reset singleton instance (for testing).
+	 *
+	 * @return void
+	 */
+	public static function reset_instance(): void {
+		self::$instance = null;
+	}
+
+	/**
 	 * Initialize the favorites system.
 	 *
 	 * @since 1.0.0
@@ -578,7 +587,9 @@ class Favorites {
 	}
 
 	/**
-	 * Increment the listing favorite count.
+	 * Increment the listing favorite count atomically.
+	 *
+	 * Uses a direct SQL UPDATE to avoid race conditions from concurrent requests.
 	 *
 	 * @since 1.0.0
 	 *
@@ -586,12 +597,35 @@ class Favorites {
 	 * @return void
 	 */
 	private function increment_listing_count( int $listing_id ): void {
-		$count = $this->get_listing_favorite_count( $listing_id ) + 1;
-		update_post_meta( $listing_id, self::LISTING_META_KEY, $count );
+		global $wpdb;
+
+		// Ensure the meta key exists first.
+		if ( ! metadata_exists( 'post', $listing_id, self::LISTING_META_KEY ) ) {
+			update_post_meta( $listing_id, self::LISTING_META_KEY, 1 );
+			return;
+		}
+
+		// Atomic increment.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->query(
+			$wpdb->prepare(
+				"UPDATE {$wpdb->postmeta}
+				SET meta_value = CAST(meta_value AS UNSIGNED) + 1
+				WHERE post_id = %d AND meta_key = %s",
+				$listing_id,
+				self::LISTING_META_KEY
+			)
+		);
+
+		// Clear the object cache for this meta so subsequent reads are fresh.
+		wp_cache_delete( $listing_id, 'post_meta' );
 	}
 
 	/**
-	 * Decrement the listing favorite count.
+	 * Decrement the listing favorite count atomically.
+	 *
+	 * Uses a direct SQL UPDATE to avoid race conditions from concurrent requests.
+	 * Ensures the count never goes below zero.
 	 *
 	 * @since 1.0.0
 	 *
@@ -599,8 +633,28 @@ class Favorites {
 	 * @return void
 	 */
 	private function decrement_listing_count( int $listing_id ): void {
-		$count = max( 0, $this->get_listing_favorite_count( $listing_id ) - 1 );
-		update_post_meta( $listing_id, self::LISTING_META_KEY, $count );
+		global $wpdb;
+
+		// Ensure the meta key exists.
+		if ( ! metadata_exists( 'post', $listing_id, self::LISTING_META_KEY ) ) {
+			update_post_meta( $listing_id, self::LISTING_META_KEY, 0 );
+			return;
+		}
+
+		// Atomic decrement with floor of 0.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->query(
+			$wpdb->prepare(
+				"UPDATE {$wpdb->postmeta}
+				SET meta_value = GREATEST(CAST(meta_value AS UNSIGNED) - 1, 0)
+				WHERE post_id = %d AND meta_key = %s",
+				$listing_id,
+				self::LISTING_META_KEY
+			)
+		);
+
+		// Clear the object cache for this meta so subsequent reads are fresh.
+		wp_cache_delete( $listing_id, 'post_meta' );
 	}
 
 	/**
@@ -715,17 +769,18 @@ class Favorites {
 		$cookie_value = wp_json_encode( $favorites );
 		$expiry       = time() + ( self::COOKIE_EXPIRY_DAYS * DAY_IN_SECONDS );
 
-		// Note: In actual WordPress, this would be set via setcookie().
-		// For unit testing, we track the cookie in $_COOKIE.
 		if ( ! headers_sent() ) {
 			setcookie(
 				self::COOKIE_NAME,
 				$cookie_value,
-				$expiry,
-				COOKIEPATH,
-				COOKIE_DOMAIN,
-				is_ssl(),
-				true
+				[
+					'expires'  => $expiry,
+					'path'     => COOKIEPATH,
+					'domain'   => COOKIE_DOMAIN,
+					'secure'   => is_ssl(),
+					'httponly'  => true,
+					'samesite' => 'Lax',
+				]
 			);
 		}
 
@@ -747,11 +802,14 @@ class Favorites {
 			setcookie(
 				self::COOKIE_NAME,
 				'',
-				time() - 3600,
-				COOKIEPATH,
-				COOKIE_DOMAIN,
-				is_ssl(),
-				true
+				[
+					'expires'  => time() - 3600,
+					'path'     => COOKIEPATH,
+					'domain'   => COOKIE_DOMAIN,
+					'secure'   => is_ssl(),
+					'httponly'  => true,
+					'samesite' => 'Lax',
+				]
 			);
 		}
 

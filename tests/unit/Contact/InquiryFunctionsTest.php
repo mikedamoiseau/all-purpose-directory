@@ -64,7 +64,7 @@ class InquiryFunctionsTest extends TestCase {
 	public function test_get_listing_inquiry_count(): void {
 		Functions\when( 'get_post_meta' )->justReturn( 5 );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$count   = $tracker->get_listing_inquiry_count( 123 );
 
 		$this->assertEquals( 5, $count );
@@ -88,7 +88,7 @@ class InquiryFunctionsTest extends TestCase {
 		Functions\when( 'update_post_meta' )->justReturn( true );
 		Functions\when( 'do_action' )->justReturn( null );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$result  = $tracker->mark_as_read( 123 );
 
 		$this->assertTrue( $result );
@@ -103,7 +103,7 @@ class InquiryFunctionsTest extends TestCase {
 
 		Functions\when( 'get_post' )->justReturn( $post );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$result  = $tracker->mark_as_read( 123 );
 
 		$this->assertFalse( $result );
@@ -120,7 +120,7 @@ class InquiryFunctionsTest extends TestCase {
 		Functions\when( 'update_post_meta' )->justReturn( true );
 		Functions\when( 'do_action' )->justReturn( null );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$result  = $tracker->mark_as_unread( 123 );
 
 		$this->assertTrue( $result );
@@ -139,7 +139,7 @@ class InquiryFunctionsTest extends TestCase {
 			return $cap === 'manage_options';
 		} );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$result  = $tracker->can_user_view( 123, 1 );
 
 		$this->assertTrue( $result );
@@ -157,7 +157,7 @@ class InquiryFunctionsTest extends TestCase {
 		Functions\when( 'user_can' )->justReturn( false );
 		Functions\when( 'apply_filters' )->returnArg( 2 );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$result  = $tracker->can_user_view( 123, 5 );
 
 		$this->assertTrue( $result );
@@ -175,7 +175,7 @@ class InquiryFunctionsTest extends TestCase {
 		Functions\when( 'user_can' )->justReturn( false );
 		Functions\when( 'apply_filters' )->returnArg( 2 );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$result  = $tracker->can_user_view( 123, 99 );
 
 		$this->assertFalse( $result );
@@ -188,7 +188,7 @@ class InquiryFunctionsTest extends TestCase {
 		Functions\when( 'get_post_meta' )->justReturn( 5 );
 		Functions\when( 'update_post_meta' )->justReturn( true );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$count   = $tracker->increment_listing_count( 123 );
 
 		$this->assertEquals( 6, $count );
@@ -201,7 +201,7 @@ class InquiryFunctionsTest extends TestCase {
 		Functions\when( 'get_post_meta' )->justReturn( 5 );
 		Functions\when( 'update_post_meta' )->justReturn( true );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$count   = $tracker->decrement_listing_count( 123 );
 
 		$this->assertEquals( 4, $count );
@@ -214,7 +214,7 @@ class InquiryFunctionsTest extends TestCase {
 		Functions\when( 'get_post_meta' )->justReturn( 0 );
 		Functions\when( 'update_post_meta' )->justReturn( true );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$count   = $tracker->decrement_listing_count( 123 );
 
 		$this->assertEquals( 0, $count );

@@ -108,6 +108,15 @@ final class FieldRegistry {
 	}
 
 	/**
+	 * Reset singleton instance (for testing).
+	 *
+	 * @return void
+	 */
+	public static function reset_instance(): void {
+		self::$instance = null;
+	}
+
+	/**
 	 * Register a field type handler.
 	 *
 	 * Field types define how fields are rendered, sanitized, and validated.

@@ -109,6 +109,15 @@ class ReviewManager {
 	}
 
 	/**
+	 * Reset singleton instance (for testing).
+	 *
+	 * @return void
+	 */
+	public static function reset_instance(): void {
+		self::$instance = null;
+	}
+
+	/**
 	 * Initialize the review system.
 	 *
 	 * @since 1.0.0

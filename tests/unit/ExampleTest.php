@@ -67,7 +67,7 @@ class ExampleTest extends UnitTestCase
         Functions\when('get_option')
             ->justReturn(['key' => 'value']);
 
-        $result = get_option('apd_settings', []);
+        $result = get_option('apd_options', []);
 
         $this->assertEquals(['key' => 'value'], $result);
     }

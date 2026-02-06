@@ -97,6 +97,15 @@ final class Plugin {
 	}
 
 	/**
+	 * Reset singleton instance (for testing).
+	 *
+	 * @return void
+	 */
+	public static function reset_instance(): void {
+		self::$instance = null;
+	}
+
+	/**
 	 * Initialize plugin components.
 	 *
 	 * @return void
@@ -154,12 +163,8 @@ final class Plugin {
 		$submission_handler->init();
 
 		// Register AJAX handlers.
-		add_action( 'wp_ajax_apd_filter_listings', [ $this, 'ajax_filter_listings' ] );
-		add_action( 'wp_ajax_nopriv_apd_filter_listings', [ $this, 'ajax_filter_listings' ] );
-
-		// Register AJAX handlers for dashboard listing actions.
-		add_action( 'wp_ajax_apd_delete_listing', [ $this, 'ajax_delete_listing' ] );
-		add_action( 'wp_ajax_apd_update_listing_status', [ $this, 'ajax_update_listing_status' ] );
+		$ajax_handler = new \APD\Api\AjaxHandler( $this->search_query );
+		$ajax_handler->init();
 
 		// Initialize My Listings action handling.
 		$my_listings = \APD\Frontend\Dashboard\MyListings::get_instance();
@@ -235,6 +240,13 @@ final class Plugin {
 		// Initialize Performance manager for caching.
 		Performance::get_instance();
 
+		// Fire apd_listing_status_changed when listing post status transitions.
+		add_action( 'transition_post_status', [ $this, 'handle_listing_status_transition' ], 10, 3 );
+
+		// Register cron event handlers.
+		add_action( 'apd_check_expired_listings', [ $this, 'cron_check_expired_listings' ] );
+		add_action( 'apd_cleanup_transients', [ $this, 'cron_cleanup_transients' ] );
+
 		/**
 		 * Fires after plugin hooks are initialized.
 		 *
@@ -243,11 +255,6 @@ final class Plugin {
 		do_action( 'apd_loaded' );
 	}
 
-	/**
-	 * Register post types.
-	 *
-	 * @return void
-	 */
 	/**
 	 * Load plugin text domain for translations.
 	 *
@@ -304,6 +311,164 @@ final class Plugin {
 		$post_type = new \APD\Listing\PostType();
 		$post_type->register();
 		$post_type->register_statuses();
+	}
+
+	/**
+	 * Handle listing post status transitions.
+	 *
+	 * Fires the apd_listing_status_changed action when an apd_listing
+	 * post transitions between statuses. This bridges the WordPress
+	 * transition_post_status hook with the plugin's custom action.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string   $new_status New post status.
+	 * @param string   $old_status Old post status.
+	 * @param \WP_Post $post       Post object.
+	 * @return void
+	 */
+	public function handle_listing_status_transition( string $new_status, string $old_status, \WP_Post $post ): void {
+		if ( $post->post_type !== \APD\Listing\PostType::POST_TYPE ) {
+			return;
+		}
+
+		if ( $new_status === $old_status ) {
+			return;
+		}
+
+		/**
+		 * Fires when a listing's status changes.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param int    $listing_id Listing post ID.
+		 * @param string $new_status New post status.
+		 * @param string $old_status Previous post status.
+		 */
+		do_action( 'apd_listing_status_changed', $post->ID, $new_status, $old_status );
+	}
+
+	/**
+	 * Cron handler: check for expired listings.
+	 *
+	 * Queries published listings that have passed their expiration date
+	 * and transitions them to 'expired' status. Also sends expiring-soon
+	 * notifications for listings expiring within 7 days.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return void
+	 */
+	public function cron_check_expired_listings(): void {
+		$expiration_days = (int) \apd_get_setting( 'expiration_days', 0 );
+
+		// 0 means listings never expire.
+		if ( $expiration_days <= 0 ) {
+			return;
+		}
+
+		$now             = current_time( 'mysql' );
+		$expiration_date = gmdate( 'Y-m-d H:i:s', strtotime( "-{$expiration_days} days", strtotime( $now ) ) );
+		$warning_date    = gmdate( 'Y-m-d H:i:s', strtotime( '-' . ( $expiration_days - 7 ) . ' days', strtotime( $now ) ) );
+
+		// Find published listings that have expired (published before the expiration cutoff).
+		$expired_listings = get_posts(
+			[
+				'post_type'      => \APD\Listing\PostType::POST_TYPE,
+				'post_status'    => 'publish',
+				'posts_per_page' => 50,
+				'date_query'     => [
+					[
+						'before' => $expiration_date,
+					],
+				],
+				'fields'         => 'ids',
+			]
+		);
+
+		foreach ( $expired_listings as $listing_id ) {
+			wp_update_post(
+				[
+					'ID'          => $listing_id,
+					'post_status' => 'expired',
+				]
+			);
+			// The transition_post_status hook will fire apd_listing_status_changed,
+			// which triggers the expired email notification via EmailManager.
+		}
+
+		// Find published listings expiring within 7 days (for warning emails).
+		if ( function_exists( '\apd_email_manager' ) ) {
+			$email_manager = \apd_email_manager();
+
+			if ( $email_manager->is_notification_enabled( 'listing_expiring' ) ) {
+				$expiring_soon = get_posts(
+					[
+						'post_type'      => \APD\Listing\PostType::POST_TYPE,
+						'post_status'    => 'publish',
+						'posts_per_page' => 50,
+						'date_query'     => [
+							[
+								'after'  => $expiration_date,
+								'before' => $warning_date,
+							],
+						],
+						'meta_query'     => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+							[
+								'key'     => '_apd_expiring_notified',
+								'compare' => 'NOT EXISTS',
+							],
+						],
+						'fields'         => 'ids',
+					]
+				);
+
+				foreach ( $expiring_soon as $listing_id ) {
+					$post_date  = get_post_field( 'post_date', $listing_id );
+					$expires_at = strtotime( "+{$expiration_days} days", strtotime( $post_date ) );
+					$days_left  = max( 1, (int) ceil( ( $expires_at - time() ) / DAY_IN_SECONDS ) );
+
+					$email_manager->send_listing_expiring( $listing_id, $days_left );
+
+					// Mark as notified so we don't send duplicate warnings.
+					update_post_meta( $listing_id, '_apd_expiring_notified', $now );
+				}
+			}
+		}
+	}
+
+	/**
+	 * Cron handler: clean up expired transients.
+	 *
+	 * WordPress normally cleans up expired transients on its own,
+	 * but this ensures APD-prefixed transients are cleaned promptly.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return void
+	 */
+	public function cron_cleanup_transients(): void {
+		global $wpdb;
+
+		// Delete expired APD transients. WordPress stores transient expiration
+		// in a separate _transient_timeout_ option. If the timeout has passed,
+		// both the transient and timeout option can be cleaned up.
+		$time = time();
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$expired = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE %s AND option_value < %d",
+				$wpdb->esc_like( '_transient_timeout_apd_cache_' ) . '%',
+				$time
+			)
+		);
+
+		foreach ( $expired as $timeout_option ) {
+			// Extract the transient name from the timeout option name.
+			$transient_name = str_replace( '_transient_timeout_', '', $timeout_option );
+			delete_transient( $transient_name );
+		}
 	}
 
 	/**
@@ -408,263 +573,6 @@ final class Plugin {
 	public function register_shortcodes(): void {
 		$manager = \APD\Shortcode\ShortcodeManager::get_instance();
 		$manager->init();
-	}
-
-	/**
-	 * AJAX handler for filtering listings.
-	 *
-	 * @return void
-	 */
-	public function ajax_filter_listings(): void {
-		// Verify nonce (required for all AJAX requests).
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$nonce = isset( $_REQUEST['_apd_nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['_apd_nonce'] ) ) : '';
-		if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, 'apd_filter_listings' ) ) {
-			wp_send_json_error( [ 'message' => __( 'Invalid security token.', 'all-purpose-directory' ) ], 403 );
-		}
-
-		/**
-		 * Fires before AJAX filtering starts.
-		 *
-		 * @since 1.0.0
-		 */
-		do_action( 'apd_before_ajax_filter' );
-
-		// Get paged parameter.
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$paged = isset( $_REQUEST['paged'] ) ? absint( $_REQUEST['paged'] ) : 1;
-
-		// Run filtered query.
-		$query = $this->search_query->get_filtered_listings(
-			[
-				'paged' => $paged,
-			]
-		);
-
-		// Get current view mode.
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$view = isset( $_REQUEST['apd_view'] ) ? sanitize_key( $_REQUEST['apd_view'] ) : 'grid';
-		if ( ! in_array( $view, [ 'grid', 'list' ], true ) ) {
-			$view = 'grid';
-		}
-
-		// Build HTML output.
-		ob_start();
-		if ( $query->have_posts() ) {
-			while ( $query->have_posts() ) {
-				$query->the_post();
-
-				// Load the appropriate card template.
-				$template_name = $view === 'list' ? 'listing-card-list' : 'listing-card';
-
-				\apd_get_template_part(
-					$template_name,
-					null,
-					[
-						'listing_id'   => get_the_ID(),
-						'current_view' => $view,
-					]
-				);
-			}
-			wp_reset_postdata();
-		} else {
-			$renderer = new \APD\Search\FilterRenderer();
-            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			echo $renderer->render_no_results();
-		}
-		$html = ob_get_clean();
-
-		// Get active filters.
-		$registry       = \APD\Search\FilterRegistry::get_instance();
-		$active_filters = $registry->get_active_filters();
-		$active_data    = [];
-
-		foreach ( $active_filters as $name => $data ) {
-			$active_data[ $name ] = [
-				'label' => $data['filter']->getLabel(),
-				'value' => $data['filter']->getDisplayValue( $data['value'] ),
-			];
-		}
-
-		$response = [
-			'html'           => $html,
-			'found_posts'    => $query->found_posts,
-			'max_pages'      => $query->max_num_pages,
-			'current_page'   => $paged,
-			'active_filters' => $active_data,
-		];
-
-		/**
-		 * Filter the AJAX response data.
-		 *
-		 * @since 1.0.0
-		 *
-		 * @param array    $response The response data.
-		 * @param WP_Query $query    The query object.
-		 */
-		$response = apply_filters( 'apd_ajax_filter_response', $response, $query );
-
-		/**
-		 * Fires after AJAX filtering completes.
-		 *
-		 * @since 1.0.0
-		 */
-		do_action( 'apd_after_ajax_filter' );
-
-		wp_send_json_success( $response );
-	}
-
-	/**
-	 * AJAX handler for deleting a listing.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return void
-	 */
-	public function ajax_delete_listing(): void {
-		// Verify nonce.
-		if ( ! check_ajax_referer( \APD\Frontend\Dashboard\MyListings::NONCE_ACTION, '_apd_nonce', false ) ) {
-			wp_send_json_error( [ 'message' => __( 'Invalid security token.', 'all-purpose-directory' ) ], 403 );
-		}
-
-		// Check if user is logged in.
-		if ( ! is_user_logged_in() ) {
-			wp_send_json_error( [ 'message' => __( 'You must be logged in.', 'all-purpose-directory' ) ], 401 );
-		}
-
-		// Get listing ID.
-		$listing_id = isset( $_POST['listing_id'] ) ? absint( $_POST['listing_id'] ) : 0;
-		if ( $listing_id <= 0 ) {
-			wp_send_json_error( [ 'message' => __( 'Invalid listing ID.', 'all-purpose-directory' ) ], 400 );
-		}
-
-		// Get action type (trash or delete).
-		$delete_type = isset( $_POST['delete_type'] ) && $_POST['delete_type'] === 'permanent' ? 'permanent' : 'trash';
-
-		$my_listings = \APD\Frontend\Dashboard\MyListings::get_instance();
-
-		if ( $delete_type === 'permanent' ) {
-			$result = $my_listings->delete_listing( $listing_id );
-		} else {
-			$result = $my_listings->trash_listing( $listing_id );
-		}
-
-		if ( $result ) {
-			wp_send_json_success(
-				[
-					'message'    => $delete_type === 'permanent'
-						? __( 'Listing permanently deleted.', 'all-purpose-directory' )
-						: __( 'Listing moved to trash.', 'all-purpose-directory' ),
-					'listing_id' => $listing_id,
-				]
-			);
-		} else {
-			wp_send_json_error(
-				[
-					'message' => __( 'Failed to delete listing. You may not have permission.', 'all-purpose-directory' ),
-				],
-				403
-			);
-		}
-	}
-
-	/**
-	 * AJAX handler for updating listing status.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return void
-	 */
-	public function ajax_update_listing_status(): void {
-		// Verify nonce.
-		if ( ! check_ajax_referer( \APD\Frontend\Dashboard\MyListings::NONCE_ACTION, '_apd_nonce', false ) ) {
-			wp_send_json_error( [ 'message' => __( 'Invalid security token.', 'all-purpose-directory' ) ], 403 );
-		}
-
-		// Check if user is logged in.
-		if ( ! is_user_logged_in() ) {
-			wp_send_json_error( [ 'message' => __( 'You must be logged in.', 'all-purpose-directory' ) ], 401 );
-		}
-
-		// Get listing ID.
-		$listing_id = isset( $_POST['listing_id'] ) ? absint( $_POST['listing_id'] ) : 0;
-		if ( $listing_id <= 0 ) {
-			wp_send_json_error( [ 'message' => __( 'Invalid listing ID.', 'all-purpose-directory' ) ], 400 );
-		}
-
-		// Get new status.
-		$new_status     = isset( $_POST['status'] ) ? sanitize_key( $_POST['status'] ) : '';
-		$valid_statuses = [ 'publish', 'draft', 'pending', 'expired' ];
-		if ( ! in_array( $new_status, $valid_statuses, true ) ) {
-			wp_send_json_error( [ 'message' => __( 'Invalid status.', 'all-purpose-directory' ) ], 400 );
-		}
-
-		$my_listings = \APD\Frontend\Dashboard\MyListings::get_instance();
-		$result      = $my_listings->update_listing_status( $listing_id, $new_status );
-
-		if ( $result ) {
-			$status_badge = $my_listings->get_status_badge( $new_status );
-
-			wp_send_json_success(
-				[
-					'message'      => __( 'Listing status updated.', 'all-purpose-directory' ),
-					'listing_id'   => $listing_id,
-					'new_status'   => $new_status,
-					'status_badge' => $status_badge,
-				]
-			);
-		} else {
-			wp_send_json_error(
-				[
-					'message' => __( 'Failed to update listing status. You may not have permission.', 'all-purpose-directory' ),
-				],
-				403
-			);
-		}
-	}
-
-	/**
-	 * Render a basic listing card for AJAX output.
-	 *
-	 * @return void
-	 */
-	private function render_listing_card(): void {
-		?>
-		<article id="listing-<?php the_ID(); ?>" <?php post_class( 'apd-listing-card' ); ?>>
-			<h2 class="apd-listing-card__title">
-				<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-			</h2>
-
-			<?php if ( has_post_thumbnail() ) : ?>
-				<div class="apd-listing-card__thumbnail">
-					<a href="<?php the_permalink(); ?>">
-						<?php the_post_thumbnail( 'medium' ); ?>
-					</a>
-				</div>
-			<?php endif; ?>
-
-			<div class="apd-listing-card__excerpt">
-				<?php the_excerpt(); ?>
-			</div>
-
-			<?php
-			$categories = \apd_get_listing_categories( get_the_ID() );
-			if ( ! empty( $categories ) ) :
-				?>
-				<div class="apd-listing-card__categories">
-					<?php
-					foreach ( $categories as $category ) {
-						printf(
-							'<a href="%s" class="apd-listing-card__category">%s</a>',
-							esc_url( get_term_link( $category ) ),
-							esc_html( $category->name )
-						);
-					}
-					?>
-				</div>
-			<?php endif; ?>
-		</article>
-		<?php
 	}
 
 	/**

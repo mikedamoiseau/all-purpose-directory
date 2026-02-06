@@ -83,6 +83,15 @@ class ReviewHandler {
 	}
 
 	/**
+	 * Reset singleton instance (for testing).
+	 *
+	 * @return void
+	 */
+	public static function reset_instance(): void {
+		self::$instance = null;
+	}
+
+	/**
 	 * Initialize the review handler.
 	 *
 	 * @since 1.0.0
@@ -162,16 +171,13 @@ class ReviewHandler {
 			exit;
 		}
 
-		// Success - redirect with message.
-		$redirect_url = add_query_arg(
-			[
-				'apd_review' => 'success',
-				'review_id'  => $result,
-			],
-			wp_get_referer() ?: home_url()
-		);
+		// Success - store flash in transient and redirect clean.
+		$user_id = get_current_user_id();
+		if ( $user_id > 0 ) {
+			set_transient( 'apd_review_success_' . $user_id, $result, 60 );
+		}
 
-		wp_safe_redirect( $redirect_url );
+		wp_safe_redirect( wp_get_referer() ?: home_url() );
 		exit;
 	}
 

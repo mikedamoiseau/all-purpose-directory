@@ -86,7 +86,7 @@ final class ProfileTest extends UnitTestCase {
 	public function test_constructor_sets_default_config(): void {
 		Functions\when( 'get_current_user_id' )->justReturn( 0 );
 
-		$profile = new Profile();
+		$profile = Profile::get_instance();
 
 		$this->assertSame( 0, $profile->get_user_id() );
 	}
@@ -97,7 +97,7 @@ final class ProfileTest extends UnitTestCase {
 	public function test_constructor_sets_current_user(): void {
 		Functions\when( 'get_current_user_id' )->justReturn( 42 );
 
-		$profile = new Profile();
+		$profile = Profile::get_instance();
 
 		$this->assertSame( 42, $profile->get_user_id() );
 	}
@@ -106,7 +106,7 @@ final class ProfileTest extends UnitTestCase {
 	 * Test set_user_id and get_user_id.
 	 */
 	public function test_set_and_get_user_id(): void {
-		$profile = new Profile();
+		$profile = Profile::get_instance();
 
 		$profile->set_user_id( 99 );
 		$this->assertSame( 99, $profile->get_user_id() );
@@ -137,7 +137,7 @@ final class ProfileTest extends UnitTestCase {
 	 * Test render returns empty string for no user.
 	 */
 	public function test_render_returns_empty_for_no_user(): void {
-		$profile = new Profile();
+		$profile = Profile::get_instance();
 		$profile->set_user_id( 0 );
 
 		$result = $profile->render();
@@ -151,7 +151,7 @@ final class ProfileTest extends UnitTestCase {
 	public function test_get_user_data_returns_empty_for_invalid_user(): void {
 		Functions\when( 'get_userdata' )->justReturn( false );
 
-		$profile = new Profile();
+		$profile = Profile::get_instance();
 		$data    = $profile->get_user_data( 0 );
 
 		$this->assertIsArray( $data );
@@ -178,7 +178,7 @@ final class ProfileTest extends UnitTestCase {
 			return $value;
 		} );
 
-		$profile = new Profile();
+		$profile = Profile::get_instance();
 		$profile->set_user_id( 1 );
 		$data = $profile->get_user_data();
 
@@ -200,7 +200,7 @@ final class ProfileTest extends UnitTestCase {
 			return $value;
 		} );
 
-		$profile = new Profile();
+		$profile = Profile::get_instance();
 		$profile->set_user_id( 1 );
 
 		$data = [
@@ -223,7 +223,7 @@ final class ProfileTest extends UnitTestCase {
 			return $value;
 		} );
 
-		$profile = new Profile();
+		$profile = Profile::get_instance();
 		$profile->set_user_id( 1 );
 
 		$data = [
@@ -246,7 +246,7 @@ final class ProfileTest extends UnitTestCase {
 			return $value;
 		} );
 
-		$profile = new Profile();
+		$profile = Profile::get_instance();
 		$profile->set_user_id( 1 );
 
 		$data = [
@@ -270,7 +270,7 @@ final class ProfileTest extends UnitTestCase {
 			return $value;
 		} );
 
-		$profile = new Profile();
+		$profile = Profile::get_instance();
 		$profile->set_user_id( 1 );
 
 		$data = [
@@ -294,7 +294,7 @@ final class ProfileTest extends UnitTestCase {
 			return $value;
 		} );
 
-		$profile = new Profile();
+		$profile = Profile::get_instance();
 		$profile->set_user_id( 1 );
 
 		$data = [
@@ -318,7 +318,7 @@ final class ProfileTest extends UnitTestCase {
 			return $value;
 		} );
 
-		$profile = new Profile();
+		$profile = Profile::get_instance();
 		$profile->set_user_id( 1 );
 
 		$data = [
@@ -343,7 +343,7 @@ final class ProfileTest extends UnitTestCase {
 			return $value;
 		} );
 
-		$profile = new Profile();
+		$profile = Profile::get_instance();
 		$profile->set_user_id( 1 );
 
 		$data = [
@@ -373,7 +373,7 @@ final class ProfileTest extends UnitTestCase {
 			return $value;
 		} );
 
-		$profile = new Profile();
+		$profile = Profile::get_instance();
 		$profile->set_user_id( 1 );
 
 		$data = [
@@ -408,7 +408,7 @@ final class ProfileTest extends UnitTestCase {
 		Functions\when( 'delete_user_meta' )->justReturn( true );
 		Functions\when( 'do_action' )->justReturn( null );
 
-		$profile = new Profile();
+		$profile = Profile::get_instance();
 		$profile->set_user_id( 1 );
 
 		$data = [
@@ -442,7 +442,7 @@ final class ProfileTest extends UnitTestCase {
 		Functions\when( 'wp_update_user' )->justReturn( new \WP_Error( 'update_failed', 'Update failed' ) );
 		Functions\when( 'do_action' )->justReturn( null );
 
-		$profile = new Profile();
+		$profile = Profile::get_instance();
 		$profile->set_user_id( 1 );
 
 		$data = [
@@ -468,7 +468,7 @@ final class ProfileTest extends UnitTestCase {
 		Functions\when( 'get_user_meta' )->justReturn( 123 );
 		Functions\when( 'wp_get_attachment_image_url' )->justReturn( 'https://example.com/avatar.jpg' );
 
-		$profile = new Profile();
+		$profile = Profile::get_instance();
 
 		$url = $profile->get_avatar_url( 1, 150 );
 
@@ -481,7 +481,7 @@ final class ProfileTest extends UnitTestCase {
 	public function test_get_avatar_url_falls_back_to_gravatar(): void {
 		Functions\when( 'get_user_meta' )->justReturn( 0 );
 
-		$profile = new Profile();
+		$profile = Profile::get_instance();
 
 		$url = $profile->get_avatar_url( 1, 150 );
 
@@ -502,7 +502,7 @@ final class ProfileTest extends UnitTestCase {
 			return $value;
 		} );
 
-		$profile = new Profile();
+		$profile = Profile::get_instance();
 
 		$links = $profile->get_social_links( 1 );
 
@@ -520,7 +520,7 @@ final class ProfileTest extends UnitTestCase {
 	public function test_has_custom_avatar_returns_true_when_set(): void {
 		Functions\when( 'get_user_meta' )->justReturn( 123 );
 
-		$profile = new Profile();
+		$profile = Profile::get_instance();
 
 		$this->assertTrue( $profile->has_custom_avatar( 1 ) );
 	}
@@ -531,7 +531,7 @@ final class ProfileTest extends UnitTestCase {
 	public function test_has_custom_avatar_returns_false_when_not_set(): void {
 		Functions\when( 'get_user_meta' )->justReturn( 0 );
 
-		$profile = new Profile();
+		$profile = Profile::get_instance();
 
 		$this->assertFalse( $profile->has_custom_avatar( 1 ) );
 	}
@@ -542,7 +542,7 @@ final class ProfileTest extends UnitTestCase {
 	public function test_get_message_returns_null_when_no_message(): void {
 		Functions\when( 'get_transient' )->justReturn( false );
 
-		$profile = new Profile();
+		$profile = Profile::get_instance();
 		$profile->set_user_id( 1 );
 
 		$message = $profile->get_message();
@@ -562,7 +562,7 @@ final class ProfileTest extends UnitTestCase {
 		Functions\when( 'get_transient' )->justReturn( $stored_message );
 		Functions\when( 'delete_transient' )->justReturn( true );
 
-		$profile = new Profile();
+		$profile = Profile::get_instance();
 		$profile->set_user_id( 1 );
 
 		$message = $profile->get_message();
@@ -587,7 +587,7 @@ final class ProfileTest extends UnitTestCase {
 	 * Test get_social_labels returns array.
 	 */
 	public function test_get_social_labels_returns_array(): void {
-		$profile = new Profile();
+		$profile = Profile::get_instance();
 		$labels  = $profile->get_social_labels();
 
 		$this->assertIsArray( $labels );
@@ -601,7 +601,7 @@ final class ProfileTest extends UnitTestCase {
 	 * Test get_social_icons returns array.
 	 */
 	public function test_get_social_icons_returns_array(): void {
-		$profile = new Profile();
+		$profile = Profile::get_instance();
 		$icons   = $profile->get_social_icons();
 
 		$this->assertIsArray( $icons );
@@ -615,7 +615,7 @@ final class ProfileTest extends UnitTestCase {
 	 * Test handle_avatar_upload returns 0 when no file.
 	 */
 	public function test_handle_avatar_upload_returns_0_when_no_file(): void {
-		$profile = new Profile();
+		$profile = Profile::get_instance();
 		$profile->set_user_id( 1 );
 
 		$result = $profile->handle_avatar_upload();
@@ -635,7 +635,7 @@ final class ProfileTest extends UnitTestCase {
 			'size'     => 1000,
 		];
 
-		$profile = new Profile();
+		$profile = Profile::get_instance();
 		$profile->set_user_id( 1 );
 
 		$result = $profile->handle_avatar_upload();
@@ -655,7 +655,7 @@ final class ProfileTest extends UnitTestCase {
 			'size'     => Profile::MAX_AVATAR_SIZE + 1,
 		];
 
-		$profile = new Profile();
+		$profile = Profile::get_instance();
 		$profile->set_user_id( 1 );
 
 		$result = $profile->handle_avatar_upload();
@@ -680,7 +680,7 @@ final class ProfileTest extends UnitTestCase {
 			'type' => 'application/pdf',
 		] );
 
-		$profile = new Profile();
+		$profile = Profile::get_instance();
 		$profile->set_user_id( 1 );
 
 		$result = $profile->handle_avatar_upload();

@@ -88,7 +88,7 @@ class InquiryTrackerTest extends TestCase {
 
 		Functions\when( 'do_action' )->justReturn( null );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$tracker->init();
 
 		$hooks = array_column( $actions, 'hook' );
@@ -109,7 +109,7 @@ class InquiryTrackerTest extends TestCase {
 			$registered_type = $type;
 		} );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$tracker->register_post_type();
 
 		$this->assertEquals( 'apd_inquiry', $registered_type );
@@ -119,7 +119,7 @@ class InquiryTrackerTest extends TestCase {
 	 * Test save_inquiry returns false for invalid listing_id.
 	 */
 	public function test_save_inquiry_fails_invalid_listing(): void {
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$result = $tracker->save_inquiry( [ 'listing_id' => 0 ] );
 
 		$this->assertFalse( $result );
@@ -131,7 +131,7 @@ class InquiryTrackerTest extends TestCase {
 	public function test_save_inquiry_fails_listing_not_found(): void {
 		Functions\when( 'get_post' )->justReturn( null );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$result = $tracker->save_inquiry( [ 'listing_id' => 123 ] );
 
 		$this->assertFalse( $result );
@@ -157,7 +157,7 @@ class InquiryTrackerTest extends TestCase {
 		Functions\when( 'wp_insert_post' )->justReturn( 456 );
 		Functions\when( 'update_post_meta' )->justReturn( true );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$result = $tracker->save_inquiry( [
 			'listing_id'   => 123,
 			'sender_name'  => 'John Doe',
@@ -189,7 +189,7 @@ class InquiryTrackerTest extends TestCase {
 		} );
 		Functions\when( 'wp_insert_post' )->justReturn( $error );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$result = $tracker->save_inquiry( [
 			'listing_id'   => 123,
 			'sender_name'  => 'John Doe',
@@ -206,7 +206,7 @@ class InquiryTrackerTest extends TestCase {
 	public function test_get_inquiry_returns_null_invalid(): void {
 		Functions\when( 'get_post' )->justReturn( null );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$result = $tracker->get_inquiry( 0 );
 
 		$this->assertNull( $result );
@@ -221,7 +221,7 @@ class InquiryTrackerTest extends TestCase {
 
 		Functions\when( 'get_post' )->justReturn( $post );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$result = $tracker->get_inquiry( 123 );
 
 		$this->assertNull( $result );
@@ -266,7 +266,7 @@ class InquiryTrackerTest extends TestCase {
 		Functions\when( 'get_option' )->justReturn( 'F j, Y' );
 		Functions\when( 'date_i18n' )->justReturn( 'January 15, 2024' );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$result = $tracker->get_inquiry( 456 );
 
 		$this->assertIsArray( $result );
@@ -285,7 +285,7 @@ class InquiryTrackerTest extends TestCase {
 	public function test_mark_as_read_fails_invalid(): void {
 		Functions\when( 'get_post' )->justReturn( null );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$result = $tracker->mark_as_read( 0 );
 
 		$this->assertFalse( $result );
@@ -300,7 +300,7 @@ class InquiryTrackerTest extends TestCase {
 
 		Functions\when( 'get_post' )->justReturn( $post );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$result = $tracker->mark_as_read( 123 );
 
 		$this->assertFalse( $result );
@@ -323,7 +323,7 @@ class InquiryTrackerTest extends TestCase {
 		} );
 		Functions\when( 'do_action' )->justReturn( null );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$result = $tracker->mark_as_read( 456 );
 
 		$this->assertTrue( $result );
@@ -347,7 +347,7 @@ class InquiryTrackerTest extends TestCase {
 		} );
 		Functions\when( 'do_action' )->justReturn( null );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$result = $tracker->mark_as_unread( 456 );
 
 		$this->assertTrue( $result );
@@ -360,7 +360,7 @@ class InquiryTrackerTest extends TestCase {
 	public function test_delete_inquiry_fails_invalid(): void {
 		Functions\when( 'get_post' )->justReturn( null );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$result = $tracker->delete_inquiry( 0 );
 
 		$this->assertFalse( $result );
@@ -375,7 +375,7 @@ class InquiryTrackerTest extends TestCase {
 
 		Functions\when( 'get_post' )->justReturn( $post );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$result = $tracker->delete_inquiry( 123 );
 
 		$this->assertFalse( $result );
@@ -394,7 +394,7 @@ class InquiryTrackerTest extends TestCase {
 		Functions\when( 'wp_delete_post' )->justReturn( $post );
 		Functions\when( 'update_post_meta' )->justReturn( true );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$result = $tracker->delete_inquiry( 456, true );
 
 		$this->assertTrue( $result );
@@ -406,7 +406,7 @@ class InquiryTrackerTest extends TestCase {
 	public function test_get_listing_inquiry_count(): void {
 		Functions\when( 'get_post_meta' )->justReturn( 5 );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$result = $tracker->get_listing_inquiry_count( 123 );
 
 		$this->assertEquals( 5, $result );
@@ -418,7 +418,7 @@ class InquiryTrackerTest extends TestCase {
 	public function test_get_listing_inquiry_count_empty(): void {
 		Functions\when( 'get_post_meta' )->justReturn( '' );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$result = $tracker->get_listing_inquiry_count( 123 );
 
 		$this->assertEquals( 0, $result );
@@ -435,7 +435,7 @@ class InquiryTrackerTest extends TestCase {
 			$new_count = $value;
 		} );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$result = $tracker->increment_listing_count( 123 );
 
 		$this->assertEquals( 6, $result );
@@ -453,7 +453,7 @@ class InquiryTrackerTest extends TestCase {
 			$new_count = $value;
 		} );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$result = $tracker->decrement_listing_count( 123 );
 
 		$this->assertEquals( 4, $result );
@@ -467,7 +467,7 @@ class InquiryTrackerTest extends TestCase {
 		Functions\when( 'get_post_meta' )->justReturn( 0 );
 		Functions\when( 'update_post_meta' )->justReturn( true );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$result = $tracker->decrement_listing_count( 123 );
 
 		$this->assertEquals( 0, $result );
@@ -479,7 +479,7 @@ class InquiryTrackerTest extends TestCase {
 	public function test_can_user_view_fails_invalid(): void {
 		Functions\when( 'get_post' )->justReturn( null );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$result = $tracker->can_user_view( 0, 1 );
 
 		$this->assertFalse( $result );
@@ -498,7 +498,7 @@ class InquiryTrackerTest extends TestCase {
 			return $cap === 'manage_options';
 		} );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$result = $tracker->can_user_view( 456, 1 );
 
 		$this->assertTrue( $result );
@@ -515,7 +515,7 @@ class InquiryTrackerTest extends TestCase {
 		Functions\when( 'get_post' )->justReturn( $post );
 		Functions\when( 'user_can' )->justReturn( false );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$result = $tracker->can_user_view( 456, 5 );
 
 		$this->assertTrue( $result );
@@ -533,7 +533,7 @@ class InquiryTrackerTest extends TestCase {
 		Functions\when( 'user_can' )->justReturn( false );
 		Functions\when( 'apply_filters' )->returnArg( 2 );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$result = $tracker->can_user_view( 456, 10 );
 
 		$this->assertFalse( $result );
@@ -555,7 +555,7 @@ class InquiryTrackerTest extends TestCase {
 			return $value;
 		} );
 
-		$tracker = new InquiryTracker();
+		$tracker = InquiryTracker::get_instance();
 		$result = $tracker->log_inquiry( [], $listing, $owner );
 
 		$this->assertFalse( $result );

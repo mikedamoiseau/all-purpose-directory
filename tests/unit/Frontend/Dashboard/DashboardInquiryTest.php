@@ -64,7 +64,7 @@ class DashboardInquiryTest extends TestCase {
 	 * Test Dashboard empty stats includes inquiry fields.
 	 */
 	public function test_dashboard_empty_stats_includes_inquiry_fields(): void {
-		$dashboard = new Dashboard();
+		$dashboard = Dashboard::get_instance();
 
 		// Use reflection to call private method.
 		$reflection = new \ReflectionClass( $dashboard );
@@ -84,7 +84,7 @@ class DashboardInquiryTest extends TestCase {
 	public function test_my_listings_config_includes_show_inquiries(): void {
 		Functions\when( 'get_current_user_id' )->justReturn( 1 );
 
-		$my_listings = new MyListings();
+		$my_listings = MyListings::get_instance();
 
 		// Access config via reflection.
 		$reflection = new \ReflectionClass( $my_listings );
@@ -102,7 +102,7 @@ class DashboardInquiryTest extends TestCase {
 		Functions\when( 'get_current_user_id' )->justReturn( 1 );
 		Functions\when( '__' )->returnArg( 1 );
 
-		$my_listings = new MyListings();
+		$my_listings = MyListings::get_instance();
 		$options     = $my_listings->get_orderby_options();
 
 		$this->assertArrayHasKey( 'inquiries', $options );
@@ -114,7 +114,8 @@ class DashboardInquiryTest extends TestCase {
 	public function test_my_listings_show_inquiries_can_be_disabled(): void {
 		Functions\when( 'get_current_user_id' )->justReturn( 1 );
 
-		$my_listings = new MyListings( [ 'show_inquiries' => false ] );
+		MyListings::reset_instance();
+		$my_listings = MyListings::get_instance( [ 'show_inquiries' => false ] );
 
 		// Access config via reflection.
 		$reflection = new \ReflectionClass( $my_listings );

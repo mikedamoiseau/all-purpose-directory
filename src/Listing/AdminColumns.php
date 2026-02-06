@@ -199,10 +199,11 @@ final class AdminColumns {
 		$status = $post->post_status;
 
 		$status_labels = [
-			'publish' => __( 'Published', 'all-purpose-directory' ),
-			'pending' => __( 'Pending', 'all-purpose-directory' ),
-			'draft'   => __( 'Draft', 'all-purpose-directory' ),
-			'expired' => __( 'Expired', 'all-purpose-directory' ),
+			'publish'  => __( 'Published', 'all-purpose-directory' ),
+			'pending'  => __( 'Pending', 'all-purpose-directory' ),
+			'draft'    => __( 'Draft', 'all-purpose-directory' ),
+			'expired'  => __( 'Expired', 'all-purpose-directory' ),
+			'rejected' => __( 'Rejected', 'all-purpose-directory' ),
 		];
 
 		$label = $status_labels[ $status ] ?? ucfirst( $status );
@@ -328,11 +329,12 @@ final class AdminColumns {
 		$selected = isset( $_GET['listing_status'] ) ? sanitize_text_field( wp_unslash( $_GET['listing_status'] ) ) : '';
 
 		$statuses = [
-			''        => __( 'All Statuses', 'all-purpose-directory' ),
-			'publish' => __( 'Published', 'all-purpose-directory' ),
-			'pending' => __( 'Pending', 'all-purpose-directory' ),
-			'draft'   => __( 'Draft', 'all-purpose-directory' ),
-			'expired' => __( 'Expired', 'all-purpose-directory' ),
+			''         => __( 'All Statuses', 'all-purpose-directory' ),
+			'publish'  => __( 'Published', 'all-purpose-directory' ),
+			'pending'  => __( 'Pending', 'all-purpose-directory' ),
+			'draft'    => __( 'Draft', 'all-purpose-directory' ),
+			'expired'  => __( 'Expired', 'all-purpose-directory' ),
+			'rejected' => __( 'Rejected', 'all-purpose-directory' ),
 		];
 
 		echo '<select name="listing_status" id="filter-by-listing-status">';
@@ -378,7 +380,7 @@ final class AdminColumns {
 			$status = sanitize_text_field( wp_unslash( $_GET['listing_status'] ) );
 
 			// Validate status value.
-			$valid_statuses = [ 'publish', 'pending', 'draft', 'expired' ];
+			$valid_statuses = [ 'publish', 'pending', 'draft', 'expired', 'rejected' ];
 			if ( in_array( $status, $valid_statuses, true ) ) {
 				$query->set( 'post_status', $status );
 			}

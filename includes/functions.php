@@ -29,7 +29,7 @@ function apd(): \APD\Core\Plugin {
  * @return mixed
  */
 function apd_get_option( string $key, mixed $default = null ): mixed {
-	$options = get_option( 'apd_settings', [] );
+	$options = get_option( \APD\Admin\Settings::OPTION_NAME, [] );
 
 	return $options[ $key ] ?? $default;
 }

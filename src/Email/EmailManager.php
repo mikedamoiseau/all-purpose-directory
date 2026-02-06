@@ -65,11 +65,12 @@ class EmailManager {
 	/**
 	 * Get single instance.
 	 *
+	 * @param array $config Optional. Configuration options.
 	 * @return EmailManager
 	 */
-	public static function get_instance(): EmailManager {
-		if ( null === self::$instance ) {
-			self::$instance = new self();
+	public static function get_instance( array $config = [] ): EmailManager {
+		if ( null === self::$instance || ! empty( $config ) ) {
+			self::$instance = new self( $config );
 		}
 		return self::$instance;
 	}
@@ -79,9 +80,27 @@ class EmailManager {
 	 *
 	 * @param array $config Configuration options.
 	 */
-	public function __construct( array $config = [] ) {
+	private function __construct( array $config = [] ) {
 		$this->config = array_merge( $this->config, $config );
 		$this->register_default_placeholders();
+	}
+
+	/**
+	 * Prevent unserialization.
+	 *
+	 * @throws \Exception Always throws exception.
+	 */
+	public function __wakeup(): void {
+		throw new \Exception( 'Cannot unserialize singleton.' );
+	}
+
+	/**
+	 * Reset singleton instance (for testing).
+	 *
+	 * @return void
+	 */
+	public static function reset_instance(): void {
+		self::$instance = null;
 	}
 
 	/**
@@ -90,6 +109,9 @@ class EmailManager {
 	 * @return void
 	 */
 	public function init(): void {
+		// Load email settings from plugin options.
+		$this->load_settings();
+
 		// Hook into listing submission.
 		add_action( 'apd_after_submission', [ $this, 'on_listing_submitted' ], 10, 2 );
 
@@ -108,6 +130,58 @@ class EmailManager {
 		 * @since 1.0.0
 		 */
 		do_action( 'apd_email_manager_init' );
+	}
+
+	/**
+	 * Load email settings from plugin options.
+	 *
+	 * Reads from_name, from_email, admin_email, and notification toggles
+	 * from the apd_options WordPress option (managed by the Settings class).
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return void
+	 */
+	private function load_settings(): void {
+		$options = get_option( 'apd_options', [] );
+
+		if ( ! is_array( $options ) ) {
+			return;
+		}
+
+		$config = [];
+
+		if ( ! empty( $options['from_name'] ) ) {
+			$config['from_name'] = $options['from_name'];
+		}
+
+		if ( ! empty( $options['from_email'] ) ) {
+			$config['from_email'] = $options['from_email'];
+		}
+
+		if ( ! empty( $options['admin_email'] ) ) {
+			$config['admin_email'] = $options['admin_email'];
+		}
+
+		// Map Settings notification keys to EmailManager notification config.
+		$notification_map = [
+			'notify_submission' => 'listing_submitted',
+			'notify_approved'   => 'listing_approved',
+			'notify_rejected'   => 'listing_rejected',
+			'notify_expiring'   => 'listing_expiring',
+			'notify_review'     => 'new_review',
+			'notify_inquiry'    => 'new_inquiry',
+		];
+
+		foreach ( $notification_map as $setting_key => $notification_key ) {
+			if ( isset( $options[ $setting_key ] ) ) {
+				$config['notifications'][ $notification_key ] = (bool) $options[ $setting_key ];
+			}
+		}
+
+		if ( ! empty( $config ) ) {
+			$this->set_config( $config );
+		}
 	}
 
 	/**

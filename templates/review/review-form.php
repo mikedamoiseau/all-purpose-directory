@@ -52,9 +52,15 @@ if ( $user_id > 0 ) {
 	}
 }
 
-// Check for success message.
-// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display only.
-$show_success = isset( $_GET['apd_review'] ) && $_GET['apd_review'] === 'success';
+// Check for success message via transient flash.
+$show_success = false;
+if ( $user_id > 0 ) {
+	$flash_success = get_transient( 'apd_review_success_' . $user_id );
+	if ( $flash_success ) {
+		$show_success = true;
+		delete_transient( 'apd_review_success_' . $user_id );
+	}
+}
 ?>
 
 <?php
@@ -220,11 +226,12 @@ do_action( 'apd_before_review_form', $listing_id );
 					aria-describedby="apd-review-content-desc"
 					placeholder="<?php esc_attr_e( 'Share your experience...', 'all-purpose-directory' ); ?>"
 					minlength="<?php echo absint( $min_content_length ); ?>"><?php echo esc_textarea( $flash_data['content'] ?? ( $is_edit_mode && isset( $existing_content ) ? $existing_content : '' ) ); ?></textarea>
-				<p id="apd-review-content-desc" class="apd-review-form__description">
+				<p id="apd-review-content-desc" class="apd-review-form__description apd-char-counter" data-min="<?php echo absint( $min_content_length ); ?>">
+					<span class="apd-char-counter__current">0</span> /
 					<?php
 					printf(
 						/* translators: %d: minimum character count */
-						esc_html__( 'Minimum %d characters required.', 'all-purpose-directory' ),
+						esc_html__( '%d characters minimum', 'all-purpose-directory' ),
 						absint( $min_content_length )
 					);
 					?>

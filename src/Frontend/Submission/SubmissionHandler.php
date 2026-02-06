@@ -884,13 +884,43 @@ class SubmissionHandler {
 
 		// Use existing image ID from form.
 		$existing_id = $this->submitted_data['featured_image'] ?? 0;
-		if ( $existing_id > 0 ) {
+		if ( $existing_id > 0 && $this->validate_featured_image_ownership( $existing_id ) ) {
 			set_post_thumbnail( $listing_id, $existing_id );
 			return;
 		}
 
 		// No image - remove if exists.
 		delete_post_thumbnail( $listing_id );
+	}
+
+	/**
+	 * Validate that the current user can use an attachment as a featured image.
+	 *
+	 * Prevents IDOR where a user could reference another user's private attachment
+	 * by submitting an arbitrary attachment ID in the form.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int $attachment_id The attachment ID to validate.
+	 * @return bool True if the user can use this attachment.
+	 */
+	private function validate_featured_image_ownership( int $attachment_id ): bool {
+		$attachment = get_post( $attachment_id );
+
+		if ( ! $attachment || $attachment->post_type !== 'attachment' ) {
+			return false;
+		}
+
+		if ( ! wp_attachment_is_image( $attachment_id ) ) {
+			return false;
+		}
+
+		// Allow if user is admin or the attachment author.
+		if ( current_user_can( 'manage_options' ) ) {
+			return true;
+		}
+
+		return (int) $attachment->post_author === get_current_user_id();
 	}
 
 	/**
@@ -1199,14 +1229,20 @@ Review the listing: %4$s',
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$token = wp_unslash( $_POST['apd_form_token'] );
 
-		// Decode the timestamp.
+		// Decode and verify the signed timestamp.
 		$decoded = base64_decode( (string) $token, true );
-		if ( $decoded === false ) {
-			// Invalid token format.
+		if ( $decoded === false || strpos( $decoded, '|' ) === false ) {
 			return true;
 		}
 
-		$form_load_time = (int) $decoded;
+		[ $timestamp_str, $signature ] = explode( '|', $decoded, 2 );
+		$expected_signature = hash_hmac( 'sha256', $timestamp_str, wp_salt( 'nonce' ) );
+
+		if ( ! hash_equals( $expected_signature, $signature ) ) {
+			return true;
+		}
+
+		$form_load_time = (int) $timestamp_str;
 		$current_time   = time();
 
 		// Check if timestamp is valid (not in the future, not too old).

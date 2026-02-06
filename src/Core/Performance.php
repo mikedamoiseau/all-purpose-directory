@@ -69,6 +69,31 @@ class Performance {
 	}
 
 	/**
+	 * Prevent unserialization.
+	 *
+	 * @throws \Exception Always throws exception.
+	 */
+	public function __wakeup(): void {
+		throw new \Exception( 'Cannot unserialize singleton.' );
+	}
+
+	/**
+	 * Reset singleton instance (for testing).
+	 *
+	 * @return void
+	 */
+	public static function reset_instance(): void {
+		self::$instance = null;
+	}
+
+	/**
+	 * Registry of known cache keys for pattern-based deletion
+	 *
+	 * @var array<string, true>
+	 */
+	private array $cache_keys = [];
+
+	/**
 	 * Register WordPress hooks for cache invalidation
 	 *
 	 * @return void
@@ -86,6 +111,14 @@ class Performance {
 
 		// Invalidate related listings cache when categories change
 		add_action( 'set_object_terms', [ $this, 'on_terms_changed' ], 10, 4 );
+
+		// Invalidate dashboard stats when reviews change
+		add_action( 'apd_review_created', [ $this, 'on_review_created' ], 10, 2 );
+		add_action( 'apd_review_deleted', [ $this, 'on_review_deleted' ] );
+
+		// Invalidate dashboard stats when favorites change
+		add_action( 'apd_favorite_added', [ $this, 'on_favorite_changed' ] );
+		add_action( 'apd_favorite_removed', [ $this, 'on_favorite_changed' ] );
 	}
 
 	/**
@@ -152,6 +185,9 @@ class Performance {
 	public function set( string $key, mixed $value, int $expiration = self::DEFAULT_EXPIRATION ): bool {
 		$cache_key = $this->get_cache_key( $key );
 
+		// Track key for pattern-based deletion
+		$this->register_cache_key( $cache_key );
+
 		// Set in object cache
 		wp_cache_set( $cache_key, $value, self::CACHE_GROUP, $expiration );
 
@@ -168,6 +204,9 @@ class Performance {
 	public function delete( string $key ): bool {
 		$cache_key = $this->get_cache_key( $key );
 
+		// Remove from registry
+		unset( $this->cache_keys[ $cache_key ] );
+
 		// Delete from object cache
 		wp_cache_delete( $cache_key, self::CACHE_GROUP );
 
@@ -178,34 +217,75 @@ class Performance {
 	/**
 	 * Delete all cached values matching a pattern
 	 *
-	 * @param string $pattern Cache key pattern (uses LIKE).
+	 * Uses a registry of known cache keys instead of a LIKE query on wp_options.
+	 *
+	 * @param string $pattern Cache key pattern prefix to match.
 	 * @return int Number of deleted entries.
 	 */
 	public function delete_pattern( string $pattern ): int {
-		global $wpdb;
+		$full_prefix   = self::TRANSIENT_PREFIX . $pattern;
+		$registry      = $this->get_cache_key_registry();
+		$deleted       = 0;
+		$keys_to_clean = [];
 
-		$transient_prefix = '_transient_' . self::TRANSIENT_PREFIX;
-		$like_pattern     = $wpdb->esc_like( $transient_prefix . $pattern ) . '%';
-
-		// Get matching transients
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$transients = $wpdb->get_col(
-			$wpdb->prepare(
-				"SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE %s",
-				$like_pattern
-			)
-		);
-
-		$deleted = 0;
-		foreach ( $transients as $transient ) {
-			$key = str_replace( '_transient_', '', $transient );
-			if ( delete_transient( $key ) ) {
-				wp_cache_delete( $key, self::CACHE_GROUP );
-				++$deleted;
+		foreach ( $registry as $cache_key => $_ ) {
+			if ( '' === $pattern || str_starts_with( $cache_key, $full_prefix ) ) {
+				wp_cache_delete( $cache_key, self::CACHE_GROUP );
+				if ( delete_transient( $cache_key ) ) {
+					++$deleted;
+				}
+				$keys_to_clean[] = $cache_key;
 			}
 		}
 
+		// Remove deleted keys from registry
+		if ( ! empty( $keys_to_clean ) ) {
+			foreach ( $keys_to_clean as $key ) {
+				unset( $registry[ $key ] );
+			}
+			update_option( 'apd_cache_key_registry', $registry, false );
+		}
+
 		return $deleted;
+	}
+
+	/**
+	 * Register a cache key in the registry
+	 *
+	 * @param string $cache_key Full cache key.
+	 * @return void
+	 */
+	private function register_cache_key( string $cache_key ): void {
+		if ( isset( $this->cache_keys[ $cache_key ] ) ) {
+			return;
+		}
+
+		$this->cache_keys[ $cache_key ] = true;
+
+		$registry = $this->get_cache_key_registry();
+		if ( ! isset( $registry[ $cache_key ] ) ) {
+			$registry[ $cache_key ] = true;
+			update_option( 'apd_cache_key_registry', $registry, false );
+		}
+	}
+
+	/**
+	 * Get the cache key registry from the database
+	 *
+	 * @return array<string, true>
+	 */
+	private function get_cache_key_registry(): array {
+		if ( ! empty( $this->cache_keys ) ) {
+			return $this->cache_keys;
+		}
+
+		$registry = get_option( 'apd_cache_key_registry', [] );
+		if ( ! is_array( $registry ) ) {
+			$registry = [];
+		}
+
+		$this->cache_keys = $registry;
+		return $registry;
 	}
 
 	/**
@@ -281,7 +361,8 @@ class Performance {
 								'terms'    => $categories,
 							],
 						],
-						'orderby'        => 'rand',
+						'orderby'        => 'date',
+						'order'          => 'DESC',
 						'no_found_rows'  => true, // Performance optimization
 					]
 				);
@@ -308,7 +389,7 @@ class Performance {
 			function () use ( $user_id ) {
 				global $wpdb;
 
-				// Get listing counts by status
+				// Get listing counts by status using a single grouped query
 				$counts = [
 					'published' => 0,
 					'pending'   => 0,
@@ -317,27 +398,29 @@ class Performance {
 					'total'     => 0,
 				];
 
-				$query = new \WP_Query(
-					[
-						'post_type'      => 'apd_listing',
-						'post_status'    => [ 'publish', 'pending', 'draft', 'expired' ],
-						'author'         => $user_id,
-						'posts_per_page' => -1,
-						'fields'         => 'ids',
-						'no_found_rows'  => true,
-					]
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$status_counts = $wpdb->get_results(
+					$wpdb->prepare(
+						"SELECT post_status, COUNT(*) AS count
+						FROM {$wpdb->posts}
+						WHERE post_type = 'apd_listing'
+						AND post_author = %d
+						AND post_status IN ('publish', 'pending', 'draft', 'expired')
+						GROUP BY post_status",
+						$user_id
+					)
 				);
 
-				if ( $query->have_posts() ) {
-					foreach ( $query->posts as $post_id ) {
-						$status = get_post_status( $post_id );
-						if ( isset( $counts[ $status ] ) ) {
-							++$counts[ $status ];
-						} elseif ( 'publish' === $status ) {
-							++$counts['published'];
-						}
-						++$counts['total'];
+				foreach ( $status_counts as $row ) {
+					$status = $row->post_status;
+					$count  = (int) $row->count;
+
+					if ( 'publish' === $status ) {
+						$counts['published'] = $count;
+					} elseif ( isset( $counts[ $status ] ) ) {
+						$counts[ $status ] = $count;
 					}
+					$counts['total'] += $count;
 				}
 
 				// Get total views
@@ -518,6 +601,53 @@ class Performance {
 			if ( 'apd_category' === $taxonomy ) {
 				$this->invalidate_category_cache();
 			}
+		}
+	}
+
+	/**
+	 * Handle review creation - invalidate dashboard stats for listing author
+	 *
+	 * @param int $comment_id Comment ID.
+	 * @param int $listing_id Listing ID.
+	 * @return void
+	 */
+	public function on_review_created( int $comment_id, int $listing_id ): void {
+		$this->invalidate_dashboard_stats_for_listing( $listing_id );
+	}
+
+	/**
+	 * Handle review deletion - invalidate dashboard stats for listing author
+	 *
+	 * @param int $review_id Review (comment) ID.
+	 * @return void
+	 */
+	public function on_review_deleted( int $review_id ): void {
+		$comment = get_comment( $review_id );
+		if ( $comment ) {
+			$this->invalidate_dashboard_stats_for_listing( (int) $comment->comment_post_ID );
+		}
+	}
+
+	/**
+	 * Handle favorite change - invalidate dashboard stats for listing author
+	 *
+	 * @param int $listing_id Listing ID.
+	 * @return void
+	 */
+	public function on_favorite_changed( int $listing_id ): void {
+		$this->invalidate_dashboard_stats_for_listing( $listing_id );
+	}
+
+	/**
+	 * Invalidate dashboard stats cache for a listing's author
+	 *
+	 * @param int $listing_id Listing ID.
+	 * @return void
+	 */
+	private function invalidate_dashboard_stats_for_listing( int $listing_id ): void {
+		$post = get_post( $listing_id );
+		if ( $post && 'apd_listing' === $post->post_type ) {
+			$this->delete( "dashboard_stats_{$post->post_author}" );
 		}
 	}
 

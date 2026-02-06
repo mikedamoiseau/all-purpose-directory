@@ -848,30 +848,42 @@ class ListingsEndpointTest extends UnitTestCase {
 
 		$listing = $this->create_mock_post( [ 'ID' => 100 ] );
 
-		Functions\expect( 'sanitize_text_field' )->andReturn( 'New Listing' );
-		Functions\expect( 'wp_kses_post' )->andReturn( '' );
-		Functions\expect( 'sanitize_textarea_field' )->andReturn( '' );
-		Functions\expect( 'get_current_user_id' )->andReturn( 1 );
-		Functions\expect( 'current_user_can' )->andReturn( false );
-		Functions\expect( 'do_action' )->andReturn( null );
-		Functions\expect( 'wp_insert_post' )->andReturn( 100 );
-		Functions\expect( 'get_post' )->andReturn( $listing );
-		Functions\expect( 'apd_get_listing_categories' )->andReturn( [] );
-		Functions\expect( 'apd_get_listing_tags' )->andReturn( [] );
-		Functions\expect( 'mysql_to_rfc3339' )->andReturn( '2024-01-01T12:00:00' );
-		Functions\expect( 'get_permalink' )->andReturn( 'https://example.com/' );
-		Functions\expect( 'get_post_thumbnail_id' )->andReturn( 50 );
-		Functions\expect( 'apd_get_fields' )->andReturn( [] );
-		Functions\expect( 'apply_filters' )->andReturnUsing( fn( $hook, $data ) => $data );
+		// Create an attachment for featured image validation.
+		$attachment = new \WP_Post( [
+			'ID'          => 50,
+			'post_type'   => 'attachment',
+			'post_author' => 1,
+		] );
+
+		Functions\when( 'sanitize_text_field' )->justReturn( 'New Listing' );
+		Functions\when( 'wp_kses_post' )->justReturn( '' );
+		Functions\when( 'sanitize_textarea_field' )->justReturn( '' );
+		Functions\when( 'get_current_user_id' )->justReturn( 1 );
+		Functions\when( 'current_user_can' )->alias( function ( $cap ) {
+			return $cap === 'manage_options';
+		} );
+		Functions\when( 'wp_insert_post' )->justReturn( 100 );
+		Functions\when( 'absint' )->alias( fn( $val ) => abs( (int) $val ) );
+		Functions\when( 'get_post' )->alias( function ( $id ) use ( $listing, $attachment ) {
+			return $id === 50 ? $attachment : $listing;
+		} );
+		Functions\when( 'wp_attachment_is_image' )->justReturn( true );
+		Functions\when( 'apd_get_listing_categories' )->justReturn( [] );
+		Functions\when( 'apd_get_listing_tags' )->justReturn( [] );
+		Functions\when( 'mysql_to_rfc3339' )->justReturn( '2024-01-01T12:00:00' );
+		Functions\when( 'get_permalink' )->justReturn( 'https://example.com/' );
+		Functions\when( 'get_post_thumbnail_id' )->justReturn( 50 );
+		Functions\when( 'apd_get_fields' )->justReturn( [] );
+		Functions\when( 'apply_filters' )->alias( fn( $hook, $data ) => $data );
 
 		Functions\expect( 'set_post_thumbnail' )
 			->once()
 			->with( 100, 50 )
 			->andReturn( true );
 
-		$this->endpoint->create_item( $request );
+		$result = $this->endpoint->create_item( $request );
 
-		$this->assertTrue( true );
+		$this->assertInstanceOf( \WP_REST_Response::class, $result );
 	}
 
 	// =========================================================================

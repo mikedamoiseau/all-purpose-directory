@@ -21,21 +21,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 ?>
 
-<ul class="apd-dashboard-nav" role="tablist">
+<ul class="apd-dashboard-nav">
 	<?php foreach ( $tabs as $tab_slug => $tab ) : ?>
 		<?php
 		$is_active = ( $tab_slug === $current_tab );
 		$tab_url   = $dashboard->get_tab_url( $tab_slug );
 		$has_count = isset( $tab['count'] ) && $tab['count'] !== null;
 		?>
-		<li class="apd-dashboard-nav__item" role="presentation">
+		<li class="apd-dashboard-nav__item">
 			<a href="<?php echo esc_url( $tab_url ); ?>"
 				id="apd-tab-<?php echo esc_attr( $tab_slug ); ?>"
 				class="apd-dashboard-nav__link <?php echo $is_active ? 'apd-dashboard-nav__link--active' : ''; ?>"
-				role="tab"
-				aria-selected="<?php echo $is_active ? 'true' : 'false'; ?>"
-				<?php if ( ! $is_active ) : ?>
-					tabindex="-1"
+				<?php if ( $is_active ) : ?>
+					aria-current="page"
 				<?php endif; ?>>
 				<?php if ( ! empty( $tab['icon'] ) ) : ?>
 					<span class="apd-dashboard-nav__icon dashicons <?php echo esc_attr( $tab['icon'] ); ?>" aria-hidden="true"></span>

@@ -62,7 +62,7 @@ class ContactFormTest extends TestCase {
 	 * Test default configuration.
 	 */
 	public function test_default_configuration(): void {
-		$form = new ContactForm();
+		$form = ContactForm::get_instance();
 
 		$this->assertTrue( $form->show_phone() );
 		$this->assertFalse( $form->is_phone_required() );
@@ -75,7 +75,7 @@ class ContactFormTest extends TestCase {
 	 * Test custom configuration.
 	 */
 	public function test_custom_configuration(): void {
-		$form = new ContactForm( [
+		$form = ContactForm::get_instance( [
 			'show_phone'      => false,
 			'phone_required'  => true,
 			'show_subject'    => true,
@@ -94,7 +94,7 @@ class ContactFormTest extends TestCase {
 	 * Test set_config merges configuration.
 	 */
 	public function test_set_config_merges(): void {
-		$form = new ContactForm();
+		$form = ContactForm::get_instance();
 		$form->set_config( [ 'show_phone' => false ] );
 
 		$this->assertFalse( $form->show_phone() );
@@ -105,7 +105,7 @@ class ContactFormTest extends TestCase {
 	 * Test set and get listing_id.
 	 */
 	public function test_set_and_get_listing_id(): void {
-		$form = new ContactForm();
+		$form = ContactForm::get_instance();
 
 		$this->assertEquals( 0, $form->get_listing_id() );
 
@@ -119,7 +119,7 @@ class ContactFormTest extends TestCase {
 	 * Test set and get errors.
 	 */
 	public function test_set_and_get_errors(): void {
-		$form = new ContactForm();
+		$form = ContactForm::get_instance();
 		$errors = [ 'Name is required', 'Email is invalid' ];
 
 		$result = $form->set_errors( $errors );
@@ -132,7 +132,7 @@ class ContactFormTest extends TestCase {
 	 * Test set and get values.
 	 */
 	public function test_set_and_get_values(): void {
-		$form = new ContactForm();
+		$form = ContactForm::get_instance();
 		$values = [
 			'contact_name' => 'John Doe',
 			'contact_email' => 'john@example.com',
@@ -148,7 +148,7 @@ class ContactFormTest extends TestCase {
 	 * Test get_value returns specific value.
 	 */
 	public function test_get_value_returns_specific(): void {
-		$form = new ContactForm();
+		$form = ContactForm::get_instance();
 		$form->set_values( [
 			'contact_name' => 'John Doe',
 			'contact_email' => 'john@example.com',
@@ -162,7 +162,7 @@ class ContactFormTest extends TestCase {
 	 * Test get_value returns default for missing key.
 	 */
 	public function test_get_value_returns_default(): void {
-		$form = new ContactForm();
+		$form = ContactForm::get_instance();
 
 		$this->assertEquals( '', $form->get_value( 'missing' ) );
 		$this->assertEquals( 'default', $form->get_value( 'missing', 'default' ) );
@@ -172,7 +172,7 @@ class ContactFormTest extends TestCase {
 	 * Test get_config returns value.
 	 */
 	public function test_get_config_returns_value(): void {
-		$form = new ContactForm();
+		$form = ContactForm::get_instance();
 
 		$this->assertTrue( $form->get_config( 'show_phone' ) );
 		$this->assertEquals( 10, $form->get_config( 'min_message_length' ) );
@@ -182,7 +182,7 @@ class ContactFormTest extends TestCase {
 	 * Test get_config returns default for missing.
 	 */
 	public function test_get_config_returns_default(): void {
-		$form = new ContactForm();
+		$form = ContactForm::get_instance();
 
 		$this->assertNull( $form->get_config( 'missing' ) );
 		$this->assertEquals( 'default', $form->get_config( 'missing', 'default' ) );
@@ -197,7 +197,7 @@ class ContactFormTest extends TestCase {
 		} );
 		Functions\when( 'sanitize_html_class' )->returnArg( 1 );
 
-		$form = new ContactForm();
+		$form = ContactForm::get_instance();
 		$classes = $form->get_css_classes();
 
 		$this->assertStringContainsString( 'apd-contact-form', $classes );
@@ -212,7 +212,7 @@ class ContactFormTest extends TestCase {
 		} );
 		Functions\when( 'sanitize_html_class' )->returnArg( 1 );
 
-		$form = new ContactForm( [ 'class' => 'my-custom-class' ] );
+		$form = ContactForm::get_instance( [ 'class' => 'my-custom-class' ] );
 		$classes = $form->get_css_classes();
 
 		$this->assertStringContainsString( 'apd-contact-form', $classes );
@@ -231,7 +231,7 @@ class ContactFormTest extends TestCase {
 	 * Test get_html returns empty for invalid listing.
 	 */
 	public function test_get_html_empty_for_invalid_listing(): void {
-		$form = new ContactForm();
+		$form = ContactForm::get_instance();
 
 		$this->assertEquals( '', $form->get_html( 0 ) );
 		$this->assertEquals( '', $form->get_html( -1 ) );
@@ -243,7 +243,7 @@ class ContactFormTest extends TestCase {
 	public function test_get_html_empty_when_listing_not_found(): void {
 		Functions\when( 'get_post' )->justReturn( null );
 
-		$form = new ContactForm();
+		$form = ContactForm::get_instance();
 		$form->set_listing_id( 123 );
 
 		$this->assertEquals( '', $form->get_html() );
@@ -258,7 +258,7 @@ class ContactFormTest extends TestCase {
 
 		Functions\when( 'get_post' )->justReturn( $post );
 
-		$form = new ContactForm();
+		$form = ContactForm::get_instance();
 		$form->set_listing_id( 123 );
 
 		$this->assertEquals( '', $form->get_html() );
@@ -275,7 +275,7 @@ class ContactFormTest extends TestCase {
 		Functions\when( 'get_post' )->justReturn( $post );
 		Functions\when( 'get_userdata' )->justReturn( false );
 
-		$form = new ContactForm();
+		$form = ContactForm::get_instance();
 		$form->set_listing_id( 123 );
 
 		$this->assertEquals( '', $form->get_html() );
@@ -287,7 +287,7 @@ class ContactFormTest extends TestCase {
 	public function test_can_receive_contact_false_invalid(): void {
 		Functions\when( 'get_post' )->justReturn( null );
 
-		$form = new ContactForm();
+		$form = ContactForm::get_instance();
 		$this->assertFalse( $form->can_receive_contact( 0 ) );
 	}
 
@@ -300,7 +300,7 @@ class ContactFormTest extends TestCase {
 
 		Functions\when( 'get_post' )->justReturn( $post );
 
-		$form = new ContactForm();
+		$form = ContactForm::get_instance();
 		$this->assertFalse( $form->can_receive_contact( 123 ) );
 	}
 
@@ -314,7 +314,7 @@ class ContactFormTest extends TestCase {
 
 		Functions\when( 'get_post' )->justReturn( $post );
 
-		$form = new ContactForm();
+		$form = ContactForm::get_instance();
 		$this->assertFalse( $form->can_receive_contact( 123 ) );
 	}
 
@@ -334,7 +334,7 @@ class ContactFormTest extends TestCase {
 		Functions\when( 'get_userdata' )->justReturn( $user );
 		Functions\when( 'is_email' )->justReturn( false );
 
-		$form = new ContactForm();
+		$form = ContactForm::get_instance();
 		$this->assertFalse( $form->can_receive_contact( 123 ) );
 	}
 
@@ -356,7 +356,7 @@ class ContactFormTest extends TestCase {
 		// returnArg is 1-indexed: arg 2 is the $value passed to apply_filters.
 		Functions\when( 'apply_filters' )->returnArg( 2 );
 
-		$form = new ContactForm();
+		$form = ContactForm::get_instance();
 		$this->assertTrue( $form->can_receive_contact( 123 ) );
 	}
 
@@ -379,7 +379,7 @@ class ContactFormTest extends TestCase {
 			}
 		} );
 
-		$form = new ContactForm();
+		$form = ContactForm::get_instance();
 		$form->init();
 
 		$this->assertTrue( $add_action_called, 'add_action should be called for apd_single_listing_contact_form' );

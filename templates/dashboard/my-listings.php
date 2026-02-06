@@ -93,7 +93,7 @@ $message = $my_listings->get_message();
 				<label for="apd-sort-select" class="apd-my-listings__sort-label">
 					<?php esc_html_e( 'Sort by:', 'all-purpose-directory' ); ?>
 				</label>
-				<select id="apd-sort-select" class="apd-my-listings__sort-select" onchange="window.location.href=this.value">
+				<select id="apd-sort-select" class="apd-my-listings__sort-select">
 					<?php
 					$orderby_options = $my_listings->get_orderby_options();
 					foreach ( $orderby_options as $orderby_key => $orderby_label ) :

@@ -97,13 +97,14 @@ abstract class UnitTestCase extends TestCase
         ]);
 
         // Hook functions - do nothing by default.
+        // Note: do_action and apply_filters are handled by Brain\Monkey's
+        // hook system (via Monkey\setUp). Do NOT stub them here or
+        // Actions\expectDone / Filters\expectApplied will not work.
         Functions\stubs([
             'add_action'       => null,
             'add_filter'       => null,
             'remove_action'    => null,
             'remove_filter'    => null,
-            'do_action'        => null,
-            'apply_filters'    => static fn($tag, $value, ...$args) => $value,
             'has_action'       => false,
             'has_filter'       => false,
             'did_action'       => 0,

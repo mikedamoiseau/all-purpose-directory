@@ -87,8 +87,26 @@ class Dashboard {
 	 *
 	 * @param array<string, mixed> $config Dashboard configuration.
 	 */
-	public function __construct( array $config = [] ) {
+	private function __construct( array $config = [] ) {
 		$this->config = wp_parse_args( $config, self::DEFAULTS );
+	}
+
+	/**
+	 * Prevent unserialization.
+	 *
+	 * @throws \Exception Always throws exception.
+	 */
+	public function __wakeup(): void {
+		throw new \Exception( 'Cannot unserialize singleton.' );
+	}
+
+	/**
+	 * Reset singleton instance (for testing).
+	 *
+	 * @return void
+	 */
+	public static function reset_instance(): void {
+		self::$instance = null;
 	}
 
 	/**

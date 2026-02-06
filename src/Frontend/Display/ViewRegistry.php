@@ -64,6 +64,24 @@ final class ViewRegistry {
 	}
 
 	/**
+	 * Prevent unserialization.
+	 *
+	 * @throws \Exception Always throws exception.
+	 */
+	public function __wakeup(): void {
+		throw new \Exception( 'Cannot unserialize singleton.' );
+	}
+
+	/**
+	 * Reset singleton instance (for testing).
+	 *
+	 * @return void
+	 */
+	public static function reset_instance(): void {
+		self::$instance = null;
+	}
+
+	/**
 	 * Get the singleton instance.
 	 *
 	 * @since 1.0.0

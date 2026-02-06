@@ -279,9 +279,10 @@ final class SearchQuery {
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $meta_key_placeholders contains safe %s placeholders.
 		$meta_condition = $wpdb->prepare( "(apd_pm.meta_key IN ($meta_key_placeholders) AND apd_pm.meta_value LIKE %s)", array_merge( $this->searchable_meta_keys, [ $like_keyword ] ) );
 
-		// Find and modify the existing search condition to include meta.
-		// WordPress adds: AND (((post_title LIKE '%keyword%') OR (post_excerpt LIKE '%keyword%') OR (post_content LIKE '%keyword%')))
-		// We want to add OR (meta condition) inside the parentheses.
+		// Extend WordPress search to include meta fields.
+		// Try to inject into the existing search clause for clean OR logic.
+		// WordPress generates: AND (((post_title LIKE ...) OR (post_excerpt LIKE ...) OR (post_content LIKE ...)))
+		$injected = false;
 		if ( preg_match( '/AND\s+\(\(\(.*?post_title.*?LIKE.*?\)\)\)/s', $where, $matches ) ) {
 			$original_search = $matches[0];
 			$modified_search = str_replace(
@@ -289,7 +290,18 @@ final class SearchQuery {
 				")) OR ($meta_condition))",
 				$original_search
 			);
-			$where           = str_replace( $original_search, $modified_search, $where );
+			if ( $modified_search !== $original_search ) {
+				$new_where = str_replace( $original_search, $modified_search, $where );
+				if ( $new_where !== $where ) {
+					$where    = $new_where;
+					$injected = true;
+				}
+			}
+		}
+
+		// Fallback: append as standalone OR condition if regex injection failed.
+		if ( ! $injected ) {
+			$where .= " OR ($meta_condition)";
 		}
 
 		return $where;

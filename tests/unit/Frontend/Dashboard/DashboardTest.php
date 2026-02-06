@@ -29,6 +29,9 @@ final class DashboardTest extends UnitTestCase {
 	protected function setUp(): void {
 		parent::setUp();
 
+		// Reset singleton to prevent state leaking between tests.
+		Dashboard::reset_instance();
+
 		// Mock common WordPress functions.
 		Functions\stubs( [
 			'get_current_user_id' => 1,
@@ -48,7 +51,7 @@ final class DashboardTest extends UnitTestCase {
 	 * Test constructor sets default configuration.
 	 */
 	public function test_constructor_sets_default_config(): void {
-		$dashboard = new Dashboard();
+		$dashboard = Dashboard::get_instance();
 
 		$config = $dashboard->get_config();
 
@@ -61,7 +64,7 @@ final class DashboardTest extends UnitTestCase {
 	 * Test constructor merges custom configuration.
 	 */
 	public function test_constructor_merges_custom_config(): void {
-		$dashboard = new Dashboard( [
+		$dashboard = Dashboard::get_instance( [
 			'default_tab' => 'favorites',
 			'show_stats'  => false,
 			'class'       => 'custom-class',
@@ -78,7 +81,7 @@ final class DashboardTest extends UnitTestCase {
 	 * Test get_config_value returns correct value.
 	 */
 	public function test_get_config_value_returns_value(): void {
-		$dashboard = new Dashboard( [ 'default_tab' => 'profile' ] );
+		$dashboard = Dashboard::get_instance( [ 'default_tab' => 'profile' ] );
 
 		$this->assertSame( 'profile', $dashboard->get_config_value( 'default_tab' ) );
 	}
@@ -87,7 +90,7 @@ final class DashboardTest extends UnitTestCase {
 	 * Test get_config_value returns default for missing key.
 	 */
 	public function test_get_config_value_returns_default_for_missing(): void {
-		$dashboard = new Dashboard();
+		$dashboard = Dashboard::get_instance();
 
 		$this->assertSame( 'default', $dashboard->get_config_value( 'nonexistent', 'default' ) );
 		$this->assertNull( $dashboard->get_config_value( 'nonexistent' ) );
@@ -99,7 +102,7 @@ final class DashboardTest extends UnitTestCase {
 	public function test_is_user_logged_in_returns_true(): void {
 		Functions\when( 'is_user_logged_in' )->justReturn( true );
 
-		$dashboard = new Dashboard();
+		$dashboard = Dashboard::get_instance();
 
 		$this->assertTrue( $dashboard->is_user_logged_in() );
 	}
@@ -110,7 +113,7 @@ final class DashboardTest extends UnitTestCase {
 	public function test_is_user_logged_in_returns_false(): void {
 		Functions\when( 'is_user_logged_in' )->justReturn( false );
 
-		$dashboard = new Dashboard();
+		$dashboard = Dashboard::get_instance();
 
 		$this->assertFalse( $dashboard->is_user_logged_in() );
 	}
@@ -121,7 +124,7 @@ final class DashboardTest extends UnitTestCase {
 	public function test_get_user_stats_returns_zero_for_no_user(): void {
 		Functions\when( 'get_current_user_id' )->justReturn( 0 );
 
-		$dashboard = new Dashboard();
+		$dashboard = Dashboard::get_instance();
 		$stats     = $dashboard->get_user_stats( 0 );
 
 		$this->assertSame( 0, $stats['total'] );
@@ -135,7 +138,7 @@ final class DashboardTest extends UnitTestCase {
 	 * Test get_tab_url returns base URL for default tab.
 	 */
 	public function test_get_tab_url_returns_base_for_default(): void {
-		$dashboard = new Dashboard( [ 'default_tab' => 'my-listings' ] );
+		$dashboard = Dashboard::get_instance( [ 'default_tab' => 'my-listings' ] );
 
 		$url = $dashboard->get_tab_url( 'my-listings' );
 
@@ -146,7 +149,7 @@ final class DashboardTest extends UnitTestCase {
 	 * Test get_tab_url adds parameter for non-default tab.
 	 */
 	public function test_get_tab_url_adds_parameter(): void {
-		$dashboard = new Dashboard( [ 'default_tab' => 'my-listings' ] );
+		$dashboard = Dashboard::get_instance( [ 'default_tab' => 'my-listings' ] );
 
 		$url = $dashboard->get_tab_url( 'favorites' );
 
@@ -157,7 +160,7 @@ final class DashboardTest extends UnitTestCase {
 	 * Test get_dashboard_url returns permalink when no filter.
 	 */
 	public function test_get_dashboard_url_returns_permalink(): void {
-		$dashboard = new Dashboard();
+		$dashboard = Dashboard::get_instance();
 		$url       = $dashboard->get_dashboard_url();
 
 		$this->assertSame( 'https://example.com/dashboard/', $url );
@@ -181,7 +184,7 @@ final class DashboardTest extends UnitTestCase {
 			}
 		);
 
-		$dashboard = new Dashboard();
+		$dashboard = Dashboard::get_instance();
 		$dashboard->render_login_required();
 
 		$this->assertSame( 'dashboard/login-required.php', $captured_template );
@@ -211,7 +214,7 @@ final class DashboardTest extends UnitTestCase {
 	 * Test render_placeholder returns HTML with tab label.
 	 */
 	public function test_render_placeholder_returns_html(): void {
-		$dashboard = new Dashboard();
+		$dashboard = Dashboard::get_instance();
 
 		// Create a mock for get_tabs that doesn't rely on WP_Query.
 		$html = $dashboard->render_placeholder( 'test-tab' );
@@ -244,7 +247,7 @@ final class DashboardTest extends UnitTestCase {
 	 * Test get_tab_url handles different tabs.
 	 */
 	public function test_get_tab_url_handles_different_tabs(): void {
-		$dashboard = new Dashboard( [ 'default_tab' => 'my-listings' ] );
+		$dashboard = Dashboard::get_instance( [ 'default_tab' => 'my-listings' ] );
 
 		// Default tab returns base URL.
 		$this->assertSame(
@@ -277,7 +280,7 @@ final class DashboardTest extends UnitTestCase {
 	 * the placeholder structure is correct.
 	 */
 	public function test_render_placeholder_has_correct_structure(): void {
-		$dashboard = new Dashboard();
+		$dashboard = Dashboard::get_instance();
 		$html      = $dashboard->render_placeholder( 'test-tab', 'Test Label' );
 
 		// Verify structure.
@@ -297,7 +300,7 @@ final class DashboardTest extends UnitTestCase {
 			'class'       => 'test-class',
 		];
 
-		$dashboard = new Dashboard( $config );
+		$dashboard = Dashboard::get_instance( $config );
 		$result    = $dashboard->get_config();
 
 		$this->assertSame( $config['default_tab'], $result['default_tab'] );
@@ -309,7 +312,7 @@ final class DashboardTest extends UnitTestCase {
 	 * Test get_config_value with various types.
 	 */
 	public function test_get_config_value_with_various_types(): void {
-		$dashboard = new Dashboard( [
+		$dashboard = Dashboard::get_instance( [
 			'string_val' => 'test',
 			'bool_val'   => true,
 			'int_val'    => 42,

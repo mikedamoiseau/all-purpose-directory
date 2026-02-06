@@ -57,7 +57,21 @@ final class SpamProtectionTest extends UnitTestCase {
 			'esc_html__'              => fn( $str ) => $str,
 			'__'                      => fn( $str ) => $str,
 			'get_terms'               => [],
+			'wp_salt'                 => 'test-salt-value',
 		] );
+	}
+
+	/**
+	 * Generate a signed form token for testing.
+	 *
+	 * @param int $timestamp Unix timestamp.
+	 * @return string Signed base64-encoded token.
+	 */
+	private function generate_signed_token( int $timestamp ): string {
+		$ts        = (string) $timestamp;
+		$signature = hash_hmac( 'sha256', $ts, 'test-salt-value' );
+
+		return base64_encode( $ts . '|' . $signature );
 	}
 
 	// =========================================================================
@@ -115,7 +129,7 @@ final class SpamProtectionTest extends UnitTestCase {
 		$_POST['listing_title']        = 'Test Title';
 		$_POST['listing_content']      = 'Test content';
 		$_POST['website_url']          = 'https://spam-site.com'; // Bot filled honeypot.
-		$_POST['apd_form_token']       = base64_encode( (string) ( time() - 10 ) );
+		$_POST['apd_form_token']       = $this->generate_signed_token( time() - 10 );
 
 		$handler = new SubmissionHandler( [ 'enable_spam_protection' => true ] );
 		$result  = $handler->process();
@@ -135,7 +149,7 @@ final class SpamProtectionTest extends UnitTestCase {
 		$_POST['listing_title']        = 'Test Title';
 		$_POST['listing_content']      = 'Test content';
 		$_POST['website_url']          = ''; // Empty honeypot.
-		$_POST['apd_form_token']       = base64_encode( (string) ( time() - 10 ) );
+		$_POST['apd_form_token']       = $this->generate_signed_token( time() - 10 );
 
 		Functions\when( 'wp_insert_post' )->justReturn( 123 );
 		Functions\when( 'wp_set_object_terms' )->justReturn( [] );
@@ -216,7 +230,7 @@ final class SpamProtectionTest extends UnitTestCase {
 		$_POST['listing_content']      = 'Test content';
 		$_POST['website_url']          = '';
 		// Submit immediately (0 seconds elapsed).
-		$_POST['apd_form_token'] = base64_encode( (string) time() );
+		$_POST['apd_form_token'] = $this->generate_signed_token( time() );
 
 		$handler = new SubmissionHandler( [ 'enable_spam_protection' => true ] );
 		$result  = $handler->process();
@@ -237,7 +251,7 @@ final class SpamProtectionTest extends UnitTestCase {
 		$_POST['listing_content']      = 'Test content';
 		$_POST['website_url']          = '';
 		// 10 seconds elapsed (more than 3 second minimum).
-		$_POST['apd_form_token'] = base64_encode( (string) ( time() - 10 ) );
+		$_POST['apd_form_token'] = $this->generate_signed_token( time() - 10 );
 
 		Functions\when( 'wp_insert_post' )->justReturn( 456 );
 		Functions\when( 'wp_set_object_terms' )->justReturn( [] );
@@ -274,7 +288,7 @@ final class SpamProtectionTest extends UnitTestCase {
 		$_POST['listing_content']      = 'Test content';
 		$_POST['website_url']          = '';
 		// 2 seconds elapsed.
-		$_POST['apd_form_token'] = base64_encode( (string) ( time() - 2 ) );
+		$_POST['apd_form_token'] = $this->generate_signed_token( time() - 2 );
 
 		// Set minimum time to 1 second via filter.
 		Functions\when( 'apply_filters' )->alias( function ( $hook, $value, ...$args ) {
@@ -319,7 +333,7 @@ final class SpamProtectionTest extends UnitTestCase {
 		$_POST['listing_content']      = 'Test content';
 		$_POST['website_url']          = '';
 		// Timestamp in the future (invalid).
-		$_POST['apd_form_token'] = base64_encode( (string) ( time() + 3600 ) );
+		$_POST['apd_form_token'] = $this->generate_signed_token( time() + 3600 );
 
 		$handler = new SubmissionHandler( [ 'enable_spam_protection' => true ] );
 		$result  = $handler->process();
@@ -361,7 +375,7 @@ final class SpamProtectionTest extends UnitTestCase {
 		$_POST['listing_title']        = 'Test Title';
 		$_POST['listing_content']      = 'Test content';
 		$_POST['website_url']          = '';
-		$_POST['apd_form_token']       = base64_encode( (string) ( time() - 10 ) );
+		$_POST['apd_form_token']       = $this->generate_signed_token( time() - 10 );
 
 		// Simulate 2 previous submissions (under default limit of 5).
 		Functions\when( 'get_transient' )->justReturn( 2 );
@@ -400,7 +414,7 @@ final class SpamProtectionTest extends UnitTestCase {
 		$_POST['listing_title']        = 'Test Title';
 		$_POST['listing_content']      = 'Test content';
 		$_POST['website_url']          = '';
-		$_POST['apd_form_token']       = base64_encode( (string) ( time() - 10 ) );
+		$_POST['apd_form_token']       = $this->generate_signed_token( time() - 10 );
 
 		// Simulate 5 previous submissions (at default limit of 5).
 		Functions\when( 'get_transient' )->justReturn( 5 );
@@ -423,7 +437,7 @@ final class SpamProtectionTest extends UnitTestCase {
 		$_POST['listing_title']        = 'Test Title';
 		$_POST['listing_content']      = 'Test content';
 		$_POST['website_url']          = '';
-		$_POST['apd_form_token']       = base64_encode( (string) ( time() - 10 ) );
+		$_POST['apd_form_token']       = $this->generate_signed_token( time() - 10 );
 
 		// Simulate 3 previous submissions.
 		Functions\when( 'get_transient' )->justReturn( 3 );
@@ -457,7 +471,7 @@ final class SpamProtectionTest extends UnitTestCase {
 		$_POST['listing_title']        = 'Test Title';
 		$_POST['listing_content']      = 'Test content';
 		$_POST['website_url']          = 'https://spam.com'; // Honeypot filled.
-		$_POST['apd_form_token']       = base64_encode( (string) time() ); // Too fast.
+		$_POST['apd_form_token']       = $this->generate_signed_token( time() ); // Too fast.
 
 		// Bypass spam protection using apply_filters stub.
 		Functions\when( 'apply_filters' )->alias( function ( $hook, $value, ...$args ) {
@@ -544,7 +558,7 @@ final class SpamProtectionTest extends UnitTestCase {
 		$_POST['listing_title']        = 'Test Title';
 		$_POST['listing_content']      = 'Test content';
 		$_POST['website_url']          = '';
-		$_POST['apd_form_token']       = base64_encode( (string) ( time() - 10 ) );
+		$_POST['apd_form_token']       = $this->generate_signed_token( time() - 10 );
 
 		// Return WP_Error from custom filter.
 		Functions\when( 'apply_filters' )->alias( function ( $hook, $value, ...$args ) {
@@ -572,7 +586,7 @@ final class SpamProtectionTest extends UnitTestCase {
 		$_POST['listing_title']        = 'Test Title';
 		$_POST['listing_content']      = 'Test content';
 		$_POST['website_url']          = '';
-		$_POST['apd_form_token']       = base64_encode( (string) ( time() - 10 ) );
+		$_POST['apd_form_token']       = $this->generate_signed_token( time() - 10 );
 
 		$received_params = [];
 
@@ -624,7 +638,7 @@ final class SpamProtectionTest extends UnitTestCase {
 		$_POST['listing_title']        = 'Test Title';
 		$_POST['listing_content']      = 'Test content';
 		$_POST['website_url']          = 'filled-by-bot';
-		$_POST['apd_form_token']       = base64_encode( (string) ( time() - 10 ) );
+		$_POST['apd_form_token']       = $this->generate_signed_token( time() - 10 );
 
 		$action_fired = false;
 		$action_type  = null;

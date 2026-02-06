@@ -96,7 +96,7 @@ class InputSanitizationTest extends SecurityTestCase {
 
         Functions\when('wp_verify_nonce')->justReturn(true);
 
-        $handler = new ContactHandler();
+        $handler = ContactHandler::get_instance();
         $reflection = new \ReflectionClass($handler);
         $method = $reflection->getMethod('get_sanitized_data');
         // setAccessible not needed in PHP 8.1+
@@ -121,7 +121,7 @@ class InputSanitizationTest extends SecurityTestCase {
 
         Functions\when('wp_verify_nonce')->justReturn(true);
 
-        $handler = new ContactHandler();
+        $handler = ContactHandler::get_instance();
         $reflection = new \ReflectionClass($handler);
         $method = $reflection->getMethod('get_sanitized_data');
         // setAccessible not needed in PHP 8.1+

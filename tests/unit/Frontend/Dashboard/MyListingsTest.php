@@ -62,10 +62,8 @@ final class MyListingsTest extends UnitTestCase {
 		// Restore original $_GET.
 		$_GET = $this->original_get;
 
-		// Reset singleton instance using reflection.
-		$reflection = new \ReflectionClass( MyListings::class );
-		$instance   = $reflection->getProperty( 'instance' );
-		$instance->setValue( null, null );
+		// Reset singleton instance.
+		MyListings::reset_instance();
 
 		parent::tearDown();
 	}
@@ -76,7 +74,7 @@ final class MyListingsTest extends UnitTestCase {
 	public function test_constructor_sets_default_config(): void {
 		Functions\when( 'get_current_user_id' )->justReturn( 0 );
 
-		$my_listings = new MyListings();
+		$my_listings = MyListings::get_instance();
 
 		$this->assertSame( 0, $my_listings->get_user_id() );
 	}
@@ -85,8 +83,9 @@ final class MyListingsTest extends UnitTestCase {
 	 * Test constructor accepts custom configuration.
 	 */
 	public function test_constructor_accepts_custom_config(): void {
+		MyListings::reset_instance();
 		$config      = [ 'per_page' => 20 ];
-		$my_listings = new MyListings( $config );
+		$my_listings = MyListings::get_instance( $config );
 
 		// Configuration is internal, but we can verify it works through behavior.
 		$this->assertInstanceOf( MyListings::class, $my_listings );
@@ -96,7 +95,7 @@ final class MyListingsTest extends UnitTestCase {
 	 * Test set_user_id and get_user_id.
 	 */
 	public function test_set_and_get_user_id(): void {
-		$my_listings = new MyListings();
+		$my_listings = MyListings::get_instance();
 
 		$my_listings->set_user_id( 42 );
 		$this->assertSame( 42, $my_listings->get_user_id() );
@@ -109,7 +108,7 @@ final class MyListingsTest extends UnitTestCase {
 	 * Test get_status_filter returns valid status.
 	 */
 	public function test_get_status_filter_returns_all_by_default(): void {
-		$my_listings = new MyListings();
+		$my_listings = MyListings::get_instance();
 
 		$status = $my_listings->get_status_filter();
 
@@ -122,7 +121,7 @@ final class MyListingsTest extends UnitTestCase {
 	public function test_get_status_filter_validates_input(): void {
 		$_GET['status'] = 'invalid_status';
 
-		$my_listings = new MyListings();
+		$my_listings = MyListings::get_instance();
 		$status      = $my_listings->get_status_filter();
 
 		$this->assertSame( 'all', $status );
@@ -135,7 +134,7 @@ final class MyListingsTest extends UnitTestCase {
 	 */
 	public function test_get_status_filter_accepts_valid_statuses(): void {
 		$valid_statuses = [ 'all', 'publish', 'pending', 'draft', 'expired' ];
-		$my_listings    = new MyListings();
+		$my_listings    = MyListings::get_instance();
 
 		foreach ( $valid_statuses as $status ) {
 			$_GET['status'] = $status;
@@ -150,7 +149,7 @@ final class MyListingsTest extends UnitTestCase {
 	 * Test get_orderby_filter returns date by default.
 	 */
 	public function test_get_orderby_filter_returns_date_by_default(): void {
-		$my_listings = new MyListings();
+		$my_listings = MyListings::get_instance();
 
 		$orderby = $my_listings->get_orderby_filter();
 
@@ -163,7 +162,7 @@ final class MyListingsTest extends UnitTestCase {
 	public function test_get_orderby_filter_validates_input(): void {
 		$_GET['orderby'] = 'invalid_orderby';
 
-		$my_listings = new MyListings();
+		$my_listings = MyListings::get_instance();
 		$orderby     = $my_listings->get_orderby_filter();
 
 		$this->assertSame( 'date', $orderby );
@@ -176,7 +175,7 @@ final class MyListingsTest extends UnitTestCase {
 	 */
 	public function test_get_orderby_filter_accepts_valid_values(): void {
 		$valid_orderby = [ 'date', 'title', 'views' ];
-		$my_listings   = new MyListings();
+		$my_listings   = MyListings::get_instance();
 
 		foreach ( $valid_orderby as $orderby ) {
 			$_GET['orderby'] = $orderby;
@@ -191,7 +190,7 @@ final class MyListingsTest extends UnitTestCase {
 	 * Test get_order_filter returns DESC by default.
 	 */
 	public function test_get_order_filter_returns_desc_by_default(): void {
-		$my_listings = new MyListings();
+		$my_listings = MyListings::get_instance();
 
 		$order = $my_listings->get_order_filter();
 
@@ -204,7 +203,7 @@ final class MyListingsTest extends UnitTestCase {
 	public function test_get_order_filter_validates_input(): void {
 		$_GET['order'] = 'invalid';
 
-		$my_listings = new MyListings();
+		$my_listings = MyListings::get_instance();
 		$order       = $my_listings->get_order_filter();
 
 		$this->assertSame( 'DESC', $order );
@@ -216,7 +215,7 @@ final class MyListingsTest extends UnitTestCase {
 	 * Test get_order_filter accepts ASC and DESC.
 	 */
 	public function test_get_order_filter_accepts_asc_and_desc(): void {
-		$my_listings = new MyListings();
+		$my_listings = MyListings::get_instance();
 
 		$_GET['order'] = 'asc';
 		$this->assertSame( 'ASC', $my_listings->get_order_filter() );
@@ -231,7 +230,7 @@ final class MyListingsTest extends UnitTestCase {
 	 * Test get_current_page returns 1 by default.
 	 */
 	public function test_get_current_page_returns_1_by_default(): void {
-		$my_listings = new MyListings();
+		$my_listings = MyListings::get_instance();
 
 		$page = $my_listings->get_current_page();
 
@@ -244,13 +243,13 @@ final class MyListingsTest extends UnitTestCase {
 	public function test_get_current_page_enforces_minimum(): void {
 		// Test with paged = 0 (should return 1).
 		$_GET        = [ 'paged' => '0' ];
-		$my_listings = new MyListings();
+		$my_listings = MyListings::get_instance();
 		$page        = $my_listings->get_current_page();
 		$this->assertSame( 1, $page, 'paged=0 should return 1' );
 
 		// Test with empty string (should return 1).
 		$_GET        = [ 'paged' => '' ];
-		$my_listings = new MyListings();
+		$my_listings = MyListings::get_instance();
 		$page        = $my_listings->get_current_page();
 		$this->assertSame( 1, $page, 'paged="" should return 1' );
 
@@ -263,7 +262,7 @@ final class MyListingsTest extends UnitTestCase {
 	public function test_get_current_page_uses_absint_for_negative(): void {
 		// Negative values are converted via absint (absolute value).
 		$_GET        = [ 'paged' => '-5' ];
-		$my_listings = new MyListings();
+		$my_listings = MyListings::get_instance();
 		$page        = $my_listings->get_current_page();
 		// absint(-5) = 5, so max(1, 5) = 5.
 		$this->assertSame( 5, $page, 'paged=-5 converts to 5 via absint' );
@@ -275,7 +274,7 @@ final class MyListingsTest extends UnitTestCase {
 	 * Test get_current_page parses valid page numbers.
 	 */
 	public function test_get_current_page_parses_valid_numbers(): void {
-		$my_listings = new MyListings();
+		$my_listings = MyListings::get_instance();
 
 		$_GET['paged'] = '5';
 		$this->assertSame( 5, $my_listings->get_current_page() );
@@ -298,7 +297,7 @@ final class MyListingsTest extends UnitTestCase {
 			'expired'   => 1,
 		] );
 
-		$my_listings = new MyListings();
+		$my_listings = MyListings::get_instance();
 		$options     = $my_listings->get_status_options();
 
 		$this->assertArrayHasKey( 'all', $options );
@@ -319,7 +318,7 @@ final class MyListingsTest extends UnitTestCase {
 	 * Test get_orderby_options returns expected options.
 	 */
 	public function test_get_orderby_options_returns_expected_options(): void {
-		$my_listings = new MyListings();
+		$my_listings = MyListings::get_instance();
 		$options     = $my_listings->get_orderby_options();
 
 		$this->assertArrayHasKey( 'date', $options );
@@ -335,7 +334,7 @@ final class MyListingsTest extends UnitTestCase {
 	 * Test can_delete_listing returns false for invalid input.
 	 */
 	public function test_can_delete_listing_returns_false_for_invalid_input(): void {
-		$my_listings = new MyListings();
+		$my_listings = MyListings::get_instance();
 
 		$this->assertFalse( $my_listings->can_delete_listing( 0 ) );
 		$this->assertFalse( $my_listings->can_delete_listing( -1 ) );
@@ -348,7 +347,7 @@ final class MyListingsTest extends UnitTestCase {
 	public function test_can_edit_listing_delegates_to_helper(): void {
 		Functions\when( '\apd_user_can_edit_listing' )->justReturn( true );
 
-		$my_listings = new MyListings();
+		$my_listings = MyListings::get_instance();
 		$my_listings->set_user_id( 1 );
 
 		$result = $my_listings->can_edit_listing( 123 );
@@ -360,7 +359,7 @@ final class MyListingsTest extends UnitTestCase {
 	 * Test get_action_url generates correct URL.
 	 */
 	public function test_get_action_url_generates_correct_url(): void {
-		$my_listings = new MyListings();
+		$my_listings = MyListings::get_instance();
 
 		$url = $my_listings->get_action_url( 123, 'delete' );
 
@@ -375,7 +374,7 @@ final class MyListingsTest extends UnitTestCase {
 	public function test_get_edit_url_delegates_to_helper(): void {
 		Functions\when( '\apd_get_edit_listing_url' )->justReturn( 'https://example.com/edit?id=123' );
 
-		$my_listings = new MyListings();
+		$my_listings = MyListings::get_instance();
 
 		$url = $my_listings->get_edit_url( 123 );
 
@@ -386,7 +385,7 @@ final class MyListingsTest extends UnitTestCase {
 	 * Test get_status_badge returns HTML with correct class.
 	 */
 	public function test_get_status_badge_returns_html_with_correct_class(): void {
-		$my_listings = new MyListings();
+		$my_listings = MyListings::get_instance();
 
 		$publish_badge = $my_listings->get_status_badge( 'publish' );
 		$this->assertStringContainsString( 'apd-status-badge--success', $publish_badge );
@@ -409,7 +408,7 @@ final class MyListingsTest extends UnitTestCase {
 	 * Test get_status_badge handles unknown status.
 	 */
 	public function test_get_status_badge_handles_unknown_status(): void {
-		$my_listings = new MyListings();
+		$my_listings = MyListings::get_instance();
 
 		$unknown_badge = $my_listings->get_status_badge( 'custom_status' );
 
@@ -423,7 +422,7 @@ final class MyListingsTest extends UnitTestCase {
 	public function test_get_message_returns_null_when_no_message(): void {
 		Functions\when( 'get_transient' )->justReturn( false );
 
-		$my_listings = new MyListings();
+		$my_listings = MyListings::get_instance();
 		$my_listings->set_user_id( 1 );
 
 		$message = $my_listings->get_message();
@@ -443,7 +442,7 @@ final class MyListingsTest extends UnitTestCase {
 		Functions\when( 'get_transient' )->justReturn( $stored_message );
 		Functions\when( 'delete_transient' )->justReturn( true );
 
-		$my_listings = new MyListings();
+		$my_listings = MyListings::get_instance();
 		$my_listings->set_user_id( 1 );
 
 		$message = $my_listings->get_message();
@@ -478,7 +477,7 @@ final class MyListingsTest extends UnitTestCase {
 	public function test_render_returns_empty_for_no_user(): void {
 		Functions\when( 'get_current_user_id' )->justReturn( 0 );
 
-		$my_listings = new MyListings();
+		$my_listings = MyListings::get_instance();
 		$my_listings->set_user_id( 0 ); // Ensure user_id is 0
 
 		$result = $my_listings->render();
@@ -512,7 +511,7 @@ final class MyListingsTest extends UnitTestCase {
 	public function test_update_listing_status_validates_status(): void {
 		Functions\when( '\apd_user_can_edit_listing' )->justReturn( true );
 
-		$my_listings = new MyListings();
+		$my_listings = MyListings::get_instance();
 		$my_listings->set_user_id( 1 );
 
 		// Invalid status should return false.
@@ -537,7 +536,7 @@ final class MyListingsTest extends UnitTestCase {
 			return $value;
 		} );
 
-		$my_listings = new MyListings();
+		$my_listings = MyListings::get_instance();
 		$my_listings->set_user_id( 1 );
 
 		$result = $my_listings->delete_listing( 123 );

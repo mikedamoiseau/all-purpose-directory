@@ -30,9 +30,9 @@ use APD\Core\Capabilities;
 function apd_uninstall(): void {
 	global $wpdb;
 
-	// Check if user wants to keep data (option could be added in settings).
-	$settings = get_option( 'apd_settings', [] );
-	if ( ! empty( $settings['keep_data_on_uninstall'] ) ) {
+	// Check if user wants to keep data.
+	$settings = get_option( 'apd_options', [] );
+	if ( empty( $settings['delete_data'] ) ) {
 		return;
 	}
 
@@ -73,7 +73,7 @@ function apd_uninstall(): void {
 
 	// Delete plugin options.
 	$options = [
-		'apd_settings',
+		'apd_options',
 		'apd_version',
 		'apd_db_version',
 		'apd_activation_time',

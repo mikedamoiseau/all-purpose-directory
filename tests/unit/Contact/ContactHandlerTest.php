@@ -70,7 +70,7 @@ class ContactHandlerTest extends TestCase {
 	 * Test default configuration.
 	 */
 	public function test_default_configuration(): void {
-		$handler = new ContactHandler();
+		$handler = ContactHandler::get_instance();
 
 		$this->assertEquals( 10, $handler->get_config( 'min_message_length' ) );
 		$this->assertFalse( $handler->get_config( 'phone_required' ) );
@@ -83,7 +83,7 @@ class ContactHandlerTest extends TestCase {
 	 * Test custom configuration.
 	 */
 	public function test_custom_configuration(): void {
-		$handler = new ContactHandler( [
+		$handler = ContactHandler::get_instance( [
 			'min_message_length' => 50,
 			'phone_required'     => true,
 			'subject_required'   => true,
@@ -102,7 +102,7 @@ class ContactHandlerTest extends TestCase {
 	 * Test set_config merges configuration.
 	 */
 	public function test_set_config_merges(): void {
-		$handler = new ContactHandler();
+		$handler = ContactHandler::get_instance();
 		$result = $handler->set_config( [ 'min_message_length' => 25 ] );
 
 		$this->assertSame( $handler, $result ); // Fluent interface.
@@ -114,7 +114,7 @@ class ContactHandlerTest extends TestCase {
 	 * Test get_config returns null for missing key.
 	 */
 	public function test_get_config_returns_default(): void {
-		$handler = new ContactHandler();
+		$handler = ContactHandler::get_instance();
 
 		$this->assertNull( $handler->get_config( 'missing' ) );
 		$this->assertEquals( 'default', $handler->get_config( 'missing', 'default' ) );
@@ -129,7 +129,7 @@ class ContactHandlerTest extends TestCase {
 			return $value;
 		} );
 
-		$handler = new ContactHandler();
+		$handler = ContactHandler::get_instance();
 		$result = $handler->validate( [
 			'listing_id'      => 0,
 			'contact_name'    => 'John',
@@ -152,7 +152,7 @@ class ContactHandlerTest extends TestCase {
 			return $value;
 		} );
 
-		$handler = new ContactHandler();
+		$handler = ContactHandler::get_instance();
 		$result = $handler->validate( [
 			'listing_id'      => 123,
 			'contact_name'    => '',
@@ -174,7 +174,7 @@ class ContactHandlerTest extends TestCase {
 			return $value;
 		} );
 
-		$handler = new ContactHandler();
+		$handler = ContactHandler::get_instance();
 		$result = $handler->validate( [
 			'listing_id'      => 123,
 			'contact_name'    => 'John',
@@ -197,7 +197,7 @@ class ContactHandlerTest extends TestCase {
 			return $value;
 		} );
 
-		$handler = new ContactHandler();
+		$handler = ContactHandler::get_instance();
 		$result = $handler->validate( [
 			'listing_id'      => 123,
 			'contact_name'    => 'John',
@@ -220,7 +220,7 @@ class ContactHandlerTest extends TestCase {
 			return $value;
 		} );
 
-		$handler = new ContactHandler( [ 'phone_required' => true ] );
+		$handler = ContactHandler::get_instance( [ 'phone_required' => true ] );
 		$result = $handler->validate( [
 			'listing_id'      => 123,
 			'contact_name'    => 'John',
@@ -243,7 +243,7 @@ class ContactHandlerTest extends TestCase {
 			return $value;
 		} );
 
-		$handler = new ContactHandler( [ 'phone_required' => false ] );
+		$handler = ContactHandler::get_instance( [ 'phone_required' => false ] );
 		$result = $handler->validate( [
 			'listing_id'      => 123,
 			'contact_name'    => 'John',
@@ -265,7 +265,7 @@ class ContactHandlerTest extends TestCase {
 			return $value;
 		} );
 
-		$handler = new ContactHandler( [ 'subject_required' => true ] );
+		$handler = ContactHandler::get_instance( [ 'subject_required' => true ] );
 		$result = $handler->validate( [
 			'listing_id'      => 123,
 			'contact_name'    => 'John',
@@ -288,7 +288,7 @@ class ContactHandlerTest extends TestCase {
 			return $value;
 		} );
 
-		$handler = new ContactHandler();
+		$handler = ContactHandler::get_instance();
 		$result = $handler->validate( [
 			'listing_id'      => 123,
 			'contact_name'    => 'John',
@@ -311,7 +311,7 @@ class ContactHandlerTest extends TestCase {
 			return $value;
 		} );
 
-		$handler = new ContactHandler( [ 'min_message_length' => 20 ] );
+		$handler = ContactHandler::get_instance( [ 'min_message_length' => 20 ] );
 		$result = $handler->validate( [
 			'listing_id'      => 123,
 			'contact_name'    => 'John',
@@ -334,7 +334,7 @@ class ContactHandlerTest extends TestCase {
 			return $value;
 		} );
 
-		$handler = new ContactHandler();
+		$handler = ContactHandler::get_instance();
 		$result = $handler->validate( [
 			'listing_id'      => 123,
 			'contact_name'    => 'John Doe',
@@ -374,7 +374,7 @@ class ContactHandlerTest extends TestCase {
 		} );
 		Functions\when( 'wp_unslash' )->returnArg( 1 );
 
-		$handler = new ContactHandler();
+		$handler = ContactHandler::get_instance();
 		$data = $handler->get_sanitized_data();
 
 		$this->assertEquals( 123, $data['listing_id'] );
@@ -393,10 +393,10 @@ class ContactHandlerTest extends TestCase {
 			return $value;
 		} );
 
-		$handler1 = new ContactHandler( [ 'send_admin_copy' => false ] );
+		$handler1 = ContactHandler::get_instance( [ 'send_admin_copy' => false ] );
 		$this->assertFalse( $handler1->should_send_admin_copy() );
 
-		$handler2 = new ContactHandler( [ 'send_admin_copy' => true ] );
+		$handler2 = ContactHandler::get_instance( [ 'send_admin_copy' => true ] );
 		$this->assertTrue( $handler2->should_send_admin_copy() );
 	}
 
@@ -408,7 +408,7 @@ class ContactHandlerTest extends TestCase {
 			return $value;
 		} );
 
-		$handler = new ContactHandler( [ 'admin_email' => 'custom@admin.com' ] );
+		$handler = ContactHandler::get_instance( [ 'admin_email' => 'custom@admin.com' ] );
 		$this->assertEquals( 'custom@admin.com', $handler->get_admin_email() );
 	}
 
@@ -421,7 +421,7 @@ class ContactHandlerTest extends TestCase {
 			return $value;
 		} );
 
-		$handler = new ContactHandler( [ 'admin_email' => '' ] );
+		$handler = ContactHandler::get_instance( [ 'admin_email' => '' ] );
 		$this->assertEquals( 'default@admin.com', $handler->get_admin_email() );
 	}
 
@@ -439,7 +439,7 @@ class ContactHandlerTest extends TestCase {
 		$listing->ID = 123;
 		$listing->post_title = 'Test Listing';
 
-		$handler = new ContactHandler();
+		$handler = ContactHandler::get_instance();
 		$message = $handler->build_email_message( [
 			'contact_name'    => 'John Doe',
 			'contact_email'   => 'john@example.com',
@@ -467,7 +467,7 @@ class ContactHandlerTest extends TestCase {
 
 		Functions\when( 'do_action' )->justReturn( null );
 
-		$handler = new ContactHandler();
+		$handler = ContactHandler::get_instance();
 		$handler->init();
 
 		$this->assertContains( 'wp_ajax_apd_send_contact', $hooks_registered );
@@ -484,7 +484,7 @@ class ContactHandlerTest extends TestCase {
 
 		$_POST = [];
 
-		$handler = new ContactHandler();
+		$handler = ContactHandler::get_instance();
 		$this->assertFalse( $handler->verify_nonce() );
 	}
 
@@ -498,7 +498,7 @@ class ContactHandlerTest extends TestCase {
 
 		$_POST[ ContactForm::NONCE_NAME ] = 'valid_nonce';
 
-		$handler = new ContactHandler();
+		$handler = ContactHandler::get_instance();
 		$this->assertTrue( $handler->verify_nonce() );
 	}
 
@@ -528,7 +528,7 @@ class ContactHandlerTest extends TestCase {
 		$owner = Mockery::mock( 'WP_User' );
 		$owner->user_email = 'owner@example.com';
 
-		$handler = new ContactHandler();
+		$handler = ContactHandler::get_instance();
 		$result = $handler->send_email( [
 			'contact_name'    => 'John',
 			'contact_email'   => 'john@example.com',
@@ -567,7 +567,7 @@ class ContactHandlerTest extends TestCase {
 		$owner = Mockery::mock( 'WP_User' );
 		$owner->user_email = 'owner@example.com';
 
-		$handler = new ContactHandler();
+		$handler = ContactHandler::get_instance();
 		$handler->send_email( [
 			'contact_name'    => 'John',
 			'contact_email'   => 'john@example.com',
@@ -605,7 +605,7 @@ class ContactHandlerTest extends TestCase {
 		$owner = Mockery::mock( 'WP_User' );
 		$owner->user_email = 'owner@example.com';
 
-		$handler = new ContactHandler();
+		$handler = ContactHandler::get_instance();
 		$handler->send_email( [
 			'contact_name'    => 'John',
 			'contact_email'   => 'john@example.com',
@@ -643,7 +643,7 @@ class ContactHandlerTest extends TestCase {
 		$owner = Mockery::mock( 'WP_User' );
 		$owner->user_email = 'owner@example.com';
 
-		$handler = new ContactHandler( [
+		$handler = ContactHandler::get_instance( [
 			'send_admin_copy' => true,
 			'admin_email'     => 'admin@example.com',
 		] );
@@ -680,7 +680,7 @@ class ContactHandlerTest extends TestCase {
 		$owner = Mockery::mock( 'WP_User' );
 		$owner->user_email = 'owner@example.com';
 
-		$handler = new ContactHandler();
+		$handler = ContactHandler::get_instance();
 		$result = $handler->send_email( [
 			'contact_name'    => 'John',
 			'contact_email'   => 'john@example.com',
@@ -706,7 +706,7 @@ class ContactHandlerTest extends TestCase {
 		$listing->ID = 123;
 		$listing->post_title = 'Test Listing';
 
-		$handler = new ContactHandler();
+		$handler = ContactHandler::get_instance();
 		$message = $handler->build_email_message( [
 			'contact_name'    => 'John Doe',
 			'contact_email'   => 'john@example.com',

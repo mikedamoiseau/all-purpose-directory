@@ -706,8 +706,10 @@ class SubmissionForm {
 	 * @return string Encoded timestamp.
 	 */
 	public function get_form_timestamp(): string {
-		// Use base64 encoding to make it less obvious what this field is.
-		return base64_encode( (string) time() );
+		$timestamp = (string) time();
+		$signature = hash_hmac( 'sha256', $timestamp, wp_salt( 'nonce' ) );
+
+		return base64_encode( $timestamp . '|' . $signature );
 	}
 
 	/**

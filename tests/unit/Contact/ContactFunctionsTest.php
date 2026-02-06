@@ -68,7 +68,7 @@ class ContactFunctionsTest extends TestCase {
 	 */
 	public function test_contact_form_new_instance_with_config(): void {
 		$singleton = ContactForm::get_instance();
-		$custom = new ContactForm( [ 'show_phone' => false ] );
+		$custom = ContactForm::get_instance( [ 'show_phone' => false ] );
 
 		$this->assertNotSame( $singleton, $custom );
 		$this->assertFalse( $custom->show_phone() );
@@ -90,7 +90,7 @@ class ContactFunctionsTest extends TestCase {
 	 */
 	public function test_contact_handler_new_instance_with_config(): void {
 		$singleton = ContactHandler::get_instance();
-		$custom = new ContactHandler( [ 'min_message_length' => 50 ] );
+		$custom = ContactHandler::get_instance( [ 'min_message_length' => 50 ] );
 
 		$this->assertNotSame( $singleton, $custom );
 		$this->assertEquals( 50, $custom->get_config( 'min_message_length' ) );
@@ -113,7 +113,7 @@ class ContactFunctionsTest extends TestCase {
 		Functions\when( 'is_email' )->justReturn( true );
 		Functions\when( 'apply_filters' )->returnArg( 2 );
 
-		$form = new ContactForm();
+		$form = ContactForm::get_instance();
 		$this->assertTrue( $form->can_receive_contact( 123 ) );
 	}
 
@@ -123,7 +123,7 @@ class ContactFunctionsTest extends TestCase {
 	public function test_can_receive_contact_false_for_invalid_listing(): void {
 		Functions\when( 'get_post' )->justReturn( null );
 
-		$form = new ContactForm();
+		$form = ContactForm::get_instance();
 		$this->assertFalse( $form->can_receive_contact( 0 ) );
 	}
 
@@ -149,7 +149,7 @@ class ContactFunctionsTest extends TestCase {
 		$owner = Mockery::mock( 'WP_User' );
 		$owner->user_email = 'owner@example.com';
 
-		$handler = new ContactHandler();
+		$handler = ContactHandler::get_instance();
 		$result = $handler->send_email( [
 			'contact_name'    => 'John',
 			'contact_email'   => 'john@example.com',
@@ -183,7 +183,7 @@ class ContactFunctionsTest extends TestCase {
 		$owner = Mockery::mock( 'WP_User' );
 		$owner->user_email = 'owner@example.com';
 
-		$handler = new ContactHandler();
+		$handler = ContactHandler::get_instance();
 		$result = $handler->send_email( [
 			'contact_name'    => 'John',
 			'contact_email'   => 'john@example.com',

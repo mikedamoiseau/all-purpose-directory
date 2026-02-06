@@ -77,11 +77,12 @@ class ContactForm {
 	/**
 	 * Get single instance.
 	 *
+	 * @param array $config Optional. Configuration options.
 	 * @return ContactForm
 	 */
-	public static function get_instance(): ContactForm {
-		if ( null === self::$instance ) {
-			self::$instance = new self();
+	public static function get_instance( array $config = [] ): ContactForm {
+		if ( null === self::$instance || ! empty( $config ) ) {
+			self::$instance = new self( $config );
 		}
 		return self::$instance;
 	}
@@ -91,8 +92,26 @@ class ContactForm {
 	 *
 	 * @param array $config Configuration options.
 	 */
-	public function __construct( array $config = [] ) {
+	private function __construct( array $config = [] ) {
 		$this->config = array_merge( $this->config, $config );
+	}
+
+	/**
+	 * Prevent unserialization.
+	 *
+	 * @throws \Exception Always throws exception.
+	 */
+	public function __wakeup(): void {
+		throw new \Exception( 'Cannot unserialize singleton.' );
+	}
+
+	/**
+	 * Reset singleton instance (for testing).
+	 *
+	 * @return void
+	 */
+	public static function reset_instance(): void {
+		self::$instance = null;
 	}
 
 	/**

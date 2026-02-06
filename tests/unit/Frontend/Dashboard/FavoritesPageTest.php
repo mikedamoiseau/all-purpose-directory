@@ -58,10 +58,8 @@ final class FavoritesPageTest extends UnitTestCase {
 		// Restore original $_GET.
 		$_GET = $this->original_get;
 
-		// Reset singleton instance using reflection.
-		$reflection = new \ReflectionClass( FavoritesPage::class );
-		$instance   = $reflection->getProperty( 'instance' );
-		$instance->setValue( null, null );
+		// Reset singleton instance.
+		FavoritesPage::reset_instance();
 
 		parent::tearDown();
 	}
@@ -72,7 +70,7 @@ final class FavoritesPageTest extends UnitTestCase {
 	public function test_constructor_sets_default_config(): void {
 		Functions\when( 'get_current_user_id' )->justReturn( 0 );
 
-		$favorites_page = new FavoritesPage();
+		$favorites_page = FavoritesPage::get_instance();
 
 		$this->assertSame( 0, $favorites_page->get_user_id() );
 	}
@@ -81,18 +79,19 @@ final class FavoritesPageTest extends UnitTestCase {
 	 * Test constructor accepts custom configuration.
 	 */
 	public function test_constructor_accepts_custom_config(): void {
+		FavoritesPage::reset_instance();
 		$config         = [ 'per_page' => 24 ];
-		$favorites_page = new FavoritesPage( $config );
+		$favorites_page = FavoritesPage::get_instance( $config );
 
-		$config = $favorites_page->get_config();
-		$this->assertSame( 24, $config['per_page'] );
+		$result = $favorites_page->get_config();
+		$this->assertSame( 24, $result['per_page'] );
 	}
 
 	/**
 	 * Test set_user_id and get_user_id.
 	 */
 	public function test_set_and_get_user_id(): void {
-		$favorites_page = new FavoritesPage();
+		$favorites_page = FavoritesPage::get_instance();
 
 		$favorites_page->set_user_id( 42 );
 		$this->assertSame( 42, $favorites_page->get_user_id() );
@@ -105,7 +104,7 @@ final class FavoritesPageTest extends UnitTestCase {
 	 * Test get_current_page returns 1 by default.
 	 */
 	public function test_get_current_page_returns_1_by_default(): void {
-		$favorites_page = new FavoritesPage();
+		$favorites_page = FavoritesPage::get_instance();
 
 		$page = $favorites_page->get_current_page();
 
@@ -118,7 +117,7 @@ final class FavoritesPageTest extends UnitTestCase {
 	public function test_get_current_page_parses_url_parameter(): void {
 		$_GET['fav_page'] = '3';
 
-		$favorites_page = new FavoritesPage();
+		$favorites_page = FavoritesPage::get_instance();
 		$page           = $favorites_page->get_current_page();
 
 		$this->assertSame( 3, $page );
@@ -132,7 +131,7 @@ final class FavoritesPageTest extends UnitTestCase {
 	public function test_get_current_page_enforces_minimum(): void {
 		$_GET['fav_page'] = '0';
 
-		$favorites_page = new FavoritesPage();
+		$favorites_page = FavoritesPage::get_instance();
 		$page           = $favorites_page->get_current_page();
 
 		$this->assertSame( 1, $page );
@@ -149,7 +148,7 @@ final class FavoritesPageTest extends UnitTestCase {
 	 * Test get_view_mode returns grid by default.
 	 */
 	public function test_get_view_mode_returns_grid_by_default(): void {
-		$favorites_page = new FavoritesPage();
+		$favorites_page = FavoritesPage::get_instance();
 
 		$view_mode = $favorites_page->get_view_mode();
 
@@ -162,7 +161,7 @@ final class FavoritesPageTest extends UnitTestCase {
 	public function test_get_view_mode_accepts_url_parameter(): void {
 		$_GET['view'] = 'list';
 
-		$favorites_page = new FavoritesPage();
+		$favorites_page = FavoritesPage::get_instance();
 		$view_mode      = $favorites_page->get_view_mode();
 
 		$this->assertSame( 'list', $view_mode );
@@ -176,7 +175,7 @@ final class FavoritesPageTest extends UnitTestCase {
 	public function test_get_view_mode_validates_url_parameter(): void {
 		$_GET['view'] = 'invalid_view';
 
-		$favorites_page = new FavoritesPage();
+		$favorites_page = FavoritesPage::get_instance();
 		$view_mode      = $favorites_page->get_view_mode();
 
 		$this->assertSame( 'grid', $view_mode );
@@ -190,7 +189,7 @@ final class FavoritesPageTest extends UnitTestCase {
 	public function test_get_view_mode_reads_from_user_meta(): void {
 		Functions\when( 'get_user_meta' )->justReturn( 'list' );
 
-		$favorites_page = new FavoritesPage();
+		$favorites_page = FavoritesPage::get_instance();
 		$favorites_page->set_user_id( 1 );
 		$view_mode = $favorites_page->get_view_mode();
 
@@ -201,7 +200,7 @@ final class FavoritesPageTest extends UnitTestCase {
 	 * Test save_view_mode saves to user meta.
 	 */
 	public function test_save_view_mode_saves_to_user_meta(): void {
-		$favorites_page = new FavoritesPage();
+		$favorites_page = FavoritesPage::get_instance();
 		$favorites_page->set_user_id( 1 );
 
 		$result = $favorites_page->save_view_mode( 'list' );
@@ -214,7 +213,7 @@ final class FavoritesPageTest extends UnitTestCase {
 	 * Test save_view_mode rejects invalid view mode.
 	 */
 	public function test_save_view_mode_rejects_invalid_view_mode(): void {
-		$favorites_page = new FavoritesPage();
+		$favorites_page = FavoritesPage::get_instance();
 		$favorites_page->set_user_id( 1 );
 
 		$result = $favorites_page->save_view_mode( 'invalid' );
@@ -226,7 +225,7 @@ final class FavoritesPageTest extends UnitTestCase {
 	 * Test save_view_mode returns false for no user.
 	 */
 	public function test_save_view_mode_returns_false_for_no_user(): void {
-		$favorites_page = new FavoritesPage();
+		$favorites_page = FavoritesPage::get_instance();
 		$favorites_page->set_user_id( 0 );
 
 		$result = $favorites_page->save_view_mode( 'list' );
@@ -240,7 +239,7 @@ final class FavoritesPageTest extends UnitTestCase {
 	public function test_get_favorites_count_delegates_to_helper(): void {
 		Functions\when( '\apd_get_favorites_count' )->justReturn( 5 );
 
-		$favorites_page = new FavoritesPage();
+		$favorites_page = FavoritesPage::get_instance();
 		$favorites_page->set_user_id( 1 );
 
 		$count = $favorites_page->get_favorites_count();
@@ -254,7 +253,7 @@ final class FavoritesPageTest extends UnitTestCase {
 	public function test_has_favorites_returns_true_when_has_favorites(): void {
 		Functions\when( '\apd_get_favorites_count' )->justReturn( 3 );
 
-		$favorites_page = new FavoritesPage();
+		$favorites_page = FavoritesPage::get_instance();
 		$favorites_page->set_user_id( 1 );
 
 		$this->assertTrue( $favorites_page->has_favorites() );
@@ -266,7 +265,7 @@ final class FavoritesPageTest extends UnitTestCase {
 	public function test_has_favorites_returns_false_when_no_favorites(): void {
 		Functions\when( '\apd_get_favorites_count' )->justReturn( 0 );
 
-		$favorites_page = new FavoritesPage();
+		$favorites_page = FavoritesPage::get_instance();
 		$favorites_page->set_user_id( 1 );
 
 		$this->assertFalse( $favorites_page->has_favorites() );
@@ -276,7 +275,7 @@ final class FavoritesPageTest extends UnitTestCase {
 	 * Test get_view_mode_url generates correct URL.
 	 */
 	public function test_get_view_mode_url_generates_correct_url(): void {
-		$favorites_page = new FavoritesPage();
+		$favorites_page = FavoritesPage::get_instance();
 
 		$url = $favorites_page->get_view_mode_url( 'list' );
 
@@ -292,7 +291,7 @@ final class FavoritesPageTest extends UnitTestCase {
 			return $value;
 		} );
 
-		$favorites_page = new FavoritesPage();
+		$favorites_page = FavoritesPage::get_instance();
 
 		$url = $favorites_page->get_listings_archive_url();
 
@@ -308,7 +307,7 @@ final class FavoritesPageTest extends UnitTestCase {
 			return $value;
 		} );
 
-		$favorites_page = new FavoritesPage();
+		$favorites_page = FavoritesPage::get_instance();
 
 		$url = $favorites_page->get_listings_archive_url();
 
@@ -319,7 +318,7 @@ final class FavoritesPageTest extends UnitTestCase {
 	 * Test get_grid_config returns expected structure.
 	 */
 	public function test_get_grid_config_returns_expected_structure(): void {
-		$favorites_page = new FavoritesPage();
+		$favorites_page = FavoritesPage::get_instance();
 
 		$config = $favorites_page->get_grid_config();
 
@@ -359,7 +358,7 @@ final class FavoritesPageTest extends UnitTestCase {
 	public function test_render_returns_empty_for_no_user(): void {
 		Functions\when( 'get_current_user_id' )->justReturn( 0 );
 
-		$favorites_page = new FavoritesPage();
+		$favorites_page = FavoritesPage::get_instance();
 		$favorites_page->set_user_id( 0 );
 
 		$result = $favorites_page->render();
@@ -379,7 +378,7 @@ final class FavoritesPageTest extends UnitTestCase {
 	 * Test get_config returns configuration.
 	 */
 	public function test_get_config_returns_configuration(): void {
-		$favorites_page = new FavoritesPage();
+		$favorites_page = FavoritesPage::get_instance();
 
 		$config = $favorites_page->get_config();
 
@@ -400,7 +399,7 @@ final class FavoritesPageTest extends UnitTestCase {
 		Functions\when( 'get_user_meta' )->justReturn( 'list' );
 		$_GET['view'] = 'grid';
 
-		$favorites_page = new FavoritesPage();
+		$favorites_page = FavoritesPage::get_instance();
 		$favorites_page->set_user_id( 1 );
 		$view_mode = $favorites_page->get_view_mode();
 

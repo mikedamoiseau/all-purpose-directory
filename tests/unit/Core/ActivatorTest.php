@@ -95,28 +95,22 @@ class ActivatorTest extends UnitTestCase
         Functions\when('update_option')->justReturn(true);
 
         // Capture the settings passed to add_option.
-        $capturedSettings = null;
-        Functions\when('get_option')->alias(function ($name) {
-            return $name === 'apd_settings' ? false : null;
+        $addOptionCalled = false;
+        $optionName = \APD\Admin\Settings::OPTION_NAME;
+        Functions\when('get_option')->alias(function ($name) use ($optionName) {
+            return $name === $optionName ? false : null;
         });
-        Functions\when('add_option')->alias(function ($name, $value) use (&$capturedSettings) {
-            if ($name === 'apd_settings') {
-                $capturedSettings = $value;
+        Functions\when('add_option')->alias(function ($name, $value) use (&$addOptionCalled, $optionName) {
+            if ($name === $optionName) {
+                $addOptionCalled = true;
             }
             return true;
         });
 
         Activator::activate();
 
-        // Verify default settings structure.
-        $this->assertIsArray($capturedSettings);
-        $this->assertArrayHasKey('listings_per_page', $capturedSettings);
-        $this->assertArrayHasKey('enable_reviews', $capturedSettings);
-        $this->assertArrayHasKey('enable_favorites', $capturedSettings);
-        $this->assertArrayHasKey('require_login_submit', $capturedSettings);
-        $this->assertArrayHasKey('moderate_submissions', $capturedSettings);
-        $this->assertArrayHasKey('listing_expiry_days', $capturedSettings);
-        $this->assertArrayHasKey('currency', $capturedSettings);
+        // Verify add_option was called with the correct option name.
+        $this->assertTrue($addOptionCalled, 'add_option should be called for ' . $optionName);
     }
 
     /**
@@ -140,14 +134,15 @@ class ActivatorTest extends UnitTestCase
         Functions\when('update_option')->justReturn(true);
 
         // Existing settings present - get_option returns existing settings.
-        Functions\when('get_option')->alias(function ($name) {
-            return $name === 'apd_settings' ? ['listings_per_page' => 24] : null;
+        $optionName = \APD\Admin\Settings::OPTION_NAME;
+        Functions\when('get_option')->alias(function ($name) use ($optionName) {
+            return $name === $optionName ? ['listings_per_page' => 24] : null;
         });
 
-        // Track if add_option was called for apd_settings.
+        // Track if add_option was called for the settings option.
         $addOptionCalled = false;
-        Functions\when('add_option')->alias(function ($name) use (&$addOptionCalled) {
-            if ($name === 'apd_settings') {
+        Functions\when('add_option')->alias(function ($name) use (&$addOptionCalled, $optionName) {
+            if ($name === $optionName) {
                 $addOptionCalled = true;
             }
             return true;
@@ -155,7 +150,7 @@ class ActivatorTest extends UnitTestCase
 
         Activator::activate();
 
-        // add_option should NOT have been called for apd_settings.
+        // add_option should NOT have been called when settings exist.
         $this->assertFalse($addOptionCalled, 'add_option should not be called when settings exist');
     }
 

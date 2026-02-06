@@ -45,11 +45,12 @@ class ContactHandler {
 	/**
 	 * Get single instance.
 	 *
+	 * @param array $config Optional. Configuration options.
 	 * @return ContactHandler
 	 */
-	public static function get_instance(): ContactHandler {
-		if ( null === self::$instance ) {
-			self::$instance = new self();
+	public static function get_instance( array $config = [] ): ContactHandler {
+		if ( null === self::$instance || ! empty( $config ) ) {
+			self::$instance = new self( $config );
 		}
 		return self::$instance;
 	}
@@ -59,8 +60,26 @@ class ContactHandler {
 	 *
 	 * @param array $config Configuration options.
 	 */
-	public function __construct( array $config = [] ) {
+	private function __construct( array $config = [] ) {
 		$this->config = array_merge( $this->config, $config );
+	}
+
+	/**
+	 * Prevent unserialization.
+	 *
+	 * @throws \Exception Always throws exception.
+	 */
+	public function __wakeup(): void {
+		throw new \Exception( 'Cannot unserialize singleton.' );
+	}
+
+	/**
+	 * Reset singleton instance (for testing).
+	 *
+	 * @return void
+	 */
+	public static function reset_instance(): void {
+		self::$instance = null;
 	}
 
 	/**
@@ -137,6 +156,12 @@ class ContactHandler {
 	 * @return true|\WP_Error True on success, WP_Error on failure.
 	 */
 	public function process(): bool|\WP_Error {
+		// Run spam protection checks.
+		$spam_check = $this->check_spam_protection();
+		if ( is_wp_error( $spam_check ) ) {
+			return $spam_check;
+		}
+
 		// Get and sanitize data.
 		$data = $this->get_sanitized_data();
 
@@ -334,9 +359,11 @@ class ContactHandler {
 		$message = apply_filters( 'apd_contact_email_message', $message, $data, $listing );
 
 		// Headers.
-		$headers = [
+		// Sanitize name for email header safety (strip control chars and header-breaking characters).
+		$safe_name = preg_replace( '/[\r\n\t:;<>"]/', '', $data['contact_name'] );
+		$headers   = [
 			'Content-Type: text/html; charset=UTF-8',
-			sprintf( 'Reply-To: %s <%s>', $data['contact_name'], $data['contact_email'] ),
+			sprintf( 'Reply-To: %s <%s>', $safe_name, $data['contact_email'] ),
 		];
 
 		/**
@@ -476,5 +503,304 @@ class ContactHandler {
 	public function set_config( array $config ): self {
 		$this->config = array_merge( $this->config, $config );
 		return $this;
+	}
+
+	// =========================================================================
+	// Spam Protection Methods
+	// =========================================================================
+
+	/**
+	 * Run all spam protection checks.
+	 *
+	 * Checks honeypot field, submission timing, rate limiting,
+	 * and allows extensions to add custom checks (e.g., reCAPTCHA).
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return true|\WP_Error True if passed, WP_Error if spam detected.
+	 */
+	private function check_spam_protection(): bool|\WP_Error {
+		/**
+		 * Filter whether to bypass contact form spam protection.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param bool $bypass  Whether to bypass. Default false.
+		 * @param int  $user_id The current user ID.
+		 */
+		$bypass = apply_filters( 'apd_contact_bypass_spam_protection', false, get_current_user_id() );
+
+		if ( $bypass ) {
+			return true;
+		}
+
+		// Check honeypot field.
+		if ( $this->is_honeypot_filled() ) {
+			$this->log_spam_attempt( 'honeypot' );
+			return $this->get_generic_spam_error();
+		}
+
+		// Check submission timing (too fast = likely bot).
+		if ( $this->is_submission_too_fast() ) {
+			$this->log_spam_attempt( 'timing' );
+			return $this->get_generic_spam_error();
+		}
+
+		// Check rate limiting.
+		$rate_limit_check = $this->check_rate_limit();
+		if ( is_wp_error( $rate_limit_check ) ) {
+			$this->log_spam_attempt( 'rate_limit' );
+			return $rate_limit_check;
+		}
+
+		/**
+		 * Filter to run custom spam checks on the contact form.
+		 *
+		 * Third-party integrations (like reCAPTCHA) can hook here
+		 * to add additional spam checking. Return WP_Error to block.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param true|\WP_Error $result  Current result. True if passed.
+		 * @param array          $post_data The $_POST data.
+		 * @param int            $user_id   The current user ID.
+		 */
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in handle_ajax().
+		$custom_check = apply_filters( 'apd_contact_spam_check', true, $_POST, get_current_user_id() );
+
+		if ( is_wp_error( $custom_check ) ) {
+			$this->log_spam_attempt( 'custom' );
+			return $custom_check;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Check if the honeypot field was filled.
+	 *
+	 * The honeypot field is hidden from real users but visible to bots.
+	 * If it contains a value, this is likely a bot submission.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return bool True if honeypot was filled (spam).
+	 */
+	private function is_honeypot_filled(): bool {
+		/**
+		 * Filter the contact form honeypot field name.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param string $field_name The honeypot field name.
+		 */
+		$honeypot_field = apply_filters( 'apd_contact_honeypot_field_name', 'contact_website' );
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in handle_ajax().
+		if ( ! isset( $_POST[ $honeypot_field ] ) ) {
+			return false;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$value = wp_unslash( $_POST[ $honeypot_field ] );
+
+		return ! hash_equals( '', (string) $value );
+	}
+
+	/**
+	 * Check if the submission happened too quickly.
+	 *
+	 * Bots typically submit forms instantly. Real users need time
+	 * to read and fill out the form.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return bool True if submission was too fast (spam).
+	 */
+	private function is_submission_too_fast(): bool {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in handle_ajax().
+		if ( ! isset( $_POST['apd_contact_token'] ) ) {
+			return false;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$token = wp_unslash( $_POST['apd_contact_token'] );
+
+		$decoded = base64_decode( (string) $token, true );
+		if ( $decoded === false || strpos( $decoded, '|' ) === false ) {
+			return true;
+		}
+
+		[ $timestamp_str, $signature ] = explode( '|', $decoded, 2 );
+		$expected_signature = hash_hmac( 'sha256', $timestamp_str, wp_salt( 'nonce' ) );
+
+		if ( ! hash_equals( $expected_signature, $signature ) ) {
+			return true;
+		}
+
+		$form_load_time = (int) $timestamp_str;
+		$current_time   = time();
+
+		// Check if timestamp is valid (not in the future, not too old).
+		$day_in_seconds = defined( 'DAY_IN_SECONDS' ) ? DAY_IN_SECONDS : 86400;
+		if ( $form_load_time > $current_time || $form_load_time < ( $current_time - $day_in_seconds ) ) {
+			return true;
+		}
+
+		$elapsed = $current_time - $form_load_time;
+
+		/**
+		 * Filter the minimum time required for contact form submission.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param int $min_time Minimum seconds before submission is allowed. Default 2.
+		 */
+		$min_time = apply_filters( 'apd_contact_min_time', 2 );
+
+		return $elapsed < $min_time;
+	}
+
+	/**
+	 * Check rate limiting for contact submissions.
+	 *
+	 * Prevents users/IPs from sending too many messages in a time period.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return true|\WP_Error True if within limit, WP_Error if rate limited.
+	 */
+	private function check_rate_limit(): bool|\WP_Error {
+		$identifier = $this->get_rate_limit_identifier();
+
+		/**
+		 * Filter the contact form rate limit.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param int $limit Maximum contact submissions in the time period. Default 10.
+		 */
+		$limit = apply_filters( 'apd_contact_rate_limit', 10 );
+
+		/**
+		 * Filter the contact form rate limit time period.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param int $period Time period in seconds. Default 3600 (1 hour).
+		 */
+		$hour_in_seconds = defined( 'HOUR_IN_SECONDS' ) ? HOUR_IN_SECONDS : 3600;
+		$period          = apply_filters( 'apd_contact_rate_period', $hour_in_seconds );
+
+		$transient_key = 'apd_contact_count_' . $identifier;
+		$count         = (int) get_transient( $transient_key );
+
+		if ( $count >= $limit ) {
+			return new \WP_Error(
+				'rate_limited',
+				__( 'You have sent too many messages. Please try again later.', 'all-purpose-directory' )
+			);
+		}
+
+		set_transient( $transient_key, $count + 1, $period );
+
+		return true;
+	}
+
+	/**
+	 * Get the identifier for rate limiting.
+	 *
+	 * Uses user ID for logged-in users, IP address for guests.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return string Rate limit identifier.
+	 */
+	private function get_rate_limit_identifier(): string {
+		$user_id = get_current_user_id();
+
+		if ( $user_id > 0 ) {
+			return 'user_' . $user_id;
+		}
+
+		$ip = $this->get_client_ip();
+
+		return 'ip_' . md5( $ip );
+	}
+
+	/**
+	 * Get the client IP address.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return string Client IP address.
+	 */
+	private function get_client_ip(): string {
+		$ip = '';
+
+		$headers = [
+			'HTTP_CF_CONNECTING_IP',
+			'HTTP_X_FORWARDED_FOR',
+			'HTTP_X_REAL_IP',
+			'REMOTE_ADDR',
+		];
+
+		foreach ( $headers as $header ) {
+			if ( ! empty( $_SERVER[ $header ] ) ) {
+				$ip = strtok( sanitize_text_field( wp_unslash( $_SERVER[ $header ] ) ), ',' );
+				break;
+			}
+		}
+
+		$ip = trim( (string) $ip );
+		if ( filter_var( $ip, FILTER_VALIDATE_IP ) ) {
+			return $ip;
+		}
+
+		return '0.0.0.0';
+	}
+
+	/**
+	 * Get a generic spam error message.
+	 *
+	 * We don't reveal which check failed to avoid helping spammers.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return \WP_Error Generic spam error.
+	 */
+	private function get_generic_spam_error(): \WP_Error {
+		return new \WP_Error(
+			'submission_failed',
+			__( 'Submission failed. Please try again.', 'all-purpose-directory' )
+		);
+	}
+
+	/**
+	 * Log a spam attempt.
+	 *
+	 * Fires an action hook for admin logging/notification.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $type Type of spam detected (honeypot, timing, rate_limit, custom).
+	 * @return void
+	 */
+	private function log_spam_attempt( string $type ): void {
+		/**
+		 * Fires when a contact form spam attempt is detected.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param string $type      Type of spam detected.
+		 * @param string $ip        Client IP address.
+		 * @param int    $user_id   User ID (0 for guests).
+		 */
+		do_action(
+			'apd_contact_spam_attempt_detected',
+			$type,
+			$this->get_client_ip(),
+			get_current_user_id()
+		);
 	}
 }

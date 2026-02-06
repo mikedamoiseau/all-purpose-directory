@@ -99,6 +99,15 @@ final class FilterRegistry {
 	}
 
 	/**
+	 * Reset singleton instance (for testing).
+	 *
+	 * @return void
+	 */
+	public static function reset_instance(): void {
+		self::$instance = null;
+	}
+
+	/**
 	 * Register a filter.
 	 *
 	 * @since 1.0.0

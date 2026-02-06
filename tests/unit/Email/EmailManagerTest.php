@@ -75,13 +75,14 @@ class EmailManagerTest extends TestCase {
 		] );
 
 		// Create new instance for each test.
-		$this->manager = new EmailManager();
+		$this->manager = EmailManager::get_instance();
 	}
 
 	/**
 	 * Tear down test environment.
 	 */
 	protected function tearDown(): void {
+		EmailManager::reset_instance();
 		Monkey\tearDown();
 		parent::tearDown();
 	}
@@ -104,7 +105,7 @@ class EmailManagerTest extends TestCase {
 			'from_name'  => 'Custom Name',
 			'from_email' => 'custom@example.com',
 		];
-		$manager = new EmailManager( $config );
+		$manager = EmailManager::get_instance( $config );
 
 		$this->assertEquals( 'Custom Name', $manager->get_config( 'from_name' ) );
 		$this->assertEquals( 'custom@example.com', $manager->get_config( 'from_email' ) );
@@ -590,7 +591,7 @@ class EmailManagerTest extends TestCase {
 	 */
 	public function test_wrap_html_email_includes_structure(): void {
 		// Disable template usage to test default wrapper.
-		$manager = new EmailManager( [ 'use_templates' => false ] );
+		$manager = EmailManager::get_instance( [ 'use_templates' => false ] );
 
 		$html = $manager->wrap_html_email( '<p>Test content</p>' );
 
@@ -625,7 +626,7 @@ class EmailManagerTest extends TestCase {
 	 */
 	public function test_on_listing_status_changed_handles_approval(): void {
 		// Create a manager with templates disabled for simpler testing.
-		$manager = new EmailManager( [ 'use_templates' => false ] );
+		$manager = EmailManager::get_instance( [ 'use_templates' => false ] );
 
 		// Create mock listing.
 		$listing               = new \stdClass();
@@ -657,7 +658,7 @@ class EmailManagerTest extends TestCase {
 	 */
 	public function test_on_listing_status_changed_handles_expiration(): void {
 		// Create a manager with templates disabled for simpler testing.
-		$manager = new EmailManager( [ 'use_templates' => false ] );
+		$manager = EmailManager::get_instance( [ 'use_templates' => false ] );
 
 		// Create mock listing.
 		$listing               = new \stdClass();
@@ -777,7 +778,7 @@ class EmailManagerTest extends TestCase {
 	 * Test send_listing_submitted returns false for invalid listing.
 	 */
 	public function test_send_listing_submitted_returns_false_for_invalid(): void {
-		$manager = new EmailManager( [ 'use_templates' => false ] );
+		$manager = EmailManager::get_instance( [ 'use_templates' => false ] );
 
 		Functions\expect( 'get_post' )->once()->andReturn( null );
 
@@ -790,7 +791,7 @@ class EmailManagerTest extends TestCase {
 	 * Test send_listing_approved returns false for invalid listing.
 	 */
 	public function test_send_listing_approved_returns_false_for_invalid(): void {
-		$manager = new EmailManager( [ 'use_templates' => false ] );
+		$manager = EmailManager::get_instance( [ 'use_templates' => false ] );
 
 		Functions\expect( 'get_post' )->once()->andReturn( null );
 
@@ -803,7 +804,7 @@ class EmailManagerTest extends TestCase {
 	 * Test send_listing_rejected with reason.
 	 */
 	public function test_send_listing_rejected_with_reason(): void {
-		$manager = new EmailManager( [ 'use_templates' => false ] );
+		$manager = EmailManager::get_instance( [ 'use_templates' => false ] );
 
 		$listing               = new \stdClass();
 		$listing->ID           = 123;
@@ -832,7 +833,7 @@ class EmailManagerTest extends TestCase {
 	 * Test send_listing_expiring.
 	 */
 	public function test_send_listing_expiring(): void {
-		$manager = new EmailManager( [ 'use_templates' => false ] );
+		$manager = EmailManager::get_instance( [ 'use_templates' => false ] );
 
 		$listing               = new \stdClass();
 		$listing->ID           = 123;
@@ -861,7 +862,7 @@ class EmailManagerTest extends TestCase {
 	 * Test send_new_review with valid review.
 	 */
 	public function test_send_new_review_with_valid_review(): void {
-		$manager = new EmailManager( [ 'use_templates' => false ] );
+		$manager = EmailManager::get_instance( [ 'use_templates' => false ] );
 
 		// Mock review.
 		$review                       = new \stdClass();
@@ -910,7 +911,7 @@ class EmailManagerTest extends TestCase {
 	 * Test send_new_review returns false for invalid review.
 	 */
 	public function test_send_new_review_returns_false_for_invalid(): void {
-		$manager = new EmailManager( [ 'use_templates' => false ] );
+		$manager = EmailManager::get_instance( [ 'use_templates' => false ] );
 
 		Functions\expect( 'get_comment' )->once()->andReturn( null );
 
@@ -923,7 +924,7 @@ class EmailManagerTest extends TestCase {
 	 * Test send_new_inquiry.
 	 */
 	public function test_send_new_inquiry(): void {
-		$manager = new EmailManager( [ 'use_templates' => false ] );
+		$manager = EmailManager::get_instance( [ 'use_templates' => false ] );
 
 		$listing               = new \stdClass();
 		$listing->ID           = 123;
@@ -959,7 +960,7 @@ class EmailManagerTest extends TestCase {
 	 * Test get_template_html falls back to plain text when templates disabled.
 	 */
 	public function test_get_template_html_falls_back_to_plain_text(): void {
-		$manager = new EmailManager( [ 'use_templates' => false ] );
+		$manager = EmailManager::get_instance( [ 'use_templates' => false ] );
 
 		$html = $manager->get_template_html( 'listing-submitted', [
 			'listing_title' => 'Test',

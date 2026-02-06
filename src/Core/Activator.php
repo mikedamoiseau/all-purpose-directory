@@ -96,22 +96,12 @@ class Activator {
 	 * @return void
 	 */
 	private static function create_options(): void {
-		$default_settings = [
-			'listings_per_page'     => 12,
-			'enable_reviews'        => true,
-			'enable_favorites'      => true,
-			'require_login_submit'  => true,
-			'moderate_submissions'  => true,
-			'listing_expiry_days'   => 30,
-			'currency'              => 'USD',
-			'currency_position'     => 'before',
-			'google_maps_api_key'   => '',
-			'default_listing_image' => '',
-		];
+		// Use the same option name as the Settings class (apd_options).
+		$option_name = \APD\Admin\Settings::OPTION_NAME;
 
-		// Only add if option doesn't exist.
-		if ( get_option( 'apd_settings' ) === false ) {
-			add_option( 'apd_settings', $default_settings );
+		// Only add if option doesn't exist. Defaults are managed by the Settings class.
+		if ( get_option( $option_name ) === false ) {
+			add_option( $option_name, [] );
 		}
 	}
 
