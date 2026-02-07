@@ -52,6 +52,9 @@ class ListingsEndpointTest extends UnitTestCase {
 			},
 		] );
 
+		// Stub wp_get_object_terms for apd_get_listing_type() calls.
+		Functions\when( 'wp_get_object_terms' )->justReturn( [] );
+
 		$this->controller = RestController::get_instance();
 		$this->endpoint   = new ListingsEndpoint( $this->controller );
 	}

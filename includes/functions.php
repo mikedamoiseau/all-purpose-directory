@@ -71,6 +71,17 @@ function apd_get_tag_taxonomy(): string {
 }
 
 /**
+ * Get the listing type taxonomy name.
+ *
+ * @since 1.1.0
+ *
+ * @return string
+ */
+function apd_get_listing_type_taxonomy(): string {
+	return \APD\Taxonomy\ListingTypeTaxonomy::TAXONOMY;
+}
+
+/**
  * Check if a post is a listing.
  *
  * @param int|\WP_Post|null $post Post ID or post object.
@@ -255,6 +266,108 @@ function apd_get_category_color( int|\WP_Term $category ): string {
 	$term_id = $category instanceof \WP_Term ? $category->term_id : $category;
 
 	return \APD\Taxonomy\CategoryTaxonomy::get_color( $term_id );
+}
+
+// ============================================================================
+// Listing Type Functions
+// ============================================================================
+
+/**
+ * Get the listing type for a listing.
+ *
+ * @since 1.1.0
+ *
+ * @param int $listing_id Listing post ID.
+ * @return string Listing type slug (e.g., 'general', 'url-directory').
+ */
+function apd_get_listing_type( int $listing_id ): string {
+	$terms = wp_get_object_terms(
+		$listing_id,
+		\APD\Taxonomy\ListingTypeTaxonomy::TAXONOMY
+	);
+
+	if ( is_wp_error( $terms ) || empty( $terms ) ) {
+		return \APD\Taxonomy\ListingTypeTaxonomy::DEFAULT_TERM;
+	}
+
+	return $terms[0]->slug;
+}
+
+/**
+ * Set the listing type for a listing.
+ *
+ * @since 1.1.0
+ *
+ * @param int    $listing_id Listing post ID.
+ * @param string $type       Listing type slug (e.g., 'url-directory').
+ * @return bool True on success, false on failure.
+ */
+function apd_set_listing_type( int $listing_id, string $type ): bool {
+	$result = wp_set_object_terms(
+		$listing_id,
+		sanitize_key( $type ),
+		\APD\Taxonomy\ListingTypeTaxonomy::TAXONOMY
+	);
+
+	return ! is_wp_error( $result );
+}
+
+/**
+ * Check if a listing is of a specific type.
+ *
+ * @since 1.1.0
+ *
+ * @param int    $listing_id Listing post ID.
+ * @param string $type       Listing type slug to check.
+ * @return bool True if the listing is of the given type.
+ */
+function apd_listing_is_type( int $listing_id, string $type ): bool {
+	return apd_get_listing_type( $listing_id ) === sanitize_key( $type );
+}
+
+/**
+ * Get all registered listing types.
+ *
+ * @since 1.1.0
+ *
+ * @param bool $hide_empty Whether to hide types with no listings.
+ * @return \WP_Term[] Array of term objects.
+ */
+function apd_get_listing_types( bool $hide_empty = false ): array {
+	$terms = get_terms( [
+		'taxonomy'   => \APD\Taxonomy\ListingTypeTaxonomy::TAXONOMY,
+		'hide_empty' => $hide_empty,
+	] );
+
+	return is_wp_error( $terms ) ? [] : $terms;
+}
+
+/**
+ * Get the listing type term object.
+ *
+ * @since 1.1.0
+ *
+ * @param string $type_slug Listing type slug.
+ * @return \WP_Term|null Term object or null if not found.
+ */
+function apd_get_listing_type_term( string $type_slug ): ?\WP_Term {
+	$term = get_term_by( 'slug', sanitize_key( $type_slug ), \APD\Taxonomy\ListingTypeTaxonomy::TAXONOMY );
+
+	return $term instanceof \WP_Term ? $term : null;
+}
+
+/**
+ * Get the count of listings for a given type.
+ *
+ * @since 1.1.0
+ *
+ * @param string $type_slug Listing type slug.
+ * @return int Number of listings with that type.
+ */
+function apd_get_listing_type_count( string $type_slug ): int {
+	$term = apd_get_listing_type_term( $type_slug );
+
+	return $term ? $term->count : 0;
 }
 
 // ============================================================================

@@ -94,6 +94,10 @@ final class ListingsBlock extends AbstractBlock {
 			'type'    => 'string',
 			'default' => '',
 		],
+		'type'           => [
+			'type'    => 'string',
+			'default' => '',
+		],
 		'orderby'        => [
 			'type'    => 'string',
 			'default' => 'date',
@@ -276,6 +280,17 @@ final class ListingsBlock extends AbstractBlock {
 				'taxonomy' => 'apd_tag',
 				'field'    => 'slug',
 				'terms'    => $tags,
+			];
+		}
+
+		// Listing type filter.
+		if ( ! empty( $attributes['type'] ) ) {
+			$types               = array_map( 'sanitize_key', explode( ',', $attributes['type'] ) );
+			$args['tax_query']   = $args['tax_query'] ?? [];
+			$args['tax_query'][] = [
+				'taxonomy' => \APD\Taxonomy\ListingTypeTaxonomy::TAXONOMY,
+				'field'    => 'slug',
+				'terms'    => $types,
 			];
 		}
 

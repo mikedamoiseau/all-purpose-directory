@@ -127,3 +127,62 @@ function apd_has_demo_data(): bool {
 function apd_get_demo_data_url(): string {
 	return admin_url( 'edit.php?post_type=apd_listing&page=apd-demo-data' );
 }
+
+/**
+ * Get the DemoDataProviderRegistry instance.
+ *
+ * @since 1.0.0
+ *
+ * @return \APD\Admin\DemoData\DemoDataProviderRegistry
+ */
+function apd_demo_provider_registry(): \APD\Admin\DemoData\DemoDataProviderRegistry {
+	return \APD\Admin\DemoData\DemoDataProviderRegistry::get_instance();
+}
+
+/**
+ * Register a demo data provider.
+ *
+ * @since 1.0.0
+ *
+ * @param \APD\Contracts\DemoDataProviderInterface $provider The provider instance.
+ * @return bool True if registered successfully.
+ */
+function apd_register_demo_provider( \APD\Contracts\DemoDataProviderInterface $provider ): bool {
+	return \APD\Admin\DemoData\DemoDataProviderRegistry::get_instance()->register( $provider );
+}
+
+/**
+ * Unregister a demo data provider.
+ *
+ * @since 1.0.0
+ *
+ * @param string $slug Provider slug to unregister.
+ * @return bool True if unregistered.
+ */
+function apd_unregister_demo_provider( string $slug ): bool {
+	return \APD\Admin\DemoData\DemoDataProviderRegistry::get_instance()->unregister( $slug );
+}
+
+/**
+ * Check if a demo data provider is registered.
+ *
+ * @since 1.0.0
+ *
+ * @param string $slug Provider slug.
+ * @return bool True if registered.
+ */
+function apd_has_demo_provider( string $slug ): bool {
+	return \APD\Admin\DemoData\DemoDataProviderRegistry::get_instance()->has( $slug );
+}
+
+/**
+ * Get a registered demo data provider.
+ *
+ * @since 1.0.0
+ *
+ * @param string $slug Provider slug.
+ * @return \APD\Contracts\DemoDataProviderInterface|null The provider or null.
+ */
+function apd_get_demo_provider( string $slug ): ?\APD\Contracts\DemoDataProviderInterface {
+	return \APD\Admin\DemoData\DemoDataProviderRegistry::get_instance()->get( $slug );
+}

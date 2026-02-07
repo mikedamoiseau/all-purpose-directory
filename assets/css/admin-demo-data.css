@@ -130,6 +130,18 @@
 	font-style: normal;
 }
 
+/* Module Data Divider */
+.apd-form-divider {
+	padding: 14px 0 6px;
+	margin-top: 4px;
+	border-top: 2px solid #c3c4c7;
+	font-size: 12px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	color: #646970;
+}
+
 /* Form Actions */
 .apd-form-actions {
 	margin-top: 20px;

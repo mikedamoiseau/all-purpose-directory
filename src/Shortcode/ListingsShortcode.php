@@ -51,6 +51,7 @@ final class ListingsShortcode extends AbstractShortcode {
 		'count'           => 12,
 		'category'        => '',
 		'tag'             => '',
+		'type'            => '',
 		'orderby'         => 'date',
 		'order'           => 'DESC',
 		'ids'             => '',
@@ -93,6 +94,11 @@ final class ListingsShortcode extends AbstractShortcode {
 		'tag'             => [
 			'type'        => 'string',
 			'description' => 'Tag slug(s) to filter by (comma-separated).',
+			'default'     => '',
+		],
+		'type'            => [
+			'type'        => 'string',
+			'description' => 'Listing type slug(s) to filter by (comma-separated).',
 			'default'     => '',
 		],
 		'orderby'         => [
@@ -315,6 +321,16 @@ final class ListingsShortcode extends AbstractShortcode {
 				'taxonomy' => 'apd_tag',
 				'field'    => 'slug',
 				'terms'    => $tags,
+			];
+		}
+
+		// Listing type filter.
+		if ( ! empty( $atts['type'] ) ) {
+			$types               = array_map( 'trim', explode( ',', $atts['type'] ) );
+			$args['tax_query'][] = [
+				'taxonomy' => \APD\Taxonomy\ListingTypeTaxonomy::TAXONOMY,
+				'field'    => 'slug',
+				'terms'    => $types,
 			];
 		}
 

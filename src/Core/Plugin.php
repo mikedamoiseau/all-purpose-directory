@@ -128,6 +128,12 @@ final class Plugin {
 		// Initialize module registry (priority 1, after text domain).
 		add_action( 'init', [ $this, 'init_modules' ], 1 );
 
+		// Register built-in field types (priority 2, after modules).
+		add_action( 'init', [ $this, 'register_field_types' ], 2 );
+
+		// Load external fields via apd_listing_fields filter (priority 3, after field types).
+		add_action( 'init', [ \APD\Fields\FieldRegistry::get_instance(), 'load_external_fields' ], 3 );
+
 		// Register post types and taxonomies.
 		add_action( 'init', [ $this, 'register_post_types' ], 5 );
 		add_action( 'init', [ $this, 'register_taxonomies' ], 5 );
@@ -314,6 +320,52 @@ final class Plugin {
 	}
 
 	/**
+	 * Register built-in field types.
+	 *
+	 * Registers all field type handlers that ship with the plugin.
+	 * These handlers define how each field type is rendered, sanitized,
+	 * and validated.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return void
+	 */
+	public function register_field_types(): void {
+		$registry = \APD\Fields\FieldRegistry::get_instance();
+
+		$field_types = [
+			new \APD\Fields\Types\TextField(),
+			new \APD\Fields\Types\TextareaField(),
+			new \APD\Fields\Types\EmailField(),
+			new \APD\Fields\Types\UrlField(),
+			new \APD\Fields\Types\PhoneField(),
+			new \APD\Fields\Types\NumberField(),
+			new \APD\Fields\Types\DecimalField(),
+			new \APD\Fields\Types\CurrencyField(),
+			new \APD\Fields\Types\DateField(),
+			new \APD\Fields\Types\TimeField(),
+			new \APD\Fields\Types\DateTimeField(),
+			new \APD\Fields\Types\DateRangeField(),
+			new \APD\Fields\Types\SelectField(),
+			new \APD\Fields\Types\MultiSelectField(),
+			new \APD\Fields\Types\RadioField(),
+			new \APD\Fields\Types\CheckboxField(),
+			new \APD\Fields\Types\CheckboxGroupField(),
+			new \APD\Fields\Types\SwitchField(),
+			new \APD\Fields\Types\ColorField(),
+			new \APD\Fields\Types\FileField(),
+			new \APD\Fields\Types\ImageField(),
+			new \APD\Fields\Types\GalleryField(),
+			new \APD\Fields\Types\HiddenField(),
+			new \APD\Fields\Types\RichTextField(),
+		];
+
+		foreach ( $field_types as $field_type ) {
+			$registry->register_field_type( $field_type );
+		}
+	}
+
+	/**
 	 * Handle listing post status transitions.
 	 *
 	 * Fires the apd_listing_status_changed action when an apd_listing
@@ -485,6 +537,11 @@ final class Plugin {
 		// Register tag taxonomy.
 		$tag_taxonomy = new \APD\Taxonomy\TagTaxonomy();
 		$tag_taxonomy->register();
+
+		// Register listing type taxonomy (hidden, for module association).
+		$listing_type_taxonomy = new \APD\Taxonomy\ListingTypeTaxonomy();
+		$listing_type_taxonomy->register();
+		$listing_type_taxonomy->init();
 	}
 
 	/**

@@ -15,6 +15,7 @@ use APD\Fields\FieldRegistry;
 use APD\Fields\AbstractFieldType;
 use APD\Contracts\FieldTypeInterface;
 use APD\Tests\Unit\UnitTestCase;
+use Brain\Monkey\Filters;
 
 /**
  * Test case for FieldRegistry class.
@@ -580,6 +581,102 @@ class FieldRegistryTest extends UnitTestCase {
 		$field = $this->registry->get_field( 'my-custom-field' );
 
 		$this->assertSame( 'My Custom Field', $field['label'] );
+	}
+
+	/**
+	 * Test load_external_fields registers fields from the filter.
+	 */
+	public function testLoadExternalFieldsRegistersFieldsFromFilter(): void {
+		Filters\expectApplied( 'apd_listing_fields' )
+			->once()
+			->with( [] )
+			->andReturn( [
+				'website' => [
+					'type'  => 'url',
+					'label' => 'Website URL',
+				],
+				'phone'   => [
+					'type'  => 'text',
+					'label' => 'Phone Number',
+				],
+			] );
+
+		$this->registry->load_external_fields();
+
+		$this->assertTrue( $this->registry->has_field( 'website' ) );
+		$this->assertTrue( $this->registry->has_field( 'phone' ) );
+		$this->assertSame( 2, $this->registry->count() );
+
+		$website = $this->registry->get_field( 'website' );
+		$this->assertSame( 'url', $website['type'] );
+		$this->assertSame( 'Website URL', $website['label'] );
+	}
+
+	/**
+	 * Test load_external_fields does not overwrite existing fields.
+	 */
+	public function testLoadExternalFieldsDoesNotOverwriteExistingFields(): void {
+		// Register a field directly first.
+		$this->registry->register_field( 'phone', [
+			'type'  => 'text',
+			'label' => 'Direct Phone',
+		] );
+
+		Filters\expectApplied( 'apd_listing_fields' )
+			->once()
+			->andReturn( [
+				'phone' => [
+					'type'  => 'tel',
+					'label' => 'Filter Phone',
+				],
+				'email' => [
+					'type'  => 'email',
+					'label' => 'Email',
+				],
+			] );
+
+		$this->registry->load_external_fields();
+
+		// Existing field should keep its original config.
+		$phone = $this->registry->get_field( 'phone' );
+		$this->assertSame( 'text', $phone['type'] );
+		$this->assertSame( 'Direct Phone', $phone['label'] );
+
+		// New field from filter should be registered.
+		$this->assertTrue( $this->registry->has_field( 'email' ) );
+		$this->assertSame( 2, $this->registry->count() );
+	}
+
+	/**
+	 * Test load_external_fields handles non-array filter return gracefully.
+	 */
+	public function testLoadExternalFieldsHandlesNonArrayReturn(): void {
+		Filters\expectApplied( 'apd_listing_fields' )
+			->once()
+			->andReturn( 'invalid' );
+
+		$this->registry->load_external_fields();
+
+		$this->assertSame( 0, $this->registry->count() );
+	}
+
+	/**
+	 * Test load_external_fields skips invalid entries.
+	 */
+	public function testLoadExternalFieldsSkipsInvalidEntries(): void {
+		Filters\expectApplied( 'apd_listing_fields' )
+			->once()
+			->andReturn( [
+				0          => [ 'type' => 'text' ], // Numeric key (not a string name).
+				''         => [ 'type' => 'text' ], // Empty string key.
+				'valid'    => [ 'type' => 'text', 'label' => 'Valid Field' ],
+				'bad_conf' => 'not an array',        // Config is not an array.
+			] );
+
+		$this->registry->load_external_fields();
+
+		$this->assertSame( 1, $this->registry->count() );
+		$this->assertTrue( $this->registry->has_field( 'valid' ) );
 	}
 
 	/**

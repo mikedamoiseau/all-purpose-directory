@@ -131,6 +131,9 @@ final class DemoDataPage {
 		 * @param DemoDataPage $page The demo data page instance.
 		 */
 		do_action( 'apd_demo_data_init', $this );
+
+		// Initialize demo data provider registry so modules can register providers.
+		DemoDataProviderRegistry::get_instance()->init();
 	}
 
 	/**
@@ -180,6 +183,14 @@ final class DemoDataPage {
 			true
 		);
 
+		// Build module labels map from registered providers.
+		$module_labels = [];
+		$providers     = DemoDataProviderRegistry::get_instance()->get_all();
+
+		foreach ( $providers as $slug => $provider ) {
+			$module_labels[ 'module_' . $slug ] = $provider->get_name();
+		}
+
 		wp_localize_script(
 			'apd-admin-demo-data',
 			'apdDemoData',
@@ -187,6 +198,7 @@ final class DemoDataPage {
 				'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
 				'generateNonce' => wp_create_nonce( self::NONCE_GENERATE ),
 				'deleteNonce'   => wp_create_nonce( self::NONCE_DELETE ),
+				'moduleLabels'  => $module_labels,
 				'strings'       => [
 					'generating'        => __( 'Generating demo data...', 'all-purpose-directory' ),
 					'deleting'          => __( 'Deleting demo data...', 'all-purpose-directory' ),
@@ -218,9 +230,22 @@ final class DemoDataPage {
 			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'all-purpose-directory' ) );
 		}
 
-		$tracker = DemoDataTracker::get_instance();
-		$counts  = $tracker->count_demo_data();
-		$total   = array_sum( $counts );
+		$tracker           = DemoDataTracker::get_instance();
+		$counts            = $tracker->count_demo_data();
+		$total             = array_sum( $counts );
+		$provider_registry = DemoDataProviderRegistry::get_instance();
+		$providers         = $provider_registry->get_all();
+		$module_counts     = [];
+
+		foreach ( $providers as $slug => $provider ) {
+			$provider_counts = $provider->count( $tracker );
+
+			foreach ( $provider_counts as $type => $count ) {
+				$key                   = 'module_' . $slug . '_' . $type;
+				$module_counts[ $key ] = $count;
+				$total                += $count;
+			}
+		}
 
 		/**
 		 * Filter the default demo data counts.
@@ -269,6 +294,24 @@ final class DemoDataPage {
 							<td><span class="dashicons dashicons-email"></span> <?php esc_html_e( 'Inquiries', 'all-purpose-directory' ); ?></td>
 							<td class="apd-stat-count" data-type="inquiries"><?php echo esc_html( number_format_i18n( $counts['inquiries'] ) ); ?></td>
 						</tr>
+						<?php foreach ( $providers as $slug => $provider ) : ?>
+							<?php
+							$provider_counts = $provider->count( $tracker );
+
+							foreach ( $provider_counts as $type => $count ) :
+								$data_type = 'module_' . $slug . '_' . $type;
+								?>
+								<tr>
+									<td>
+										<span class="dashicons <?php echo esc_attr( $provider->get_icon() ); ?>"></span>
+										<?php echo esc_html( $provider->get_name() ); ?> &mdash; <?php echo esc_html( ucfirst( $type ) ); ?>
+									</td>
+									<td class="apd-stat-count" data-type="<?php echo esc_attr( $data_type ); ?>">
+										<?php echo esc_html( number_format_i18n( $count ) ); ?>
+									</td>
+								</tr>
+							<?php endforeach; ?>
+						<?php endforeach; ?>
 					</tbody>
 					<tfoot>
 						<tr>
@@ -345,6 +388,30 @@ final class DemoDataPage {
 							</label>
 							<span class="description"><?php esc_html_e( '1-5 favorites per user', 'all-purpose-directory' ); ?></span>
 						</div>
+
+						<?php if ( ! empty( $providers ) ) : ?>
+							<div class="apd-form-divider"><?php esc_html_e( 'Module Data', 'all-purpose-directory' ); ?></div>
+
+							<?php foreach ( $providers as $slug => $provider ) : ?>
+								<div class="apd-form-row">
+									<label class="apd-checkbox-label">
+										<input type="checkbox" name="generate_module_<?php echo esc_attr( $slug ); ?>" value="1" checked>
+										<?php echo esc_html( $provider->get_name() ); ?>
+									</label>
+									<?php foreach ( $provider->get_form_fields() as $field ) : ?>
+										<input
+											type="<?php echo esc_attr( $field['type'] ); ?>"
+											name="module_<?php echo esc_attr( $slug ); ?>_<?php echo esc_attr( $field['name'] ); ?>"
+											value="<?php echo esc_attr( (string) $field['default'] ); ?>"
+											min="<?php echo esc_attr( (string) ( $field['min'] ?? 1 ) ); ?>"
+											max="<?php echo esc_attr( (string) ( $field['max'] ?? 100 ) ); ?>"
+											class="small-text"
+										>
+									<?php endforeach; ?>
+									<span class="description"><?php echo esc_html( $provider->get_description() ); ?></span>
+								</div>
+							<?php endforeach; ?>
+						<?php endif; ?>
 					</fieldset>
 
 					<div class="apd-form-actions">
@@ -493,9 +560,60 @@ final class DemoDataPage {
 			$results['favorites'] = $generator->generate_favorites( $listing_ids, $user_ids );
 		}
 
+		// Generate module provider data.
+		$context = [
+			'user_ids'     => $user_ids,
+			'listing_ids'  => $listing_ids,
+			'category_ids' => isset( $category_ids ) ? $category_ids : [],
+			'tag_ids'      => isset( $tag_ids ) ? $tag_ids : [],
+			'options'      => [],
+		];
+
+		$tracker            = DemoDataTracker::get_instance();
+		$provider_registry  = DemoDataProviderRegistry::get_instance();
+		$module_providers   = $provider_registry->get_all();
+
+		foreach ( $module_providers as $slug => $provider ) {
+			if ( empty( $_POST[ 'generate_module_' . $slug ] ) ) {
+				continue;
+			}
+
+			// Extract provider-specific options from POST fields.
+			$provider_options = [];
+
+			foreach ( $provider->get_form_fields() as $field ) {
+				$post_key = 'module_' . $slug . '_' . $field['name'];
+
+				if ( ! isset( $_POST[ $post_key ] ) ) {
+					continue;
+				}
+
+				if ( $field['type'] === 'number' ) {
+					$provider_options[ $field['name'] ] = absint( $_POST[ $post_key ] );
+				} else {
+					$provider_options[ $field['name'] ] = sanitize_text_field( wp_unslash( $_POST[ $post_key ] ) );
+				}
+			}
+
+			$context['options']  = $provider_options;
+			$provider_results    = $provider->generate( $context, $tracker );
+
+			foreach ( $provider_results as $type => $count ) {
+				$results[ 'module_' . $slug . '_' . $type ] = $count;
+			}
+		}
+
 		// Get updated counts.
-		$tracker        = DemoDataTracker::get_instance();
 		$updated_counts = $tracker->count_demo_data();
+
+		// Merge module counts into updated counts.
+		foreach ( $module_providers as $slug => $provider ) {
+			$provider_counts = $provider->count( $tracker );
+
+			foreach ( $provider_counts as $type => $count ) {
+				$updated_counts[ 'module_' . $slug . '_' . $type ] = $count;
+			}
+		}
 
 		/**
 		 * Fires after demo data generation completes.

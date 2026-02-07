@@ -59,6 +59,13 @@ require_once APD_PLUGIN_DIR . 'includes/module-functions.php';
 require_once APD_PLUGIN_DIR . 'includes/demo-data-functions.php';
 
 /**
+ * Register WP-CLI commands.
+ */
+if ( defined( 'WP_CLI' ) && WP_CLI ) {
+	WP_CLI::add_command( 'apd demo', \APD\CLI\DemoDataCommand::class );
+}
+
+/**
  * Initialize the plugin.
  *
  * @return void

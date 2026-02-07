@@ -284,6 +284,7 @@ final class AdminColumns {
 		}
 
 		$this->render_category_filter();
+		$this->render_listing_type_filter();
 		$this->render_status_filter();
 	}
 
@@ -301,7 +302,7 @@ final class AdminColumns {
 		}
 
 		// Get selected category from query string.
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filter display.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filter display.
 		$selected = isset( $_GET[ $taxonomy ] ) ? sanitize_text_field( wp_unslash( $_GET[ $taxonomy ] ) ) : '';
 
 		wp_dropdown_categories(
@@ -320,12 +321,123 @@ final class AdminColumns {
 	}
 
 	/**
+	 * Render the listing type dropdown filter.
+	 *
+	 * @return void
+	 */
+	private function render_listing_type_filter(): void {
+		$taxonomy = \APD\Taxonomy\ListingTypeTaxonomy::TAXONOMY;
+
+		$terms = get_terms(
+			[
+				'taxonomy'   => $taxonomy,
+				'hide_empty' => false,
+			]
+		);
+
+		// Only show filter when 2+ listing types exist.
+		if ( is_wp_error( $terms ) || count( $terms ) < 2 ) {
+			return;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filter display.
+		$selected = isset( $_GET[ $taxonomy ] ) ? sanitize_text_field( wp_unslash( $_GET[ $taxonomy ] ) ) : '';
+
+		echo '<select name="' . esc_attr( $taxonomy ) . '" id="filter-by-listing-type">';
+		echo '<option value="">' . esc_html__( 'All Listing Types', 'all-purpose-directory' ) . '</option>';
+
+		foreach ( $terms as $term ) {
+			$count = $this->get_listing_type_admin_count( $term->slug );
+
+			printf(
+				'<option value="%s" %s>%s (%d)</option>',
+				esc_attr( $term->slug ),
+				selected( $selected, $term->slug, false ),
+				esc_html( $term->name ),
+				absint( $count )
+			);
+		}
+
+		echo '</select>';
+	}
+
+	/**
+	 * Get listing count for a listing type in the current admin status context.
+	 *
+	 * @param string $type_slug Listing type term slug.
+	 * @return int
+	 */
+	private function get_listing_type_admin_count( string $type_slug ): int {
+		$post_status = $this->get_listing_type_count_statuses();
+
+		$query = new \WP_Query(
+			[
+				'post_type'              => PostType::POST_TYPE,
+				'post_status'            => $post_status,
+				'posts_per_page'         => 1,
+				'fields'                 => 'ids',
+				'no_found_rows'          => false,
+				'orderby'                => 'none',
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+				'tax_query'              => [
+					[
+						'taxonomy' => \APD\Taxonomy\ListingTypeTaxonomy::TAXONOMY,
+						'field'    => 'slug',
+						'terms'    => sanitize_key( $type_slug ),
+					],
+				],
+			]
+		);
+
+		return (int) $query->found_posts;
+	}
+
+	/**
+	 * Resolve which post statuses should be used for listing type counts.
+	 *
+	 * Mirrors the admin list table context:
+	 * 1) custom APD status dropdown (`listing_status`)
+	 * 2) core post status tabs (`post_status`)
+	 * 3) default "all" admin-visible statuses.
+	 *
+	 * @return string|string[] Post status argument for WP_Query.
+	 */
+	private function get_listing_type_count_statuses(): string|array {
+		$available_statuses = get_post_stati( [ 'show_in_admin_status_list' => true ], 'names' );
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filter context.
+		if ( ! empty( $_GET['listing_status'] ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$listing_status = sanitize_text_field( wp_unslash( $_GET['listing_status'] ) );
+
+			if ( in_array( $listing_status, $available_statuses, true ) ) {
+				return $listing_status;
+			}
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filter context.
+		if ( ! empty( $_GET['post_status'] ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$post_status = sanitize_text_field( wp_unslash( $_GET['post_status'] ) );
+
+			if ( 'all' !== $post_status && in_array( $post_status, $available_statuses, true ) ) {
+				return $post_status;
+			}
+		}
+
+		$all_admin_statuses = get_post_stati( [ 'show_in_admin_all_list' => true ], 'names' );
+
+		return empty( $all_admin_statuses ) ? 'publish' : array_values( $all_admin_statuses );
+	}
+
+	/**
 	 * Render the status dropdown filter.
 	 *
 	 * @return void
 	 */
 	private function render_status_filter(): void {
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filter display.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filter display.
 		$selected = isset( $_GET['listing_status'] ) ? sanitize_text_field( wp_unslash( $_GET['listing_status'] ) ) : '';
 
 		$statuses = [
@@ -374,9 +486,9 @@ final class AdminColumns {
 		}
 
 		// Apply status filter.
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filter query.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filter query.
 		if ( ! empty( $_GET['listing_status'] ) ) {
-            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$status = sanitize_text_field( wp_unslash( $_GET['listing_status'] ) );
 
 			// Validate status value.
@@ -384,6 +496,22 @@ final class AdminColumns {
 			if ( in_array( $status, $valid_statuses, true ) ) {
 				$query->set( 'post_status', $status );
 			}
+		}
+
+		// Apply listing type filter.
+		$listing_type_taxonomy = \APD\Taxonomy\ListingTypeTaxonomy::TAXONOMY;
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filter query.
+		if ( ! empty( $_GET[ $listing_type_taxonomy ] ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$type_slug = sanitize_text_field( wp_unslash( $_GET[ $listing_type_taxonomy ] ) );
+
+			$tax_query   = $query->get( 'tax_query' ) ?: [];
+			$tax_query[] = [
+				'taxonomy' => $listing_type_taxonomy,
+				'field'    => 'slug',
+				'terms'    => $type_slug,
+			];
+			$query->set( 'tax_query', $tax_query );
 		}
 	}
 

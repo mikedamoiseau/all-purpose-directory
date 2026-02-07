@@ -491,6 +491,47 @@ final class FieldRegistry {
 	}
 
 	/**
+	 * Load fields registered via the apd_listing_fields filter.
+	 *
+	 * Fires the filter and registers any fields that were added.
+	 * Should be called once during initialization after all plugins
+	 * have had a chance to add their filter callbacks.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return void
+	 */
+	public function load_external_fields(): void {
+		/**
+		 * Filter the registered listing fields.
+		 *
+		 * Use this filter to add, remove, or modify listing fields.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array $fields Array of field definitions keyed by name.
+		 */
+		$external_fields = apply_filters( 'apd_listing_fields', [] );
+
+		if ( ! is_array( $external_fields ) ) {
+			return;
+		}
+
+		foreach ( $external_fields as $name => $config ) {
+			if ( ! is_string( $name ) || empty( $name ) || ! is_array( $config ) ) {
+				continue;
+			}
+
+			// Skip if already registered (direct registration takes priority).
+			if ( $this->has_field( $name ) ) {
+				continue;
+			}
+
+			$this->register_field( $name, $config );
+		}
+	}
+
+	/**
 	 * Reset the registry.
 	 *
 	 * Clears all registered fields and field types.

@@ -161,7 +161,7 @@ final class PostType {
 				'author',
 				'excerpt',
 			],
-			'show_in_rest'       => false,
+			'show_in_rest'       => true,
 		];
 	}
 }

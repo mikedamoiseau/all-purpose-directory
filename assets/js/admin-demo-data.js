@@ -84,6 +84,14 @@
 				listings_count: parseInt($form.find('[name="listings_count"]').val(), 10) || 25
 			};
 
+			// Collect module provider form data.
+			$form.find('input[name^="generate_module_"]').each(function() {
+				formData[this.name] = $(this).is(':checked') ? 1 : 0;
+			});
+			$form.find('input[name^="module_"][type="number"]').each(function() {
+				formData[this.name] = parseInt($(this).val(), 10) || 0;
+			});
+
 			// Simulate progress for better UX
 			var progress = 0;
 			var progressInterval = setInterval(function() {
@@ -267,7 +275,13 @@
 
 				for (var key in data.created) {
 					if (data.created.hasOwnProperty(key) && data.created[key] > 0) {
-						html += '<li><span class="dashicons dashicons-yes"></span> ' + labels[key] + ': ' + data.created[key] + '</li>';
+						var label = labels[key];
+						if (!label && key.indexOf('module_') === 0) {
+							label = this.getModuleLabel(key, 'created');
+						}
+						if (label) {
+							html += '<li><span class="dashicons dashicons-yes"></span> ' + label + ': ' + data.created[key] + '</li>';
+						}
 					}
 				}
 
@@ -303,7 +317,13 @@
 
 				for (var key in data.deleted) {
 					if (data.deleted.hasOwnProperty(key) && data.deleted[key] > 0) {
-						html += '<li><span class="dashicons dashicons-yes"></span> ' + labels[key] + ': ' + data.deleted[key] + '</li>';
+						var label = labels[key];
+						if (!label && key.indexOf('module_') === 0) {
+							label = this.getModuleLabel(key, 'deleted');
+						}
+						if (label) {
+							html += '<li><span class="dashicons dashicons-yes"></span> ' + label + ': ' + data.deleted[key] + '</li>';
+						}
 					}
 				}
 
@@ -348,6 +368,27 @@
 				'No demo data found. Your directory contains only real content.' +
 				'</p>'
 			);
+		},
+
+		/**
+		 * Get a display label for a module result key.
+		 *
+		 * @param {string} key    Result key (e.g., 'module_url-directory_urls').
+		 * @param {string} action 'created' or 'deleted'.
+		 * @return {string|null} Display label or null.
+		 */
+		getModuleLabel: function(key, action) {
+			var moduleLabels = this.config.moduleLabels || {};
+			// key format: module_{slug}_{type}
+			// Find the matching module slug from moduleLabels keys
+			for (var moduleKey in moduleLabels) {
+				if (moduleLabels.hasOwnProperty(moduleKey) && key.indexOf(moduleKey + '_') === 0) {
+					var typeKey = key.substring(moduleKey.length + 1);
+					var typeName = typeKey.charAt(0).toUpperCase() + typeKey.slice(1);
+					return moduleLabels[moduleKey] + ' — ' + typeName + ' ' + action;
+				}
+			}
+			return null;
 		},
 
 		/**

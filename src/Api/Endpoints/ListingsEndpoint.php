@@ -174,6 +174,17 @@ class ListingsEndpoint {
 			];
 		}
 
+		// Listing type filter.
+		$type = $request->get_param( 'type' );
+		if ( ! empty( $type ) ) {
+			$args['tax_query']   = $args['tax_query'] ?? [];
+			$args['tax_query'][] = [
+				'taxonomy' => \APD\Taxonomy\ListingTypeTaxonomy::TAXONOMY,
+				'field'    => is_numeric( $type ) ? 'term_id' : 'slug',
+				'terms'    => $type,
+			];
+		}
+
 		// Author filter.
 		$author = $request->get_param( 'author' );
 		if ( ! empty( $author ) ) {
@@ -326,6 +337,12 @@ class ListingsEndpoint {
 			wp_set_object_terms( $listing_id, array_map( 'absint', $tags ), 'apd_tag' );
 		}
 
+		// Handle listing type.
+		$type = $request->get_param( 'type' );
+		if ( ! empty( $type ) ) {
+			wp_set_object_terms( $listing_id, sanitize_key( $type ), \APD\Taxonomy\ListingTypeTaxonomy::TAXONOMY );
+		}
+
 		// Handle custom fields.
 		$meta = $request->get_param( 'meta' );
 		if ( ! empty( $meta ) && is_array( $meta ) ) {
@@ -442,6 +459,12 @@ class ListingsEndpoint {
 		$tags = $request->get_param( 'tags' );
 		if ( $tags !== null && is_array( $tags ) ) {
 			wp_set_object_terms( $listing_id, array_map( 'absint', $tags ), 'apd_tag' );
+		}
+
+		// Handle listing type.
+		$type = $request->get_param( 'type' );
+		if ( $type !== null ) {
+			wp_set_object_terms( $listing_id, sanitize_key( $type ), \APD\Taxonomy\ListingTypeTaxonomy::TAXONOMY );
 		}
 
 		// Handle custom fields.
@@ -586,6 +609,7 @@ class ListingsEndpoint {
 				],
 				$tags
 			),
+			'type'           => apd_get_listing_type( $listing->ID ),
 			'meta'           => $this->get_listing_meta( $listing->ID ),
 		];
 
@@ -739,6 +763,10 @@ class ListingsEndpoint {
 				'description' => __( 'Filter by tag ID or slug.', 'all-purpose-directory' ),
 				'type'        => [ 'integer', 'string' ],
 			],
+			'type'     => [
+				'description' => __( 'Filter by listing type slug.', 'all-purpose-directory' ),
+				'type'        => 'string',
+			],
 			'author'   => [
 				'description' => __( 'Filter by author user ID.', 'all-purpose-directory' ),
 				'type'        => 'integer',
@@ -800,6 +828,10 @@ class ListingsEndpoint {
 				'description' => __( 'Tag term IDs.', 'all-purpose-directory' ),
 				'type'        => 'array',
 				'items'       => [ 'type' => 'integer' ],
+			],
+			'type'           => [
+				'description' => __( 'Listing type slug.', 'all-purpose-directory' ),
+				'type'        => 'string',
 			],
 			'meta'           => [
 				'description' => __( 'Custom field values.', 'all-purpose-directory' ),

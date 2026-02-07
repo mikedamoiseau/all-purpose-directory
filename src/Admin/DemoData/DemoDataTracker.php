@@ -555,15 +555,25 @@ final class DemoDataTracker {
 		 */
 		do_action( 'apd_before_delete_demo_data' );
 
-		$counts = [
-			'reviews'    => $this->delete_demo_reviews(),
-			'inquiries'  => $this->delete_demo_inquiries(),
-			'favorites'  => $this->clear_demo_favorites(),
-			'listings'   => $this->delete_demo_listings(),
-			'tags'       => $this->delete_demo_tags(),
-			'categories' => $this->delete_demo_categories(),
-			'users'      => $this->delete_demo_users(),
-		];
+		$counts = [];
+
+		// Delete module provider demo data first (may reference core data).
+		$provider_registry = DemoDataProviderRegistry::get_instance();
+		foreach ( $provider_registry->get_all() as $slug => $provider ) {
+			$provider_counts = $provider->delete( $this );
+			foreach ( $provider_counts as $type => $type_count ) {
+				$counts[ 'module_' . $slug . '_' . $type ] = $type_count;
+			}
+		}
+
+		// Delete core data in dependency order.
+		$counts['reviews']    = $this->delete_demo_reviews();
+		$counts['inquiries']  = $this->delete_demo_inquiries();
+		$counts['favorites']  = $this->clear_demo_favorites();
+		$counts['listings']   = $this->delete_demo_listings();
+		$counts['tags']       = $this->delete_demo_tags();
+		$counts['categories'] = $this->delete_demo_categories();
+		$counts['users']      = $this->delete_demo_users();
 
 		/**
 		 * Fires after demo data deletion completes.
@@ -575,6 +585,24 @@ final class DemoDataTracker {
 		do_action( 'apd_after_delete_demo_data', $counts );
 
 		return $counts;
+	}
+
+	/**
+	 * Count demo data from module providers.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return array<string, array<string, int>> Counts keyed by provider slug, then type.
+	 */
+	public function count_module_demo_data(): array {
+		$provider_registry = DemoDataProviderRegistry::get_instance();
+		$module_counts     = [];
+
+		foreach ( $provider_registry->get_all() as $slug => $provider ) {
+			$module_counts[ $slug ] = $provider->count( $this );
+		}
+
+		return $module_counts;
 	}
 
 	/**
