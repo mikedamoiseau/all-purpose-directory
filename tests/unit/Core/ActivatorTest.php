@@ -64,6 +64,10 @@ class ActivatorTest extends UnitTestCase
         Functions\when('wp_next_scheduled')->justReturn(false);
         Functions\when('wp_schedule_event')->justReturn(true);
 
+        // Mock page creation functions.
+        Functions\when('wp_insert_post')->justReturn(100);
+        Functions\when('get_post')->justReturn(null);
+
         // Run activation - should not throw.
         Activator::activate();
 
@@ -93,6 +97,10 @@ class ActivatorTest extends UnitTestCase
         Functions\when('wp_next_scheduled')->justReturn(false);
         Functions\when('wp_schedule_event')->justReturn(true);
         Functions\when('update_option')->justReturn(true);
+
+        // Mock page creation functions.
+        Functions\when('wp_insert_post')->justReturn(100);
+        Functions\when('get_post')->justReturn(null);
 
         // Capture the settings passed to add_option.
         $addOptionCalled = false;
@@ -132,6 +140,10 @@ class ActivatorTest extends UnitTestCase
         Functions\when('wp_next_scheduled')->justReturn(false);
         Functions\when('wp_schedule_event')->justReturn(true);
         Functions\when('update_option')->justReturn(true);
+
+        // Mock page creation functions.
+        Functions\when('wp_insert_post')->justReturn(100);
+        Functions\when('get_post')->justReturn(null);
 
         // Existing settings present - get_option returns existing settings.
         $optionName = \APD\Admin\Settings::OPTION_NAME;
@@ -190,6 +202,10 @@ class ActivatorTest extends UnitTestCase
         Functions\when('wp_next_scheduled')->justReturn(false);
         Functions\when('wp_schedule_event')->justReturn(true);
 
+        // Mock page creation functions.
+        Functions\when('wp_insert_post')->justReturn(100);
+        Functions\when('get_post')->justReturn(null);
+
         Activator::activate();
 
         // Verify all capabilities were granted to admin.
@@ -222,6 +238,10 @@ class ActivatorTest extends UnitTestCase
         Functions\when('add_option')->justReturn(true);
         Functions\when('update_option')->justReturn(true);
 
+        // Mock page creation functions.
+        Functions\when('wp_insert_post')->justReturn(100);
+        Functions\when('get_post')->justReturn(null);
+
         // Track scheduled events.
         $scheduledEvents = [];
         Functions\when('wp_next_scheduled')->justReturn(false);
@@ -238,6 +258,117 @@ class ActivatorTest extends UnitTestCase
         $hooks = array_column($scheduledEvents, 'hook');
         $this->assertContains('apd_check_expired_listings', $hooks);
         $this->assertContains('apd_cleanup_transients', $hooks);
+    }
+
+    /**
+     * Test that activate creates default pages.
+     */
+    public function test_activate_creates_default_pages(): void
+    {
+        // Setup mocks.
+        Functions\when('get_bloginfo')->justReturn('6.5.0');
+        Functions\when('deactivate_plugins')->justReturn(null);
+        Functions\when('wp_die')->alias(function () {
+            throw new \RuntimeException('wp_die called');
+        });
+
+        $mockRole = Mockery::mock('WP_Role');
+        $mockRole->shouldReceive('add_cap')->andReturn(true);
+        Functions\when('get_role')->justReturn($mockRole);
+
+        Functions\when('wp_next_scheduled')->justReturn(false);
+        Functions\when('wp_schedule_event')->justReturn(true);
+
+        // Track page creation.
+        $created_pages = [];
+        Functions\when('wp_insert_post')->alias(function ($args) use (&$created_pages) {
+            static $id = 100;
+            $id++;
+            $created_pages[] = $args;
+            return $id;
+        });
+        Functions\when('get_post')->justReturn(null);
+
+        // Return empty options initially (no existing pages).
+        $optionName = \APD\Admin\Settings::OPTION_NAME;
+        $savedOptions = null;
+        Functions\when('get_option')->alias(function ($name) use ($optionName) {
+            return $name === $optionName ? [] : false;
+        });
+        Functions\when('add_option')->justReturn(true);
+        Functions\when('update_option')->alias(function ($name, $value) use (&$savedOptions, $optionName) {
+            if ($name === $optionName) {
+                $savedOptions = $value;
+            }
+            return true;
+        });
+
+        Activator::activate();
+
+        // Should have created 3 pages.
+        $this->assertCount(3, $created_pages, 'Should create 3 default pages');
+
+        // Verify page titles.
+        $titles = array_column($created_pages, 'post_title');
+        $this->assertContains('Directory', $titles);
+        $this->assertContains('Submit a Listing', $titles);
+        $this->assertContains('My Dashboard', $titles);
+
+        // Verify page IDs were saved to options.
+        $this->assertNotNull($savedOptions, 'Options should be saved with page IDs');
+        $this->assertArrayHasKey('directory_page', $savedOptions);
+        $this->assertArrayHasKey('submit_page', $savedOptions);
+        $this->assertArrayHasKey('dashboard_page', $savedOptions);
+    }
+
+    /**
+     * Test that activate skips page creation when pages already exist.
+     */
+    public function test_activate_skips_existing_pages(): void
+    {
+        // Setup mocks.
+        Functions\when('get_bloginfo')->justReturn('6.5.0');
+        Functions\when('deactivate_plugins')->justReturn(null);
+        Functions\when('wp_die')->alias(function () {
+            throw new \RuntimeException('wp_die called');
+        });
+
+        $mockRole = Mockery::mock('WP_Role');
+        $mockRole->shouldReceive('add_cap')->andReturn(true);
+        Functions\when('get_role')->justReturn($mockRole);
+
+        Functions\when('wp_next_scheduled')->justReturn(false);
+        Functions\when('wp_schedule_event')->justReturn(true);
+
+        // Existing page.
+        $existingPage = Mockery::mock('WP_Post');
+        $existingPage->post_status = 'publish';
+        Functions\when('get_post')->justReturn($existingPage);
+
+        $insertCalled = false;
+        Functions\when('wp_insert_post')->alias(function () use (&$insertCalled) {
+            $insertCalled = true;
+            return 999;
+        });
+
+        // Settings already have page IDs.
+        $optionName = \APD\Admin\Settings::OPTION_NAME;
+        Functions\when('get_option')->alias(function ($name) use ($optionName) {
+            if ($name === $optionName) {
+                return [
+                    'directory_page' => 10,
+                    'submit_page'    => 11,
+                    'dashboard_page' => 12,
+                ];
+            }
+            return false;
+        });
+        Functions\when('add_option')->justReturn(true);
+        Functions\when('update_option')->justReturn(true);
+
+        Activator::activate();
+
+        $this->assertFalse($insertCalled, 'Should not create pages when they already exist');
     }
 
     /**
@@ -259,6 +390,10 @@ class ActivatorTest extends UnitTestCase
         Functions\when('get_option')->justReturn(false);
         Functions\when('add_option')->justReturn(true);
         Functions\when('update_option')->justReturn(true);
+
+        // Mock page creation functions.
+        Functions\when('wp_insert_post')->justReturn(100);
+        Functions\when('get_post')->justReturn(null);
 
         // Events already scheduled.
         Functions\when('wp_next_scheduled')->justReturn(time() + 3600);

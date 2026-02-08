@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace APD\Blocks;
 
 use APD\Frontend\Display\ViewRegistry;
+use APD\Listing\ListingQueryBuilder;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -46,13 +47,6 @@ final class ListingsBlock extends AbstractBlock {
 	 * @var string
 	 */
 	protected string $description = 'Display listings in grid or list view.';
-
-	/**
-	 * Block category.
-	 *
-	 * @var string
-	 */
-	protected string $category = 'widgets';
 
 	/**
 	 * Block icon.
@@ -237,89 +231,19 @@ final class ListingsBlock extends AbstractBlock {
 	 * @return array Query arguments.
 	 */
 	private function build_query_args( array $attributes ): array {
-		$args = [
-			'post_type'      => 'apd_listing',
-			'post_status'    => 'publish',
-			'posts_per_page' => absint( $attributes['count'] ),
-			'paged'          => $this->get_paged(),
-		];
+		$builder = new ListingQueryBuilder();
 
-		// Specific IDs.
-		if ( ! empty( $attributes['ids'] ) ) {
-			$ids = array_map( 'absint', array_filter( explode( ',', $attributes['ids'] ) ) );
-			if ( ! empty( $ids ) ) {
-				$args['post__in'] = $ids;
-				$args['orderby']  = 'post__in';
-			}
-		}
-
-		// Exclude IDs.
-		if ( ! empty( $attributes['exclude'] ) ) {
-			$exclude = array_map( 'absint', array_filter( explode( ',', $attributes['exclude'] ) ) );
-			if ( ! empty( $exclude ) ) {
-				$args['post__not_in'] = $exclude;
-			}
-		}
-
-		// Category filter.
-		if ( ! empty( $attributes['category'] ) ) {
-			$categories          = array_map( 'sanitize_key', explode( ',', $attributes['category'] ) );
-			$args['tax_query']   = $args['tax_query'] ?? [];
-			$args['tax_query'][] = [
-				'taxonomy' => 'apd_category',
-				'field'    => 'slug',
-				'terms'    => $categories,
-			];
-		}
-
-		// Tag filter.
-		if ( ! empty( $attributes['tag'] ) ) {
-			$tags                = array_map( 'sanitize_key', explode( ',', $attributes['tag'] ) );
-			$args['tax_query']   = $args['tax_query'] ?? [];
-			$args['tax_query'][] = [
-				'taxonomy' => 'apd_tag',
-				'field'    => 'slug',
-				'terms'    => $tags,
-			];
-		}
-
-		// Listing type filter.
-		if ( ! empty( $attributes['type'] ) ) {
-			$types               = array_map( 'sanitize_key', explode( ',', $attributes['type'] ) );
-			$args['tax_query']   = $args['tax_query'] ?? [];
-			$args['tax_query'][] = [
-				'taxonomy' => \APD\Taxonomy\ListingTypeTaxonomy::TAXONOMY,
-				'field'    => 'slug',
-				'terms'    => $types,
-			];
-		}
-
-		// Set tax_query relation if both category and tag are set.
-		if ( isset( $args['tax_query'] ) && count( $args['tax_query'] ) > 1 ) {
-			$args['tax_query']['relation'] = 'AND';
-		}
-
-		// Order settings.
-		if ( empty( $attributes['ids'] ) ) {
-			$orderby = sanitize_key( $attributes['orderby'] );
-			$order   = strtoupper( $attributes['order'] ) === 'ASC' ? 'ASC' : 'DESC';
-
-			$valid_orderby = [ 'date', 'title', 'modified', 'rand', 'views', 'menu_order', 'ID' ];
-			if ( ! in_array( $orderby, $valid_orderby, true ) ) {
-				$orderby = 'date';
-			}
-
-			if ( $orderby === 'views' ) {
-				$args['meta_key'] = '_apd_views_count';
-				$args['orderby']  = 'meta_value_num';
-			} else {
-				$args['orderby'] = $orderby;
-			}
-
-			$args['order'] = $order;
-		}
-
-		return $args;
+		return $builder->build( [
+			'count'    => $attributes['count'],
+			'paged'    => $this->get_paged(),
+			'ids'      => $attributes['ids'],
+			'exclude'  => $attributes['exclude'],
+			'category' => $attributes['category'],
+			'tag'      => $attributes['tag'],
+			'type'     => $attributes['type'],
+			'orderby'  => $attributes['orderby'],
+			'order'    => $attributes['order'],
+		] );
 	}
 
 	/**

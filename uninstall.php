@@ -36,25 +36,29 @@ function apd_uninstall(): void {
 		return;
 	}
 
-	// Delete all listings in batches to prevent memory issues.
+	// Delete all listings and inquiries in batches to prevent memory issues.
+	$post_types = [ 'apd_listing', 'apd_inquiry' ];
 	$batch_size = 100;
-	do {
-		$listings = get_posts(
-			[
-				'post_type'      => 'apd_listing',
-				'posts_per_page' => $batch_size,
-				'post_status'    => 'any',
-				'fields'         => 'ids',
-			]
-		);
 
-		foreach ( $listings as $listing_id ) {
-			wp_delete_post( $listing_id, true );
-		}
-	} while ( count( $listings ) === $batch_size );
+	foreach ( $post_types as $post_type ) {
+		do {
+			$posts = get_posts(
+				[
+					'post_type'      => $post_type,
+					'posts_per_page' => $batch_size,
+					'post_status'    => 'any',
+					'fields'         => 'ids',
+				]
+			);
+
+			foreach ( $posts as $post_id ) {
+				wp_delete_post( $post_id, true );
+			}
+		} while ( count( $posts ) === $batch_size );
+	}
 
 	// Delete all terms from custom taxonomies.
-	$taxonomies = [ 'apd_category', 'apd_tag' ];
+	$taxonomies = [ 'apd_category', 'apd_tag', 'apd_listing_type' ];
 	foreach ( $taxonomies as $taxonomy ) {
 		$terms = get_terms(
 			[
@@ -78,6 +82,7 @@ function apd_uninstall(): void {
 		'apd_db_version',
 		'apd_activation_time',
 		'apd_flush_rewrite_rules',
+		'apd_cache_key_registry',
 	];
 
 	foreach ( $options as $option ) {

@@ -13,11 +13,15 @@ use APD\Admin\ListingMetaBox;
 use APD\Fields\FieldRegistry;
 use APD\Fields\Types\TextField;
 use APD\Fields\Types\CheckboxField;
+use APD\Module\ModuleRegistry;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use WP_Post;
+
+// Load listing type helper functions (real implementations that call stubbed WP functions).
+require_once dirname( __DIR__ ) . '/Taxonomy/listing-type-test-functions.php';
 
 /**
  * Class ListingMetaBoxTest
@@ -111,6 +115,18 @@ class ListingMetaBoxTest extends TestCase {
 				}
 				return $result;
 			},
+			'wp_get_object_terms' => function () {
+				$term       = Mockery::mock( \WP_Term::class );
+				$term->slug = 'general';
+				$term->name = 'General';
+				return [ $term ];
+			},
+			'get_terms' => function () {
+				return [];
+			},
+			'wp_set_object_terms' => function () {
+				return [ 1 ];
+			},
 		] );
 
 		// Get fresh registry instance before mocking helper functions.
@@ -122,6 +138,9 @@ class ListingMetaBoxTest extends TestCase {
 		Functions\stubs( [
 			'apd_get_fields' => function ( $args = [] ) use ( $registry ) {
 				return $registry->get_fields( $args );
+			},
+			'apd_get_field' => function ( $name ) use ( $registry ) {
+				return $registry->get_field( $name );
 			},
 			'apd_render_admin_fields' => function ( $listing_id, $args = [] ) use ( $registry ) {
 				// Simplified render for testing.
@@ -537,5 +556,326 @@ class ListingMetaBoxTest extends TestCase {
 
 		// The rendered output should contain the nonce field name.
 		$this->assertStringContainsString( ListingMetaBox::NONCE_NAME, $output );
+	}
+
+	/**
+	 * Test init() registers admin_notices hook.
+	 */
+	public function test_init_registers_admin_notices_hook(): void {
+		$hooks_added = [];
+
+		Functions\when( 'add_action' )->alias( function ( $hook, $callback, $priority = 10, $args = 1 ) use ( &$hooks_added ) {
+			$hooks_added[] = [
+				'hook'     => $hook,
+				'callback' => $callback,
+			];
+		} );
+
+		$this->meta_box->init();
+
+		$found = false;
+		foreach ( $hooks_added as $hook ) {
+			if ( $hook['hook'] === 'admin_notices' ) {
+				$found = true;
+				$this->assertIsCallable( $hook['callback'] );
+			}
+		}
+
+		$this->assertTrue( $found, 'admin_notices hook should be registered' );
+	}
+
+	/**
+	 * Test that store_validation_errors stores WP_Error messages in transient.
+	 */
+	public function test_store_validation_errors_with_wp_error(): void {
+		Functions\when( 'get_current_user_id' )->justReturn( 42 );
+
+		$wp_error = Mockery::mock( 'WP_Error' );
+		$wp_error->shouldReceive( 'get_error_messages' )
+			->andReturn( [ 'Invalid email address.' ] );
+
+		$transient_data = null;
+		Functions\when( 'set_transient' )->alias( function ( $key, $value, $expiration ) use ( &$transient_data ) {
+			$transient_data = [
+				'key'        => $key,
+				'value'      => $value,
+				'expiration' => $expiration,
+			];
+			return true;
+		} );
+
+		// Call private method via reflection.
+		$reflection = new \ReflectionMethod( $this->meta_box, 'store_validation_errors' );
+		$reflection->invoke( $this->meta_box, [ 'email_field' => $wp_error ] );
+
+		$this->assertNotNull( $transient_data, 'set_transient should have been called' );
+		$this->assertSame( 'apd_field_errors_42', $transient_data['key'] );
+		$this->assertContains( 'Invalid email address.', $transient_data['value'] );
+		$this->assertSame( 60, $transient_data['expiration'] );
+	}
+
+	/**
+	 * Test that store_validation_errors handles string error messages.
+	 */
+	public function test_store_validation_errors_with_string_errors(): void {
+		Functions\when( 'get_current_user_id' )->justReturn( 42 );
+
+		$transient_data = null;
+		Functions\when( 'set_transient' )->alias( function ( $key, $value, $expiration ) use ( &$transient_data ) {
+			$transient_data = [
+				'key'   => $key,
+				'value' => $value,
+			];
+			return true;
+		} );
+
+		$reflection = new \ReflectionMethod( $this->meta_box, 'store_validation_errors' );
+		$reflection->invoke( $this->meta_box, [
+			'phone' => 'Phone number is required.',
+			'email' => 'Email format is invalid.',
+		] );
+
+		$this->assertNotNull( $transient_data );
+		$this->assertCount( 2, $transient_data['value'] );
+		$this->assertContains( 'Phone number is required.', $transient_data['value'] );
+		$this->assertContains( 'Email format is invalid.', $transient_data['value'] );
+	}
+
+	/**
+	 * Test that store_validation_errors skips when no user.
+	 */
+	public function test_store_validation_errors_skips_without_user(): void {
+		Functions\when( 'get_current_user_id' )->justReturn( 0 );
+
+		$transient_set = false;
+		Functions\when( 'set_transient' )->alias( function () use ( &$transient_set ) {
+			$transient_set = true;
+			return true;
+		} );
+
+		$reflection = new \ReflectionMethod( $this->meta_box, 'store_validation_errors' );
+		$reflection->invoke( $this->meta_box, [ 'field' => 'error' ] );
+
+		$this->assertFalse( $transient_set, 'set_transient should not be called without user' );
+	}
+
+	/**
+	 * Test display_field_errors shows notices and deletes transient.
+	 */
+	public function test_display_field_errors_shows_notices(): void {
+		// Mock screen.
+		$screen            = new \stdClass();
+		$screen->post_type = 'apd_listing';
+		Functions\when( 'get_current_screen' )->justReturn( $screen );
+		Functions\when( 'get_current_user_id' )->justReturn( 42 );
+
+		Functions\when( 'get_transient' )->justReturn( [
+			'Email is required.',
+			'Phone format is invalid.',
+		] );
+
+		$deleted_transient = null;
+		Functions\when( 'delete_transient' )->alias( function ( $key ) use ( &$deleted_transient ) {
+			$deleted_transient = $key;
+			return true;
+		} );
+
+		ob_start();
+		$this->meta_box->display_field_errors();
+		$output = ob_get_clean();
+
+		$this->assertStringContainsString( 'notice-error', $output );
+		$this->assertStringContainsString( 'Email is required.', $output );
+		$this->assertStringContainsString( 'Phone format is invalid.', $output );
+		$this->assertSame( 'apd_field_errors_42', $deleted_transient );
+	}
+
+	/**
+	 * Test display_field_errors does nothing on wrong screen.
+	 */
+	public function test_display_field_errors_skips_wrong_screen(): void {
+		$screen            = new \stdClass();
+		$screen->post_type = 'post';
+		Functions\when( 'get_current_screen' )->justReturn( $screen );
+
+		ob_start();
+		$this->meta_box->display_field_errors();
+		$output = ob_get_clean();
+
+		$this->assertEmpty( $output );
+	}
+
+	/**
+	 * Test display_field_errors does nothing when no transient.
+	 */
+	public function test_display_field_errors_skips_when_no_errors(): void {
+		$screen            = new \stdClass();
+		$screen->post_type = 'apd_listing';
+		Functions\when( 'get_current_screen' )->justReturn( $screen );
+		Functions\when( 'get_current_user_id' )->justReturn( 42 );
+		Functions\when( 'get_transient' )->justReturn( false );
+
+		ob_start();
+		$this->meta_box->display_field_errors();
+		$output = ob_get_clean();
+
+		$this->assertEmpty( $output );
+	}
+
+	// =========================================================================
+	// Listing Type Filter on Save
+	// =========================================================================
+
+	/**
+	 * Test filter_values_by_listing_type keeps global fields.
+	 */
+	public function test_filter_values_keeps_global_fields(): void {
+		$this->registry->register_field( 'phone', [
+			'type'         => 'text',
+			'listing_type' => null,
+		] );
+
+		$values = [ 'phone' => '555-1234' ];
+
+		$reflection = new \ReflectionMethod( $this->meta_box, 'filter_values_by_listing_type' );
+		$result     = $reflection->invoke( $this->meta_box, $values, 'url-directory' );
+
+		$this->assertArrayHasKey( 'phone', $result );
+		$this->assertSame( '555-1234', $result['phone'] );
+	}
+
+	/**
+	 * Test filter_values_by_listing_type removes non-matching type fields.
+	 */
+	public function test_filter_values_removes_non_matching_type(): void {
+		$this->registry->register_field( 'website_url', [
+			'type'         => 'text',
+			'listing_type' => 'url-directory',
+		] );
+
+		$values = [ 'website_url' => 'https://example.com' ];
+
+		$reflection = new \ReflectionMethod( $this->meta_box, 'filter_values_by_listing_type' );
+		$result     = $reflection->invoke( $this->meta_box, $values, 'general' );
+
+		$this->assertArrayNotHasKey( 'website_url', $result );
+	}
+
+	/**
+	 * Test filter_values_by_listing_type keeps matching type fields.
+	 */
+	public function test_filter_values_keeps_matching_type(): void {
+		$this->registry->register_field( 'website_url', [
+			'type'         => 'text',
+			'listing_type' => 'url-directory',
+		] );
+
+		$values = [ 'website_url' => 'https://example.com' ];
+
+		$reflection = new \ReflectionMethod( $this->meta_box, 'filter_values_by_listing_type' );
+		$result     = $reflection->invoke( $this->meta_box, $values, 'url-directory' );
+
+		$this->assertArrayHasKey( 'website_url', $result );
+	}
+
+	/**
+	 * Test filter_values_by_listing_type handles array listing_type.
+	 */
+	public function test_filter_values_handles_array_listing_type(): void {
+		$this->registry->register_field( 'shared_field', [
+			'type'         => 'text',
+			'listing_type' => [ 'url-directory', 'venue' ],
+		] );
+
+		$values = [ 'shared_field' => 'test value' ];
+
+		$reflection = new \ReflectionMethod( $this->meta_box, 'filter_values_by_listing_type' );
+
+		// Should be included for url-directory.
+		$result = $reflection->invoke( $this->meta_box, $values, 'url-directory' );
+		$this->assertArrayHasKey( 'shared_field', $result );
+
+		// Should be excluded for general.
+		$result = $reflection->invoke( $this->meta_box, $values, 'general' );
+		$this->assertArrayNotHasKey( 'shared_field', $result );
+	}
+
+	/**
+	 * Test filter_values_by_listing_type excludes module-hidden fields.
+	 */
+	public function test_filter_values_excludes_module_hidden_fields(): void {
+		$this->registry->register_field( 'website', [
+			'type'         => 'text',
+			'listing_type' => null,
+		] );
+
+		// Register module that hides 'website' for url-directory.
+		$module_registry = ModuleRegistry::get_instance();
+		$module_registry->reset();
+		$module_registry->register( 'url-directory', [
+			'name'          => 'URL Directory',
+			'hidden_fields' => [ 'website' ],
+		] );
+
+		$values = [ 'website' => 'https://example.com' ];
+
+		$reflection = new \ReflectionMethod( $this->meta_box, 'filter_values_by_listing_type' );
+		$result     = $reflection->invoke( $this->meta_box, $values, 'url-directory' );
+
+		$this->assertArrayNotHasKey( 'website', $result );
+
+		// Clean up.
+		$module_registry->reset();
+	}
+
+	/**
+	 * Test filter_values_by_listing_type keeps unknown fields.
+	 */
+	public function test_filter_values_keeps_unknown_fields(): void {
+		// Don't register the field — simulate an unknown field name.
+		$values = [ 'unknown_field' => 'some value' ];
+
+		$reflection = new \ReflectionMethod( $this->meta_box, 'filter_values_by_listing_type' );
+		$result     = $reflection->invoke( $this->meta_box, $values, 'url-directory' );
+
+		$this->assertArrayHasKey( 'unknown_field', $result );
+	}
+
+	/**
+	 * Test is_field_hidden_by_module returns true when hidden.
+	 */
+	public function test_is_field_hidden_by_module_true(): void {
+		$module_registry = ModuleRegistry::get_instance();
+		$module_registry->reset();
+		$module_registry->register( 'url-directory', [
+			'name'          => 'URL Directory',
+			'hidden_fields' => [ 'website' ],
+		] );
+
+		$reflection = new \ReflectionMethod( $this->meta_box, 'is_field_hidden_by_module' );
+		$result     = $reflection->invoke( $this->meta_box, 'website', 'url-directory' );
+
+		$this->assertTrue( $result );
+
+		$module_registry->reset();
+	}
+
+	/**
+	 * Test is_field_hidden_by_module returns false for different type.
+	 */
+	public function test_is_field_hidden_by_module_false_different_type(): void {
+		$module_registry = ModuleRegistry::get_instance();
+		$module_registry->reset();
+		$module_registry->register( 'url-directory', [
+			'name'          => 'URL Directory',
+			'hidden_fields' => [ 'website' ],
+		] );
+
+		$reflection = new \ReflectionMethod( $this->meta_box, 'is_field_hidden_by_module' );
+		$result     = $reflection->invoke( $this->meta_box, 'website', 'general' );
+
+		$this->assertFalse( $result );
+
+		$module_registry->reset();
 	}
 }

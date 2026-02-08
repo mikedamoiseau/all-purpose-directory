@@ -385,4 +385,28 @@ class ContactFormTest extends TestCase {
 		$this->assertTrue( $add_action_called, 'add_action should be called for apd_single_listing_contact_form' );
 		$this->assertTrue( $do_action_called, 'do_action should be called for apd_contact_form_init' );
 	}
+
+	/**
+	 * Test contact form template contains novalidate for JS validation consistency.
+	 */
+	public function test_contact_form_template_has_novalidate(): void {
+		$template_path = dirname( __DIR__, 3 ) . '/templates/contact/contact-form.php';
+
+		$this->assertFileExists( $template_path );
+
+		$content = file_get_contents( $template_path );
+
+		$this->assertStringContainsString( 'novalidate', $content, 'Contact form template should have novalidate attribute for JS validation consistency' );
+	}
+
+	/**
+	 * Test contact form template has aria-label for accessibility.
+	 */
+	public function test_contact_form_template_has_aria_label(): void {
+		$template_path = dirname( __DIR__, 3 ) . '/templates/contact/contact-form.php';
+
+		$content = file_get_contents( $template_path );
+
+		$this->assertStringContainsString( 'aria-label', $content, 'Contact form template should have aria-label for accessibility' );
+	}
 }

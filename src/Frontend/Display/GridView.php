@@ -175,17 +175,9 @@ final class GridView extends AbstractView {
 	 * @return string Rendered HTML.
 	 */
 	public function renderListing( int $listing_id, array $args = [] ): string {
-		// Add grid-specific config to args.
-		$args['show_image']        = $this->getConfigValue( 'show_image', true );
-		$args['show_excerpt']      = $this->getConfigValue( 'show_excerpt', true );
-		$args['excerpt_length']    = $this->getConfigValue( 'excerpt_length', 15 );
-		$args['show_category']     = $this->getConfigValue( 'show_category', true );
-		$args['show_badge']        = $this->getConfigValue( 'show_badge', true );
-		$args['show_price']        = $this->getConfigValue( 'show_price', true );
-		$args['show_rating']       = $this->getConfigValue( 'show_rating', true );
-		$args['show_favorite']     = $this->getConfigValue( 'show_favorite', true );
-		$args['show_view_details'] = $this->getConfigValue( 'show_view_details', true );
-		$args['image_size']        = $this->getConfigValue( 'image_size', 'medium' );
+		// Build shared args from config, then add grid-specific values.
+		$args = array_merge( $this->buildRenderArgs(), $args );
+		$args['show_badge'] = $this->getConfigValue( 'show_badge', true );
 
 		return parent::renderListing( $listing_id, $args );
 	}

@@ -329,6 +329,53 @@ final class Settings {
 				'description' => __( 'Unit for distance measurements.', 'all-purpose-directory' ),
 			]
 		);
+
+		// Pages section.
+		$pages_section = 'apd_general_pages_section';
+		add_settings_section(
+			$pages_section,
+			__( 'Pages', 'all-purpose-directory' ),
+			function () {
+				echo '<p>' . esc_html__( 'Pages created during activation. You can reassign them here.', 'all-purpose-directory' ) . '</p>';
+			},
+			$page
+		);
+
+		add_settings_field(
+			'directory_page',
+			__( 'Directory Page', 'all-purpose-directory' ),
+			[ $this, 'render_page_select_field' ],
+			$page,
+			$pages_section,
+			[
+				'field'       => 'directory_page',
+				'description' => __( 'Main directory page with search form and listings.', 'all-purpose-directory' ),
+			]
+		);
+
+		add_settings_field(
+			'submit_page',
+			__( 'Submit Listing Page', 'all-purpose-directory' ),
+			[ $this, 'render_page_select_field' ],
+			$page,
+			$pages_section,
+			[
+				'field'       => 'submit_page',
+				'description' => __( 'Page with the listing submission form.', 'all-purpose-directory' ),
+			]
+		);
+
+		add_settings_field(
+			'dashboard_page',
+			__( 'Dashboard Page', 'all-purpose-directory' ),
+			[ $this, 'render_page_select_field' ],
+			$page,
+			$pages_section,
+			[
+				'field'       => 'dashboard_page',
+				'description' => __( 'User dashboard page.', 'all-purpose-directory' ),
+			]
+		);
 	}
 
 	/**
@@ -1449,6 +1496,9 @@ final class Settings {
 			'currency_position'   => 'before',
 			'date_format'         => 'default',
 			'distance_unit'       => 'km',
+			'directory_page'      => 0,
+			'submit_page'         => 0,
+			'dashboard_page'      => 0,
 
 			// Listings.
 			'listings_per_page'   => 12,
@@ -1583,6 +1633,19 @@ final class Settings {
 			&& in_array( $input['distance_unit'], [ 'km', 'miles' ], true )
 			? $input['distance_unit']
 			: $defaults['distance_unit'];
+
+		// Page settings.
+		$sanitized['directory_page'] = isset( $input['directory_page'] )
+			? absint( $input['directory_page'] )
+			: $defaults['directory_page'];
+
+		$sanitized['submit_page'] = isset( $input['submit_page'] )
+			? absint( $input['submit_page'] )
+			: $defaults['submit_page'];
+
+		$sanitized['dashboard_page'] = isset( $input['dashboard_page'] )
+			? absint( $input['dashboard_page'] )
+			: $defaults['dashboard_page'];
 
 		// Listings settings.
 		$sanitized['listings_per_page'] = isset( $input['listings_per_page'] )

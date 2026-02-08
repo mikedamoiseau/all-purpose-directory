@@ -680,6 +680,212 @@ class FieldRegistryTest extends UnitTestCase {
 	}
 
 	/**
+	 * Test register_default_fields registers all expected fields.
+	 */
+	public function testRegisterDefaultFieldsRegistersAllFields(): void {
+		$this->registry->register_default_fields();
+
+		$expected = [ 'phone', 'email', 'website', 'address', 'city', 'state', 'zip', 'hours', 'price_range' ];
+
+		foreach ( $expected as $name ) {
+			$this->assertTrue( $this->registry->has_field( $name ), "Field '{$name}' should be registered" );
+		}
+
+		$this->assertSame( 9, $this->registry->count() );
+	}
+
+	/**
+	 * Test register_default_fields sets correct field types.
+	 */
+	public function testRegisterDefaultFieldsHasCorrectTypes(): void {
+		$this->registry->register_default_fields();
+
+		$this->assertSame( 'phone', $this->registry->get_field( 'phone' )['type'] );
+		$this->assertSame( 'email', $this->registry->get_field( 'email' )['type'] );
+		$this->assertSame( 'url', $this->registry->get_field( 'website' )['type'] );
+		$this->assertSame( 'text', $this->registry->get_field( 'address' )['type'] );
+		$this->assertSame( 'textarea', $this->registry->get_field( 'hours' )['type'] );
+		$this->assertSame( 'select', $this->registry->get_field( 'price_range' )['type'] );
+	}
+
+	/**
+	 * Test register_default_fields respects priority ordering.
+	 */
+	public function testRegisterDefaultFieldsHasCorrectPriority(): void {
+		$this->registry->register_default_fields();
+
+		$fields = $this->registry->get_fields( [ 'orderby' => 'priority', 'order' => 'ASC' ] );
+		$keys = array_keys( $fields );
+
+		$this->assertSame( 'phone', $keys[0] );
+		$this->assertSame( 'price_range', end( $keys ) );
+	}
+
+	/**
+	 * Test register_default_fields does not overwrite existing fields.
+	 */
+	public function testRegisterDefaultFieldsDoesNotOverwriteExisting(): void {
+		// Register a custom phone field first.
+		$this->registry->register_field( 'phone', [
+			'type'  => 'text',
+			'label' => 'Custom Phone',
+		] );
+
+		$this->registry->register_default_fields();
+
+		$phone = $this->registry->get_field( 'phone' );
+		$this->assertSame( 'text', $phone['type'] );
+		$this->assertSame( 'Custom Phone', $phone['label'] );
+	}
+
+	/**
+	 * Test register_default_fields can be disabled via filter.
+	 */
+	public function testRegisterDefaultFieldsCanBeDisabledViaFilter(): void {
+		Filters\expectApplied( 'apd_register_default_fields' )
+			->once()
+			->andReturn( [] );
+
+		$this->registry->register_default_fields();
+
+		$this->assertSame( 0, $this->registry->count() );
+	}
+
+	/**
+	 * Test register_default_fields handles non-array filter return.
+	 */
+	public function testRegisterDefaultFieldsHandlesNonArrayFilterReturn(): void {
+		Filters\expectApplied( 'apd_register_default_fields' )
+			->once()
+			->andReturn( false );
+
+		$this->registry->register_default_fields();
+
+		$this->assertSame( 0, $this->registry->count() );
+	}
+
+	/**
+	 * Test price_range field has options configured.
+	 */
+	public function testPriceRangeFieldHasOptions(): void {
+		$this->registry->register_default_fields();
+
+		$price_range = $this->registry->get_field( 'price_range' );
+
+		$this->assertNotEmpty( $price_range['options'] );
+		$this->assertArrayHasKey( '$', $price_range['options'] );
+		$this->assertArrayHasKey( '$$$$', $price_range['options'] );
+	}
+
+	/**
+	 * Test default field config includes listing_type as null.
+	 */
+	public function testDefaultFieldConfigIncludesListingType(): void {
+		$this->registry->register_field( 'test_field', [
+			'type' => 'text',
+		] );
+
+		$field = $this->registry->get_field( 'test_field' );
+
+		$this->assertArrayHasKey( 'listing_type', $field );
+		$this->assertNull( $field['listing_type'] );
+	}
+
+	/**
+	 * Test get_fields filters by listing_type string.
+	 */
+	public function testGetFieldsFiltersByListingTypeString(): void {
+		$this->registry->register_field( 'global_field', [
+			'type'         => 'text',
+			'listing_type' => null,
+		] );
+		$this->registry->register_field( 'url_field', [
+			'type'         => 'text',
+			'listing_type' => 'url-directory',
+		] );
+		$this->registry->register_field( 'venue_field', [
+			'type'         => 'text',
+			'listing_type' => 'venue',
+		] );
+
+		$fields = $this->registry->get_fields( [ 'listing_type' => 'url-directory' ] );
+
+		// Should include global (null) + matching type.
+		$this->assertCount( 2, $fields );
+		$this->assertArrayHasKey( 'global_field', $fields );
+		$this->assertArrayHasKey( 'url_field', $fields );
+		$this->assertArrayNotHasKey( 'venue_field', $fields );
+	}
+
+	/**
+	 * Test get_fields filters by listing_type with array value.
+	 */
+	public function testGetFieldsFiltersByListingTypeArray(): void {
+		$this->registry->register_field( 'shared_field', [
+			'type'         => 'text',
+			'listing_type' => [ 'url-directory', 'venue' ],
+		] );
+		$this->registry->register_field( 'only_venue', [
+			'type'         => 'text',
+			'listing_type' => 'venue',
+		] );
+
+		$fields = $this->registry->get_fields( [ 'listing_type' => 'url-directory' ] );
+
+		$this->assertCount( 1, $fields );
+		$this->assertArrayHasKey( 'shared_field', $fields );
+		$this->assertArrayNotHasKey( 'only_venue', $fields );
+	}
+
+	/**
+	 * Test get_fields with listing_type null returns all fields.
+	 */
+	public function testGetFieldsWithNullListingTypeReturnsAll(): void {
+		$this->registry->register_field( 'global_field', [
+			'type'         => 'text',
+			'listing_type' => null,
+		] );
+		$this->registry->register_field( 'typed_field', [
+			'type'         => 'text',
+			'listing_type' => 'url-directory',
+		] );
+
+		$fields = $this->registry->get_fields( [ 'listing_type' => null ] );
+
+		$this->assertCount( 2, $fields );
+	}
+
+	/**
+	 * Test get_fields listing_type combined with other filters.
+	 */
+	public function testGetFieldsListingTypeCombinedWithOtherFilters(): void {
+		$this->registry->register_field( 'searchable_url', [
+			'type'         => 'text',
+			'searchable'   => true,
+			'listing_type' => 'url-directory',
+		] );
+		$this->registry->register_field( 'not_searchable_url', [
+			'type'         => 'text',
+			'searchable'   => false,
+			'listing_type' => 'url-directory',
+		] );
+		$this->registry->register_field( 'searchable_global', [
+			'type'         => 'text',
+			'searchable'   => true,
+			'listing_type' => null,
+		] );
+
+		$fields = $this->registry->get_fields( [
+			'listing_type' => 'url-directory',
+			'searchable'   => true,
+		] );
+
+		$this->assertCount( 2, $fields );
+		$this->assertArrayHasKey( 'searchable_url', $fields );
+		$this->assertArrayHasKey( 'searchable_global', $fields );
+	}
+
+	/**
 	 * Create a mock field type for testing.
 	 *
 	 * @param string $type The type identifier.

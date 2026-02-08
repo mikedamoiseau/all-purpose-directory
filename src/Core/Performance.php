@@ -94,6 +94,20 @@ class Performance {
 	private array $cache_keys = [];
 
 	/**
+	 * New cache keys pending flush to the database
+	 *
+	 * @var array<string, true>
+	 */
+	private array $pending_keys = [];
+
+	/**
+	 * Whether the shutdown hook has been registered
+	 *
+	 * @var bool
+	 */
+	private bool $shutdown_registered = false;
+
+	/**
 	 * Register WordPress hooks for cache invalidation
 	 *
 	 * @return void
@@ -204,8 +218,9 @@ class Performance {
 	public function delete( string $key ): bool {
 		$cache_key = $this->get_cache_key( $key );
 
-		// Remove from registry
+		// Remove from registry and pending keys.
 		unset( $this->cache_keys[ $cache_key ] );
+		unset( $this->pending_keys[ $cache_key ] );
 
 		// Delete from object cache
 		wp_cache_delete( $cache_key, self::CACHE_GROUP );
@@ -238,10 +253,12 @@ class Performance {
 			}
 		}
 
-		// Remove deleted keys from registry
+		// Remove deleted keys from registry and pending keys.
 		if ( ! empty( $keys_to_clean ) ) {
 			foreach ( $keys_to_clean as $key ) {
 				unset( $registry[ $key ] );
+				unset( $this->pending_keys[ $key ] );
+				unset( $this->cache_keys[ $key ] );
 			}
 			update_option( 'apd_cache_key_registry', $registry, false );
 		}
@@ -252,6 +269,9 @@ class Performance {
 	/**
 	 * Register a cache key in the registry
 	 *
+	 * Buffers new keys in memory and flushes them to the database
+	 * once on shutdown to avoid multiple update_option() calls per request.
+	 *
 	 * @param string $cache_key Full cache key.
 	 * @return void
 	 */
@@ -260,12 +280,51 @@ class Performance {
 			return;
 		}
 
-		$this->cache_keys[ $cache_key ] = true;
+		// Ensure the persisted registry is loaded into cache_keys.
+		$this->get_cache_key_registry();
 
-		$registry = $this->get_cache_key_registry();
-		if ( ! isset( $registry[ $cache_key ] ) ) {
-			$registry[ $cache_key ] = true;
-			update_option( 'apd_cache_key_registry', $registry, false );
+		// If still not known (wasn't in DB), queue for batched flush.
+		if ( ! isset( $this->cache_keys[ $cache_key ] ) ) {
+			$this->pending_keys[ $cache_key ] = true;
+			$this->ensure_shutdown_hook();
+		}
+
+		$this->cache_keys[ $cache_key ] = true;
+	}
+
+	/**
+	 * Flush pending cache keys to the database
+	 *
+	 * Called on shutdown to batch all new key registrations
+	 * into a single update_option() call.
+	 *
+	 * @return void
+	 */
+	public function flush_registry(): void {
+		if ( empty( $this->pending_keys ) ) {
+			return;
+		}
+
+		$registry = get_option( 'apd_cache_key_registry', [] );
+		if ( ! is_array( $registry ) ) {
+			$registry = [];
+		}
+
+		$registry = array_merge( $registry, $this->pending_keys );
+		update_option( 'apd_cache_key_registry', $registry, false );
+
+		$this->pending_keys = [];
+	}
+
+	/**
+	 * Register the shutdown hook for flushing pending keys
+	 *
+	 * @return void
+	 */
+	private function ensure_shutdown_hook(): void {
+		if ( ! $this->shutdown_registered ) {
+			add_action( 'shutdown', [ $this, 'flush_registry' ] );
+			$this->shutdown_registered = true;
 		}
 	}
 

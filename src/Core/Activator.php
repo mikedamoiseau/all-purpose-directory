@@ -31,6 +31,7 @@ class Activator {
 		self::create_tables();
 		self::create_options();
 		self::create_roles();
+		self::create_default_pages();
 		self::schedule_events();
 
 		// Flush rewrite rules after post type registration.
@@ -134,6 +135,77 @@ class Activator {
 				$author->add_cap( $cap );
 			}
 		}
+	}
+
+	/**
+	 * Create default pages with shortcodes.
+	 *
+	 * Creates pages only if the corresponding setting is empty or the page
+	 * no longer exists. Stores page IDs in plugin settings for reference.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return void
+	 */
+	private static function create_default_pages(): void {
+		$pages = [
+			'directory_page' => [
+				'title'   => __( 'Directory', 'all-purpose-directory' ),
+				'content' => "<!-- wp:shortcode -->\n[apd_search_form]\n<!-- /wp:shortcode -->\n\n<!-- wp:shortcode -->\n[apd_listings]\n<!-- /wp:shortcode -->",
+			],
+			'submit_page'    => [
+				'title'   => __( 'Submit a Listing', 'all-purpose-directory' ),
+				'content' => "<!-- wp:shortcode -->\n[apd_submission_form]\n<!-- /wp:shortcode -->",
+			],
+			'dashboard_page' => [
+				'title'   => __( 'My Dashboard', 'all-purpose-directory' ),
+				'content' => "<!-- wp:shortcode -->\n[apd_dashboard]\n<!-- /wp:shortcode -->",
+			],
+		];
+
+		/**
+		 * Filter the default pages to create on activation.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array<string, array{title: string, content: string}> $pages Page configurations keyed by setting name.
+		 */
+		$pages = apply_filters( 'apd_default_pages', $pages );
+
+		if ( ! is_array( $pages ) || empty( $pages ) ) {
+			return;
+		}
+
+		$option_name = \APD\Admin\Settings::OPTION_NAME;
+		$options     = get_option( $option_name, [] );
+		if ( ! is_array( $options ) ) {
+			$options = [];
+		}
+
+		foreach ( $pages as $setting_key => $page_config ) {
+			// Skip if page ID already set and page still exists.
+			if ( ! empty( $options[ $setting_key ] ) ) {
+				$existing = get_post( (int) $options[ $setting_key ] );
+				if ( $existing && $existing->post_status !== 'trash' ) {
+					continue;
+				}
+			}
+
+			$page_id = wp_insert_post(
+				[
+					'post_title'   => $page_config['title'],
+					'post_content' => $page_config['content'],
+					'post_status'  => 'publish',
+					'post_type'    => 'page',
+				]
+			);
+
+			if ( $page_id && ! is_wp_error( $page_id ) ) {
+				$options[ $setting_key ] = $page_id;
+			}
+		}
+
+		update_option( $option_name, $options );
 	}
 
 	/**

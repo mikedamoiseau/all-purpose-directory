@@ -42,6 +42,7 @@ $form_classes = $form->get_css_classes();
 		class="<?php echo esc_attr( $form_classes ); ?>"
 		method="post"
 		action=""
+		novalidate
 		data-listing-id="<?php echo esc_attr( $listing_id ); ?>"
 		aria-label="<?php esc_attr_e( 'Contact form', 'all-purpose-directory' ); ?>"
 	>
@@ -55,9 +56,9 @@ $form_classes = $form->get_css_classes();
 		?>
 		<input type="hidden" name="apd_contact_token" value="<?php echo esc_attr( base64_encode( $apd_contact_ts . '|' . $apd_contact_sig ) ); ?>">
 		<?php // Honeypot field — hidden from real users, bots will fill it. ?>
-		<div class="apd-field apd-field--honeypot" style="position: absolute; left: -9999px;" aria-hidden="true">
+		<div class="apd-field apd-field--hp" aria-hidden="true">
 			<label for="apd-contact-website-<?php echo esc_attr( $listing_id ); ?>"><?php esc_html_e( 'Website', 'all-purpose-directory' ); ?></label>
-			<input type="text" id="apd-contact-website-<?php echo esc_attr( $listing_id ); ?>" name="contact_website" value="" tabindex="-1" autocomplete="off">
+			<input type="text" id="apd-contact-website-<?php echo esc_attr( $listing_id ); ?>" name="contact_website" class="apd-field__hp-input" value="" tabindex="-1" autocomplete="off">
 		</div>
 
 		<div class="apd-field apd-field--contact-name">

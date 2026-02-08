@@ -63,20 +63,18 @@ $message = $my_listings->get_message();
 		<div class="apd-my-listings__filters">
 			<!-- Status Filter Tabs -->
 			<nav class="apd-my-listings__status-tabs" aria-label="<?php esc_attr_e( 'Filter by status', 'all-purpose-directory' ); ?>">
-				<ul class="apd-status-tabs" role="tablist">
+				<ul class="apd-status-tabs">
 					<?php foreach ( $statuses as $status_key => $status_data ) : ?>
 						<?php
 						$is_active = ( $status === $status_key );
 						$tab_url   = add_query_arg( 'status', $status_key );
 						$tab_url   = remove_query_arg( 'paged', $tab_url );
 						?>
-						<li class="apd-status-tabs__item" role="presentation">
+						<li class="apd-status-tabs__item">
 							<a href="<?php echo esc_url( $tab_url ); ?>"
 								class="apd-status-tabs__link <?php echo $is_active ? 'apd-status-tabs__link--active' : ''; ?>"
-								role="tab"
-								aria-selected="<?php echo $is_active ? 'true' : 'false'; ?>"
-								<?php if ( ! $is_active ) : ?>
-									tabindex="-1"
+								<?php if ( $is_active ) : ?>
+									aria-current="page"
 								<?php endif; ?>>
 								<?php echo esc_html( $status_data['label'] ); ?>
 								<?php if ( $status_data['count'] > 0 ) : ?>
@@ -113,7 +111,7 @@ $message = $my_listings->get_message();
 	<?php if ( $listings->have_posts() ) : ?>
 
 		<div class="apd-my-listings__table-wrapper">
-			<table class="apd-my-listings__table" role="grid">
+			<table class="apd-my-listings__table">
 				<thead>
 					<tr>
 						<?php if ( $config['show_thumbnail'] ) : ?>

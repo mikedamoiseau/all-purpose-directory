@@ -99,6 +99,9 @@ final class BlockManager {
 			return;
 		}
 
+		// Register custom block category.
+		add_filter( 'block_categories_all', [ $this, 'register_block_category' ] );
+
 		// Register blocks on init (priority 20 to ensure post types are registered).
 		add_action( 'init', [ $this, 'register_blocks' ], 20 );
 
@@ -111,6 +114,27 @@ final class BlockManager {
 		add_action( 'delete_term', [ $this, 'invalidate_term_cache' ], 10, 3 );
 
 		$this->initialized = true;
+	}
+
+	/**
+	 * Register custom block category for the plugin.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array<int, array<string, mixed>> $categories Existing block categories.
+	 * @return array<int, array<string, mixed>> Modified block categories.
+	 */
+	public function register_block_category( array $categories ): array {
+		array_unshift(
+			$categories,
+			[
+				'slug'  => 'all-purpose-directory',
+				'title' => __( 'All Purpose Directory', 'all-purpose-directory' ),
+				'icon'  => 'dashicons-location-alt',
+			]
+		);
+
+		return $categories;
 	}
 
 	/**

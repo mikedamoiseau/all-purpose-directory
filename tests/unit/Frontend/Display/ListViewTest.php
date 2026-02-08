@@ -315,4 +315,57 @@ final class ListViewTest extends UnitTestCase {
 		$result = $this->view->setConfigValue( 'show_date', false );
 		$this->assertSame( $this->view, $result );
 	}
+
+	// =========================================================================
+	// buildRenderArgs Tests
+	// =========================================================================
+
+	/**
+	 * Test buildRenderArgs returns shared config keys.
+	 */
+	public function test_build_render_args_returns_shared_keys(): void {
+		$ref  = new \ReflectionMethod( $this->view, 'buildRenderArgs' );
+		$args = $ref->invoke( $this->view );
+
+		$expected_keys = [
+			'show_image',
+			'show_excerpt',
+			'excerpt_length',
+			'show_category',
+			'show_price',
+			'show_rating',
+			'show_favorite',
+			'show_view_details',
+			'image_size',
+		];
+
+		foreach ( $expected_keys as $key ) {
+			$this->assertArrayHasKey( $key, $args, "buildRenderArgs should include '$key'" );
+		}
+	}
+
+	/**
+	 * Test buildRenderArgs uses list defaults (30 for excerpt_length, not grid's 15).
+	 */
+	public function test_build_render_args_uses_list_defaults(): void {
+		$ref  = new \ReflectionMethod( $this->view, 'buildRenderArgs' );
+		$args = $ref->invoke( $this->view );
+
+		$this->assertTrue( $args['show_image'] );
+		$this->assertSame( 30, $args['excerpt_length'] );
+		$this->assertSame( 'medium', $args['image_size'] );
+	}
+
+	/**
+	 * Test buildRenderArgs does not include list-specific keys.
+	 */
+	public function test_build_render_args_excludes_list_specific_keys(): void {
+		$ref  = new \ReflectionMethod( $this->view, 'buildRenderArgs' );
+		$args = $ref->invoke( $this->view );
+
+		$this->assertArrayNotHasKey( 'show_tags', $args );
+		$this->assertArrayNotHasKey( 'max_tags', $args );
+		$this->assertArrayNotHasKey( 'show_date', $args );
+		$this->assertArrayNotHasKey( 'image_width', $args );
+	}
 }

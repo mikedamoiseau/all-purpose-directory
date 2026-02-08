@@ -50,7 +50,7 @@ abstract class AbstractBlock {
 	 *
 	 * @var string
 	 */
-	protected string $category = 'widgets';
+	protected string $category = 'all-purpose-directory';
 
 	/**
 	 * Block icon.

@@ -51,6 +51,11 @@ final class ListingMetaBox {
 	public const POST_TYPE = 'apd_listing';
 
 	/**
+	 * Transient key prefix for field validation errors.
+	 */
+	private const ERROR_TRANSIENT_PREFIX = 'apd_field_errors_';
+
+	/**
 	 * Initialize the meta box hooks.
 	 *
 	 * Registers the meta box and save handlers.
@@ -67,6 +72,7 @@ final class ListingMetaBox {
 
 		add_action( 'add_meta_boxes', [ $this, 'register_meta_box' ] );
 		add_action( 'save_post_' . self::POST_TYPE, [ $this, 'save_meta_box' ], 10, 2 );
+		add_action( 'admin_notices', [ $this, 'display_field_errors' ] );
 	}
 
 	/**
@@ -168,6 +174,19 @@ final class ListingMetaBox {
 		// Extract field values from POST data.
 		$values = $this->extract_field_values( $fields );
 
+		// Get the selected listing type from POST data (set before taxonomy save at priority 20).
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce already verified above.
+		$selected_type = isset( $_POST['apd_listing_type'] )
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce verified, sanitized by sanitize_key.
+			? sanitize_key( wp_unslash( $_POST['apd_listing_type'] ) )
+			: apd_get_listing_type( $post_id );
+
+		// Filter values to only include fields matching the listing type.
+		// Prevents required-field validation failures for hidden type-specific fields.
+		if ( $selected_type ) {
+			$values = $this->filter_values_by_listing_type( $values, $selected_type );
+		}
+
 		/**
 		 * Fires before listing field values are saved.
 		 *
@@ -183,11 +202,10 @@ final class ListingMetaBox {
 		// Process (sanitize and validate) field values.
 		$result = apd_process_fields( $values );
 
-		// If validation fails, store errors for display.
-		// Note: WordPress admin doesn't easily support displaying validation errors
-		// on post save, but we set them for hooks that might use them.
+		// If validation fails, store errors for display on redirect.
 		if ( ! $result['valid'] && $result['errors'] !== null ) {
 			apd_set_field_errors( $result['errors'] );
+			$this->store_validation_errors( $result['errors'] );
 		}
 
 		// Save sanitized values (even if some validation failed, save what we can).
@@ -208,6 +226,89 @@ final class ListingMetaBox {
 		 * @param array<string, mixed> $values  Sanitized field values keyed by field name.
 		 */
 		do_action( 'apd_after_listing_save', $post_id, $sanitized_values );
+	}
+
+	/**
+	 * Filter field values to only include fields matching the listing type.
+	 *
+	 * Removes values for fields that don't belong to the selected listing type,
+	 * preventing required-field validation failures for hidden type-specific fields.
+	 * The field data is preserved in meta from previous saves; it just isn't
+	 * re-validated on this save.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param array<string, mixed> $values        Field values keyed by field name.
+	 * @param string               $selected_type The selected listing type slug.
+	 * @return array<string, mixed> Filtered field values.
+	 */
+	private function filter_values_by_listing_type( array $values, string $selected_type ): array {
+		$filtered = [];
+
+		foreach ( $values as $field_name => $value ) {
+			$field = apd_get_field( $field_name );
+
+			if ( $field === null ) {
+				// Unknown field, keep it.
+				$filtered[ $field_name ] = $value;
+				continue;
+			}
+
+			$field_type = $field['listing_type'] ?? null;
+
+			// Global fields (listing_type is null) are always included.
+			if ( $field_type === null ) {
+				// Check if a module hides this field for the selected type.
+				if ( $this->is_field_hidden_by_module( $field_name, $selected_type ) ) {
+					continue;
+				}
+				$filtered[ $field_name ] = $value;
+				continue;
+			}
+
+			// Type-specific field: include only if it matches the selected type.
+			if ( is_string( $field_type ) && $field_type === $selected_type ) {
+				$filtered[ $field_name ] = $value;
+			} elseif ( is_array( $field_type ) && in_array( $selected_type, $field_type, true ) ) {
+				$filtered[ $field_name ] = $value;
+			}
+		}
+
+		return $filtered;
+	}
+
+	/**
+	 * Check if a field is hidden by a module's hidden_fields config.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string $field_name   Field name.
+	 * @param string $listing_type Current listing type slug.
+	 * @return bool True if hidden.
+	 */
+	private function is_field_hidden_by_module( string $field_name, string $listing_type ): bool {
+		if ( empty( $field_name ) || empty( $listing_type ) ) {
+			return false;
+		}
+
+		if ( ! function_exists( 'apd_get_modules' ) ) {
+			return false;
+		}
+
+		$modules = apd_get_modules();
+
+		foreach ( $modules as $slug => $config ) {
+			if ( $slug !== $listing_type ) {
+				continue;
+			}
+
+			$hidden_fields = $config['hidden_fields'] ?? [];
+			if ( in_array( $field_name, $hidden_fields, true ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -255,5 +356,81 @@ final class ListingMetaBox {
 		}
 
 		return $values;
+	}
+
+	/**
+	 * Store validation errors in a transient for display after redirect.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array|\WP_Error $errors Validation errors.
+	 * @return void
+	 */
+	private function store_validation_errors( $errors ): void {
+		$user_id = get_current_user_id();
+		if ( ! $user_id ) {
+			return;
+		}
+
+		$messages = [];
+		if ( is_wp_error( $errors ) ) {
+			$messages = $errors->get_error_messages();
+		} elseif ( is_array( $errors ) ) {
+			foreach ( $errors as $field_name => $error ) {
+				if ( is_wp_error( $error ) ) {
+					foreach ( $error->get_error_messages() as $msg ) {
+						$messages[] = $msg;
+					}
+				} elseif ( is_string( $error ) ) {
+					$messages[] = $error;
+				}
+			}
+		}
+
+		if ( ! empty( $messages ) ) {
+			set_transient(
+				self::ERROR_TRANSIENT_PREFIX . $user_id,
+				$messages,
+				60
+			);
+		}
+	}
+
+	/**
+	 * Display field validation errors as admin notices.
+	 *
+	 * Reads errors from a user-specific transient, displays them,
+	 * and deletes the transient so errors are shown only once.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return void
+	 */
+	public function display_field_errors(): void {
+		$screen = get_current_screen();
+		if ( ! $screen || $screen->post_type !== self::POST_TYPE ) {
+			return;
+		}
+
+		$user_id = get_current_user_id();
+		if ( ! $user_id ) {
+			return;
+		}
+
+		$transient_key = self::ERROR_TRANSIENT_PREFIX . $user_id;
+		$messages      = get_transient( $transient_key );
+
+		if ( empty( $messages ) || ! is_array( $messages ) ) {
+			return;
+		}
+
+		delete_transient( $transient_key );
+
+		foreach ( $messages as $message ) {
+			printf(
+				'<div class="notice notice-error"><p>%s</p></div>',
+				esc_html( $message )
+			);
+		}
 	}
 }

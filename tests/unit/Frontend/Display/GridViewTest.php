@@ -315,4 +315,71 @@ final class GridViewTest extends UnitTestCase {
 		$result = $this->view->setConfigValue( 'show_image', false );
 		$this->assertSame( $this->view, $result );
 	}
+
+	// =========================================================================
+	// buildRenderArgs Tests
+	// =========================================================================
+
+	/**
+	 * Test buildRenderArgs returns shared config keys.
+	 */
+	public function test_build_render_args_returns_shared_keys(): void {
+		$ref  = new \ReflectionMethod( $this->view, 'buildRenderArgs' );
+		$args = $ref->invoke( $this->view );
+
+		$expected_keys = [
+			'show_image',
+			'show_excerpt',
+			'excerpt_length',
+			'show_category',
+			'show_price',
+			'show_rating',
+			'show_favorite',
+			'show_view_details',
+			'image_size',
+		];
+
+		foreach ( $expected_keys as $key ) {
+			$this->assertArrayHasKey( $key, $args, "buildRenderArgs should include '$key'" );
+		}
+	}
+
+	/**
+	 * Test buildRenderArgs uses grid defaults.
+	 */
+	public function test_build_render_args_uses_grid_defaults(): void {
+		$ref  = new \ReflectionMethod( $this->view, 'buildRenderArgs' );
+		$args = $ref->invoke( $this->view );
+
+		$this->assertTrue( $args['show_image'] );
+		$this->assertSame( 15, $args['excerpt_length'] );
+		$this->assertSame( 'medium', $args['image_size'] );
+	}
+
+	/**
+	 * Test buildRenderArgs reflects config changes.
+	 */
+	public function test_build_render_args_reflects_config_changes(): void {
+		$this->view->setConfigValue( 'show_image', false );
+		$this->view->setConfigValue( 'excerpt_length', 25 );
+
+		$ref  = new \ReflectionMethod( $this->view, 'buildRenderArgs' );
+		$args = $ref->invoke( $this->view );
+
+		$this->assertFalse( $args['show_image'] );
+		$this->assertSame( 25, $args['excerpt_length'] );
+	}
+
+	/**
+	 * Test buildRenderArgs does not include view-specific keys.
+	 */
+	public function test_build_render_args_excludes_grid_specific_keys(): void {
+		$ref  = new \ReflectionMethod( $this->view, 'buildRenderArgs' );
+		$args = $ref->invoke( $this->view );
+
+		// Grid-specific keys should not appear in shared args.
+		$this->assertArrayNotHasKey( 'show_badge', $args );
+		$this->assertArrayNotHasKey( 'columns', $args );
+		$this->assertArrayNotHasKey( 'card_hover', $args );
+	}
 }

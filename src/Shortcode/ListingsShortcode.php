@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace APD\Shortcode;
 
 use APD\Frontend\Display\ViewRegistry;
+use APD\Listing\ListingQueryBuilder;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -274,84 +275,20 @@ final class ListingsShortcode extends AbstractShortcode {
 	 * @return array Query arguments.
 	 */
 	private function build_query_args( array $atts ): array {
-		$args = [
-			'post_type'      => 'apd_listing',
-			'post_status'    => 'publish',
-			'posts_per_page' => $atts['count'],
-			'paged'          => $this->get_paged(),
-		];
+		$builder = new ListingQueryBuilder();
 
-		// Specific IDs.
-		if ( ! empty( $atts['ids'] ) ) {
-			$args['post__in'] = $atts['ids'];
-			$args['orderby']  = 'post__in';
-		}
-
-		// Exclude IDs.
-		if ( ! empty( $atts['exclude'] ) ) {
-			$args['post__not_in'] = $atts['exclude'];
-		}
-
-		// Author filter.
-		if ( ! empty( $atts['author'] ) ) {
-			if ( is_numeric( $atts['author'] ) ) {
-				$args['author'] = absint( $atts['author'] );
-			} else {
-				$user = get_user_by( 'login', $atts['author'] );
-				if ( $user ) {
-					$args['author'] = $user->ID;
-				}
-			}
-		}
-
-		// Category filter.
-		if ( ! empty( $atts['category'] ) ) {
-			$categories          = array_map( 'trim', explode( ',', $atts['category'] ) );
-			$args['tax_query'][] = [
-				'taxonomy' => 'apd_category',
-				'field'    => 'slug',
-				'terms'    => $categories,
-			];
-		}
-
-		// Tag filter.
-		if ( ! empty( $atts['tag'] ) ) {
-			$tags                = array_map( 'trim', explode( ',', $atts['tag'] ) );
-			$args['tax_query'][] = [
-				'taxonomy' => 'apd_tag',
-				'field'    => 'slug',
-				'terms'    => $tags,
-			];
-		}
-
-		// Listing type filter.
-		if ( ! empty( $atts['type'] ) ) {
-			$types               = array_map( 'trim', explode( ',', $atts['type'] ) );
-			$args['tax_query'][] = [
-				'taxonomy' => \APD\Taxonomy\ListingTypeTaxonomy::TAXONOMY,
-				'field'    => 'slug',
-				'terms'    => $types,
-			];
-		}
-
-		// Set tax_query relation if both category and tag are set.
-		if ( ! empty( $args['tax_query'] ) && count( $args['tax_query'] ) > 1 ) {
-			$args['tax_query']['relation'] = 'AND';
-		}
-
-		// Order settings.
-		if ( empty( $atts['ids'] ) ) {
-			$args['orderby'] = $this->validate_orderby( $atts['orderby'] );
-			$args['order']   = strtoupper( $atts['order'] ) === 'ASC' ? 'ASC' : 'DESC';
-
-			// Handle views orderby.
-			if ( $atts['orderby'] === 'views' ) {
-				$args['meta_key'] = '_apd_views_count';
-				$args['orderby']  = 'meta_value_num';
-			}
-		}
-
-		return $args;
+		return $builder->build( [
+			'count'    => $atts['count'],
+			'paged'    => $this->get_paged(),
+			'ids'      => $atts['ids'],
+			'exclude'  => $atts['exclude'],
+			'category' => $atts['category'],
+			'tag'      => $atts['tag'],
+			'type'     => $atts['type'],
+			'orderby'  => $atts['orderby'],
+			'order'    => $atts['order'],
+			'author'   => $atts['author'],
+		] );
 	}
 
 	/**
@@ -401,24 +338,6 @@ final class ListingsShortcode extends AbstractShortcode {
 		}
 
 		return $registry->get_default_view();
-	}
-
-	/**
-	 * Validate orderby value.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param string $orderby Orderby value.
-	 * @return string Validated orderby.
-	 */
-	private function validate_orderby( string $orderby ): string {
-		$valid = [ 'date', 'title', 'modified', 'rand', 'views', 'menu_order', 'ID' ];
-
-		if ( in_array( $orderby, $valid, true ) ) {
-			return $orderby;
-		}
-
-		return 'date';
 	}
 
 	/**

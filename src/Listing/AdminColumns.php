@@ -74,6 +74,11 @@ final class AdminColumns {
 		// Category.
 		$new_columns['apd_category'] = __( 'Category', 'all-purpose-directory' );
 
+		// Listing type (only when 2+ types exist).
+		if ( $this->has_multiple_listing_types() ) {
+			$new_columns['listing_type'] = __( 'Type', 'all-purpose-directory' );
+		}
+
 		// Status badge.
 		$new_columns['listing_status'] = __( 'Status', 'all-purpose-directory' );
 
@@ -108,6 +113,10 @@ final class AdminColumns {
 
 			case 'apd_category':
 				$this->render_category_column( $post_id );
+				break;
+
+			case 'listing_type':
+				$this->render_listing_type_column( $post_id );
 				break;
 
 			case 'listing_status':
@@ -186,6 +195,58 @@ final class AdminColumns {
 				],
 			]
 		);
+	}
+
+	/**
+	 * Render the listing type column.
+	 *
+	 * Shows the listing type as a filter link matching the category column pattern.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param int $post_id Post ID.
+	 * @return void
+	 */
+	private function render_listing_type_column( int $post_id ): void {
+		$type = apd_get_listing_type( $post_id );
+		$term = apd_get_listing_type_term( $type );
+
+		if ( $term === null ) {
+			echo '<span aria-hidden="true">—</span>';
+			echo '<span class="screen-reader-text">' . esc_html__( 'No type', 'all-purpose-directory' ) . '</span>';
+			return;
+		}
+
+		printf(
+			'<a href="%s">%s</a>',
+			esc_url(
+				add_query_arg(
+					[
+						'post_type'        => PostType::POST_TYPE,
+						\APD\Taxonomy\ListingTypeTaxonomy::TAXONOMY => $term->slug,
+					],
+					admin_url( 'edit.php' )
+				)
+			),
+			esc_html( $term->name )
+		);
+	}
+
+	/**
+	 * Check whether 2+ listing type terms exist.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return bool
+	 */
+	private function has_multiple_listing_types(): bool {
+		if ( ! function_exists( 'apd_get_listing_types' ) ) {
+			return false;
+		}
+
+		$types = apd_get_listing_types( false );
+
+		return count( $types ) >= 2;
 	}
 
 	/**

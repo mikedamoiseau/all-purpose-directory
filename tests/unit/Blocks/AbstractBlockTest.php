@@ -48,7 +48,7 @@ class AbstractBlockTest extends TestCase {
 			protected string $name = 'test-block';
 			protected string $title = 'Test Block';
 			protected string $description = 'A test block';
-			protected string $category = 'widgets';
+			protected string $category = 'all-purpose-directory';
 			protected string $icon = 'smiley';
 			protected array $keywords = [ 'test', 'block' ];
 			protected array $attributes = [
@@ -229,7 +229,7 @@ class AbstractBlockTest extends TestCase {
 		$category = $property->getValue( $block );
 
 		$this->assertNotEmpty( $category );
-		$this->assertSame( 'widgets', $category );
+		$this->assertSame( 'all-purpose-directory', $category );
 	}
 
 	/**

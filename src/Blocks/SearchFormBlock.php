@@ -48,13 +48,6 @@ final class SearchFormBlock extends AbstractBlock {
 	protected string $description = 'Display a search form for filtering listings.';
 
 	/**
-	 * Block category.
-	 *
-	 * @var string
-	 */
-	protected string $category = 'widgets';
-
-	/**
 	 * Block icon.
 	 *
 	 * @var string

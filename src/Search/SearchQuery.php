@@ -94,7 +94,7 @@ final class SearchQuery {
 
 		add_action( 'pre_get_posts', [ $this, 'modify_main_query' ], 10 );
 		add_filter( 'posts_join', [ $this, 'add_meta_join' ], 10, 2 );
-		add_filter( 'posts_where', [ $this, 'add_meta_where' ], 10, 2 );
+		add_filter( 'posts_search', [ $this, 'add_meta_search' ], 10, 2 );
 		add_filter( 'posts_distinct', [ $this, 'add_distinct' ], 10, 2 );
 
 		$this->initialized = true;
@@ -245,21 +245,26 @@ final class SearchQuery {
 	}
 
 	/**
-	 * Add WHERE clause for meta search.
+	 * Add meta fields to the search clause.
+	 *
+	 * Uses the `posts_search` filter which receives only the search-specific
+	 * SQL clause (e.g. `AND ((conditions))`), making it safe to inject OR
+	 * conditions without affecting other WHERE clauses like post_type or
+	 * post_status.
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string   $where The WHERE clause.
-	 * @param WP_Query $query The query.
-	 * @return string Modified WHERE clause.
+	 * @param string   $search The search SQL clause.
+	 * @param WP_Query $query  The query.
+	 * @return string Modified search clause.
 	 */
-	public function add_meta_where( string $where, WP_Query $query ): string {
+	public function add_meta_search( string $search, WP_Query $query ): string {
 		if ( ! $query->get( 'apd_meta_search' ) ) {
-			return $where;
+			return $search;
 		}
 
-		if ( empty( $this->searchable_meta_keys ) ) {
-			return $where;
+		if ( empty( $this->searchable_meta_keys ) || empty( $search ) ) {
+			return $search;
 		}
 
 		global $wpdb;
@@ -267,7 +272,7 @@ final class SearchQuery {
 		$keyword = $query->get( 'apd_keyword' );
 
 		if ( empty( $keyword ) ) {
-			return $where;
+			return $search;
 		}
 
 		// Prepare meta key conditions.
@@ -279,32 +284,17 @@ final class SearchQuery {
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $meta_key_placeholders contains safe %s placeholders.
 		$meta_condition = $wpdb->prepare( "(apd_pm.meta_key IN ($meta_key_placeholders) AND apd_pm.meta_value LIKE %s)", array_merge( $this->searchable_meta_keys, [ $like_keyword ] ) );
 
-		// Extend WordPress search to include meta fields.
-		// Try to inject into the existing search clause for clean OR logic.
-		// WordPress generates: AND (((post_title LIKE ...) OR (post_excerpt LIKE ...) OR (post_content LIKE ...)))
-		$injected = false;
-		if ( preg_match( '/AND\s+\(\(\(.*?post_title.*?LIKE.*?\)\)\)/s', $where, $matches ) ) {
-			$original_search = $matches[0];
-			$modified_search = str_replace(
-				')))',
-				")) OR ($meta_condition))",
-				$original_search
-			);
-			if ( $modified_search !== $original_search ) {
-				$new_where = str_replace( $original_search, $modified_search, $where );
-				if ( $new_where !== $where ) {
-					$where    = $new_where;
-					$injected = true;
-				}
-			}
+		// WordPress search clause ends with )). Insert OR before the final
+		// closing parens so meta search is OR'd with title/content/excerpt
+		// within the search group, preserving other WHERE conditions.
+		$last_parens_pos = strrpos( $search, '))' );
+		if ( false !== $last_parens_pos ) {
+			$search = substr( $search, 0, $last_parens_pos )
+				. " OR $meta_condition)"
+				. substr( $search, $last_parens_pos + 1 );
 		}
 
-		// Fallback: append as standalone OR condition if regex injection failed.
-		if ( ! $injected ) {
-			$where .= " OR ($meta_condition)";
-		}
-
-		return $where;
+		return $search;
 	}
 
 	/**

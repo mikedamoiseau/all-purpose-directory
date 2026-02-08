@@ -102,9 +102,6 @@ class PerformanceTest extends TestCase {
         Functions\expect( 'get_option' )
             ->andReturn( [] );
 
-        Functions\expect( 'update_option' )
-            ->andReturn( true );
-
         Functions\expect( 'wp_cache_set' )
             ->once()
             ->with( 'apd_cache_test_key', $test_value, 'apd', HOUR_IN_SECONDS )
@@ -228,9 +225,6 @@ class PerformanceTest extends TestCase {
 
         Functions\expect( 'get_option' )
             ->andReturn( [] );
-
-        Functions\expect( 'update_option' )
-            ->andReturn( true );
 
         Functions\expect( 'wp_cache_set' )
             ->once()
@@ -460,9 +454,6 @@ class PerformanceTest extends TestCase {
         Functions\expect( 'get_option' )
             ->andReturn( [] );
 
-        Functions\expect( 'update_option' )
-            ->andReturn( true );
-
         Functions\expect( 'wp_cache_set' )
             ->once()
             ->with( 'apd_cache_test_key', 'value', 'apd', $custom_expiration )
@@ -477,6 +468,86 @@ class PerformanceTest extends TestCase {
         $result = $performance->set( 'test_key', 'value', $custom_expiration );
 
         $this->assertTrue( $result );
+    }
+
+    /**
+     * Test that register_cache_key buffers keys instead of writing immediately
+     *
+     * @return void
+     */
+    public function test_set_does_not_call_update_option_immediately(): void {
+        Functions\when( 'get_option' )
+            ->justReturn( [] );
+
+        Functions\when( 'wp_cache_set' )
+            ->justReturn( true );
+
+        Functions\when( 'set_transient' )
+            ->justReturn( true );
+
+        $update_option_calls = 0;
+        Functions\when( 'update_option' )->alias( function () use ( &$update_option_calls ) {
+            $update_option_calls++;
+            return true;
+        } );
+
+        $performance = Performance::get_instance();
+        $performance->set( 'key1', 'value1' );
+        $performance->set( 'key2', 'value2' );
+
+        $this->assertSame( 0, $update_option_calls, 'No update_option calls during set()' );
+    }
+
+    /**
+     * Test flush_registry writes all pending keys at once
+     *
+     * @return void
+     */
+    public function test_flush_registry_writes_pending_keys(): void {
+        Functions\when( 'get_option' )
+            ->justReturn( [] );
+
+        Functions\when( 'wp_cache_set' )
+            ->justReturn( true );
+
+        Functions\when( 'set_transient' )
+            ->justReturn( true );
+
+        $saved_registry = null;
+        Functions\when( 'update_option' )->alias( function ( $name, $value, $autoload = null ) use ( &$saved_registry ) {
+            if ( $name === 'apd_cache_key_registry' ) {
+                $saved_registry = $value;
+            }
+            return true;
+        } );
+
+        $performance = Performance::get_instance();
+        $performance->set( 'key1', 'value1' );
+        $performance->set( 'key2', 'value2' );
+
+        $performance->flush_registry();
+
+        $this->assertNotNull( $saved_registry, 'update_option should have been called' );
+        $this->assertArrayHasKey( 'apd_cache_key1', $saved_registry );
+        $this->assertArrayHasKey( 'apd_cache_key2', $saved_registry );
+    }
+
+    /**
+     * Test flush_registry is a no-op when no pending keys
+     *
+     * @return void
+     */
+    public function test_flush_registry_noop_when_empty(): void {
+        Functions\expect( 'get_option' )
+            ->never();
+
+        Functions\expect( 'update_option' )
+            ->never();
+
+        $performance = Performance::get_instance();
+        $performance->flush_registry();
+
+        $this->assertTrue( true, 'No DB calls when nothing pending' );
     }
 }
 
@@ -591,9 +662,6 @@ class PerformanceHelperFunctionsTest extends TestCase {
     public function test_apd_cache_set(): void {
         Functions\expect( 'get_option' )
             ->andReturn( [] );
-
-        Functions\expect( 'update_option' )
-            ->andReturn( true );
 
         Functions\expect( 'wp_cache_set' )
             ->once()

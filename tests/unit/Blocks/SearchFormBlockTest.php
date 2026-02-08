@@ -177,17 +177,17 @@ class SearchFormBlockTest extends TestCase {
 	}
 
 	/**
-	 * Test block is in widgets category.
+	 * Test block is in plugin category.
 	 */
-	public function test_block_is_in_widgets_category(): void {
+	public function test_block_is_in_plugin_category(): void {
 		$block = new SearchFormBlock();
 
 		// Use reflection to check the category.
 		$reflection = new \ReflectionClass( $block );
 		$property = $reflection->getProperty( 'category' );
-		
 
-		$this->assertSame( 'widgets', $property->getValue( $block ) );
+
+		$this->assertSame( 'all-purpose-directory', $property->getValue( $block ) );
 	}
 
 	/**

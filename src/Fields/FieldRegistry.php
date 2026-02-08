@@ -56,21 +56,22 @@ final class FieldRegistry {
 	 * @var array<string, mixed>
 	 */
 	private const DEFAULT_FIELD_CONFIG = [
-		'name'        => '',
-		'type'        => 'text',
-		'label'       => '',
-		'description' => '',
-		'required'    => false,
-		'default'     => '',
-		'placeholder' => '',
-		'options'     => [],
-		'validation'  => [],
-		'searchable'  => false,
-		'filterable'  => false,
-		'admin_only'  => false,
-		'priority'    => 10,
-		'class'       => '',
-		'attributes'  => [],
+		'name'         => '',
+		'type'         => 'text',
+		'label'        => '',
+		'description'  => '',
+		'required'     => false,
+		'default'      => '',
+		'placeholder'  => '',
+		'options'      => [],
+		'validation'   => [],
+		'searchable'   => false,
+		'filterable'   => false,
+		'admin_only'   => false,
+		'priority'     => 10,
+		'class'        => '',
+		'attributes'   => [],
+		'listing_type' => null,
 	];
 
 	/**
@@ -332,12 +333,13 @@ final class FieldRegistry {
 	 */
 	public function get_fields( array $args = [] ): array {
 		$defaults = [
-			'type'       => null,
-			'searchable' => null,
-			'filterable' => null,
-			'admin_only' => null,
-			'orderby'    => 'priority',
-			'order'      => 'ASC',
+			'type'         => null,
+			'searchable'   => null,
+			'filterable'   => null,
+			'admin_only'   => null,
+			'listing_type' => null,
+			'orderby'      => 'priority',
+			'order'        => 'ASC',
 		];
 
 		$args = wp_parse_args( $args, $defaults );
@@ -373,6 +375,16 @@ final class FieldRegistry {
 			$fields = array_filter(
 				$fields,
 				fn( $field ) => $field['admin_only'] === $args['admin_only']
+			);
+		}
+
+		// Filter by listing_type.
+		if ( $args['listing_type'] !== null ) {
+			$fields = array_filter(
+				$fields,
+				fn( $field ) => $field['listing_type'] === null
+					|| $field['listing_type'] === $args['listing_type']
+					|| ( is_array( $field['listing_type'] ) && in_array( $args['listing_type'], $field['listing_type'], true ) )
 			);
 		}
 
@@ -488,6 +500,104 @@ final class FieldRegistry {
 	 */
 	public function get_meta_key( string $field_name ): string {
 		return '_apd_' . sanitize_key( $field_name );
+	}
+
+	/**
+	 * Register default listing fields.
+	 *
+	 * Registers the standard set of fields that ship with the plugin.
+	 * These match the meta keys used by demo data and provide a working
+	 * out-of-the-box experience. Modules and themes can modify or remove
+	 * these via the apd_register_default_fields filter.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return void
+	 */
+	public function register_default_fields(): void {
+		$fields = [
+			'phone'       => [
+				'type'     => 'phone',
+				'label'    => __( 'Phone', 'all-purpose-directory' ),
+				'priority' => 10,
+			],
+			'email'       => [
+				'type'     => 'email',
+				'label'    => __( 'Email', 'all-purpose-directory' ),
+				'priority' => 20,
+			],
+			'website'     => [
+				'type'     => 'url',
+				'label'    => __( 'Website', 'all-purpose-directory' ),
+				'priority' => 30,
+			],
+			'address'     => [
+				'type'     => 'text',
+				'label'    => __( 'Address', 'all-purpose-directory' ),
+				'priority' => 40,
+			],
+			'city'        => [
+				'type'     => 'text',
+				'label'    => __( 'City', 'all-purpose-directory' ),
+				'priority' => 50,
+			],
+			'state'       => [
+				'type'     => 'text',
+				'label'    => __( 'State', 'all-purpose-directory' ),
+				'priority' => 60,
+			],
+			'zip'         => [
+				'type'     => 'text',
+				'label'    => __( 'Zip Code', 'all-purpose-directory' ),
+				'priority' => 70,
+			],
+			'hours'       => [
+				'type'     => 'textarea',
+				'label'    => __( 'Business Hours', 'all-purpose-directory' ),
+				'priority' => 80,
+			],
+			'price_range' => [
+				'type'     => 'select',
+				'label'    => __( 'Price Range', 'all-purpose-directory' ),
+				'priority' => 90,
+				'options'  => [
+					''     => __( 'Not specified', 'all-purpose-directory' ),
+					'$'    => '$',
+					'$$'   => '$$',
+					'$$$'  => '$$$',
+					'$$$$' => '$$$$',
+				],
+			],
+		];
+
+		/**
+		 * Filter the default listing fields.
+		 *
+		 * Return an empty array to disable all default fields.
+		 * Modify individual entries to customize labels, types, or priorities.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array<string, array<string, mixed>> $fields Default field configurations.
+		 */
+		$fields = apply_filters( 'apd_register_default_fields', $fields );
+
+		if ( ! is_array( $fields ) ) {
+			return;
+		}
+
+		foreach ( $fields as $name => $config ) {
+			if ( ! is_string( $name ) || empty( $name ) || ! is_array( $config ) ) {
+				continue;
+			}
+
+			// Skip if already registered (direct registration takes priority).
+			if ( $this->has_field( $name ) ) {
+				continue;
+			}
+
+			$this->register_field( $name, $config );
+		}
 	}
 
 	/**

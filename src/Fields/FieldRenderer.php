@@ -244,8 +244,15 @@ class FieldRenderer {
 		}
 
 		// Check if field should be displayed in current context.
-		if ( ! $this->should_display_field( $field, $listing_id ) ) {
-			return '';
+		$should_display = $this->should_display_field( $field, $listing_id );
+
+		if ( ! $should_display ) {
+			// In admin context, render hidden fields as display:none so JS can
+			// toggle them when listing type changes. Skip admin_only check since
+			// should_display_field already handles it and we're in admin context.
+			if ( $this->context !== self::CONTEXT_ADMIN ) {
+				return '';
+			}
 		}
 
 		// Get the field type handler.
@@ -264,7 +271,7 @@ class FieldRenderer {
 			return $this->render_field_display( $field, $field_type, $value, $listing_id );
 		}
 
-		return $this->render_field_input( $field, $field_type, $value, $listing_id );
+		return $this->render_field_input( $field, $field_type, $value, $listing_id, ! $should_display );
 	}
 
 	/**
@@ -278,7 +285,7 @@ class FieldRenderer {
 	 * @param int                  $listing_id Listing ID for context.
 	 * @return string Rendered HTML.
 	 */
-	private function render_field_input( array $field, FieldTypeInterface $field_type, mixed $value, int $listing_id ): string {
+	private function render_field_input( array $field, FieldTypeInterface $field_type, mixed $value, int $listing_id, bool $hidden = false ): string {
 		$field_name    = $field['name'];
 		$field_id      = 'apd-field-' . $field_name;
 		$is_admin      = $this->context === self::CONTEXT_ADMIN;
@@ -304,11 +311,26 @@ class FieldRenderer {
 		 */
 		$wrapper_class = apply_filters( 'apd_field_wrapper_class', $wrapper_class, $field, $this->context );
 
+		// Build listing type data attribute for JS type switching.
+		$listing_type_attr = '';
+		$listing_type      = $field['listing_type'] ?? null;
+
+		if ( $listing_type !== null ) {
+			$types_value       = is_array( $listing_type ) ? implode( ',', $listing_type ) : $listing_type;
+			$listing_type_attr = sprintf( ' data-listing-types="%s"', esc_attr( $types_value ) );
+		}
+
+		// Hide field via inline style when PHP-side filtering says it shouldn't
+		// display but we still need the DOM element for JS type switching.
+		$hidden_attr = $hidden ? ' style="display:none;"' : '';
+
 		$html = sprintf(
-			'<div class="%s" data-field-name="%s" data-field-type="%s">',
+			'<div class="%s" data-field-name="%s" data-field-type="%s"%s%s>',
 			esc_attr( $wrapper_class ),
 			esc_attr( $field_name ),
-			esc_attr( $field['type'] )
+			esc_attr( $field['type'] ),
+			$listing_type_attr,
+			$hidden_attr
 		);
 
 		// Render label.
@@ -367,24 +389,22 @@ class FieldRenderer {
 			return '';
 		}
 
-		$field_name = $field['name'];
+		$field_name     = $field['name'];
+		$display_format = $field['display_format'] ?? 'default';
 
-		$html = sprintf(
-			'<div class="apd-field-display apd-field-display--%s">',
-			esc_attr( $field_name )
-		);
+		switch ( $display_format ) {
+			case 'inline':
+				$html = $this->render_field_display_inline( $field_name, $field['label'], $formatted_value );
+				break;
 
-		$html .= sprintf(
-			'<dt class="apd-field-display__label">%s</dt>',
-			esc_html( $field['label'] )
-		);
+			case 'value-only':
+				$html = $this->render_field_display_value_only( $field_name, $formatted_value );
+				break;
 
-		$html .= sprintf(
-			'<dd class="apd-field-display__value">%s</dd>',
-			$formatted_value // Already escaped by formatValue().
-		);
-
-		$html .= '</div>';
+			default:
+				$html = $this->render_field_display_default( $field_name, $field['label'], $formatted_value );
+				break;
+		}
 
 		/**
 		 * Filter the rendered field display HTML.
@@ -397,6 +417,78 @@ class FieldRenderer {
 		 * @param int                  $listing_id Listing ID.
 		 */
 		return apply_filters( 'apd_render_field_display', $html, $field, $value, $listing_id );
+	}
+
+	/**
+	 * Render field display in default format (dt/dd).
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $field_name      Field name.
+	 * @param string $label           Field label.
+	 * @param string $formatted_value Formatted value.
+	 * @return string HTML output.
+	 */
+	private function render_field_display_default( string $field_name, string $label, string $formatted_value ): string {
+		$html = sprintf(
+			'<div class="apd-field-display apd-field-display--%s">',
+			esc_attr( $field_name )
+		);
+
+		$html .= sprintf(
+			'<dt class="apd-field-display__label">%s</dt>',
+			esc_html( $label )
+		);
+
+		$html .= sprintf(
+			'<dd class="apd-field-display__value">%s</dd>',
+			$formatted_value // Already escaped by formatValue().
+		);
+
+		$html .= '</div>';
+
+		return $html;
+	}
+
+	/**
+	 * Render field display in inline format (label: value on one line).
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $field_name      Field name.
+	 * @param string $label           Field label.
+	 * @param string $formatted_value Formatted value.
+	 * @return string HTML output.
+	 */
+	private function render_field_display_inline( string $field_name, string $label, string $formatted_value ): string {
+		return sprintf(
+			'<div class="apd-field-display apd-field-display--%s apd-field-display--inline">'
+			. '<span class="apd-field-display__label">%s:</span> '
+			. '<span class="apd-field-display__value">%s</span>'
+			. '</div>',
+			esc_attr( $field_name ),
+			esc_html( $label ),
+			$formatted_value
+		);
+	}
+
+	/**
+	 * Render field display in value-only format (no label).
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $field_name      Field name.
+	 * @param string $formatted_value Formatted value.
+	 * @return string HTML output.
+	 */
+	private function render_field_display_value_only( string $field_name, string $formatted_value ): string {
+		return sprintf(
+			'<div class="apd-field-display apd-field-display--%s apd-field-display--value-only">'
+			. '<span class="apd-field-display__value">%s</span>'
+			. '</div>',
+			esc_attr( $field_name ),
+			$formatted_value
+		);
 	}
 
 	/**

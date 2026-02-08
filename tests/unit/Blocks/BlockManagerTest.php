@@ -223,4 +223,29 @@ class BlockManagerTest extends TestCase {
 		$this->assertIsArray( $result );
 		$this->assertEmpty( $result );
 	}
+
+	/**
+	 * Test register_block_category adds the plugin category.
+	 */
+	public function test_register_block_category_adds_plugin_category(): void {
+		Functions\expect( '__' )
+			->once()
+			->with( 'All Purpose Directory', 'all-purpose-directory' )
+			->andReturn( 'All Purpose Directory' );
+
+		$manager    = BlockManager::get_instance();
+		$categories = [
+			[
+				'slug'  => 'text',
+				'title' => 'Text',
+			],
+		];
+
+		$result = $manager->register_block_category( $categories );
+
+		$this->assertCount( 2, $result );
+		$this->assertSame( 'all-purpose-directory', $result[0]['slug'] );
+		$this->assertSame( 'All Purpose Directory', $result[0]['title'] );
+		$this->assertSame( 'text', $result[1]['slug'] );
+	}
 }

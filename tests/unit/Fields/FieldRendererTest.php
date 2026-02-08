@@ -916,4 +916,270 @@ class FieldRendererTest extends TestCase {
 		$this->assertStringContainsString( 'Lone Field', $html );
 		$this->assertStringNotContainsString( 'apd-field-group', $html );
 	}
+
+	// =========================================================================
+	// Listing Type Data Attribute
+	// =========================================================================
+
+	/**
+	 * @test
+	 */
+	public function it_adds_data_listing_types_for_string_type(): void {
+		$this->registry->register_field( 'website_url', [
+			'type'         => 'text',
+			'label'        => 'Website URL',
+			'listing_type' => 'url-directory',
+		] );
+
+		$html = $this->renderer->render_field( 'website_url', 'https://example.com' );
+
+		$this->assertStringContainsString( 'data-listing-types="url-directory"', $html );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_adds_data_listing_types_for_array_type(): void {
+		$this->registry->register_field( 'shared_field', [
+			'type'         => 'text',
+			'label'        => 'Shared Field',
+			'listing_type' => [ 'url-directory', 'venue' ],
+		] );
+
+		$html = $this->renderer->render_field( 'shared_field', 'test' );
+
+		$this->assertStringContainsString( 'data-listing-types="url-directory,venue"', $html );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_omits_data_listing_types_for_global_field(): void {
+		$this->registry->register_field( 'phone', [
+			'type'  => 'text',
+			'label' => 'Phone',
+		] );
+
+		$html = $this->renderer->render_field( 'phone', '555-1234' );
+
+		$this->assertStringNotContainsString( 'data-listing-types', $html );
+	}
+
+	// =========================================================================
+	// Admin Context: Hidden Fields Rendered with display:none
+	// =========================================================================
+
+	/**
+	 * @test
+	 */
+	public function it_renders_hidden_field_with_display_none_in_admin_context(): void {
+		$this->registry->register_field( 'url_only', [
+			'type'         => 'text',
+			'label'        => 'URL Only Field',
+			'listing_type' => 'url-directory',
+		] );
+
+		// Override apply_filters to make apd_should_display_field return false.
+		Functions\when( 'apply_filters' )->alias( function ( $tag, $value, ...$args ) {
+			if ( $tag === 'apd_should_display_field' ) {
+				return false;
+			}
+			return $value;
+		} );
+
+		$this->renderer->set_context( FieldRenderer::CONTEXT_ADMIN );
+		$html = $this->renderer->render_field( 'url_only', 'test' );
+
+		// Field should be rendered (not empty) but hidden.
+		$this->assertNotEmpty( $html );
+		$this->assertStringContainsString( 'style="display:none;"', $html );
+		$this->assertStringContainsString( 'data-field-name="url_only"', $html );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_omits_hidden_field_in_frontend_context(): void {
+		$this->registry->register_field( 'url_only', [
+			'type'         => 'text',
+			'label'        => 'URL Only Field',
+			'listing_type' => 'url-directory',
+		] );
+
+		// Override apply_filters to make apd_should_display_field return false.
+		Functions\when( 'apply_filters' )->alias( function ( $tag, $value, ...$args ) {
+			if ( $tag === 'apd_should_display_field' ) {
+				return false;
+			}
+			return $value;
+		} );
+
+		$this->renderer->set_context( FieldRenderer::CONTEXT_FRONTEND );
+		$html = $this->renderer->render_field( 'url_only', 'test' );
+
+		// Field should be completely omitted in frontend.
+		$this->assertSame( '', $html );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_omits_hidden_field_in_display_context(): void {
+		$this->registry->register_field( 'url_only', [
+			'type'         => 'text',
+			'label'        => 'URL Only Field',
+			'listing_type' => 'url-directory',
+		] );
+
+		// Override apply_filters to make apd_should_display_field return false.
+		Functions\when( 'apply_filters' )->alias( function ( $tag, $value, ...$args ) {
+			if ( $tag === 'apd_should_display_field' ) {
+				return false;
+			}
+			return $value;
+		} );
+
+		$this->renderer->set_context( FieldRenderer::CONTEXT_DISPLAY );
+		$html = $this->renderer->render_field( 'url_only', 'test' );
+
+		// Field should be completely omitted in display.
+		$this->assertSame( '', $html );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_renders_visible_field_without_display_none_in_admin(): void {
+		$this->registry->register_field( 'visible_field', [
+			'type'  => 'text',
+			'label' => 'Visible Field',
+		] );
+
+		$this->renderer->set_context( FieldRenderer::CONTEXT_ADMIN );
+		$html = $this->renderer->render_field( 'visible_field', 'test' );
+
+		// Field should be rendered without display:none.
+		$this->assertNotEmpty( $html );
+		$this->assertStringNotContainsString( 'style="display:none;"', $html );
+	}
+
+	// -------------------------------------------------------------------------
+	// Display Format Tests
+	// -------------------------------------------------------------------------
+
+	/**
+	 * @test
+	 */
+	public function it_renders_default_display_format_with_dt_dd(): void {
+		$this->registry->register_field( 'address', [
+			'type'  => 'text',
+			'label' => 'Address',
+		] );
+
+		$this->renderer->set_context( FieldRenderer::CONTEXT_DISPLAY );
+		$html = $this->renderer->render_field( 'address', '123 Main St' );
+
+		$this->assertStringContainsString( '<dt class="apd-field-display__label">', $html );
+		$this->assertStringContainsString( '<dd class="apd-field-display__value">', $html );
+		$this->assertStringNotContainsString( 'apd-field-display--inline', $html );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_renders_inline_display_format(): void {
+		$this->registry->register_field( 'phone', [
+			'type'           => 'text',
+			'label'          => 'Phone',
+			'display_format' => 'inline',
+		] );
+
+		$this->renderer->set_context( FieldRenderer::CONTEXT_DISPLAY );
+		$html = $this->renderer->render_field( 'phone', '555-1234' );
+
+		$this->assertStringContainsString( 'apd-field-display--inline', $html );
+		$this->assertStringContainsString( '<span class="apd-field-display__label">Phone:</span>', $html );
+		$this->assertStringContainsString( '<span class="apd-field-display__value">555-1234</span>', $html );
+		// Should NOT have dt/dd elements.
+		$this->assertStringNotContainsString( '<dt', $html );
+		$this->assertStringNotContainsString( '<dd', $html );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_renders_value_only_display_format(): void {
+		$this->registry->register_field( 'tagline', [
+			'type'           => 'text',
+			'label'          => 'Tagline',
+			'display_format' => 'value-only',
+		] );
+
+		$this->renderer->set_context( FieldRenderer::CONTEXT_DISPLAY );
+		$html = $this->renderer->render_field( 'tagline', 'Best in class' );
+
+		$this->assertStringContainsString( 'apd-field-display--value-only', $html );
+		$this->assertStringContainsString( '<span class="apd-field-display__value">Best in class</span>', $html );
+		// Should NOT have label, dt, or dd.
+		$this->assertStringNotContainsString( 'apd-field-display__label', $html );
+		$this->assertStringNotContainsString( '<dt', $html );
+		$this->assertStringNotContainsString( '<dd', $html );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_treats_unknown_display_format_as_default(): void {
+		$this->registry->register_field( 'notes', [
+			'type'           => 'text',
+			'label'          => 'Notes',
+			'display_format' => 'unknown-format',
+		] );
+
+		$this->renderer->set_context( FieldRenderer::CONTEXT_DISPLAY );
+		$html = $this->renderer->render_field( 'notes', 'Some notes' );
+
+		// Should fall through to default format.
+		$this->assertStringContainsString( '<dt class="apd-field-display__label">', $html );
+		$this->assertStringContainsString( '<dd class="apd-field-display__value">', $html );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_skips_empty_values_for_all_display_formats(): void {
+		$formats = [ 'default', 'inline', 'value-only' ];
+
+		foreach ( $formats as $format ) {
+			$field_name = 'empty_' . str_replace( '-', '_', $format );
+			$this->registry->register_field( $field_name, [
+				'type'           => 'text',
+				'label'          => 'Empty ' . $format,
+				'display_format' => $format,
+			] );
+
+			$this->renderer->set_context( FieldRenderer::CONTEXT_DISPLAY );
+			$html = $this->renderer->render_field( $field_name, '' );
+
+			$this->assertSame( '', $html, "Empty values should produce no output for '$format' format" );
+		}
+	}
+
+	/**
+	 * @test
+	 */
+	public function display_format_does_not_affect_admin_or_frontend_context(): void {
+		$this->registry->register_field( 'inline_field', [
+			'type'           => 'text',
+			'label'          => 'Inline Field',
+			'display_format' => 'inline',
+		] );
+
+		// Admin context should render as input, not display format.
+		$this->renderer->set_context( FieldRenderer::CONTEXT_ADMIN );
+		$html = $this->renderer->render_field( 'inline_field', 'test' );
+
+		$this->assertStringContainsString( 'apd-field--admin', $html );
+		$this->assertStringNotContainsString( 'apd-field-display--inline', $html );
+	}
 }

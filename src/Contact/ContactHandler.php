@@ -184,7 +184,15 @@ class ContactHandler {
 
 		// Get listing and owner.
 		$listing = get_post( $listing_id );
-		$owner   = get_userdata( $listing->post_author );
+
+		if ( ! $listing ) {
+			return new \WP_Error(
+				'listing_not_found',
+				__( 'The listing could not be found.', 'all-purpose-directory' )
+			);
+		}
+
+		$owner = get_userdata( $listing->post_author );
 
 		/**
 		 * Fires before sending contact message.

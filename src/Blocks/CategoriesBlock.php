@@ -46,13 +46,6 @@ final class CategoriesBlock extends AbstractBlock {
 	protected string $description = 'Display listing categories in a grid or list.';
 
 	/**
-	 * Block category.
-	 *
-	 * @var string
-	 */
-	protected string $category = 'widgets';
-
-	/**
 	 * Block icon.
 	 *
 	 * @var string

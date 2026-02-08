@@ -53,15 +53,16 @@ final class ModuleRegistry {
 	 * @var array<string, mixed>
 	 */
 	private const DEFAULT_CONFIG = [
-		'name'        => '',
-		'description' => '',
-		'version'     => '1.0.0',
-		'author'      => '',
-		'author_uri'  => '',
-		'requires'    => [],
-		'features'    => [],
-		'icon'        => 'dashicons-admin-plugins',
-		'priority'    => 10,
+		'name'          => '',
+		'description'   => '',
+		'version'       => '1.0.0',
+		'author'        => '',
+		'author_uri'    => '',
+		'requires'      => [],
+		'features'      => [],
+		'hidden_fields' => [],
+		'icon'          => 'dashicons-admin-plugins',
+		'priority'      => 10,
 	];
 
 	/**
@@ -195,12 +196,15 @@ final class ModuleRegistry {
 		// Ensure priority is an integer.
 		$config['priority'] = absint( $config['priority'] );
 
-		// Ensure requires and features are arrays.
+		// Ensure requires, features, and hidden_fields are arrays.
 		if ( ! is_array( $config['requires'] ) ) {
 			$config['requires'] = [];
 		}
 		if ( ! is_array( $config['features'] ) ) {
 			$config['features'] = [];
+		}
+		if ( ! is_array( $config['hidden_fields'] ) ) {
+			$config['hidden_fields'] = [];
 		}
 
 		/**

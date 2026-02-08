@@ -131,8 +131,11 @@ final class Plugin {
 		// Register built-in field types (priority 2, after modules).
 		add_action( 'init', [ $this, 'register_field_types' ], 2 );
 
-		// Load external fields via apd_listing_fields filter (priority 3, after field types).
-		add_action( 'init', [ \APD\Fields\FieldRegistry::get_instance(), 'load_external_fields' ], 3 );
+		// Register default listing fields (priority 3, after field types).
+		add_action( 'init', [ \APD\Fields\FieldRegistry::get_instance(), 'register_default_fields' ], 3 );
+
+		// Load external fields via apd_listing_fields filter (priority 4, after defaults).
+		add_action( 'init', [ \APD\Fields\FieldRegistry::get_instance(), 'load_external_fields' ], 4 );
 
 		// Register post types and taxonomies.
 		add_action( 'init', [ $this, 'register_post_types' ], 5 );
@@ -145,6 +148,10 @@ final class Plugin {
 		// Initialize listing meta box for custom fields.
 		$meta_box = new \APD\Admin\ListingMetaBox();
 		$meta_box->init();
+
+		// Initialize listing type meta box for type selection.
+		$listing_type_meta_box = new \APD\Admin\ListingTypeMetaBox();
+		$listing_type_meta_box->init();
 
 		// Initialize search query handler.
 		$this->search_query = new \APD\Search\SearchQuery();

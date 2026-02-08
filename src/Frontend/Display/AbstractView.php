@@ -273,6 +273,39 @@ abstract class AbstractView implements ViewInterface {
 	}
 
 	/**
+	 * Build shared render args from view config.
+	 *
+	 * Maps common config values (show_image, show_excerpt, etc.) into
+	 * template arguments. Subclasses call this then add view-specific args.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return array<string, mixed> Shared render arguments.
+	 */
+	protected function buildRenderArgs(): array {
+		$shared_keys = [
+			'show_image',
+			'show_excerpt',
+			'excerpt_length',
+			'show_category',
+			'show_price',
+			'show_rating',
+			'show_favorite',
+			'show_view_details',
+			'image_size',
+		];
+
+		$args = [];
+		foreach ( $shared_keys as $key ) {
+			if ( isset( $this->config[ $key ] ) ) {
+				$args[ $key ] = $this->config[ $key ];
+			}
+		}
+
+		return $args;
+	}
+
+	/**
 	 * Render a single listing.
 	 *
 	 * @since 1.0.0

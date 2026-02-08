@@ -44,9 +44,17 @@
         },
 
         /**
+         * Whether the module has been initialized.
+         */
+        initialized: false,
+
+        /**
          * Initialize the filter module.
          */
         init: function() {
+            if (this.initialized) return;
+            this.initialized = true;
+
             this.cacheElements();
 
             if (!this.elements.form) {
@@ -369,6 +377,9 @@
             // Update active filters display
             this.updateActiveFilters(data.active_filters);
 
+            // Announce results to screen readers via dedicated live region
+            this.announceResults(data.found_posts || 0);
+
             // Trigger custom event for other scripts
             document.dispatchEvent(new CustomEvent('apd:filtered', {
                 detail: data,
@@ -383,6 +394,39 @@
         updateActiveFilters: function(activeFilters) {
             // For now, we rely on PHP rendering the active filters
             // In a full implementation, we'd rebuild the chips here
+        },
+
+        /**
+         * Announce filter results to screen readers via a dedicated live region.
+         *
+         * @param {number} count - Number of results found.
+         */
+        announceResults: function(count) {
+            var liveRegion = document.getElementById('apd-filter-live-region');
+            if (!liveRegion) {
+                liveRegion = document.createElement('div');
+                liveRegion.id = 'apd-filter-live-region';
+                liveRegion.setAttribute('role', 'status');
+                liveRegion.setAttribute('aria-live', 'polite');
+                liveRegion.setAttribute('aria-atomic', 'true');
+                liveRegion.className = 'screen-reader-text';
+                document.body.appendChild(liveRegion);
+            }
+
+            var message;
+            if (count === 0) {
+                message = this.config.i18n?.noResults || 'No listings found.';
+            } else if (count === 1) {
+                message = this.config.i18n?.oneResultFound || '1 listing found';
+            } else {
+                message = (this.config.i18n?.resultsFound || '%d listings found').replace('%d', count);
+            }
+
+            // Clear then set to ensure screen readers detect the change
+            liveRegion.textContent = '';
+            setTimeout(function() {
+                liveRegion.textContent = message;
+            }, 100);
         },
 
         /**
@@ -590,9 +634,17 @@
         },
 
         /**
+         * Whether the module has been initialized.
+         */
+        initialized: false,
+
+        /**
          * Initialize the submission module.
          */
         init: function() {
+            if (this.initialized) return;
+            this.initialized = true;
+
             this.elements.form = document.querySelector('.apd-submission-form');
 
             if (!this.elements.form) {
@@ -941,6 +993,10 @@
                                 return;
                             }
 
+                            // Set loading state for screen readers
+                            upload.setAttribute('aria-busy', 'true');
+                            this.announceImageStatus(upload, this.config.i18n?.imageLoading || 'Loading image preview...');
+
                             // Show preview
                             const reader = new FileReader();
                             reader.onload = (e) => {
@@ -967,6 +1023,10 @@
                                     fieldWrapper.classList.add('apd-field--has-image');
                                     this.clearFieldError({ target: fileInput });
                                 }
+
+                                // Clear loading state
+                                upload.setAttribute('aria-busy', 'false');
+                                this.announceImageStatus(upload, this.config.i18n?.imageReady || 'Image preview ready.');
                             };
                             reader.readAsDataURL(file);
                         }
@@ -997,6 +1057,24 @@
                     });
                 }
             });
+        },
+
+        /**
+         * Announce image upload status to screen readers.
+         *
+         * @param {HTMLElement} upload - The image upload container.
+         * @param {string} message - The status message.
+         */
+        announceImageStatus: function(upload, message) {
+            var statusEl = upload.querySelector('.apd-image-upload__status');
+            if (!statusEl) {
+                statusEl = document.createElement('div');
+                statusEl.className = 'apd-image-upload__status screen-reader-text';
+                statusEl.setAttribute('role', 'status');
+                statusEl.setAttribute('aria-live', 'polite');
+                upload.appendChild(statusEl);
+            }
+            statusEl.textContent = message;
         },
 
         /**
@@ -1031,14 +1109,6 @@
     };
 
     /**
-     * Initialize on DOM ready.
-     */
-    document.addEventListener('DOMContentLoaded', function() {
-        APDFilter.init();
-        APDSubmission.init();
-    });
-
-    /**
      * APD My Listings Module
      *
      * Handles AJAX actions for the My Listings dashboard tab.
@@ -1058,9 +1128,18 @@
         },
 
         /**
+         * Whether the module has been initialized.
+         */
+        initialized: false,
+
+        /**
          * Initialize the module.
+         * Guards: bails early if already initialized or DOM element not present.
          */
         init: function() {
+            if (this.initialized) return;
+            this.initialized = true;
+
             this.elements.container = document.querySelector('.apd-my-listings');
 
             if (!this.elements.container) {
@@ -1267,6 +1346,11 @@
         config: window.apdFrontend || {},
 
         /**
+         * Whether the module has been initialized.
+         */
+        initialized: false,
+
+        /**
          * State tracking for pending requests.
          */
         state: {
@@ -1275,8 +1359,18 @@
 
         /**
          * Initialize the favorites module.
+         * Guards: bails early if already initialized or no favorite buttons present.
+         * Uses event delegation on document for dynamically-added buttons.
          */
         init: function() {
+            if (this.initialized) return;
+            this.initialized = true;
+
+            // Check if any favorite buttons exist before binding global listener.
+            if (!document.querySelector('.apd-favorite-button')) {
+                return;
+            }
+
             this.bindEvents();
         },
 
@@ -1624,6 +1718,11 @@
         },
 
         /**
+         * Whether the module has been initialized.
+         */
+        initialized: false,
+
+        /**
          * Current state.
          */
         state: {
@@ -1632,8 +1731,12 @@
 
         /**
          * Initialize the review form module.
+         * Guards: bails early if already initialized or no review forms present.
          */
         init: function() {
+            if (this.initialized) return;
+            this.initialized = true;
+
             this.cacheElements();
 
             if (this.elements.forms.length === 0) {
@@ -1708,6 +1811,11 @@
                 radio.addEventListener('focus', (e) => {
                     const value = parseInt(e.target.value, 10);
                     this.highlightStars(stars, value);
+                    this.setStarFocus(stars, value - 1);
+                });
+
+                radio.addEventListener('blur', () => {
+                    this.clearStarFocus(stars);
                 });
             });
 
@@ -1776,6 +1884,29 @@
                 } else {
                     star.classList.remove('apd-star-input__star--active');
                 }
+            });
+        },
+
+        /**
+         * Set focus indicator on a specific star.
+         *
+         * @param {NodeList} stars - The star elements.
+         * @param {number} index - The star index to focus.
+         */
+        setStarFocus: function(stars, index) {
+            stars.forEach((star, i) => {
+                star.classList.toggle('apd-star-input__star--focused', i === index);
+            });
+        },
+
+        /**
+         * Remove focus indicator from all stars.
+         *
+         * @param {NodeList} stars - The star elements.
+         */
+        clearStarFocus: function(stars) {
+            stars.forEach(star => {
+                star.classList.remove('apd-star-input__star--focused');
             });
         },
 
@@ -2015,6 +2146,11 @@
         },
 
         /**
+         * Whether the module has been initialized.
+         */
+        initialized: false,
+
+        /**
          * State tracking.
          */
         state: {
@@ -2025,8 +2161,12 @@
 
         /**
          * Initialize the profile module.
+         * Guards: bails early if already initialized or no profile form present.
          */
         init: function() {
+            if (this.initialized) return;
+            this.initialized = true;
+
             this.elements.form = document.querySelector('.apd-profile-form');
             if (!this.elements.form) {
                 return;
@@ -2100,10 +2240,24 @@
     const APDCharCounter = {
 
         /**
+         * Whether the module has been initialized.
+         */
+        initialized: false,
+
+        /**
          * Initialize all character counters on the page.
+         * Guards: bails early if already initialized or no counter elements present.
          */
         init: function() {
+            if (this.initialized) return;
+            this.initialized = true;
+
             var counters = document.querySelectorAll('.apd-char-counter');
+
+            if (counters.length === 0) {
+                return;
+            }
+
             counters.forEach(this.bindCounter.bind(this));
         },
 
@@ -2156,11 +2310,204 @@
     };
 
     /**
+     * APD Contact Form Validation Module
+     *
+     * Provides client-side validation for the contact form,
+     * matching the submission form's validation pattern.
+     */
+    const APDContactForm = {
+
+        config: window.apdFrontend || {},
+
+        elements: {
+            form: null,
+        },
+
+        initialized: false,
+
+        init: function() {
+            if (this.initialized) return;
+            this.initialized = true;
+
+            this.elements.form = document.querySelector('.apd-contact-form');
+
+            if (!this.elements.form) {
+                return;
+            }
+
+            this.bindEvents();
+        },
+
+        bindEvents: function() {
+            var form = this.elements.form;
+
+            form.addEventListener('submit', this.handleSubmit.bind(this));
+
+            form.querySelectorAll('input, textarea').forEach(function(field) {
+                field.addEventListener('blur', function(e) {
+                    this.validateField(e.target);
+                }.bind(this));
+
+                field.addEventListener('focus', function(e) {
+                    this.clearFieldError(e.target);
+                }.bind(this));
+            }.bind(this));
+        },
+
+        handleSubmit: function(e) {
+            var isValid = this.validateForm();
+
+            if (!isValid) {
+                e.preventDefault();
+
+                var firstError = this.elements.form.querySelector('.apd-field--has-error');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    var input = firstError.querySelector('input, textarea');
+                    if (input) {
+                        input.focus();
+                    }
+                }
+
+                this.announceErrors();
+            }
+        },
+
+        validateForm: function() {
+            var form = this.elements.form;
+            var isValid = true;
+
+            form.querySelectorAll('[required]').forEach(function(field) {
+                if (!this.validateField(field)) {
+                    isValid = false;
+                }
+            }.bind(this));
+
+            return isValid;
+        },
+
+        validateField: function(field) {
+            var wrapper = field.closest('.apd-field');
+            if (!wrapper) {
+                return true;
+            }
+
+            // Skip honeypot
+            if (wrapper.classList.contains('apd-field--hp')) {
+                return true;
+            }
+
+            var isValid = true;
+            var errorMessage = '';
+
+            // Required check
+            if (field.hasAttribute('required') && !field.value.trim()) {
+                isValid = false;
+                errorMessage = this.config.i18n?.requiredField || 'This field is required.';
+            }
+
+            // Email format
+            if (isValid && field.type === 'email' && field.value.trim()) {
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(field.value.trim())) {
+                    isValid = false;
+                    errorMessage = this.config.i18n?.invalidEmail || 'Please enter a valid email address.';
+                }
+            }
+
+            // Min length
+            if (isValid && field.value.trim()) {
+                var minLength = field.getAttribute('minlength');
+                if (minLength && field.value.length < parseInt(minLength, 10)) {
+                    isValid = false;
+                    errorMessage = (this.config.i18n?.minLength || 'Minimum %d characters required.').replace('%d', minLength);
+                }
+            }
+
+            if (isValid) {
+                this.clearFieldError(field);
+            } else {
+                this.setFieldError(wrapper, errorMessage);
+            }
+
+            return isValid;
+        },
+
+        setFieldError: function(wrapper, message) {
+            wrapper.classList.add('apd-field--has-error');
+
+            var errorContainer = wrapper.querySelector('.apd-field__errors');
+            if (!errorContainer) {
+                errorContainer = document.createElement('div');
+                errorContainer.className = 'apd-field__errors';
+                errorContainer.setAttribute('role', 'alert');
+                errorContainer.setAttribute('aria-live', 'polite');
+                wrapper.appendChild(errorContainer);
+            }
+
+            // Remove existing client errors
+            var existing = errorContainer.querySelectorAll('.apd-field__error--client');
+            existing.forEach(function(el) { el.remove(); });
+
+            var errorEl = document.createElement('p');
+            errorEl.className = 'apd-field__error apd-field__error--client';
+            errorEl.textContent = message;
+            errorContainer.appendChild(errorEl);
+        },
+
+        clearFieldError: function(field) {
+            var wrapper = field.closest('.apd-field');
+            if (!wrapper) {
+                return;
+            }
+
+            wrapper.classList.remove('apd-field--has-error');
+
+            var clientErrors = wrapper.querySelectorAll('.apd-field__error--client');
+            clientErrors.forEach(function(el) { el.remove(); });
+
+            var errorContainer = wrapper.querySelector('.apd-field__errors');
+            if (errorContainer && errorContainer.children.length === 0) {
+                errorContainer.remove();
+            }
+        },
+
+        announceErrors: function() {
+            var errors = this.elements.form.querySelectorAll('.apd-field--has-error');
+            var count = errors.length;
+
+            if (count === 0) {
+                return;
+            }
+
+            var liveRegion = document.getElementById('apd-contact-live-region');
+            if (!liveRegion) {
+                liveRegion = document.createElement('div');
+                liveRegion.id = 'apd-contact-live-region';
+                liveRegion.setAttribute('role', 'status');
+                liveRegion.setAttribute('aria-live', 'assertive');
+                liveRegion.setAttribute('aria-atomic', 'true');
+                liveRegion.className = 'screen-reader-text';
+                document.body.appendChild(liveRegion);
+            }
+
+            var message = count === 1
+                ? (this.config.i18n?.oneError || 'Please fix 1 error before submitting.')
+                : (this.config.i18n?.multipleErrors || 'Please fix %d errors before submitting.').replace('%d', count);
+
+            liveRegion.textContent = '';
+            setTimeout(function() {
+                liveRegion.textContent = message;
+            }, 100);
+        },
+    };
+
+    /**
      * Initialize on DOM ready.
      */
     document.addEventListener('DOMContentLoaded', function() {
         APDFilter.init();
         APDSubmission.init();
+        APDContactForm.init();
         APDMyListings.init();
         APDFavorites.init();
         APDReviewForm.init();
@@ -2171,6 +2518,7 @@
     // Expose to global scope for external access
     window.APDFilter = APDFilter;
     window.APDSubmission = APDSubmission;
+    window.APDContactForm = APDContactForm;
     window.APDMyListings = APDMyListings;
     window.APDFavorites = APDFavorites;
     window.APDReviewForm = APDReviewForm;

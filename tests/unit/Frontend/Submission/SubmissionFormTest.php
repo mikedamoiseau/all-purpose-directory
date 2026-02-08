@@ -565,4 +565,43 @@ final class SubmissionFormTest extends UnitTestCase {
 		$this->assertSame( 'Updated Title', $form->get_title_value() );
 		$this->assertSame( 'Updated content', $form->get_content_value() );
 	}
+
+	// =========================================================================
+	// Template Accessibility Tests
+	// =========================================================================
+
+	/**
+	 * Test image upload template has aria-labelledby for accessibility.
+	 */
+	public function test_image_upload_template_has_aria_labelledby(): void {
+		$template_path = dirname( __DIR__, 4 ) . '/templates/submission/image-upload.php';
+
+		$this->assertFileExists( $template_path );
+
+		$content = file_get_contents( $template_path );
+
+		$this->assertStringContainsString( 'aria-labelledby', $content, 'Image upload template should have aria-labelledby for accessibility' );
+	}
+
+	/**
+	 * Test image upload template has aria-describedby for accessibility.
+	 */
+	public function test_image_upload_template_has_aria_describedby(): void {
+		$template_path = dirname( __DIR__, 4 ) . '/templates/submission/image-upload.php';
+
+		$content = file_get_contents( $template_path );
+
+		$this->assertStringContainsString( 'aria-describedby', $content, 'Image upload template should have aria-describedby for accessibility' );
+	}
+
+	/**
+	 * Test image upload template error container has role="alert".
+	 */
+	public function test_image_upload_template_errors_have_role_alert(): void {
+		$template_path = dirname( __DIR__, 4 ) . '/templates/submission/image-upload.php';
+
+		$content = file_get_contents( $template_path );
+
+		$this->assertStringContainsString( 'role="alert"', $content, 'Image upload template errors should have role="alert" for screen readers' );
+	}
 }

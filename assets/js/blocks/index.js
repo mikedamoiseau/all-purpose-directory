@@ -38,7 +38,7 @@
 		title: __( 'Listings', 'all-purpose-directory' ),
 		description: __( 'Display listings in grid or list view.', 'all-purpose-directory' ),
 		icon: 'grid-view',
-		category: 'widgets',
+		category: 'all-purpose-directory',
 		keywords: [
 			__( 'listings', 'all-purpose-directory' ),
 			__( 'directory', 'all-purpose-directory' ),
@@ -250,7 +250,7 @@
 		title: __( 'Listing Search Form', 'all-purpose-directory' ),
 		description: __( 'Display a search form for filtering listings.', 'all-purpose-directory' ),
 		icon: 'search',
-		category: 'widgets',
+		category: 'all-purpose-directory',
 		keywords: [
 			__( 'search', 'all-purpose-directory' ),
 			__( 'filter', 'all-purpose-directory' ),
@@ -400,7 +400,7 @@
 		title: __( 'Listing Categories', 'all-purpose-directory' ),
 		description: __( 'Display listing categories in a grid or list.', 'all-purpose-directory' ),
 		icon: 'category',
-		category: 'widgets',
+		category: 'all-purpose-directory',
 		keywords: [
 			__( 'categories', 'all-purpose-directory' ),
 			__( 'taxonomy', 'all-purpose-directory' ),
