@@ -1,13 +1,13 @@
 <?php
 /**
  * Plugin Name:       All Purpose Directory
- * Plugin URI:        https://damoiseau.net/plugins/all-purpose-directory
+ * Plugin URI:        https://damoiseau.xyz/plugins/all-purpose-directory
  * Description:       A flexible WordPress plugin for building directory and listing websites.
  * Version:           1.0.0
  * Requires at least: 6.0
  * Requires PHP:      8.0
  * Author:            Michaël Damoiseau
- * Author URI:        https://damoiseau.net
+ * Author URI:        https://damoiseau.xyz
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       all-purpose-directory

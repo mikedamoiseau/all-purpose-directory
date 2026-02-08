@@ -1,6 +1,6 @@
 === All Purpose Directory ===
 Contributors: mdamoiseau
-Donate link: https://damoiseau.net/donate
+Donate link: https://damoiseau.xyz/donate
 Tags: directory, listings, business directory, classifieds, job board
 Requires at least: 6.0
 Tested up to: 6.9
@@ -150,7 +150,7 @@ All Purpose Directory is a powerful and flexible plugin for creating any type of
 
 = Documentation =
 
-For detailed documentation, visit [our documentation site](https://damoiseau.net/docs/all-purpose-directory/).
+For detailed documentation, visit [our documentation site](https://damoiseau.xyz/docs/all-purpose-directory/).
 
 = Support =
 
@@ -309,7 +309,7 @@ Initial release of All Purpose Directory. Thank you for choosing our plugin!
 == Credits ==
 
 * Icons: [Dashicons](https://developer.wordpress.org/resource/dashicons/)
-* Development: [Michaël Damoiseau](https://damoiseau.net)
+* Development: [Michaël Damoiseau](https://damoiseau.xyz)
 
 == Privacy Policy ==
 
