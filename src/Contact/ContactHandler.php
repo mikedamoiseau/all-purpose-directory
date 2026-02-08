@@ -88,6 +88,10 @@ class ContactHandler {
 	 * @return void
 	 */
 	public function init(): void {
+		if ( ! apd_contact_form_enabled() ) {
+			return;
+		}
+
 		// Register AJAX handlers.
 		add_action( 'wp_ajax_apd_send_contact', [ $this, 'handle_ajax' ] );
 		add_action( 'wp_ajax_nopriv_apd_send_contact', [ $this, 'handle_ajax' ] );

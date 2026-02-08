@@ -99,6 +99,10 @@ class ReviewHandler {
 	 * @return void
 	 */
 	public function init(): void {
+		if ( ! apd_reviews_enabled() ) {
+			return;
+		}
+
 		// Register AJAX handlers.
 		add_action( 'wp_ajax_' . self::AJAX_ACTION, [ $this, 'handle_ajax_submit' ] );
 		add_action( 'wp_ajax_nopriv_' . self::AJAX_ACTION, [ $this, 'handle_ajax_submit_nopriv' ] );

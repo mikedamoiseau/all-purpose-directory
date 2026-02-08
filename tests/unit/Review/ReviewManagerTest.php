@@ -925,11 +925,10 @@ final class ReviewManagerTest extends UnitTestCase {
 	}
 
 	/**
-	 * Test init hooks are registered.
+	 * Test init registers comments_clauses filter.
 	 */
 	public function test_init_registers_hooks(): void {
-		$filter_added  = false;
-		$action_added = false;
+		$filter_added = false;
 
 		Functions\when( 'add_filter' )->alias(
 			function( $tag, $callback, $priority = 10, $args = 1 ) use ( &$filter_added ) {
@@ -938,6 +937,22 @@ final class ReviewManagerTest extends UnitTestCase {
 				}
 			}
 		);
+
+		$this->manager->init();
+
+		$this->assertTrue( $filter_added );
+	}
+
+	/**
+	 * Test init does not register enable_listing_comments action.
+	 *
+	 * Comment support is intentionally never added to prevent block themes
+	 * from rendering the default WordPress comment form.
+	 */
+	public function test_init_does_not_add_comments_support(): void {
+		$action_added = false;
+
+		Functions\when( 'add_filter' )->justReturn( true );
 
 		Functions\when( 'add_action' )->alias(
 			function( $tag, $callback, $priority = 10, $args = 1 ) use ( &$action_added ) {
@@ -949,8 +964,7 @@ final class ReviewManagerTest extends UnitTestCase {
 
 		$this->manager->init();
 
-		$this->assertTrue( $filter_added );
-		$this->assertTrue( $action_added );
+		$this->assertFalse( $action_added, 'enable_listing_comments should never be registered' );
 	}
 
 	/**

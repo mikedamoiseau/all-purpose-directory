@@ -125,11 +125,8 @@ class ReviewManager {
 	 * @return void
 	 */
 	public function init(): void {
-		// Filter to exclude reviews from regular comment queries.
+		// Filter to exclude reviews from regular comment queries (always active).
 		add_filter( 'comments_clauses', [ $this, 'exclude_reviews_from_comments' ], 10, 2 );
-
-		// Ensure listing post type supports comments.
-		add_action( 'init', [ $this, 'enable_listing_comments' ], 20 );
 
 		/**
 		 * Fires after the review system is initialized.

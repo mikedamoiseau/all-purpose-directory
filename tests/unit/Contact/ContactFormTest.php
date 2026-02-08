@@ -361,11 +361,13 @@ class ContactFormTest extends TestCase {
 	}
 
 	/**
-	 * Test init registers hooks.
+	 * Test init registers hooks when contact form is enabled.
 	 */
 	public function test_init_registers_hooks(): void {
 		$add_action_called = false;
 		$do_action_called = false;
+
+		Functions\when( 'apd_contact_form_enabled' )->justReturn( true );
 
 		Functions\when( 'add_action' )->alias( function( $hook ) use ( &$add_action_called ) {
 			if ( 'apd_single_listing_contact_form' === $hook ) {
@@ -384,6 +386,26 @@ class ContactFormTest extends TestCase {
 
 		$this->assertTrue( $add_action_called, 'add_action should be called for apd_single_listing_contact_form' );
 		$this->assertTrue( $do_action_called, 'do_action should be called for apd_contact_form_init' );
+	}
+
+	/**
+	 * Test init does not register hooks when contact form is disabled.
+	 */
+	public function test_init_skips_hooks_when_disabled(): void {
+		$add_action_called = false;
+
+		Functions\when( 'apd_contact_form_enabled' )->justReturn( false );
+
+		Functions\when( 'add_action' )->alias( function( $hook ) use ( &$add_action_called ) {
+			if ( 'apd_single_listing_contact_form' === $hook ) {
+				$add_action_called = true;
+			}
+		} );
+
+		$form = ContactForm::get_instance();
+		$form->init();
+
+		$this->assertFalse( $add_action_called, 'No hooks should be registered when contact form is disabled' );
 	}
 
 	/**

@@ -118,6 +118,10 @@ class ReviewForm {
 	 * @return void
 	 */
 	public function init(): void {
+		if ( ! apd_reviews_enabled() ) {
+			return;
+		}
+
 		// Hook into the render review form action (triggered by reviews-section.php template).
 		add_action( 'apd_render_review_form', [ $this, 'render_form_for_listing' ], 10, 1 );
 

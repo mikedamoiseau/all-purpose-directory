@@ -57,6 +57,8 @@ final class TemplateLoader {
 		add_filter( 'body_class', [ $this, 'body_class' ], 10 );
 		add_action( 'wp_head', [ $this, 'track_listing_view' ] );
 		add_filter( 'the_content', [ $this, 'append_listing_fields' ], 20 );
+		add_filter( 'comments_template', [ $this, 'listing_comments_template' ], 10 );
+		add_filter( 'render_block', [ $this, 'replace_listing_comments_block' ], 10, 2 );
 	}
 
 	/**
@@ -550,6 +552,81 @@ final class TemplateLoader {
 		}
 
 		return $content;
+	}
+
+	/**
+	 * Override the comments template for listings.
+	 *
+	 * Replaces the default WordPress comments template with a custom one
+	 * that renders reviews instead of standard comments. This ensures
+	 * block themes display the review system rather than a plain comment form.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $template Path to the comments template.
+	 * @return string Filtered template path.
+	 */
+	public function listing_comments_template( string $template ): string {
+		if ( ! is_singular( 'apd_listing' ) ) {
+			return $template;
+		}
+
+		$custom = $this->template->locate_template( 'comments-listing.php' );
+
+		if ( $custom ) {
+			return $custom;
+		}
+
+		return $template;
+	}
+
+	/**
+	 * Replace the core/comments block output for listings.
+	 *
+	 * Block themes render comments via the core/comments block, which bypasses
+	 * the `comments_template` filter. This filter intercepts the block output
+	 * and replaces it with the plugin's review section when on a listing.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string               $block_content The block content.
+	 * @param array<string, mixed> $block         The full block, including name and attributes.
+	 * @return string The filtered block content.
+	 */
+	public function replace_listing_comments_block( string $block_content, array $block ): string {
+		if ( $block['blockName'] !== 'core/comments' ) {
+			return $block_content;
+		}
+
+		if ( ! is_singular( 'apd_listing' ) ) {
+			return $block_content;
+		}
+
+		// Reviews disabled — suppress the comments block entirely.
+		if ( ! apd_reviews_enabled() ) {
+			return '';
+		}
+
+		$listing_id = get_the_ID();
+
+		if ( ! $listing_id ) {
+			return '';
+		}
+
+		ob_start();
+
+		/**
+		 * Fires in the reviews section area for listings.
+		 *
+		 * Replaces the default WordPress Comments block in block themes.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param int $listing_id The listing post ID.
+		 */
+		do_action( 'apd_single_listing_reviews', $listing_id );
+
+		return ob_get_clean();
 	}
 
 	/**

@@ -97,6 +97,10 @@ class ReviewDisplay {
 	 * @return void
 	 */
 	public function init(): void {
+		if ( ! apd_reviews_enabled() ) {
+			return;
+		}
+
 		// Hook into single listing reviews action to render reviews section.
 		add_action( 'apd_single_listing_reviews', [ $this, 'render_reviews_section' ], 20, 1 );
 

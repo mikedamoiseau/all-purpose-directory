@@ -456,10 +456,12 @@ class ContactHandlerTest extends TestCase {
 	}
 
 	/**
-	 * Test init registers AJAX hooks.
+	 * Test init registers AJAX hooks when contact form is enabled.
 	 */
 	public function test_init_registers_ajax_hooks(): void {
 		$hooks_registered = [];
+
+		Functions\when( 'apd_contact_form_enabled' )->justReturn( true );
 
 		Functions\when( 'add_action' )->alias( function( $hook, $callback ) use ( &$hooks_registered ) {
 			$hooks_registered[] = $hook;
@@ -472,6 +474,25 @@ class ContactHandlerTest extends TestCase {
 
 		$this->assertContains( 'wp_ajax_apd_send_contact', $hooks_registered );
 		$this->assertContains( 'wp_ajax_nopriv_apd_send_contact', $hooks_registered );
+	}
+
+	/**
+	 * Test init does not register AJAX hooks when contact form is disabled.
+	 */
+	public function test_init_skips_ajax_hooks_when_disabled(): void {
+		$hooks_registered = [];
+
+		Functions\when( 'apd_contact_form_enabled' )->justReturn( false );
+
+		Functions\when( 'add_action' )->alias( function( $hook, $callback ) use ( &$hooks_registered ) {
+			$hooks_registered[] = $hook;
+		} );
+
+		$handler = ContactHandler::get_instance();
+		$handler->init();
+
+		$this->assertNotContains( 'wp_ajax_apd_send_contact', $hooks_registered );
+		$this->assertNotContains( 'wp_ajax_nopriv_apd_send_contact', $hooks_registered );
 	}
 
 	/**

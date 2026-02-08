@@ -120,6 +120,10 @@ class ContactForm {
 	 * @return void
 	 */
 	public function init(): void {
+		if ( ! apd_contact_form_enabled() ) {
+			return;
+		}
+
 		// Hook into single listing template.
 		add_action( 'apd_single_listing_contact_form', [ $this, 'render_on_listing' ] );
 

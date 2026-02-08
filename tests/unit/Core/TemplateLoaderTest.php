@@ -76,22 +76,24 @@ final class TemplateLoaderTest extends TestCase {
 	public function test_init_registers_hooks(): void {
 		$loader = new TemplateLoader();
 
-		Functions\expect( 'add_filter' )
-			->once()
-			->with( 'template_include', [ $loader, 'template_include' ], 10 );
+		$hooks_registered = [];
 
-		Functions\expect( 'add_filter' )
-			->once()
-			->with( 'body_class', [ $loader, 'body_class' ], 10 );
+		Functions\when( 'add_filter' )->alias( function( $tag, $callback, $priority = 10 ) use ( &$hooks_registered ) {
+			$hooks_registered[] = $tag;
+		} );
 
-		Functions\expect( 'add_action' )
-			->once()
-			->with( 'wp_head', [ $loader, 'track_listing_view' ] );
+		Functions\when( 'add_action' )->alias( function( $tag, $callback ) use ( &$hooks_registered ) {
+			$hooks_registered[] = $tag;
+		} );
 
 		$loader->init();
 
-		// Verify the function was called (Mockery expectation assertions).
-		$this->assertTrue( true );
+		$this->assertContains( 'template_include', $hooks_registered );
+		$this->assertContains( 'body_class', $hooks_registered );
+		$this->assertContains( 'wp_head', $hooks_registered );
+		$this->assertContains( 'the_content', $hooks_registered );
+		$this->assertContains( 'comments_template', $hooks_registered );
+		$this->assertContains( 'render_block', $hooks_registered );
 	}
 
 	/**
@@ -858,5 +860,130 @@ final class TemplateLoaderTest extends TestCase {
 		$this->assertSame( 123, $increment_called_with, 'apd_increment_listing_views should be called' );
 
 		unset( $_SERVER['HTTP_USER_AGENT'] );
+	}
+
+	/**
+	 * Test listing_comments_template returns custom template for listings.
+	 */
+	public function test_listing_comments_template_returns_custom_for_listings(): void {
+		\APD\Core\Template::reset_instance();
+
+		$template_path = APD_PLUGIN_DIR . 'templates/comments-listing.php';
+
+		$loader = new TemplateLoader();
+
+		Functions\when( 'is_singular' )->alias( function( $type ) {
+			return $type === 'apd_listing';
+		} );
+		Functions\when( 'get_stylesheet_directory' )->justReturn( '/nonexistent/child-theme' );
+		Functions\when( 'get_template_directory' )->justReturn( '/nonexistent/parent-theme' );
+		Functions\when( 'apply_filters' )->returnArg( 2 );
+
+		$result = $loader->listing_comments_template( '/default/comments.php' );
+
+		$this->assertSame( $template_path, $result );
+	}
+
+	/**
+	 * Test listing_comments_template passes through for non-listings.
+	 */
+	public function test_listing_comments_template_passthrough_for_non_listings(): void {
+		$loader = new TemplateLoader();
+
+		Functions\when( 'is_singular' )->justReturn( false );
+
+		$result = $loader->listing_comments_template( '/default/comments.php' );
+
+		$this->assertSame( '/default/comments.php', $result );
+	}
+
+	/**
+	 * Test listing_comments_template falls back when custom template not found.
+	 */
+	public function test_listing_comments_template_fallback_when_not_found(): void {
+		\APD\Core\Template::reset_instance();
+
+		$loader = new TemplateLoader();
+
+		Functions\when( 'is_singular' )->alias( function( $type ) {
+			return $type === 'apd_listing';
+		} );
+		Functions\when( 'get_stylesheet_directory' )->justReturn( '/nonexistent/child-theme' );
+		Functions\when( 'get_template_directory' )->justReturn( '/nonexistent/parent-theme' );
+		// Force locate_template to return false via filter.
+		Functions\when( 'apply_filters' )->alias( function( $hook, $value ) {
+			if ( 'apd_locate_template' === $hook ) {
+				return false;
+			}
+			return $value;
+		} );
+
+		$result = $loader->listing_comments_template( '/default/comments.php' );
+
+		$this->assertSame( '/default/comments.php', $result );
+	}
+
+	/**
+	 * Test replace_listing_comments_block passes through non-comments blocks.
+	 */
+	public function test_replace_listing_comments_block_passthrough_non_comments(): void {
+		$loader = new TemplateLoader();
+
+		$result = $loader->replace_listing_comments_block( '<p>Content</p>', [ 'blockName' => 'core/paragraph' ] );
+
+		$this->assertSame( '<p>Content</p>', $result );
+	}
+
+	/**
+	 * Test replace_listing_comments_block passes through for non-listings.
+	 */
+	public function test_replace_listing_comments_block_passthrough_non_listing(): void {
+		$loader = new TemplateLoader();
+
+		Functions\when( 'is_singular' )->justReturn( false );
+
+		$result = $loader->replace_listing_comments_block( '<div>Comments</div>', [ 'blockName' => 'core/comments' ] );
+
+		$this->assertSame( '<div>Comments</div>', $result );
+	}
+
+	/**
+	 * Test replace_listing_comments_block returns empty when reviews disabled.
+	 */
+	public function test_replace_listing_comments_block_empty_when_reviews_disabled(): void {
+		$loader = new TemplateLoader();
+
+		Functions\when( 'is_singular' )->alias( function( $type ) {
+			return $type === 'apd_listing';
+		} );
+		Functions\when( 'apd_reviews_enabled' )->justReturn( false );
+
+		$result = $loader->replace_listing_comments_block( '<div>Comments</div>', [ 'blockName' => 'core/comments' ] );
+
+		$this->assertSame( '', $result );
+	}
+
+	/**
+	 * Test replace_listing_comments_block fires review action when reviews enabled.
+	 */
+	public function test_replace_listing_comments_block_fires_review_action(): void {
+		$loader = new TemplateLoader();
+
+		$action_fired = false;
+
+		Functions\when( 'is_singular' )->alias( function( $type ) {
+			return $type === 'apd_listing';
+		} );
+		Functions\when( 'apd_reviews_enabled' )->justReturn( true );
+		Functions\when( 'get_the_ID' )->justReturn( 123 );
+		Functions\when( 'do_action' )->alias( function( $hook ) use ( &$action_fired ) {
+			if ( 'apd_single_listing_reviews' === $hook ) {
+				$action_fired = true;
+			}
+		} );
+
+		$loader->replace_listing_comments_block( '<div>Comments</div>', [ 'blockName' => 'core/comments' ] );
+
+		$this->assertTrue( $action_fired, 'apd_single_listing_reviews action should fire' );
 	}
 }
