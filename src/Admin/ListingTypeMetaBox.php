@@ -59,13 +59,16 @@ final class ListingTypeMetaBox {
 	 * @return void
 	 */
 	public function init(): void {
+		// Field display filter runs on both admin and frontend so type-specific
+		// fields are correctly hidden when viewing a single listing.
+		add_filter( 'apd_should_display_field', [ $this, 'filter_field_display' ], 10, 4 );
+
 		if ( ! is_admin() ) {
 			return;
 		}
 
 		add_action( 'add_meta_boxes', [ $this, 'register_meta_box' ] );
 		add_action( 'save_post_' . self::POST_TYPE, [ $this, 'save_meta_box' ], 20, 2 );
-		add_filter( 'apd_should_display_field', [ $this, 'filter_field_display' ], 10, 4 );
 	}
 
 	/**

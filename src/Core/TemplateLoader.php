@@ -56,6 +56,7 @@ final class TemplateLoader {
 		add_filter( 'template_include', [ $this, 'template_include' ], 10 );
 		add_filter( 'body_class', [ $this, 'body_class' ], 10 );
 		add_action( 'wp_head', [ $this, 'track_listing_view' ] );
+		add_filter( 'the_content', [ $this, 'append_listing_fields' ], 20 );
 	}
 
 	/**
@@ -451,6 +452,104 @@ final class TemplateLoader {
 		$output .= '</nav>';
 
 		return $output;
+	}
+
+	/**
+	 * Append listing fields to post content for block themes.
+	 *
+	 * Block themes (FSE) don't use the plugin's single-listing.php template,
+	 * so we inject the custom fields, categories, tags, and contact form
+	 * directly into the_content output.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $content The post content.
+	 * @return string Modified content with listing fields appended.
+	 */
+	public function append_listing_fields( string $content ): string {
+		// Only apply on single listing pages in the main query.
+		if ( ! is_singular( 'apd_listing' ) || ! in_the_loop() || ! is_main_query() ) {
+			return $content;
+		}
+
+		// Only apply for block themes where our template isn't loaded.
+		if ( ! function_exists( 'wp_is_block_theme' ) || ! wp_is_block_theme() ) {
+			return $content;
+		}
+
+		$listing_id = get_the_ID();
+
+		if ( ! $listing_id ) {
+			return $content;
+		}
+
+		$extra = '';
+
+		/**
+		 * Fires before the listing content in block theme context.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param int $listing_id The listing post ID.
+		 */
+		do_action( 'apd_single_listing_after_content', $listing_id );
+
+		// Custom fields.
+		$custom_fields_html = apd_render_display_fields( $listing_id );
+
+		if ( ! empty( $custom_fields_html ) ) {
+			$extra .= '<div class="apd-single-listing__fields">';
+			$extra .= '<h2 class="apd-single-listing__section-title">'
+				. esc_html__( 'Details', 'all-purpose-directory' ) . '</h2>';
+			$extra .= $custom_fields_html;
+			$extra .= '</div>';
+		}
+
+		/**
+		 * Fires after custom fields in block theme context.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param int $listing_id The listing post ID.
+		 */
+		do_action( 'apd_single_listing_after_fields', $listing_id );
+
+		// Tags.
+		$tags = apd_get_listing_tags( $listing_id );
+
+		if ( ! empty( $tags ) ) {
+			$extra .= '<div class="apd-single-listing__tags">';
+			$extra .= '<h3 class="apd-single-listing__tags-title">';
+			$extra .= '<span class="dashicons dashicons-tag" aria-hidden="true"></span> ';
+			$extra .= esc_html__( 'Tags', 'all-purpose-directory' );
+			$extra .= '</h3>';
+			$extra .= '<div class="apd-single-listing__tags-list">';
+
+			foreach ( $tags as $tag ) {
+				$extra .= sprintf(
+					'<a href="%s" class="apd-single-listing__tag">%s</a> ',
+					esc_url( get_term_link( $tag ) ),
+					esc_html( $tag->name )
+				);
+			}
+
+			$extra .= '</div></div>';
+		}
+
+		// Contact form hook.
+		ob_start();
+		do_action( 'apd_single_listing_contact_form', $listing_id );
+		$contact_html = ob_get_clean();
+
+		if ( ! empty( trim( $contact_html ) ) ) {
+			$extra .= $contact_html;
+		}
+
+		if ( ! empty( $extra ) ) {
+			$content .= '<div class="apd-single-listing-extras">' . $extra . '</div>';
+		}
+
+		return $content;
 	}
 
 	/**
