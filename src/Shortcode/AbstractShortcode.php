@@ -255,9 +255,9 @@ abstract class AbstractShortcode {
 
 			case 'ids':
 				if ( is_string( $value ) ) {
-					return array_map( 'absint', explode( ',', $value ) );
+					return array_filter( array_map( 'absint', explode( ',', $value ) ) );
 				}
-				return is_array( $value ) ? array_map( 'absint', $value ) : [];
+				return is_array( $value ) ? array_filter( array_map( 'absint', $value ) ) : [];
 
 			case 'slug':
 				return sanitize_key( $value );

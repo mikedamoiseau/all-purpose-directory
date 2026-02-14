@@ -1,44 +1,87 @@
-import { chromium, FullConfig } from '@playwright/test';
+import { test as setup } from '@playwright/test';
+import { mkdirSync } from 'fs';
+import {
+  wpCli,
+  createPage,
+  createUser,
+  generateDemoData,
+  getPostCount,
+  ADMIN_USER,
+  ADMIN_STATE,
+  AUTH_STATE_DIR,
+  TEST_USER,
+  USER_STATE,
+} from './helpers';
 
 /**
- * Global setup for Playwright tests.
- *
- * This runs once before all tests and is used to:
- * - Login as a test user
- * - Store authentication state
- * - Set up any global test data
+ * Global setup: seed data, create pages, authenticate users.
+ * Runs once before all test suites.
  */
-async function globalSetup(config: FullConfig) {
-  const { baseURL, storageState } = config.projects[0].use;
+setup('seed test data and authenticate', async ({ page, baseURL }) => {
+  setup.setTimeout(120_000);
 
-  // Create a browser for setup tasks
-  const browser = await chromium.launch();
-  const page = await browser.newPage();
+  // Ensure auth state directory exists
+  mkdirSync(AUTH_STATE_DIR, { recursive: true });
 
-  try {
-    // Navigate to WordPress login
-    await page.goto(`${baseURL}/wp-login.php`);
-
-    // Login as test user
-    await page.fill('#user_login', process.env.WP_TEST_USER || 'admin');
-    await page.fill('#user_pass', process.env.WP_TEST_PASS || 'password');
-    await page.click('#wp-submit');
-
-    // Wait for login to complete
-    await page.waitForURL('**/wp-admin/**');
-
-    // Save authentication state
-    if (storageState) {
-      await page.context().storageState({ path: storageState as string });
-    }
-
-    console.log('Global setup complete: User authenticated');
-  } catch (error) {
-    console.error('Global setup failed:', error);
-    throw error;
-  } finally {
-    await browser.close();
+  // ── 1. Ensure demo data exists ───────────────────────────
+  const listingCount = await getPostCount('apd_listing', 'publish');
+  if (listingCount < 5) {
+    console.log('Generating demo data...');
+    await generateDemoData({ listings: 25, users: 5 });
+    console.log('Demo data generated.');
+  } else {
+    console.log(`Found ${listingCount} listings, skipping demo data generation.`);
   }
-}
 
-export default globalSetup;
+  // ── 2. Create pages required for frontend tests ──────────
+  // Use "directory" slug instead of "listings" to avoid conflict with
+  // the post type archive at /listings/.
+  const directoryPageId = await createPage(
+    'Directory',
+    'directory',
+    '[apd_search_form]\n[apd_listings]'
+  );
+  const submitPageId = await createPage(
+    'Submit Listing',
+    'submit-listing',
+    '[apd_submission_form]'
+  );
+  const dashboardPageId = await createPage(
+    'Dashboard',
+    'dashboard',
+    '[apd_dashboard]'
+  );
+
+  // Update plugin settings to reference these pages
+  await wpCli(
+    `eval '$o = get_option("apd_options", []); $o["submit_page"] = ${submitPageId}; $o["dashboard_page"] = ${dashboardPageId}; $o["directory_page"] = ${directoryPageId}; $o["enable_reviews"] = true; $o["enable_favorites"] = true; $o["enable_contact_form"] = true; $o["show_thumbnail"] = true; $o["show_excerpt"] = true; $o["show_category"] = true; $o["show_rating"] = true; $o["show_favorite"] = true; update_option("apd_options", $o);'`
+  );
+  console.log('Plugin settings updated.');
+
+  // ── 3. Create test user (non-admin) ──────────────────────
+  await createUser(TEST_USER.login, TEST_USER.email, TEST_USER.role, TEST_USER.password);
+  console.log(`Test user "${TEST_USER.login}" ready.`);
+
+  // ── 4. Authenticate admin user ───────────────────────────
+  await page.goto(`${baseURL}/wp-login.php`);
+  await page.fill('#user_login', ADMIN_USER.login);
+  await page.fill('#user_pass', ADMIN_USER.password);
+  await page.click('#wp-submit');
+  await page.waitForURL('**/wp-admin/**');
+  await page.context().storageState({ path: ADMIN_STATE });
+  console.log('Admin auth state saved.');
+
+  // ── 5. Authenticate test user ────────────────────────────
+  // Clear cookies instead of logging out (logout invalidates admin session tokens).
+  await page.context().clearCookies();
+
+  await page.goto(`${baseURL}/wp-login.php`);
+  await page.fill('#user_login', TEST_USER.login);
+  await page.fill('#user_pass', TEST_USER.password);
+  await page.click('#wp-submit');
+  await page.waitForURL('**/wp-admin/**');
+  await page.context().storageState({ path: USER_STATE });
+  console.log('Test user auth state saved.');
+
+  console.log('Global setup complete.');
+});

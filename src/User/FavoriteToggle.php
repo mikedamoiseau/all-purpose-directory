@@ -299,7 +299,7 @@ class FavoriteToggle {
 	 * @return void
 	 */
 	public function render_button( int $listing_id, array $args = [] ): void {
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML escaped in get_button() via esc_attr/esc_html.
 		echo $this->get_button( $listing_id, $args );
 	}
 

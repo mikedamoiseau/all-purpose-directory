@@ -153,8 +153,9 @@ class SearchQueryTest extends UnitTestCase {
 		$this->assertStringContainsString( "post_title LIKE", $result );
 		$this->assertStringContainsString( "post_content LIKE", $result );
 
-		// Should contain the meta OR.
-		$this->assertStringContainsString( 'OR (apd_pm.meta_key IN', $result );
+		// Should contain the meta EXISTS subquery.
+		$this->assertStringContainsString( 'OR EXISTS', $result );
+		$this->assertStringContainsString( 'apd_pm.meta_key IN', $result );
 		$this->assertStringContainsString( 'apd_pm.meta_value LIKE', $result );
 
 		// Should still start with AND.
@@ -251,14 +252,9 @@ class SearchQueryTest extends UnitTestCase {
 	}
 
 	/**
-	 * Test add_meta_join adds LEFT JOIN for meta search.
+	 * Test add_meta_join returns unchanged (EXISTS replaces LEFT JOIN).
 	 */
-	public function test_add_meta_join_adds_join(): void {
-		global $wpdb;
-		$wpdb           = Mockery::mock( 'wpdb' );
-		$wpdb->postmeta = 'wp_postmeta';
-		$wpdb->posts    = 'wp_posts';
-
+	public function test_add_meta_join_returns_unchanged(): void {
 		$ref = new \ReflectionProperty( $this->search_query, 'searchable_meta_keys' );
 		// Property is accessible since PHP 8.1.
 		$ref->setValue( $this->search_query, [ '_apd_address' ] );
@@ -267,9 +263,8 @@ class SearchQueryTest extends UnitTestCase {
 
 		$result = $this->search_query->add_meta_join( '', $query );
 
-		$this->assertStringContainsString( 'LEFT JOIN', $result );
-		$this->assertStringContainsString( 'wp_postmeta', $result );
-		$this->assertStringContainsString( 'apd_pm', $result );
+		// EXISTS subquery eliminates need for LEFT JOIN.
+		$this->assertSame( '', $result );
 	}
 
 	// =========================================================================
@@ -277,9 +272,9 @@ class SearchQueryTest extends UnitTestCase {
 	// =========================================================================
 
 	/**
-	 * Test add_distinct returns DISTINCT for meta search.
+	 * Test add_distinct returns unchanged (EXISTS eliminates duplicates).
 	 */
-	public function test_add_distinct_returns_distinct(): void {
+	public function test_add_distinct_returns_unchanged_for_meta_search(): void {
 		$ref = new \ReflectionProperty( $this->search_query, 'searchable_meta_keys' );
 		// Property is accessible since PHP 8.1.
 		$ref->setValue( $this->search_query, [ '_apd_address' ] );
@@ -288,7 +283,8 @@ class SearchQueryTest extends UnitTestCase {
 
 		$result = $this->search_query->add_distinct( '', $query );
 
-		$this->assertSame( 'DISTINCT', $result );
+		// EXISTS subquery eliminates need for DISTINCT.
+		$this->assertSame( '', $result );
 	}
 
 	/**

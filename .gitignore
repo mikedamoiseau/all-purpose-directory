@@ -38,3 +38,6 @@ debug.log
 # Testing
 /tests/e2e/test-results/
 /tests/e2e/playwright-report/
+/tests/e2e/.auth/
+/test-results/
+/playwright-report/

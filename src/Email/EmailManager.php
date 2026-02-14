@@ -119,7 +119,7 @@ class EmailManager {
 		add_action( 'apd_listing_status_changed', [ $this, 'on_listing_status_changed' ], 10, 3 );
 
 		// Hook into new review.
-		add_action( 'apd_review_created', [ $this, 'on_review_created' ], 10, 2 );
+		add_action( 'apd_review_created', [ $this, 'on_review_created' ], 10, 3 );
 
 		// Hook into new inquiry.
 		add_action( 'apd_inquiry_logged', [ $this, 'on_inquiry_logged' ], 10, 2 );
@@ -645,11 +645,12 @@ class EmailManager {
 	/**
 	 * Handler for review created action.
 	 *
-	 * @param int   $review_id Review comment ID.
-	 * @param array $data      Review data.
+	 * @param int   $review_id  Review comment ID.
+	 * @param int   $listing_id Listing post ID.
+	 * @param array $data       Review data.
 	 * @return void
 	 */
-	public function on_review_created( int $review_id, array $data ): void {
+	public function on_review_created( int $review_id, int $listing_id, array $data ): void {
 		if ( ! $this->is_notification_enabled( 'new_review' ) ) {
 			return;
 		}

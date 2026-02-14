@@ -1319,6 +1319,9 @@ final class Settings {
 				<form method="post" action="options.php" class="apd-settings-form">
 					<?php
 					settings_fields( self::OPTION_GROUP );
+					?>
+					<input type="hidden" name="<?php echo esc_attr( self::OPTION_NAME ); ?>[_active_tab]" value="<?php echo esc_attr( $current_tab ); ?>" />
+					<?php
 
 					// Render the current tab content.
 					$this->render_tab_content( $current_tab );
@@ -1614,63 +1617,74 @@ final class Settings {
 	public function sanitize_settings( $input ): array {
 		$sanitized = [];
 		$defaults  = $this->get_defaults();
+		$existing  = get_option( self::OPTION_NAME, [] );
 
 		// General settings.
 		$sanitized['currency_symbol'] = isset( $input['currency_symbol'] )
 			? sanitize_text_field( $input['currency_symbol'] )
-			: $defaults['currency_symbol'];
+			: ( $existing['currency_symbol'] ?? $defaults['currency_symbol'] );
 
 		$sanitized['currency_position'] = isset( $input['currency_position'] )
 			&& in_array( $input['currency_position'], [ 'before', 'after' ], true )
 			? $input['currency_position']
-			: $defaults['currency_position'];
+			: ( $existing['currency_position'] ?? $defaults['currency_position'] );
 
 		$sanitized['date_format'] = isset( $input['date_format'] )
 			? sanitize_text_field( $input['date_format'] )
-			: $defaults['date_format'];
+			: ( $existing['date_format'] ?? $defaults['date_format'] );
 
 		$sanitized['distance_unit'] = isset( $input['distance_unit'] )
 			&& in_array( $input['distance_unit'], [ 'km', 'miles' ], true )
 			? $input['distance_unit']
-			: $defaults['distance_unit'];
+			: ( $existing['distance_unit'] ?? $defaults['distance_unit'] );
 
 		// Page settings.
 		$sanitized['directory_page'] = isset( $input['directory_page'] )
 			? absint( $input['directory_page'] )
-			: $defaults['directory_page'];
+			: ( $existing['directory_page'] ?? $defaults['directory_page'] );
 
 		$sanitized['submit_page'] = isset( $input['submit_page'] )
 			? absint( $input['submit_page'] )
-			: $defaults['submit_page'];
+			: ( $existing['submit_page'] ?? $defaults['submit_page'] );
 
 		$sanitized['dashboard_page'] = isset( $input['dashboard_page'] )
 			? absint( $input['dashboard_page'] )
-			: $defaults['dashboard_page'];
+			: ( $existing['dashboard_page'] ?? $defaults['dashboard_page'] );
 
 		// Listings settings.
 		$sanitized['listings_per_page'] = isset( $input['listings_per_page'] )
 			? absint( $input['listings_per_page'] )
-			: $defaults['listings_per_page'];
+			: ( $existing['listings_per_page'] ?? $defaults['listings_per_page'] );
 		$sanitized['listings_per_page'] = max( 1, min( 100, $sanitized['listings_per_page'] ) );
 
 		$sanitized['default_status'] = isset( $input['default_status'] )
 			&& in_array( $input['default_status'], [ 'publish', 'pending', 'draft' ], true )
 			? $input['default_status']
-			: $defaults['default_status'];
+			: ( $existing['default_status'] ?? $defaults['default_status'] );
 
 		$sanitized['expiration_days'] = isset( $input['expiration_days'] )
 			? absint( $input['expiration_days'] )
-			: $defaults['expiration_days'];
+			: ( $existing['expiration_days'] ?? $defaults['expiration_days'] );
 
-		$sanitized['enable_reviews']      = ! empty( $input['enable_reviews'] );
-		$sanitized['enable_favorites']    = ! empty( $input['enable_favorites'] );
-		$sanitized['enable_contact_form'] = ! empty( $input['enable_contact_form'] );
+		// Checkbox fields are only submitted when checked. When saving a tab
+		// that doesn't contain these fields, preserve the existing values.
+		$active_tab = $input['_active_tab'] ?? '';
+
+		if ( 'listings' === $active_tab ) {
+			$sanitized['enable_reviews']      = ! empty( $input['enable_reviews'] );
+			$sanitized['enable_favorites']    = ! empty( $input['enable_favorites'] );
+			$sanitized['enable_contact_form'] = ! empty( $input['enable_contact_form'] );
+		} else {
+			$sanitized['enable_reviews']      = ! empty( $existing['enable_reviews'] );
+			$sanitized['enable_favorites']    = ! empty( $existing['enable_favorites'] );
+			$sanitized['enable_contact_form'] = ! empty( $existing['enable_contact_form'] );
+		}
 
 		// Submission settings.
 		$sanitized['who_can_submit'] = isset( $input['who_can_submit'] )
 			&& in_array( $input['who_can_submit'], [ 'anyone', 'logged_in', 'specific_roles' ], true )
 			? $input['who_can_submit']
-			: $defaults['who_can_submit'];
+			: ( $existing['who_can_submit'] ?? $defaults['who_can_submit'] );
 
 		// Sanitize submission roles - only valid WordPress role slugs.
 		$sanitized['submission_roles'] = [];
@@ -1684,71 +1698,96 @@ final class Settings {
 			}
 		}
 
-		$sanitized['guest_submission'] = ! empty( $input['guest_submission'] );
+		if ( 'submission' === $active_tab ) {
+			$sanitized['guest_submission'] = ! empty( $input['guest_submission'] );
+		} else {
+			$sanitized['guest_submission'] = ! empty( $existing['guest_submission'] );
+		}
 
 		$sanitized['terms_page'] = isset( $input['terms_page'] )
 			? absint( $input['terms_page'] )
-			: $defaults['terms_page'];
+			: ( $existing['terms_page'] ?? $defaults['terms_page'] );
 
 		$sanitized['redirect_after'] = isset( $input['redirect_after'] )
 			&& in_array( $input['redirect_after'], [ 'listing', 'dashboard', 'custom' ], true )
 			? $input['redirect_after']
-			: $defaults['redirect_after'];
+			: ( $existing['redirect_after'] ?? $defaults['redirect_after'] );
 
 		// Display settings.
 		$sanitized['default_view'] = isset( $input['default_view'] )
 			&& in_array( $input['default_view'], [ 'grid', 'list' ], true )
 			? $input['default_view']
-			: $defaults['default_view'];
+			: ( $existing['default_view'] ?? $defaults['default_view'] );
 
 		$sanitized['grid_columns'] = isset( $input['grid_columns'] )
 			? absint( $input['grid_columns'] )
-			: $defaults['grid_columns'];
+			: ( $existing['grid_columns'] ?? $defaults['grid_columns'] );
 		$sanitized['grid_columns'] = max( 2, min( 4, $sanitized['grid_columns'] ) );
 
-		$sanitized['show_thumbnail'] = ! empty( $input['show_thumbnail'] );
-		$sanitized['show_excerpt']   = ! empty( $input['show_excerpt'] );
-		$sanitized['show_category']  = ! empty( $input['show_category'] );
-		$sanitized['show_rating']    = ! empty( $input['show_rating'] );
-		$sanitized['show_favorite']  = ! empty( $input['show_favorite'] );
+		if ( 'display' === $active_tab ) {
+			$sanitized['show_thumbnail'] = ! empty( $input['show_thumbnail'] );
+			$sanitized['show_excerpt']   = ! empty( $input['show_excerpt'] );
+			$sanitized['show_category']  = ! empty( $input['show_category'] );
+			$sanitized['show_rating']    = ! empty( $input['show_rating'] );
+			$sanitized['show_favorite']  = ! empty( $input['show_favorite'] );
+		} else {
+			$sanitized['show_thumbnail'] = ! empty( $existing['show_thumbnail'] );
+			$sanitized['show_excerpt']   = ! empty( $existing['show_excerpt'] );
+			$sanitized['show_category']  = ! empty( $existing['show_category'] );
+			$sanitized['show_rating']    = ! empty( $existing['show_rating'] );
+			$sanitized['show_favorite']  = ! empty( $existing['show_favorite'] );
+		}
 
 		$sanitized['archive_title'] = isset( $input['archive_title'] )
 			? sanitize_text_field( $input['archive_title'] )
-			: $defaults['archive_title'];
+			: ( $existing['archive_title'] ?? $defaults['archive_title'] );
 
 		$sanitized['single_layout'] = isset( $input['single_layout'] )
 			&& in_array( $input['single_layout'], [ 'full', 'sidebar' ], true )
 			? $input['single_layout']
-			: $defaults['single_layout'];
+			: ( $existing['single_layout'] ?? $defaults['single_layout'] );
 
 		// Email settings.
 		$sanitized['from_name'] = isset( $input['from_name'] )
 			? sanitize_text_field( $input['from_name'] )
-			: $defaults['from_name'];
+			: ( $existing['from_name'] ?? $defaults['from_name'] );
 
 		$sanitized['from_email'] = isset( $input['from_email'] )
 			? sanitize_email( $input['from_email'] )
-			: $defaults['from_email'];
+			: ( $existing['from_email'] ?? $defaults['from_email'] );
 
 		$sanitized['admin_email'] = isset( $input['admin_email'] )
 			? sanitize_email( $input['admin_email'] )
-			: $defaults['admin_email'];
+			: ( $existing['admin_email'] ?? $defaults['admin_email'] );
 
-		$sanitized['notify_submission'] = ! empty( $input['notify_submission'] );
-		$sanitized['notify_approved']   = ! empty( $input['notify_approved'] );
-		$sanitized['notify_rejected']   = ! empty( $input['notify_rejected'] );
-		$sanitized['notify_expiring']   = ! empty( $input['notify_expiring'] );
-		$sanitized['notify_review']     = ! empty( $input['notify_review'] );
-		$sanitized['notify_inquiry']    = ! empty( $input['notify_inquiry'] );
+		if ( 'email' === $active_tab ) {
+			$sanitized['notify_submission'] = ! empty( $input['notify_submission'] );
+			$sanitized['notify_approved']   = ! empty( $input['notify_approved'] );
+			$sanitized['notify_rejected']   = ! empty( $input['notify_rejected'] );
+			$sanitized['notify_expiring']   = ! empty( $input['notify_expiring'] );
+			$sanitized['notify_review']     = ! empty( $input['notify_review'] );
+			$sanitized['notify_inquiry']    = ! empty( $input['notify_inquiry'] );
+		} else {
+			$sanitized['notify_submission'] = ! empty( $existing['notify_submission'] );
+			$sanitized['notify_approved']   = ! empty( $existing['notify_approved'] );
+			$sanitized['notify_rejected']   = ! empty( $existing['notify_rejected'] );
+			$sanitized['notify_expiring']   = ! empty( $existing['notify_expiring'] );
+			$sanitized['notify_review']     = ! empty( $existing['notify_review'] );
+			$sanitized['notify_inquiry']    = ! empty( $existing['notify_inquiry'] );
+		}
 
 		// Advanced settings.
-		$sanitized['delete_data'] = ! empty( $input['delete_data'] );
+		if ( 'advanced' === $active_tab ) {
+			$sanitized['delete_data'] = ! empty( $input['delete_data'] );
+			$sanitized['debug_mode']  = ! empty( $input['debug_mode'] );
+		} else {
+			$sanitized['delete_data'] = ! empty( $existing['delete_data'] );
+			$sanitized['debug_mode']  = ! empty( $existing['debug_mode'] );
+		}
 
 		$sanitized['custom_css'] = isset( $input['custom_css'] )
 			? wp_strip_all_tags( $input['custom_css'] )
-			: $defaults['custom_css'];
-
-		$sanitized['debug_mode'] = ! empty( $input['debug_mode'] );
+			: ( $existing['custom_css'] ?? $defaults['custom_css'] );
 
 		/**
 		 * Filter the sanitized settings.

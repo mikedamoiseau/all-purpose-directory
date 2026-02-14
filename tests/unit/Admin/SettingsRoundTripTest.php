@@ -158,6 +158,7 @@ final class SettingsRoundTripTest extends UnitTestCase {
 	 */
 	public function test_sanitized_settings_round_trip(): void {
 		$raw_input = [
+			'_active_tab'       => 'listings',
 			'currency_symbol'   => '  EUR  ',
 			'listings_per_page' => '24',
 			'enable_reviews'    => '1',
@@ -256,15 +257,23 @@ final class SettingsRoundTripTest extends UnitTestCase {
 			},
 		] );
 
-		// Simulate checked checkboxes.
-		$checked = $this->settings->sanitize_settings( [
+		// Simulate checked checkboxes on listings tab.
+		$listings_save = $this->settings->sanitize_settings( [
+			'_active_tab'       => 'listings',
 			'enable_reviews'    => '1',
 			'enable_favorites'  => '1',
-			'delete_data'       => '1',
-			'debug_mode'        => '1',
 		] );
 
-		$this->options_store[ Settings::OPTION_NAME ] = $checked;
+		$this->options_store[ Settings::OPTION_NAME ] = $listings_save;
+
+		// Simulate checked checkboxes on advanced tab (merges with existing).
+		$advanced_save = $this->settings->sanitize_settings( [
+			'_active_tab' => 'advanced',
+			'delete_data' => '1',
+			'debug_mode'  => '1',
+		] );
+
+		$this->options_store[ Settings::OPTION_NAME ] = $advanced_save;
 
 		Settings::reset_instance();
 		$fresh = Settings::get_instance();
@@ -275,10 +284,19 @@ final class SettingsRoundTripTest extends UnitTestCase {
 		$this->assertTrue( $fresh->get( 'delete_data' ) );
 		$this->assertTrue( $fresh->get( 'debug_mode' ) );
 
-		// Simulate unchecked checkboxes (keys absent from input).
-		$unchecked = $this->settings->sanitize_settings( [] );
+		// Simulate unchecked checkboxes on listings tab (keys absent from input).
+		$listings_uncheck = $this->settings->sanitize_settings( [
+			'_active_tab' => 'listings',
+		] );
 
-		$this->options_store[ Settings::OPTION_NAME ] = $unchecked;
+		$this->options_store[ Settings::OPTION_NAME ] = $listings_uncheck;
+
+		// Simulate unchecked checkboxes on advanced tab.
+		$advanced_uncheck = $this->settings->sanitize_settings( [
+			'_active_tab' => 'advanced',
+		] );
+
+		$this->options_store[ Settings::OPTION_NAME ] = $advanced_uncheck;
 
 		Settings::reset_instance();
 		$fresh2 = Settings::get_instance();

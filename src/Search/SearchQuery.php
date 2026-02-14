@@ -221,31 +221,25 @@ final class SearchQuery {
 	/**
 	 * Add JOIN clause for meta search.
 	 *
+	 * No longer adds a LEFT JOIN since we now use an EXISTS subquery.
+	 * Kept for backward compatibility with the posts_join filter hook.
+	 *
 	 * @since 1.0.0
 	 *
 	 * @param string   $join  The JOIN clause.
 	 * @param WP_Query $query The query.
-	 * @return string Modified JOIN clause.
+	 * @return string Unmodified JOIN clause.
 	 */
 	public function add_meta_join( string $join, WP_Query $query ): string {
-		if ( ! $query->get( 'apd_meta_search' ) ) {
-			return $join;
-		}
-
-		if ( empty( $this->searchable_meta_keys ) ) {
-			return $join;
-		}
-
-		global $wpdb;
-
-		// Add join to postmeta for searchable fields.
-		$join .= " LEFT JOIN {$wpdb->postmeta} AS apd_pm ON ({$wpdb->posts}.ID = apd_pm.post_id)";
-
 		return $join;
 	}
 
 	/**
-	 * Add meta fields to the search clause.
+	 * Add meta fields to the search clause using an EXISTS subquery.
+	 *
+	 * Uses an EXISTS subquery instead of LEFT JOIN + DISTINCT to avoid
+	 * row multiplication when multiple meta keys match. MySQL short-circuits
+	 * on the first matching row, making this more efficient on large tables.
 	 *
 	 * Uses the `posts_search` filter which receives only the search-specific
 	 * SQL clause (e.g. `AND ((conditions))`), making it safe to inject OR
@@ -279,10 +273,13 @@ final class SearchQuery {
 		$meta_key_placeholders = implode( ',', array_fill( 0, count( $this->searchable_meta_keys ), '%s' ) );
 		$like_keyword          = '%' . $wpdb->esc_like( $keyword ) . '%';
 
-		// Build the meta search condition.
+		// Build EXISTS subquery: avoids LEFT JOIN row multiplication.
 		// $meta_key_placeholders is a string of %s placeholders generated above.
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $meta_key_placeholders contains safe %s placeholders.
-		$meta_condition = $wpdb->prepare( "(apd_pm.meta_key IN ($meta_key_placeholders) AND apd_pm.meta_value LIKE %s)", array_merge( $this->searchable_meta_keys, [ $like_keyword ] ) );
+		$meta_condition = $wpdb->prepare(
+			"EXISTS (SELECT 1 FROM {$wpdb->postmeta} AS apd_pm WHERE apd_pm.post_id = {$wpdb->posts}.ID AND apd_pm.meta_key IN ($meta_key_placeholders) AND apd_pm.meta_value LIKE %s)",
+			array_merge( $this->searchable_meta_keys, [ $like_keyword ] )
+		);
 
 		// WordPress search clause ends with )). Insert OR before the final
 		// closing parens so meta search is OR'd with title/content/excerpt
@@ -300,22 +297,17 @@ final class SearchQuery {
 	/**
 	 * Add DISTINCT to prevent duplicate results.
 	 *
+	 * No longer needed since EXISTS subquery doesn't produce duplicates.
+	 * Kept for backward compatibility with the posts_distinct filter hook.
+	 *
 	 * @since 1.0.0
 	 *
 	 * @param string   $distinct The DISTINCT clause.
 	 * @param WP_Query $query    The query.
-	 * @return string Modified DISTINCT clause.
+	 * @return string Unmodified DISTINCT clause.
 	 */
 	public function add_distinct( string $distinct, WP_Query $query ): string {
-		if ( ! $query->get( 'apd_meta_search' ) ) {
-			return $distinct;
-		}
-
-		if ( empty( $this->searchable_meta_keys ) ) {
-			return $distinct;
-		}
-
-		return 'DISTINCT';
+		return $distinct;
 	}
 
 	/**

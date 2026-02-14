@@ -187,30 +187,111 @@ class QueryOptimizationTest extends TestCase {
      *
      * @return void
      */
-    public function test_dashboard_count_uses_no_found_rows(): void {
+    public function test_dashboard_count_uses_single_grouped_query(): void {
         $source = file_get_contents( __DIR__ . '/../../../src/Frontend/Dashboard/Dashboard.php' );
 
-        // Check that count_user_listings includes no_found_rows
+        // Check that dashboard uses a single grouped SQL query instead of multiple WP_Query calls
         $this->assertStringContainsString(
-            "'no_found_rows'  => true",
+            'GROUP BY post_status',
             $source,
-            'Dashboard::count_user_listings should include no_found_rows optimization'
+            'Dashboard::count_user_listings_by_status should use a single grouped SQL query'
         );
     }
 
     /**
-     * Test that Dashboard counting uses fields => ids
+     * Test that Dashboard counting uses prepared SQL for safety.
      *
      * @return void
      */
-    public function test_dashboard_count_uses_fields_ids(): void {
+    public function test_dashboard_count_uses_prepared_sql(): void {
         $source = file_get_contents( __DIR__ . '/../../../src/Frontend/Dashboard/Dashboard.php' );
 
-        // Check that count_user_listings uses fields => 'ids' for efficiency
+        // Check that the query uses wpdb->prepare for safety
         $this->assertStringContainsString(
-            "'fields'         => 'ids'",
+            'wpdb->prepare',
             $source,
-            'Dashboard::count_user_listings should use fields=ids optimization'
+            'Dashboard::count_user_listings_by_status should use prepared SQL'
+        );
+    }
+
+    /**
+     * Test that apd_increment_listing_views uses atomic SQL UPDATE.
+     *
+     * @return void
+     */
+    public function test_increment_views_uses_atomic_sql(): void {
+        $source = file_get_contents( __DIR__ . '/../../../includes/functions.php' );
+
+        $this->assertStringContainsString(
+            'meta_value = meta_value + 1',
+            $source,
+            'apd_increment_listing_views should use atomic SQL increment'
+        );
+    }
+
+    /**
+     * Test that apd_increment_listing_views uses prepared SQL.
+     *
+     * @return void
+     */
+    public function test_increment_views_uses_prepared_sql(): void {
+        $source = file_get_contents( __DIR__ . '/../../../includes/functions.php' );
+
+        // The function should use wpdb->prepare for the atomic update
+        $pattern = '/apd_increment_listing_views.*?wpdb->prepare/s';
+        $this->assertMatchesRegularExpression(
+            $pattern,
+            $source,
+            'apd_increment_listing_views should use prepared SQL for atomic increment'
+        );
+    }
+
+    /**
+     * Test that apd_increment_listing_views handles first view with add_post_meta.
+     *
+     * @return void
+     */
+    public function test_increment_views_handles_first_view(): void {
+        $source = file_get_contents( __DIR__ . '/../../../includes/functions.php' );
+
+        // The function should fall back to add_post_meta for first views
+        $pattern = '/apd_increment_listing_views.*?add_post_meta/s';
+        $this->assertMatchesRegularExpression(
+            $pattern,
+            $source,
+            'apd_increment_listing_views should use add_post_meta for first view fallback'
+        );
+    }
+
+    /**
+     * Test that SearchQuery uses EXISTS subquery instead of LEFT JOIN.
+     *
+     * @return void
+     */
+    public function test_search_query_uses_exists_subquery(): void {
+        $source = file_get_contents( __DIR__ . '/../../../src/Search/SearchQuery.php' );
+
+        $this->assertStringContainsString(
+            'EXISTS (SELECT 1 FROM',
+            $source,
+            'SearchQuery::add_meta_search should use EXISTS subquery'
+        );
+    }
+
+    /**
+     * Test that SearchQuery add_meta_join does not execute a LEFT JOIN.
+     *
+     * @return void
+     */
+    public function test_search_query_no_left_join_in_code(): void {
+        $source = file_get_contents( __DIR__ . '/../../../src/Search/SearchQuery.php' );
+
+        // Extract the add_meta_join method body (between the function signature and the next public/private/protected method).
+        // The method should just return $join unchanged — no SQL concatenation.
+        $this->assertStringNotContainsString(
+            '$join .=',
+            $source,
+            'SearchQuery::add_meta_join should not append to $join (LEFT JOIN replaced by EXISTS subquery)'
         );
     }
 

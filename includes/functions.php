@@ -1403,8 +1403,27 @@ function apd_get_listing_views( int $listing_id ): int {
  * @return int The new view count.
  */
 function apd_increment_listing_views( int $listing_id ): int {
-	$views = apd_get_listing_views( $listing_id ) + 1;
-	update_post_meta( $listing_id, '_apd_views_count', $views );
+	global $wpdb;
+
+	$meta_key = '_apd_views_count';
+
+	// Atomic increment: single UPDATE avoids race conditions from concurrent requests.
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+	$updated = $wpdb->query(
+		$wpdb->prepare(
+			"UPDATE {$wpdb->postmeta} SET meta_value = meta_value + 1 WHERE post_id = %d AND meta_key = %s",
+			$listing_id,
+			$meta_key
+		)
+	);
+
+	if ( ! $updated ) {
+		// No row existed yet — first view for this listing.
+		add_post_meta( $listing_id, $meta_key, 1, true );
+	}
+
+	// Read back the current count for the action hook and return value.
+	$views = apd_get_listing_views( $listing_id );
 
 	/**
 	 * Fires after a listing's view count is incremented.
@@ -4659,6 +4678,54 @@ function apd_rest_paginated_response(
 		$per_page,
 		$extra_data
 	);
+}
+
+// ============================================================================
+// String Utility Functions
+// ============================================================================
+
+/**
+ * Get the length of a string, with mbstring fallback.
+ *
+ * Uses mb_strlen() when available for proper multi-byte character counting,
+ * falls back to strlen() on hosts without ext-mbstring.
+ *
+ * @since 1.0.0
+ *
+ * @param string $string The string to measure.
+ * @return int String length in characters.
+ */
+function apd_strlen( string $string ): int {
+	if ( function_exists( 'mb_strlen' ) ) {
+		return mb_strlen( $string, 'UTF-8' );
+	}
+
+	return strlen( $string );
+}
+
+/**
+ * Get part of a string, with mbstring fallback.
+ *
+ * Uses mb_substr() when available for proper multi-byte character handling,
+ * falls back to substr() on hosts without ext-mbstring.
+ *
+ * @since 1.0.0
+ *
+ * @param string   $string The string to extract from.
+ * @param int      $start  Start position.
+ * @param int|null $length Maximum characters to return. Null for remainder of string.
+ * @return string The extracted substring.
+ */
+function apd_substr( string $string, int $start, ?int $length = null ): string {
+	if ( function_exists( 'mb_substr' ) ) {
+		return mb_substr( $string, $start, $length, 'UTF-8' );
+	}
+
+	if ( $length === null ) {
+		return substr( $string, $start );
+	}
+
+	return substr( $string, $start, $length );
 }
 
 // ============================================================================

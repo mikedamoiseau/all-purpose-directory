@@ -218,7 +218,7 @@ final class CategoriesShortcode extends AbstractShortcode {
 	private function get_categories( array $atts ): array {
 		$args = [
 			'taxonomy'   => 'apd_category',
-			'hide_empty' => $atts['hide_empty'],
+			'hide_empty' => filter_var( $atts['hide_empty'], FILTER_VALIDATE_BOOLEAN ),
 			'orderby'    => $this->validate_orderby( $atts['orderby'] ),
 			'order'      => strtoupper( $atts['order'] ) === 'DESC' ? 'DESC' : 'ASC',
 		];

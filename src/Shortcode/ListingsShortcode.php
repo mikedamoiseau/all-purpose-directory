@@ -237,7 +237,7 @@ final class ListingsShortcode extends AbstractShortcode {
 
 			if ( $query->have_posts() ) {
 				// Render using the view.
-				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML escaped in view templates via esc_html/esc_attr/esc_url.
 				echo $view->renderListings( $query );
 
 				// Pagination.

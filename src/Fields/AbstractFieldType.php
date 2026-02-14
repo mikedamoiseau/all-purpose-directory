@@ -372,7 +372,7 @@ abstract class AbstractFieldType implements FieldTypeInterface {
 
 		// Min length validation.
 		if ( isset( $validation['min_length'] ) && is_string( $value ) ) {
-			if ( mb_strlen( $value ) < (int) $validation['min_length'] ) {
+			if ( \apd_strlen( $value ) < (int) $validation['min_length'] ) {
 				$errors->add(
 					'min_length',
 					sprintf(
@@ -387,7 +387,7 @@ abstract class AbstractFieldType implements FieldTypeInterface {
 
 		// Max length validation.
 		if ( isset( $validation['max_length'] ) && is_string( $value ) ) {
-			if ( mb_strlen( $value ) > (int) $validation['max_length'] ) {
+			if ( \apd_strlen( $value ) > (int) $validation['max_length'] ) {
 				$errors->add(
 					'max_length',
 					sprintf(

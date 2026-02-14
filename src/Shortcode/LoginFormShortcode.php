@@ -195,7 +195,7 @@ final class LoginFormShortcode extends AbstractShortcode {
 	 */
 	private function build_form_args( array $atts ): array {
 		$args = [
-			'echo'        => false,
+			'echo'        => true,
 			'remember'    => $atts['show_remember'],
 			'form_id'     => 'apd-login-form',
 			'id_username' => 'apd-user-login',

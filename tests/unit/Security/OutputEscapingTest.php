@@ -276,6 +276,64 @@ class OutputEscapingTest extends SecurityTestCase {
         $this->assertEquals('Test string', $result);
     }
 
+    // =========================================================================
+    // phpcs:ignore documentation regression tests
+    // =========================================================================
+
+    /**
+     * Test that ListingsShortcode phpcs:ignore documents escaping methods.
+     */
+    public function test_listings_shortcode_phpcsignore_documents_escaping(): void {
+        $source = file_get_contents( __DIR__ . '/../../../src/Shortcode/ListingsShortcode.php' );
+
+        $this->assertStringContainsString(
+            'phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML escaped in view templates',
+            $source,
+            'ListingsShortcode phpcs:ignore should document where escaping occurs'
+        );
+    }
+
+    /**
+     * Test that ReviewDisplay phpcs:ignore documents escaping methods.
+     */
+    public function test_review_display_phpcsignore_documents_escaping(): void {
+        $source = file_get_contents( __DIR__ . '/../../../src/Review/ReviewDisplay.php' );
+
+        $this->assertStringContainsString(
+            'phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML escaped in review templates',
+            $source,
+            'ReviewDisplay phpcs:ignore should document where escaping occurs'
+        );
+    }
+
+    /**
+     * Test that FavoriteToggle phpcs:ignore documents escaping methods.
+     */
+    public function test_favorite_toggle_phpcsignore_documents_escaping(): void {
+        $source = file_get_contents( __DIR__ . '/../../../src/User/FavoriteToggle.php' );
+
+        $this->assertStringContainsString(
+            'phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML escaped in get_button()',
+            $source,
+            'FavoriteToggle phpcs:ignore should document where escaping occurs'
+        );
+    }
+
+    /**
+     * Test that FavoriteToggle get_button uses esc_attr for dynamic attributes.
+     */
+    public function test_favorite_toggle_get_button_uses_esc_attr(): void {
+        $source = file_get_contents( __DIR__ . '/../../../src/User/FavoriteToggle.php' );
+
+        // The get_button method should use esc_attr for HTML attributes
+        $pattern = '/function get_button.*?esc_attr/s';
+        $this->assertMatchesRegularExpression(
+            $pattern,
+            $source,
+            'FavoriteToggle::get_button() should use esc_attr for HTML attributes'
+        );
+    }
+
     /**
      * Clean up after each test.
      */

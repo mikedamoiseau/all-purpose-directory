@@ -141,25 +141,13 @@ final class Plugin {
 		add_action( 'init', [ $this, 'register_post_types' ], 5 );
 		add_action( 'init', [ $this, 'register_taxonomies' ], 5 );
 
-		// Initialize admin columns for listings.
-		$admin_columns = new \APD\Listing\AdminColumns();
-		$admin_columns->init();
-
-		// Initialize listing meta box for custom fields.
-		$meta_box = new \APD\Admin\ListingMetaBox();
-		$meta_box->init();
-
-		// Initialize listing type meta box for type selection.
+		// Initialize listing type meta box for type selection (shared: filters fields on both contexts).
 		$listing_type_meta_box = new \APD\Admin\ListingTypeMetaBox();
 		$listing_type_meta_box->init();
 
-		// Initialize search query handler.
+		// Initialize search query handler (shared: used by AjaxHandler for AJAX filtering).
 		$this->search_query = new \APD\Search\SearchQuery();
 		$this->search_query->init();
-
-		// Initialize template loader for archive/single templates.
-		$this->template_loader = new TemplateLoader();
-		$this->template_loader->init();
 
 		// Register default filters on init.
 		add_action( 'init', [ $this, 'register_default_filters' ], 15 );
@@ -167,90 +155,62 @@ final class Plugin {
 		// Register shortcodes on init.
 		add_action( 'init', [ $this, 'register_shortcodes' ], 20 );
 
-		// Initialize Gutenberg blocks.
+		// Initialize Gutenberg blocks (shared: registers blocks on init, editor assets in admin).
 		$block_manager = \APD\Blocks\BlockManager::get_instance();
 		$block_manager->init();
 
-		// Initialize submission handler for frontend form processing.
+		// Initialize submission handler (shared: processes form submissions via init hook).
 		$submission_handler = new \APD\Frontend\Submission\SubmissionHandler();
 		$submission_handler->init();
 
-		// Register AJAX handlers.
+		// Register AJAX handlers (shared: wp_ajax_* hooks fire in admin context for frontend).
 		$ajax_handler = new \APD\Api\AjaxHandler( $this->search_query );
 		$ajax_handler->init();
 
-		// Initialize My Listings action handling.
+		// Initialize My Listings action handling (shared: processes actions via init hook).
 		$my_listings = \APD\Frontend\Dashboard\MyListings::get_instance();
 		$my_listings->init();
 
-		// Initialize Favorites system.
+		// Initialize Favorites system (shared: utility class for both contexts).
 		$favorites = \APD\User\Favorites::get_instance();
 		$favorites->init();
 
-		// Initialize Favorite Toggle UI.
+		// Initialize Favorite Toggle UI (shared: AJAX handlers + frontend display hooks).
 		$favorite_toggle = \APD\User\FavoriteToggle::get_instance();
 		$favorite_toggle->init();
 
-		// Initialize Review Manager.
+		// Initialize Review Manager (shared: filters comments globally).
 		$review_manager = \APD\Review\ReviewManager::get_instance();
 		$review_manager->init();
 
-		// Initialize Rating Calculator.
+		// Initialize Rating Calculator (shared: utility class).
 		$rating_calculator = \APD\Review\RatingCalculator::get_instance();
 		$rating_calculator->init();
 
-		// Initialize Review Form.
-		$review_form = \APD\Review\ReviewForm::get_instance();
-		$review_form->init();
-
-		// Initialize Review Handler.
+		// Initialize Review Handler (shared: AJAX handlers + form submission via init).
 		$review_handler = \APD\Review\ReviewHandler::get_instance();
 		$review_handler->init();
 
-		// Initialize Review Display.
-		$review_display = \APD\Review\ReviewDisplay::get_instance();
-		$review_display->init();
-
-		// Initialize Review Moderation admin page.
-		$review_moderation = \APD\Admin\ReviewModeration::get_instance();
-		$review_moderation->init();
-
-		// Initialize Contact Form system.
-		$contact_form = \APD\Contact\ContactForm::get_instance();
-		$contact_form->init();
-
-		// Initialize Contact Handler for AJAX processing.
+		// Initialize Contact Handler for AJAX processing (shared: wp_ajax_* hooks).
 		$contact_handler = \APD\Contact\ContactHandler::get_instance();
 		$contact_handler->init();
 
-		// Initialize Inquiry Tracker for logging contact inquiries.
+		// Initialize Inquiry Tracker (shared: registers post type + hooks to contact events).
 		$inquiry_tracker = \APD\Contact\InquiryTracker::get_instance();
 		$inquiry_tracker->init();
 
-		// Initialize Email Manager for notifications.
+		// Initialize Email Manager for notifications (shared: hooks to events from both contexts).
 		$email_manager = \APD\Email\EmailManager::get_instance();
 		$email_manager->init();
 
-		// Initialize Admin Settings page.
-		$settings = \APD\Admin\Settings::get_instance();
-		$settings->init();
-
-		// Initialize Modules admin page.
-		$modules_page = \APD\Module\ModulesAdminPage::get_instance();
-		$modules_page->init();
-
-		// Initialize Demo Data page (admin only).
-		$demo_data_page = \APD\Admin\DemoData\DemoDataPage::get_instance();
-		$demo_data_page->init();
-
-		// Initialize REST API controller.
+		// Initialize REST API controller (shared: rest_api_init fires in both contexts).
 		$rest_controller = \APD\Api\RestController::get_instance();
 		$rest_controller->init();
 
 		// Register REST API endpoints.
 		add_action( 'apd_register_rest_routes', [ $this, 'register_rest_endpoints' ] );
 
-		// Initialize Performance manager for caching.
+		// Initialize Performance manager for caching (shared: invalidation hooks fire in both contexts).
 		Performance::get_instance();
 
 		// Fire apd_listing_status_changed when listing post status transitions.
@@ -259,6 +219,42 @@ final class Plugin {
 		// Register cron event handlers.
 		add_action( 'apd_check_expired_listings', [ $this, 'cron_check_expired_listings' ] );
 		add_action( 'apd_cleanup_transients', [ $this, 'cron_cleanup_transients' ] );
+
+		// === Admin-only classes: skip on frontend to avoid unnecessary loading. ===
+		if ( is_admin() ) {
+			$admin_columns = new \APD\Listing\AdminColumns();
+			$admin_columns->init();
+
+			$meta_box = new \APD\Admin\ListingMetaBox();
+			$meta_box->init();
+
+			$review_moderation = \APD\Admin\ReviewModeration::get_instance();
+			$review_moderation->init();
+
+			$settings = \APD\Admin\Settings::get_instance();
+			$settings->init();
+
+			$modules_page = \APD\Module\ModulesAdminPage::get_instance();
+			$modules_page->init();
+
+			$demo_data_page = \APD\Admin\DemoData\DemoDataPage::get_instance();
+			$demo_data_page->init();
+		}
+
+		// === Frontend-only classes: skip in admin/AJAX to avoid unnecessary loading. ===
+		if ( ! is_admin() ) {
+			$this->template_loader = new TemplateLoader();
+			$this->template_loader->init();
+
+			$review_display = \APD\Review\ReviewDisplay::get_instance();
+			$review_display->init();
+
+			$review_form = \APD\Review\ReviewForm::get_instance();
+			$review_form->init();
+
+			$contact_form = \APD\Contact\ContactForm::get_instance();
+			$contact_form->init();
+		}
 
 		/**
 		 * Fires after plugin hooks are initialized.

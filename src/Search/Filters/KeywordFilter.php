@@ -110,8 +110,8 @@ class KeywordFilter extends AbstractFilter {
 		$sanitized = sanitize_text_field( (string) $value );
 
 		// Limit to max length to prevent memory/DB issues.
-		if ( mb_strlen( $sanitized ) > self::MAX_KEYWORD_LENGTH ) {
-			$sanitized = mb_substr( $sanitized, 0, self::MAX_KEYWORD_LENGTH );
+		if ( \apd_strlen( $sanitized ) > self::MAX_KEYWORD_LENGTH ) {
+			$sanitized = \apd_substr( $sanitized, 0, self::MAX_KEYWORD_LENGTH );
 		}
 
 		return $sanitized;
@@ -174,6 +174,6 @@ class KeywordFilter extends AbstractFilter {
 	public function isActive( mixed $value ): bool {
 		$min_length = $this->config['min_length'] ?? 2;
 
-		return is_string( $value ) && mb_strlen( trim( $value ) ) >= $min_length;
+		return is_string( $value ) && \apd_strlen( trim( $value ) ) >= $min_length;
 	}
 }

@@ -474,11 +474,11 @@ class ReviewsEndpoint {
 			$args['author'] = (int) $author;
 		}
 
-		$reviews = apd_get_listing_reviews( $listing_id ?? 0, $args );
-		$total   = apd_get_review_count( $listing_id ?? 0, $status );
+		$result = apd_get_listing_reviews( $listing_id ?? 0, $args );
+		$total  = $result['total'] ?? apd_get_review_count( $listing_id ?? 0, $status );
 
 		$items = [];
-		foreach ( $reviews as $review ) {
+		foreach ( $result['reviews'] ?? [] as $review ) {
 			$items[] = $this->prepare_review_for_response( $review );
 		}
 
@@ -515,11 +515,11 @@ class ReviewsEndpoint {
 			'per_page' => $per_page,
 		];
 
-		$reviews = apd_get_listing_reviews( $listing_id, $args );
-		$total   = apd_get_review_count( $listing_id, $status );
+		$result = apd_get_listing_reviews( $listing_id, $args );
+		$total  = $result['total'] ?? apd_get_review_count( $listing_id, $status );
 
 		$items = [];
-		foreach ( $reviews as $review ) {
+		foreach ( $result['reviews'] ?? [] as $review ) {
 			$items[] = $this->prepare_review_for_response( $review );
 		}
 

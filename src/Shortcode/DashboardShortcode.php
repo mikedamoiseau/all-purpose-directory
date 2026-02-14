@@ -102,8 +102,8 @@ final class DashboardShortcode extends AbstractShortcode {
 			'class'       => $atts['class'],
 		];
 
-		// Create dashboard instance.
-		$dashboard = new Dashboard( $config );
+		// Get dashboard instance (singleton).
+		$dashboard = Dashboard::get_instance( $config );
 
 		// Render the dashboard.
 		$output = $dashboard->render();

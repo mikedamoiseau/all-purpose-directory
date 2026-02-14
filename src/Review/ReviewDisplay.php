@@ -133,7 +133,7 @@ class ReviewDisplay {
 	 * @return void
 	 */
 	public function render_reviews_section( int $listing_id ): void {
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Output is escaped in render method.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML escaped in review templates via esc_html/esc_attr/wp_kses_post.
 		echo $this->render( $listing_id );
 	}
 

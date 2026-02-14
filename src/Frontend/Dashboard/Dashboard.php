@@ -252,20 +252,14 @@ class Dashboard {
 			'unread_inquiries' => 0,
 		];
 
-		// Count listings by status.
-		$statuses = [ 'publish', 'pending', 'draft', 'expired' ];
+		// Count listings by status in a single query.
+		$status_counts = $this->count_user_listings_by_status( $user_id );
 
-		foreach ( $statuses as $status ) {
-			$count = $this->count_user_listings( $user_id, $status );
-
-			if ( $status === 'publish' ) {
-				$stats['published'] = $count;
-			} else {
-				$stats[ $status ] = $count;
-			}
-
-			$stats['total'] += $count;
-		}
+		$stats['published'] = $status_counts['publish'] ?? 0;
+		$stats['pending']   = $status_counts['pending'] ?? 0;
+		$stats['draft']     = $status_counts['draft'] ?? 0;
+		$stats['expired']   = $status_counts['expired'] ?? 0;
+		$stats['total']     = $stats['published'] + $stats['pending'] + $stats['draft'] + $stats['expired'];
 
 		// Get total views.
 		$stats['views'] = $this->get_user_total_views( $user_id );
@@ -307,27 +301,37 @@ class Dashboard {
 	}
 
 	/**
-	 * Count user's listings by status.
+	 * Count user's listings grouped by status in a single query.
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param int    $user_id User ID.
-	 * @param string $status  Post status.
-	 * @return int Listing count.
+	 * @param int $user_id User ID.
+	 * @return array<string, int> Counts keyed by post_status.
 	 */
-	private function count_user_listings( int $user_id, string $status = 'publish' ): int {
-		$query = new \WP_Query(
-			[
-				'post_type'      => 'apd_listing',
-				'post_status'    => $status,
-				'author'         => $user_id,
-				'posts_per_page' => -1,
-				'fields'         => 'ids',
-				'no_found_rows'  => true,
-			]
+	private function count_user_listings_by_status( int $user_id ): array {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$results = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT post_status, COUNT(*) AS count
+				FROM {$wpdb->posts}
+				WHERE post_author = %d
+				AND post_type = 'apd_listing'
+				AND post_status IN ('publish', 'pending', 'draft', 'expired')
+				GROUP BY post_status",
+				$user_id
+			)
 		);
 
-		return $query->post_count;
+		$counts = [];
+		if ( $results ) {
+			foreach ( $results as $row ) {
+				$counts[ $row->post_status ] = (int) $row->count;
+			}
+		}
+
+		return $counts;
 	}
 
 	/**

@@ -496,6 +496,15 @@ final class TemplateLoader {
 		 */
 		do_action( 'apd_single_listing_after_content', $listing_id );
 
+		// Listing meta (favorite button, rating summary, etc.).
+		ob_start();
+		do_action( 'apd_single_listing_meta', $listing_id );
+		$meta_html = ob_get_clean();
+
+		if ( ! empty( trim( $meta_html ) ) ) {
+			$extra .= '<div class="apd-single-listing__meta">' . $meta_html . '</div>';
+		}
+
 		// Custom fields.
 		$custom_fields_html = apd_render_display_fields( $listing_id );
 

@@ -397,15 +397,18 @@ final class SettingsTest extends UnitTestCase {
 	 * Test sanitize_settings handles boolean fields.
 	 */
 	public function test_sanitize_settings_handles_boolean_fields(): void {
-		$input     = [ 'enable_reviews' => '1' ];
+		// When saving the listings tab with enable_reviews checked.
+		$input     = [ '_active_tab' => 'listings', 'enable_reviews' => '1' ];
 		$sanitized = $this->settings->sanitize_settings( $input );
 		$this->assertTrue( $sanitized['enable_reviews'] );
 
-		$input     = [ 'enable_reviews' => '' ];
+		// When saving the listings tab with enable_reviews unchecked (absent).
+		$input     = [ '_active_tab' => 'listings' ];
 		$sanitized = $this->settings->sanitize_settings( $input );
 		$this->assertFalse( $sanitized['enable_reviews'] );
 
-		$input     = [];
+		// When saving a different tab, checkbox preserves existing value (false when no existing).
+		$input     = [ '_active_tab' => 'general' ];
 		$sanitized = $this->settings->sanitize_settings( $input );
 		$this->assertFalse( $sanitized['enable_reviews'] );
 	}

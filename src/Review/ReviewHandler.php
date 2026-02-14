@@ -451,7 +451,7 @@ class ReviewHandler {
 
 		if ( empty( $content ) ) {
 			$this->errors->add( 'content', __( 'Review content is required.', 'all-purpose-directory' ) );
-		} elseif ( mb_strlen( $content ) < $min_length ) {
+		} elseif ( \apd_strlen( $content ) < $min_length ) {
 			$this->errors->add(
 				'content',
 				sprintf(

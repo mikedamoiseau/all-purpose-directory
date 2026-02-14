@@ -555,6 +555,28 @@ if ( ! class_exists( 'WP_Term' ) ) {
 	}
 }
 
+// Define string utility functions used by src/ classes.
+if ( ! function_exists( 'apd_strlen' ) ) {
+	function apd_strlen( string $string ): int {
+		if ( function_exists( 'mb_strlen' ) ) {
+			return mb_strlen( $string, 'UTF-8' );
+		}
+		return strlen( $string );
+	}
+}
+
+if ( ! function_exists( 'apd_substr' ) ) {
+	function apd_substr( string $string, int $start, ?int $length = null ): string {
+		if ( function_exists( 'mb_substr' ) ) {
+			return mb_substr( $string, $start, $length, 'UTF-8' );
+		}
+		if ( $length === null ) {
+			return substr( $string, $start );
+		}
+		return substr( $string, $start, $length );
+	}
+}
+
 // Load helper functions for testing.
 require_once dirname(__DIR__, 2) . '/includes/module-functions.php';
 

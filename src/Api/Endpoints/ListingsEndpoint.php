@@ -212,7 +212,7 @@ class ListingsEndpoint {
 		// Prime the post meta cache to avoid N+1 queries when fetching field values.
 		if ( ! empty( $query->posts ) ) {
 			$post_ids = wp_list_pluck( $query->posts, 'ID' );
-			update_post_meta_cache( $post_ids );
+			\update_postmeta_cache( $post_ids );
 		}
 
 		$items = [];
@@ -621,7 +621,7 @@ class ListingsEndpoint {
 		// Add rating if function exists.
 		if ( function_exists( 'apd_get_listing_rating' ) ) {
 			$data['rating']       = apd_get_listing_rating( $listing->ID );
-			$data['review_count'] = apd_get_listing_review_count( $listing->ID );
+			$data['review_count'] = apd_get_review_count( $listing->ID );
 		}
 
 		// Add favorite count if function exists.

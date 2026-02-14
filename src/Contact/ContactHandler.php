@@ -151,7 +151,7 @@ class ContactHandler {
 			? sanitize_text_field( wp_unslash( $_POST[ ContactForm::NONCE_NAME ] ) )
 			: '';
 
-		return wp_verify_nonce( $nonce, ContactForm::NONCE_ACTION );
+		return (bool) wp_verify_nonce( $nonce, ContactForm::NONCE_ACTION );
 	}
 
 	/**
@@ -177,7 +177,7 @@ class ContactHandler {
 
 		// Check listing can receive contact.
 		$listing_id = (int) $data['listing_id'];
-		$form       = new ContactForm();
+		$form       = ContactForm::get_instance();
 
 		if ( ! $form->can_receive_contact( $listing_id ) ) {
 			return new \WP_Error(

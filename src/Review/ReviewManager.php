@@ -343,7 +343,7 @@ class ReviewManager {
 			$min_length = $this->get_min_content_length();
 			$content    = trim( $data['content'] );
 
-			if ( mb_strlen( $content ) < $min_length ) {
+			if ( \apd_strlen( $content ) < $min_length ) {
 				return new \WP_Error(
 					'content_too_short',
 					sprintf(
@@ -775,7 +775,7 @@ class ReviewManager {
 			$min_length = $this->get_min_content_length();
 			$content    = trim( $data['content'] );
 
-			if ( mb_strlen( $content ) < $min_length ) {
+			if ( \apd_strlen( $content ) < $min_length ) {
 				$errors->add(
 					'content_too_short',
 					sprintf(
