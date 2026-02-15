@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name:       All Purpose Directory
- * Plugin URI:        https://damoiseau.xyz/plugins/all-purpose-directory
+ * Plugin URI:        https://damoiseau.xyz/all-purpose-directory/
  * Description:       A flexible WordPress plugin for building directory and listing websites.
  * Version:           1.0.0
  * Requires at least: 6.0
