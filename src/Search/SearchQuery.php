@@ -418,9 +418,10 @@ final class SearchQuery {
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param array<string, mixed> $query_args Query arguments.
+		 * @param array<string, mixed>      $query_args     Query arguments.
+		 * @param array<string, mixed>|null $request_params Submitted request/query params.
 		 */
-		$query_args = apply_filters( 'apd_search_query_args', $query_args );
+		$query_args = apply_filters( 'apd_search_query_args', $query_args, $request_params );
 		$final_query_args = $this->build_filtered_query_args( $query_args, $request_params );
 
 		return new WP_Query( $final_query_args );
@@ -461,13 +462,6 @@ final class SearchQuery {
 	 */
 	private function create_query_arg_collector( array $query_args ): WP_Query {
 		return new class( $query_args ) extends WP_Query {
-			/**
-			 * Collected query vars.
-			 *
-			 * @var array<string, mixed>
-			 */
-			public array $query_vars = [];
-
 			/**
 			 * Constructor.
 			 *

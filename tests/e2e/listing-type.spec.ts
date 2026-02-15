@@ -85,8 +85,11 @@ test.describe('Listing Type', () => {
       await dockerExec(
         `rm -f /var/www/html/wp-content/mu-plugins/apd-e2e-module.php`
       );
-      // Deactivate the URL Directory plugin so only "General" type exists.
-      await wpCli('plugin deactivate apd-url-directory');
+      // Deactivate ALL module plugins so only "General" type exists.
+      const modulePlugins = ['apd-url-directory', 'apd-business-directory', 'apd-classifieds', 'apd-job-board', 'apd-real-estate'];
+      for (const plugin of modulePlugins) {
+        await wpCli(`plugin deactivate ${plugin}`).catch(() => {});
+      }
       // Delete ALL non-general listing type terms so only "general" remains.
       // (Taxonomy terms persist in the DB even after plugin deactivation
       //  and leftover test-type terms may remain from previous runs.)
@@ -102,8 +105,11 @@ test.describe('Listing Type', () => {
     });
 
     test.afterAll(async () => {
-      // Re-activate the URL Directory plugin (recreates the term via sync_existing_modules).
-      await wpCli('plugin activate apd-url-directory');
+      // Re-activate ALL module plugins (recreates their terms via sync_existing_modules).
+      const modulePlugins = ['apd-url-directory', 'apd-business-directory', 'apd-classifieds', 'apd-job-board', 'apd-real-estate'];
+      for (const plugin of modulePlugins) {
+        await wpCli(`plugin activate ${plugin}`).catch(() => {});
+      }
     });
 
     test('listing type meta box is absent when only one type exists', async ({ admin, page }) => {
@@ -364,8 +370,9 @@ test.describe('Listing Type', () => {
       const href = await typeLink.getAttribute('href');
       expect(href).toContain('apd_listing_type=');
 
-      // Click the filter link to verify it filters.
-      await typeLink.click();
+      // Navigate to the filter link URL directly (the adjacent status badge
+      // column may intercept pointer events due to CSS overlap).
+      await page.goto(href!);
       await page.waitForLoadState('networkidle');
 
       // URL should contain the type filter parameter.

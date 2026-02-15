@@ -512,6 +512,23 @@ test.describe('Admin', () => {
     // (single option with sanitize_callback), causing race conditions in parallel.
     test.describe.configure({ mode: 'serial' });
 
+    // Module plugins (e.g. apd-business-directory) register their own
+    // register_setting() for 'apd_options' with a sanitize callback that
+    // overwrites core settings. Deactivate them while testing core settings.
+    const modulePlugins = ['apd-url-directory', 'apd-business-directory', 'apd-classifieds', 'apd-job-board', 'apd-real-estate'];
+
+    test.beforeAll(async () => {
+      for (const plugin of modulePlugins) {
+        await wpCli(`plugin deactivate ${plugin}`).catch(() => {});
+      }
+    });
+
+    test.afterAll(async () => {
+      for (const plugin of modulePlugins) {
+        await wpCli(`plugin activate ${plugin}`).catch(() => {});
+      }
+    });
+
     // Each settings tab save wipes checkbox settings from other tabs
     // (sanitize_callback sees empty input for unchecked boxes on other tabs).
     // Restore feature toggles after each test to avoid breaking concurrent specs.
@@ -531,9 +548,10 @@ test.describe('Admin', () => {
       // Verify settings tabs navigation.
       await expect(admin.settingsNav).toBeVisible();
 
-      // Verify all tabs are present.
+      // Verify core tabs are present (modules may add more).
       const tabs = page.locator('.apd-settings-tabs .nav-tab');
-      await expect(tabs).toHaveCount(6);
+      const tabCount = await tabs.count();
+      expect(tabCount).toBeGreaterThanOrEqual(6);
 
       // Check tab labels.
       await expect(page.locator('.nav-tab:has-text("General")')).toBeVisible();

@@ -65,9 +65,15 @@ test.describe('Search and Filtering', () => {
 
       // Wait for the AJAX request to complete.
       const ajaxResponse = await ajaxResponsePromise;
-      const responseData = await ajaxResponse.json();
+      const responseText = await ajaxResponse.text();
 
-      // Verify the AJAX response indicates no results or the form handled it.
+      // Verify the response is valid JSON and indicates success.
+      let responseData: any;
+      try {
+        responseData = JSON.parse(responseText);
+      } catch {
+        throw new Error(`Expected JSON from admin-ajax.php but got: ${responseText.slice(0, 200)}`);
+      }
       expect(responseData.success).toBe(true);
 
       // The URL should have been updated via pushState to include the keyword.

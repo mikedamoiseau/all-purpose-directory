@@ -282,6 +282,38 @@ test.describe('Listing Submission', () => {
       await submissionForm.fillTitle(title);
       await submissionForm.fillDescription(`Description for redirect test ${id}. Checking post-submission behavior.`);
 
+      // Fill any other visible required fields added by module plugins
+      // (e.g., Price, Street Address) to prevent validation failures.
+      const requiredFields = page.locator('.apd-submission-form .apd-field--required');
+      const requiredCount = await requiredFields.count();
+      for (let i = 0; i < requiredCount; i++) {
+        const wrapper = requiredFields.nth(i);
+
+        // Skip title/description (already filled above).
+        const textInput = wrapper.locator('input[type="text"]');
+        if (await textInput.count() > 0 && await textInput.first().isVisible().catch(() => false)) {
+          const val = await textInput.first().inputValue();
+          if (!val) {
+            await textInput.first().fill('Test Value');
+          }
+        }
+
+        // Number fields: respect the step attribute for HTML5 validation.
+        const numInput = wrapper.locator('input[type="number"]');
+        if (await numInput.count() > 0 && await numInput.first().isVisible().catch(() => false)) {
+          const val = await numInput.first().inputValue();
+          if (!val) {
+            const step = await numInput.first().getAttribute('step') || '1';
+            const min = await numInput.first().getAttribute('min') || '0';
+            // Use min + step as a safe valid value, or just step if min is 0.
+            const stepNum = parseFloat(step) || 1;
+            const minNum = parseFloat(min) || 0;
+            const fillVal = minNum > 0 ? String(minNum) : String(stepNum);
+            await numInput.first().fill(fillVal);
+          }
+        }
+      }
+
       // Select a category if available.
       const categoryCheckbox = page.locator('.apd-submission-form__section--categories input[type="checkbox"]').first();
       if (await categoryCheckbox.isVisible({ timeout: 2000 }).catch(() => false)) {
@@ -297,20 +329,19 @@ test.describe('Listing Submission', () => {
       // Record URL before submission.
       const urlBefore = page.url();
 
-      // Submit the form.
-      await submissionForm.submit();
+      // Submit the form and wait for the POST + server-side redirect to complete.
+      await submissionForm.submitAndWaitForNavigation();
 
       // After successful submission, the page should either:
-      // 1. Show a success message on the same page
-      // 2. Redirect to a success/listing page
-      await page.waitForLoadState('networkidle', { timeout: 15_000 });
-
+      // 1. Show a success message on the same page (with ?apd_submission=success)
+      // 2. Redirect to a different page
       const hasSuccessMessage = await page.locator('.apd-submission-success').isVisible({ timeout: 5000 }).catch(() => false);
       const urlAfter = page.url();
+      const hasSuccessParam = urlAfter.includes('apd_submission=success');
 
       // Confirm either a redirect occurred or a success message is displayed.
       const redirected = urlAfter !== urlBefore;
-      expect(hasSuccessMessage || redirected).toBe(true);
+      expect(hasSuccessMessage || redirected || hasSuccessParam).toBe(true);
 
       if (hasSuccessMessage) {
         // Verify success actions are available.
