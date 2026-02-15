@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace APD\Tests\Unit\Search;
 
+use APD\Contracts\FilterInterface;
+use APD\Search\FilterRegistry;
 use APD\Search\SearchQuery;
 use APD\Tests\Unit\UnitTestCase;
 use Brain\Monkey\Functions;
@@ -320,7 +322,7 @@ class SearchQueryTest extends UnitTestCase {
 	 * Test get_current_orderby returns default when not set.
 	 */
 	public function test_get_current_orderby_returns_default(): void {
-		$_GET = [];
+		$this->search_query->set_request_params( [] );
 
 		$result = $this->search_query->get_current_orderby();
 
@@ -331,7 +333,7 @@ class SearchQueryTest extends UnitTestCase {
 	 * Test get_current_order returns default when not set.
 	 */
 	public function test_get_current_order_returns_default(): void {
-		$_GET = [];
+		$this->search_query->set_request_params( [] );
 
 		$result = $this->search_query->get_current_order();
 
@@ -342,7 +344,7 @@ class SearchQueryTest extends UnitTestCase {
 	 * Test get_current_order sanitizes invalid values.
 	 */
 	public function test_get_current_order_sanitizes_invalid(): void {
-		$_GET = [ 'apd_order' => 'INVALID' ];
+		$this->search_query->set_request_params( [ 'apd_order' => 'INVALID' ] );
 
 		$result = $this->search_query->get_current_order();
 
@@ -353,11 +355,81 @@ class SearchQueryTest extends UnitTestCase {
 	 * Test get_current_keyword returns empty when not set.
 	 */
 	public function test_get_current_keyword_returns_empty(): void {
-		$_GET = [];
+		$this->search_query->set_request_params( [] );
 
 		$result = $this->search_query->get_current_keyword();
 
 		$this->assertSame( '', $result );
+	}
+
+	/**
+	 * Test get_filtered_listings builds final args before running query.
+	 */
+	public function test_get_filtered_listings_builds_args_before_query_execution(): void {
+		$request_params = [
+			'apd_custom'  => 1,
+			'apd_keyword' => 'pizza',
+			'apd_orderby' => 'title',
+			'apd_order'   => 'ASC',
+		];
+
+		FilterRegistry::reset_instance();
+		$registry = FilterRegistry::get_instance();
+		$registry->reset();
+
+		$filter = new class() implements FilterInterface {
+			public function getName(): string { return 'custom'; }
+			public function getType(): string { return 'text'; }
+			public function render( mixed $value ): string { return ''; }
+			public function sanitize( mixed $value ): mixed { return absint( $value ); }
+			public function modifyQuery( \WP_Query $query, mixed $value ): void {
+				$query->set( 'custom_filter_applied', $value === 1 );
+			}
+			public function getOptions(): array { return []; }
+			public function isActive( mixed $value ): bool { return (int) $value > 0; }
+			public function getConfig(): array { return []; }
+			public function getUrlParam(): string { return 'apd_custom'; }
+			public function getLabel(): string { return 'Custom'; }
+			public function getDisplayValue( mixed $value ): string { return (string) $value; }
+		};
+		$registry->register_filter( $filter );
+
+		$this->search_query = new SearchQuery( $registry, $request_params );
+
+		Functions\when( 'apply_filters' )->alias(
+			static function ( string $hook, mixed $value ): mixed {
+				return $value;
+			}
+		);
+		Functions\when( 'do_action' )->justReturn( null );
+		Functions\when( 'get_option' )->alias(
+			static function ( string $option, mixed $default = false ): mixed {
+				return $option === 'posts_per_page' ? 10 : $default;
+			}
+		);
+
+		$reflection = new \ReflectionMethod( $this->search_query, 'build_filtered_query_args' );
+		$result = $reflection->invoke(
+			$this->search_query,
+			[
+				'post_type'      => 'apd_listing',
+				'post_status'    => 'publish',
+				'posts_per_page' => 10,
+				'paged'          => 2,
+			]
+		);
+
+		$this->assertIsArray( $result );
+		$this->assertSame( 'apd_listing', $result['post_type'] ?? '' );
+		$this->assertSame( 'publish', $result['post_status'] ?? '' );
+		$this->assertSame( 10, $result['posts_per_page'] ?? 0 );
+		$this->assertSame( 2, $result['paged'] ?? 0 );
+		$this->assertSame( 'pizza', $result['s'] ?? '' );
+		$this->assertTrue( (bool) ( $result['apd_meta_search'] ?? false ) );
+		$this->assertSame( 'pizza', $result['apd_keyword'] ?? '' );
+		$this->assertSame( 'post_title', $result['orderby'] ?? '' );
+		$this->assertSame( 'ASC', $result['order'] ?? '' );
+		$this->assertTrue( (bool) ( $result['custom_filter_applied'] ?? false ) );
 	}
 
 	/**
@@ -366,7 +438,7 @@ class SearchQueryTest extends UnitTestCase {
 	protected function tearDown(): void {
 		global $wpdb;
 		$wpdb = null;
-		$_GET = [];
+		FilterRegistry::reset_instance();
 		parent::tearDown();
 	}
 }

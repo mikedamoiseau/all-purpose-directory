@@ -37,6 +37,17 @@ class CronHandlersTest extends UnitTestCase {
 
 		$reflection   = new \ReflectionClass( Plugin::class );
 		$this->plugin = $reflection->newInstanceWithoutConstructor();
+
+		Functions\stubs(
+			[
+				'get_transient'    => false,
+				'set_transient'    => true,
+				'delete_transient' => true,
+				'add_post_meta'    => true,
+				'delete_post_meta' => true,
+				'current_time'     => '2026-02-06 12:00:00',
+			]
+		);
 	}
 
 	/*
@@ -64,6 +75,21 @@ class CronHandlersTest extends UnitTestCase {
 	public function test_expired_check_skips_when_expiration_negative(): void {
 		Functions\when( 'apd_get_setting' )->justReturn( -1 );
 
+		Functions\expect( 'get_posts' )->never();
+		Functions\expect( 'wp_update_post' )->never();
+
+		$this->plugin->cron_check_expired_listings();
+	}
+
+	/**
+	 * Test expiration check returns early when another cron run holds the lock.
+	 */
+	public function test_expired_check_skips_when_lock_active(): void {
+		Functions\when( 'apd_get_setting' )->justReturn( 30 );
+		Functions\when( 'get_transient' )->justReturn( 1 );
+
+		Functions\expect( 'set_transient' )->never();
+		Functions\expect( 'delete_transient' )->never();
 		Functions\expect( 'get_posts' )->never();
 		Functions\expect( 'wp_update_post' )->never();
 
@@ -132,6 +158,27 @@ class CronHandlersTest extends UnitTestCase {
 		$this->assertSame( 'expired', $captured_args['post_status'] );
 	}
 
+	/**
+	 * Test expiration check processes multiple batches until exhausted.
+	 */
+	public function test_expired_check_processes_multiple_batches(): void {
+		Functions\when( 'apd_get_setting' )->justReturn( 30 );
+		Functions\when( 'current_time' )->justReturn( '2026-02-06 12:00:00' );
+
+		$first_batch  = range( 1, 50 );
+		$second_batch = [ 51 ];
+
+		Functions\expect( 'get_posts' )
+			->twice()
+			->andReturn( $first_batch, $second_batch );
+
+		Functions\expect( 'wp_update_post' )
+			->times( 51 )
+			->andReturn( 1 );
+
+		$this->plugin->cron_check_expired_listings();
+	}
+
 	/*
 	|--------------------------------------------------------------------------
 	| cron_cleanup_transients tests
@@ -163,10 +210,15 @@ class CronHandlersTest extends UnitTestCase {
 
 		$GLOBALS['wpdb'] = $mock_wpdb;
 
-		Functions\expect( 'delete_transient' )
-			->times( 2 );
+		$deleted_transients = [];
+		Functions\when( 'delete_transient' )->alias( function( $name ) use ( &$deleted_transients ) {
+			$deleted_transients[] = $name;
+			return true;
+		} );
 
 		$this->plugin->cron_cleanup_transients();
+
+		$this->assertCount( 2, $deleted_transients );
 
 		unset( $GLOBALS['wpdb'] );
 	}
@@ -192,9 +244,15 @@ class CronHandlersTest extends UnitTestCase {
 
 		$GLOBALS['wpdb'] = $mock_wpdb;
 
-		Functions\expect( 'delete_transient' )->never();
+		$deleted_transients = [];
+		Functions\when( 'delete_transient' )->alias( function( $name ) use ( &$deleted_transients ) {
+			$deleted_transients[] = $name;
+			return true;
+		} );
 
 		$this->plugin->cron_cleanup_transients();
+
+		$this->assertCount( 0, $deleted_transients );
 
 		unset( $GLOBALS['wpdb'] );
 	}
@@ -213,12 +271,15 @@ class CronHandlersTest extends UnitTestCase {
 
 		$GLOBALS['wpdb'] = $mock_wpdb;
 
-		// The transient name should have the _transient_timeout_ prefix removed.
-		Functions\expect( 'delete_transient' )
-			->once()
-			->with( 'apd_cache_my_key' );
+		$deleted_transients = [];
+		Functions\when( 'delete_transient' )->alias( function( $name ) use ( &$deleted_transients ) {
+			$deleted_transients[] = $name;
+			return true;
+		} );
 
 		$this->plugin->cron_cleanup_transients();
+
+		$this->assertSame( [ 'apd_cache_my_key' ], $deleted_transients );
 
 		unset( $GLOBALS['wpdb'] );
 	}

@@ -73,6 +73,13 @@ if ( ! class_exists( 'WP_Error' ) ) {
 		private array $error_data = [];
 
 		/**
+		 * Stores all error data entries per code.
+		 *
+		 * @var array<string, array<mixed>>
+		 */
+		private array $additional_data = [];
+
+		/**
 		 * Constructor.
 		 *
 		 * @param string $code    Error code.
@@ -94,9 +101,29 @@ if ( ! class_exists( 'WP_Error' ) ) {
 		 */
 		public function add( string $code, string $message, mixed $data = '' ): void {
 			$this->errors[ $code ][] = $message;
-			if ( ! empty( $data ) ) {
-				$this->error_data[ $code ] = $data;
+			if ( '' !== $data ) {
+				$this->add_data( $data, $code );
 			}
+		}
+
+		/**
+		 * Add data for an error code.
+		 *
+		 * @param mixed  $data Error data.
+		 * @param string $code Optional. Error code.
+		 * @return void
+		 */
+		public function add_data( mixed $data, string $code = '' ): void {
+			if ( empty( $code ) ) {
+				$code = $this->get_error_code();
+			}
+
+			if ( empty( $code ) ) {
+				return;
+			}
+
+			$this->error_data[ $code ]         = $data;
+			$this->additional_data[ $code ][] = $data;
 		}
 
 		/**
@@ -168,6 +195,68 @@ if ( ! class_exists( 'WP_Error' ) ) {
 				$code = $this->get_error_code();
 			}
 			return $this->error_data[ $code ] ?? null;
+		}
+
+		/**
+		 * Get all data entries for an error code.
+		 *
+		 * @param string $code Optional. Error code.
+		 * @return array<mixed> All stored data entries for the code.
+		 */
+		public function get_all_error_data( string $code = '' ): array {
+			if ( empty( $code ) ) {
+				$code = $this->get_error_code();
+			}
+
+			return $this->additional_data[ $code ] ?? [];
+		}
+
+		/**
+		 * Remove all errors for a code.
+		 *
+		 * @param string $code Error code.
+		 * @return void
+		 */
+		public function remove( string $code ): void {
+			unset( $this->errors[ $code ], $this->error_data[ $code ], $this->additional_data[ $code ] );
+		}
+
+		/**
+		 * Copy errors from another WP_Error.
+		 *
+		 * @param WP_Error $error Source error object.
+		 * @return void
+		 */
+		public function copy_errors( WP_Error $error ): void {
+			foreach ( $error->get_error_codes() as $code ) {
+				foreach ( $error->get_error_messages( $code ) as $message ) {
+					$this->add( $code, $message );
+				}
+
+				foreach ( $error->get_all_error_data( $code ) as $data ) {
+					$this->add_data( $data, $code );
+				}
+			}
+		}
+
+		/**
+		 * Merge errors from another WP_Error into this instance.
+		 *
+		 * @param WP_Error $error Source error object.
+		 * @return void
+		 */
+		public function merge_from( WP_Error $error ): void {
+			$this->copy_errors( $error );
+		}
+
+		/**
+		 * Export current errors into another WP_Error instance.
+		 *
+		 * @param WP_Error $error Destination error object.
+		 * @return void
+		 */
+		public function export_to( WP_Error $error ): void {
+			$error->copy_errors( $this );
 		}
 	}
 }

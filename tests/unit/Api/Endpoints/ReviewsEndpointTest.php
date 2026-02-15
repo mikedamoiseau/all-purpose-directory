@@ -271,7 +271,10 @@ class ReviewsEndpointTest extends UnitTestCase {
 		$review = $this->create_review_data();
 
 		Functions\stubs( [
-			'apd_get_listing_reviews' => [ $review ],
+			'apd_get_listing_reviews' => [
+				'reviews' => [ $review ],
+				'total'   => 1,
+			],
 			'apd_get_review_count'    => 1,
 			'get_user_by'             => false,
 			'apply_filters'           => function ( $hook, $data ) {
@@ -301,7 +304,10 @@ class ReviewsEndpointTest extends UnitTestCase {
 		$review = $this->create_review_data( [ 'listing_id' => 5 ] );
 
 		Functions\stubs( [
-			'apd_get_listing_reviews' => [ $review ],
+			'apd_get_listing_reviews' => [
+				'reviews' => [ $review ],
+				'total'   => 1,
+			],
 			'apd_get_review_count'    => 1,
 			'get_user_by'             => false,
 			'apply_filters'           => function ( $hook, $data ) {
@@ -314,6 +320,118 @@ class ReviewsEndpointTest extends UnitTestCase {
 
 		$this->assertCount( 1, $data['items'] );
 		$this->assertEquals( 5, $data['items'][0]['listing_id'] );
+	}
+
+	/**
+	 * Test get_reviews passes author filter to manager args.
+	 */
+	public function test_get_reviews_passes_author_filter_to_manager(): void {
+		$request       = $this->create_mock_request(
+			[
+				'author' => 9,
+				'status' => 'approved',
+			]
+		);
+		$captured_args = [];
+
+		Functions\when( 'apd_get_listing_reviews' )->alias(
+			static function ( int $listing_id, array $args ) use ( &$captured_args ): array {
+				$captured_args = $args;
+				return [
+					'reviews' => [],
+					'total'   => 0,
+				];
+			}
+		);
+
+		$result = $this->endpoint->get_reviews( $request );
+
+		$this->assertInstanceOf( \WP_REST_Response::class, $result );
+		$this->assertSame( 9, $captured_args['author'] ?? null );
+	}
+
+	/**
+	 * Test get_reviews forces approved status for non-admin users.
+	 */
+	public function test_get_reviews_forces_approved_status_for_non_admin(): void {
+		$request         = $this->create_mock_request( [ 'status' => 'pending' ] );
+		$captured_status = null;
+
+		Functions\when( 'apd_get_listing_reviews' )->alias(
+			static function ( int $listing_id, array $args ) use ( &$captured_status ): array {
+				$captured_status = $args['status'] ?? null;
+				return [
+					'reviews' => [],
+					'total'   => 0,
+				];
+			}
+		);
+
+		Functions\stubs( [
+			'current_user_can' => false,
+		] );
+
+		$result = $this->endpoint->get_reviews( $request );
+
+		$this->assertInstanceOf( \WP_REST_Response::class, $result );
+		$this->assertSame( 'approved', $captured_status );
+	}
+
+	/**
+	 * Test get_reviews keeps requested status for admin users.
+	 */
+	public function test_get_reviews_keeps_status_for_admin(): void {
+		$request         = $this->create_mock_request( [ 'status' => 'pending' ] );
+		$captured_status = null;
+
+		Functions\when( 'apd_get_listing_reviews' )->alias(
+			static function ( int $listing_id, array $args ) use ( &$captured_status ): array {
+				$captured_status = $args['status'] ?? null;
+				return [
+					'reviews' => [],
+					'total'   => 0,
+				];
+			}
+		);
+
+		Functions\stubs( [
+			'current_user_can' => true,
+		] );
+
+		$result = $this->endpoint->get_reviews( $request );
+
+		$this->assertInstanceOf( \WP_REST_Response::class, $result );
+		$this->assertSame( 'pending', $captured_status );
+	}
+
+	/**
+	 * Test get_reviews maps page/per_page to number/offset.
+	 */
+	public function test_get_reviews_maps_pagination_args_for_manager(): void {
+		$request       = $this->create_mock_request(
+			[
+				'page'     => 3,
+				'per_page' => 7,
+				'status'   => 'approved',
+			]
+		);
+		$captured_args = [];
+
+		Functions\when( 'apd_get_listing_reviews' )->alias(
+			static function ( int $listing_id, array $args ) use ( &$captured_args ): array {
+				$captured_args = $args;
+				return [
+					'reviews' => [],
+					'total'   => 0,
+				];
+			}
+		);
+
+		$result = $this->endpoint->get_reviews( $request );
+
+		$this->assertInstanceOf( \WP_REST_Response::class, $result );
+		$this->assertSame( 7, $captured_args['number'] ?? null );
+		$this->assertSame( 14, $captured_args['offset'] ?? null );
 	}
 
 	// =========================================================================
@@ -364,6 +482,80 @@ class ReviewsEndpointTest extends UnitTestCase {
 		$this->assertEquals( 5, $data['listing_rating']['review_count'] );
 	}
 
+	/**
+	 * Test get_listing_reviews forces approved status for non-admin users.
+	 */
+	public function test_get_listing_reviews_forces_approved_status_for_non_admin(): void {
+		$request         = $this->create_mock_request(
+			[
+				'listing_id' => 1,
+				'status'     => 'pending',
+			]
+		);
+		$post            = $this->create_mock_post();
+		$captured_status = null;
+
+		Functions\when( 'apd_get_listing_reviews' )->alias(
+			static function ( int $listing_id, array $args ) use ( &$captured_status ): array {
+				$captured_status = $args['status'] ?? null;
+				return [
+					'reviews' => [],
+					'total'   => 0,
+				];
+			}
+		);
+
+		Functions\stubs( [
+			'get_post'               => $post,
+			'current_user_can'       => false,
+			'apd_get_listing_rating' => 0,
+		] );
+
+		$result = $this->endpoint->get_listing_reviews( $request );
+
+		$this->assertInstanceOf( \WP_REST_Response::class, $result );
+		$this->assertSame( 'approved', $captured_status );
+	}
+
+	/**
+	 * Test get_listing_reviews maps page/per_page to number/offset.
+	 */
+	public function test_get_listing_reviews_maps_pagination_args_for_manager(): void {
+		$request       = $this->create_mock_request(
+			[
+				'listing_id' => 1,
+				'page'       => 2,
+				'per_page'   => 15,
+				'status'     => 'approved',
+			]
+		);
+		$post          = $this->create_mock_post();
+		$captured_args = [];
+
+		Functions\when( 'apd_get_listing_reviews' )->alias(
+			static function ( int $listing_id, array $args ) use ( &$captured_args ): array {
+				$captured_args = $args;
+				return [
+					'reviews' => [],
+					'total'   => 0,
+				];
+			}
+		);
+
+		Functions\stubs(
+			[
+				'get_post'               => $post,
+				'apd_get_listing_rating' => 0,
+			]
+		);
+
+		$result = $this->endpoint->get_listing_reviews( $request );
+
+		$this->assertInstanceOf( \WP_REST_Response::class, $result );
+		$this->assertSame( 15, $captured_args['number'] ?? null );
+		$this->assertSame( 15, $captured_args['offset'] ?? null );
+	}
+
 	// =========================================================================
 	// Get Single Review Tests
 	// =========================================================================
@@ -410,6 +602,61 @@ class ReviewsEndpointTest extends UnitTestCase {
 		$data = $result->get_data();
 		$this->assertEquals( 1, $data['id'] );
 		$this->assertEquals( 5, $data['rating'] );
+	}
+
+	/**
+	 * Test get_review hides pending review from unrelated public users.
+	 */
+	public function test_get_review_hides_pending_review_from_public(): void {
+		$request = $this->create_mock_request( [ 'id' => 1 ] );
+		$review  = $this->create_review_data(
+			[
+				'status'    => 'pending',
+				'author_id' => 5,
+			]
+		);
+
+		Functions\stubs( [
+			'apd_get_review'      => $review,
+			'current_user_can'    => false,
+			'get_current_user_id' => 0,
+			'__'                  => static function ( string $text ): string {
+				return $text;
+			},
+		] );
+
+		$result = $this->endpoint->get_review( $request );
+
+		$this->assertInstanceOf( \WP_Error::class, $result );
+		$this->assertSame( 'rest_review_not_found', $result->get_error_code() );
+	}
+
+	/**
+	 * Test get_review allows review author to view pending review.
+	 */
+	public function test_get_review_allows_author_to_view_pending_review(): void {
+		$request = $this->create_mock_request( [ 'id' => 1 ] );
+		$review  = $this->create_review_data(
+			[
+				'status'    => 'pending',
+				'author_id' => 5,
+			]
+		);
+
+		Functions\stubs( [
+			'apd_get_review'      => $review,
+			'current_user_can'    => false,
+			'get_current_user_id' => 5,
+			'get_user_by'         => false,
+			'apply_filters'       => static function ( string $hook, array $data ): array {
+				return $data;
+			},
+		] );
+
+		$result = $this->endpoint->get_review( $request );
+
+		$this->assertInstanceOf( \WP_REST_Response::class, $result );
+		$this->assertSame( 200, $result->get_status() );
 	}
 
 	// =========================================================================

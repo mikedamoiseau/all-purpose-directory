@@ -921,16 +921,14 @@ function apd_has_filter( string $name ): bool {
  *
  * @since 1.0.0
  *
+ * @param array<string, mixed>|null $request_params Optional request/query params.
  * @return \APD\Search\SearchQuery
  */
-function apd_search_query(): \APD\Search\SearchQuery {
-	static $search_query = null;
+function apd_search_query( ?array $request_params = null ): \APD\Search\SearchQuery {
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$request_params = $request_params ?? $_GET;
 
-	if ( $search_query === null ) {
-		$search_query = new \APD\Search\SearchQuery();
-	}
-
-	return $search_query;
+	return new \APD\Search\SearchQuery( null, $request_params );
 }
 
 /**
@@ -940,11 +938,12 @@ function apd_search_query(): \APD\Search\SearchQuery {
  *
  * @since 1.0.0
  *
- * @param array $args Additional query arguments.
+ * @param array<string, mixed>      $args           Additional query arguments.
+ * @param array<string, mixed>|null $request_params Optional request/query params.
  * @return \WP_Query The query result.
  */
-function apd_get_filtered_listings( array $args = [] ): \WP_Query {
-	return apd_search_query()->get_filtered_listings( $args );
+function apd_get_filtered_listings( array $args = [], ?array $request_params = null ): \WP_Query {
+	return apd_search_query( $request_params )->get_filtered_listings( $args, $request_params );
 }
 
 /**
@@ -3155,24 +3154,56 @@ function apd_get_favorite_listings( ?int $user_id = null, array $args = [] ): ar
 		'post_status'    => 'publish',
 		'post__in'       => $favorite_ids,
 		'orderby'        => 'post__in',
-		'posts_per_page' => -1,
+		'posts_per_page' => count( $favorite_ids ),
+		'no_found_rows'  => true,
 	];
 
-	$query_args = wp_parse_args( $args, $defaults );
+	$requested_posts_per_page = isset( $args['posts_per_page'] ) ? (int) $args['posts_per_page'] : 0;
+	if ( $requested_posts_per_page > 0 ) {
+		$query_args = wp_parse_args( $args, $defaults );
 
-	/**
-	 * Filter the favorite listings query arguments.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param array $query_args Query arguments.
-	 * @param int[] $favorite_ids Favorite listing IDs.
-	 */
-	$query_args = apply_filters( 'apd_favorite_listings_query_args', $query_args, $favorite_ids );
+		/**
+		 * Filter the favorite listings query arguments.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array $query_args Query arguments.
+		 * @param int[] $favorite_ids Favorite listing IDs.
+		 */
+		$query_args = apply_filters( 'apd_favorite_listings_query_args', $query_args, $favorite_ids );
 
-	$query = new \WP_Query( $query_args );
+		$query = new \WP_Query( $query_args );
 
-	return $query->posts;
+		return $query->posts;
+	}
+
+	$batch_size = max( 1, (int) apply_filters( 'apd_favorite_listings_batch_size', 100 ) );
+	$posts      = [];
+
+	foreach ( array_chunk( $favorite_ids, $batch_size ) as $favorite_id_batch ) {
+		$batch_defaults = $defaults;
+		$batch_defaults['post__in']       = $favorite_id_batch;
+		$batch_defaults['posts_per_page'] = count( $favorite_id_batch );
+
+		$query_args = wp_parse_args( $args, $batch_defaults );
+		$query_args['post__in']       = $favorite_id_batch;
+		$query_args['posts_per_page'] = count( $favorite_id_batch );
+
+		/**
+		 * Filter the favorite listings query arguments.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array $query_args Query arguments.
+		 * @param int[] $favorite_ids Favorite listing IDs.
+		 */
+		$query_args = apply_filters( 'apd_favorite_listings_query_args', $query_args, $favorite_ids );
+
+		$query  = new \WP_Query( $query_args );
+		$posts  = array_merge( $posts, $query->posts );
+	}
+
+	return $posts;
 }
 
 /**
@@ -3775,14 +3806,12 @@ function apd_contact_form( array $config = [] ): \APD\Contact\ContactForm {
  *
  * @since 1.0.0
  *
- * @param array $config Optional configuration.
+ * @param array                  $config         Optional configuration.
+ * @param \APD\Core\Config|null $config_service Optional configuration service.
  * @return \APD\Contact\ContactHandler ContactHandler instance.
  */
-function apd_contact_handler( array $config = [] ): \APD\Contact\ContactHandler {
-	if ( empty( $config ) ) {
-		return \APD\Contact\ContactHandler::get_instance();
-	}
-	return new \APD\Contact\ContactHandler( $config );
+function apd_contact_handler( array $config = [], ?\APD\Core\Config $config_service = null ): \APD\Contact\ContactHandler {
+	return \APD\Contact\ContactHandler::get_instance( $config, $config_service );
 }
 
 /**
@@ -3962,11 +3991,12 @@ function apd_get_user_inquiries( int $user_id = 0, array $args = [] ): array {
  *
  * @since 1.0.0
  *
- * @param int $listing_id Listing ID.
+ * @param int    $listing_id Listing ID.
+ * @param string $status     Status filter (all, read, unread).
  * @return int Inquiry count.
  */
-function apd_get_listing_inquiry_count( int $listing_id ): int {
-	return apd_inquiry_tracker()->get_listing_inquiry_count( $listing_id );
+function apd_get_listing_inquiry_count( int $listing_id, string $status = 'all' ): int {
+	return apd_inquiry_tracker()->get_listing_inquiry_count( $listing_id, $status );
 }
 
 /**
@@ -4059,10 +4089,12 @@ function apd_recalculate_listing_inquiry_count( int $listing_id ): int {
  *
  * @since 1.0.0
  *
+ * @param array                  $config         Optional configuration.
+ * @param \APD\Core\Config|null $config_service Optional configuration service.
  * @return \APD\Email\EmailManager
  */
-function apd_email_manager(): \APD\Email\EmailManager {
-	return \APD\Email\EmailManager::get_instance();
+function apd_email_manager( array $config = [], ?\APD\Core\Config $config_service = null ): \APD\Email\EmailManager {
+	return \APD\Email\EmailManager::get_instance( $config, $config_service );
 }
 
 /**

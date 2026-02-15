@@ -9,6 +9,7 @@ namespace APD\Tests\Unit\Contact;
 
 use APD\Contact\ContactHandler;
 use APD\Contact\ContactForm;
+use APD\Core\Config;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use Mockery;
@@ -46,6 +47,22 @@ class ContactHandlerTest extends TestCase {
 		Monkey\tearDown();
 		Mockery::close();
 		parent::tearDown();
+	}
+
+	/**
+	 * Get contact rate-limit identifier via reflection.
+	 *
+	 * @param ContactHandler $handler Contact handler.
+	 * @return string
+	 */
+	private function get_rate_limit_identifier( ContactHandler $handler ): string {
+		$reflection = new \ReflectionClass( $handler );
+		$method     = $reflection->getMethod( 'get_rate_limit_identifier' );
+		if ( \PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
+
+		return (string) $method->invoke( $handler );
 	}
 
 	/**
@@ -426,6 +443,24 @@ class ContactHandlerTest extends TestCase {
 	}
 
 	/**
+	 * Test get_admin_email can use injected config service.
+	 */
+	public function test_get_admin_email_uses_injected_config_service(): void {
+		$config_service = new class() extends Config {
+			public function get_option( string $option, mixed $default = false ): mixed {
+				return 'admin_email' === $option ? 'injected@admin.com' : $default;
+			}
+		};
+
+		Functions\when( 'apply_filters' )->alias( function( $hook, $value ) {
+			return $value;
+		} );
+
+		$handler = ContactHandler::get_instance( [ 'admin_email' => '' ], $config_service );
+		$this->assertEquals( 'injected@admin.com', $handler->get_admin_email() );
+	}
+
+	/**
 	 * Test build_email_message contains required elements.
 	 */
 	public function test_build_email_message(): void {
@@ -521,6 +556,117 @@ class ContactHandlerTest extends TestCase {
 
 		$handler = ContactHandler::get_instance();
 		$this->assertTrue( $handler->verify_nonce() );
+	}
+
+	/**
+	 * Test contact rate-limit identity ignores proxy headers by default.
+	 */
+	public function test_rate_limit_identifier_uses_remote_addr_when_proxy_not_trusted(): void {
+		$_SERVER['REMOTE_ADDR']          = '198.51.100.33';
+		$_SERVER['HTTP_X_FORWARDED_FOR'] = '203.0.113.8';
+
+		Functions\when( 'get_current_user_id' )->justReturn( 0 );
+
+		$handler    = ContactHandler::get_instance();
+		$identifier = $this->get_rate_limit_identifier( $handler );
+
+		$this->assertSame( 'ip_' . md5( '198.51.100.33' ), $identifier );
+	}
+
+	/**
+	 * Test contact rate-limit identity uses forwarded IP for trusted proxies.
+	 */
+	public function test_rate_limit_identifier_uses_forwarded_ip_when_proxy_trusted(): void {
+		$_SERVER['REMOTE_ADDR']          = '10.0.0.11';
+		$_SERVER['HTTP_X_FORWARDED_FOR'] = '203.0.113.8, 203.0.113.9';
+
+		Functions\when( 'get_current_user_id' )->justReturn( 0 );
+		Functions\when( 'wp_unslash' )->returnArg( 1 );
+		Functions\when( 'sanitize_text_field' )->returnArg( 1 );
+		Functions\when( 'apply_filters' )->alias( function ( $hook, $value, ...$args ) {
+			if ( $hook === 'apd_contact_trusted_proxies' ) {
+				return [ '10.0.0.11' ];
+			}
+
+			return $value;
+		} );
+
+		$handler    = ContactHandler::get_instance();
+		$identifier = $this->get_rate_limit_identifier( $handler );
+
+		$this->assertSame( 'ip_' . md5( '203.0.113.8' ), $identifier );
+	}
+
+	/**
+	 * Test process returns error when listing owner cannot be loaded.
+	 */
+	public function test_process_returns_error_when_listing_owner_missing(): void {
+		ContactForm::reset_instance();
+
+		$_POST = [
+			'listing_id'      => '123',
+			'contact_name'    => 'John Doe',
+			'contact_email'   => 'john@example.com',
+			'contact_phone'   => '',
+			'contact_subject' => 'Question',
+			'contact_message' => 'This is a valid test message.',
+		];
+
+		$listing              = Mockery::mock( 'WP_Post' );
+		$listing->ID          = 123;
+		$listing->post_author = 77;
+		$listing->post_type   = 'apd_listing';
+		$listing->post_status = 'publish';
+
+		$owner = Mockery::mock( 'WP_User' );
+		$owner->user_email = 'owner@example.com';
+
+		$userdata_call_count = 0;
+
+		Functions\stubs(
+			[
+				'absint'                  => static function( $value ) {
+					return abs( (int) $value );
+				},
+				'sanitize_text_field'     => static function( $value ) {
+					return trim( (string) $value );
+				},
+				'sanitize_email'          => static function( $value ) {
+					return trim( (string) $value );
+				},
+				'sanitize_textarea_field' => static function( $value ) {
+					return trim( (string) $value );
+				},
+				'wp_unslash'              => static function( $value ) {
+					return $value;
+				},
+				'get_current_user_id'     => 0,
+				'is_email'                => true,
+				'get_post'                => $listing,
+				'apply_filters'           => static function( $hook, $value ) {
+					if ( 'apd_contact_bypass_spam_protection' === $hook ) {
+						return true;
+					}
+					return $value;
+				},
+			]
+		);
+
+		Functions\when( 'get_userdata' )->alias(
+			static function( $user_id ) use ( &$userdata_call_count, $owner ) {
+				++$userdata_call_count;
+				return 1 === $userdata_call_count ? $owner : false;
+			}
+		);
+
+		Functions\expect( 'do_action' )->never();
+		Functions\expect( 'wp_mail' )->never();
+
+		$handler = ContactHandler::get_instance();
+		$result  = $handler->process();
+
+		$this->assertInstanceOf( \WP_Error::class, $result );
+		$this->assertEquals( 'listing_owner_not_found', $result->get_error_code() );
 	}
 
 	/**

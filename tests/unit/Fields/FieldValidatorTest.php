@@ -18,6 +18,8 @@ use APD\Fields\Types\EmailField;
 use APD\Fields\Types\UrlField;
 use APD\Fields\Types\PhoneField;
 use APD\Fields\Types\NumberField;
+use APD\Fields\Types\DecimalField;
+use APD\Fields\Types\CurrencyField;
 use APD\Fields\Types\SelectField;
 use APD\Fields\Types\CheckboxField;
 use APD\Tests\Unit\UnitTestCase;
@@ -62,6 +64,8 @@ class FieldValidatorTest extends UnitTestCase
         $this->registry->register_field_type(new UrlField());
         $this->registry->register_field_type(new PhoneField());
         $this->registry->register_field_type(new NumberField());
+        $this->registry->register_field_type(new DecimalField());
+        $this->registry->register_field_type(new CurrencyField());
         $this->registry->register_field_type(new SelectField());
         $this->registry->register_field_type(new CheckboxField());
 
@@ -376,6 +380,57 @@ class FieldValidatorTest extends UnitTestCase
         $result = $this->validator->validate_field('count', 'not a number', false);
 
         $this->assertInstanceOf(WP_Error::class, $result);
+    }
+
+    /**
+     * Test required number field fails for empty string before sanitize.
+     */
+    public function testRequiredNumberFieldEmptyFailsBeforeSanitize(): void
+    {
+        $this->registry->register_field('count', [
+            'type'     => 'number',
+            'label'    => 'Count',
+            'required' => true,
+        ]);
+
+        $result = $this->validator->validate_field('count', '');
+
+        $this->assertInstanceOf(WP_Error::class, $result);
+        $this->assertContains('required', $result->get_error_codes());
+    }
+
+    /**
+     * Test required decimal field fails for empty string before sanitize.
+     */
+    public function testRequiredDecimalFieldEmptyFailsBeforeSanitize(): void
+    {
+        $this->registry->register_field('price_decimal', [
+            'type'     => 'decimal',
+            'label'    => 'Decimal Price',
+            'required' => true,
+        ]);
+
+        $result = $this->validator->validate_field('price_decimal', '');
+
+        $this->assertInstanceOf(WP_Error::class, $result);
+        $this->assertContains('required', $result->get_error_codes());
+    }
+
+    /**
+     * Test required currency field fails for empty string before sanitize.
+     */
+    public function testRequiredCurrencyFieldEmptyFailsBeforeSanitize(): void
+    {
+        $this->registry->register_field('price_currency', [
+            'type'     => 'currency',
+            'label'    => 'Currency Price',
+            'required' => true,
+        ]);
+
+        $result = $this->validator->validate_field('price_currency', '');
+
+        $this->assertInstanceOf(WP_Error::class, $result);
+        $this->assertContains('required', $result->get_error_codes());
     }
 
     // =========================================================================
@@ -949,6 +1004,33 @@ class FieldValidatorTest extends UnitTestCase
 
         $this->assertFalse($result['valid']);
         $this->assertInstanceOf(WP_Error::class, $result['errors']);
+    }
+
+    /**
+     * Test process fields preserves empty values for required numeric fields.
+     */
+    public function testProcessFieldsPreservesEmptyRequiredNumericValues(): void
+    {
+        $this->registry->register_field('count', ['type' => 'number', 'required' => true]);
+        $this->registry->register_field('price_decimal', ['type' => 'decimal', 'required' => true]);
+        $this->registry->register_field('price_currency', ['type' => 'currency', 'required' => true]);
+
+        $values = [
+            'count'          => '',
+            'price_decimal'  => '',
+            'price_currency' => '',
+        ];
+
+        $result = $this->validator->process_fields($values);
+
+        $this->assertFalse($result['valid']);
+        $this->assertSame('', $result['values']['count']);
+        $this->assertSame('', $result['values']['price_decimal']);
+        $this->assertSame('', $result['values']['price_currency']);
+        $this->assertInstanceOf(WP_Error::class, $result['errors']);
+        $this->assertContains('count', $result['errors']->get_error_codes());
+        $this->assertContains('price_decimal', $result['errors']->get_error_codes());
+        $this->assertContains('price_currency', $result['errors']->get_error_codes());
     }
 
     // =========================================================================

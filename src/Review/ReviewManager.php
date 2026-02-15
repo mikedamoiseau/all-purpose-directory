@@ -481,6 +481,8 @@ class ReviewManager {
 	 *                          - order: (string) Order direction (ASC, DESC). Default 'DESC'.
 	 *                          - number: (int) Number of reviews to retrieve. Default 10.
 	 *                          - offset: (int) Number of reviews to skip. Default 0.
+	 *                          - author: (int) Filter by review author user ID.
+	 *                          - user_id: (int) Alias for author filter.
 	 *                          - rating: (int) Filter by specific rating.
 	 * @return array{reviews: array[], total: int, pages: int} Reviews, total count, and page count.
 	 */
@@ -505,6 +507,18 @@ class ReviewManager {
 
 		// Handle status.
 		$query_args['status'] = $this->translate_status( $args['status'] );
+
+		// Handle author filter.
+		$author_id = 0;
+		if ( isset( $args['author'] ) ) {
+			$author_id = absint( $args['author'] );
+		} elseif ( isset( $args['user_id'] ) ) {
+			$author_id = absint( $args['user_id'] );
+		}
+
+		if ( $author_id > 0 ) {
+			$query_args['user_id'] = $author_id;
+		}
 
 		// Handle orderby.
 		if ( $args['orderby'] === 'rating' ) {

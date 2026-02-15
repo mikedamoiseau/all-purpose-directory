@@ -383,15 +383,15 @@ class InquiriesEndpoint {
 	public function get_inquiries( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$user_id  = get_current_user_id();
 		$status   = $request->get_param( 'status' ) ?? 'all';
-		$page     = (int) ( $request->get_param( 'page' ) ?? 1 );
-		$per_page = (int) ( $request->get_param( 'per_page' ) ?? 10 );
+		$page     = max( 1, (int) ( $request->get_param( 'page' ) ?? 1 ) );
+		$per_page = max( 1, (int) ( $request->get_param( 'per_page' ) ?? 10 ) );
 		$orderby  = $request->get_param( 'orderby' ) ?? 'date';
 		$order    = $request->get_param( 'order' ) ?? 'DESC';
 
 		$args = [
+			'number'   => $per_page,
+			'offset'   => ( $page - 1 ) * $per_page,
 			'status'   => $status,
-			'page'     => $page,
-			'per_page' => $per_page,
 			'orderby'  => $orderby,
 			'order'    => $order,
 		];
@@ -424,8 +424,8 @@ class InquiriesEndpoint {
 	public function get_listing_inquiries( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$listing_id = (int) $request->get_param( 'listing_id' );
 		$status     = $request->get_param( 'status' ) ?? 'all';
-		$page       = (int) ( $request->get_param( 'page' ) ?? 1 );
-		$per_page   = (int) ( $request->get_param( 'per_page' ) ?? 10 );
+		$page       = max( 1, (int) ( $request->get_param( 'page' ) ?? 1 ) );
+		$per_page   = max( 1, (int) ( $request->get_param( 'per_page' ) ?? 10 ) );
 
 		// Verify listing exists.
 		$post = get_post( $listing_id );
@@ -438,13 +438,13 @@ class InquiriesEndpoint {
 		}
 
 		$args = [
+			'number'   => $per_page,
+			'offset'   => ( $page - 1 ) * $per_page,
 			'status'   => $status,
-			'page'     => $page,
-			'per_page' => $per_page,
 		];
 
 		$inquiries = apd_get_listing_inquiries( $listing_id, $args );
-		$total     = apd_get_listing_inquiry_count( $listing_id );
+		$total     = apd_get_listing_inquiry_count( $listing_id, $status );
 
 		$items = [];
 		foreach ( $inquiries as $inquiry ) {

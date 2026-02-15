@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace APD\Contact;
 
+use APD\Core\Config;
+
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -43,14 +45,22 @@ class ContactHandler {
 	];
 
 	/**
+	 * Configuration service.
+	 *
+	 * @var Config
+	 */
+	private Config $config_service;
+
+	/**
 	 * Get single instance.
 	 *
-	 * @param array $config Optional. Configuration options.
+	 * @param array       $config         Optional. Configuration options.
+	 * @param Config|null $config_service Optional. Configuration service.
 	 * @return ContactHandler
 	 */
-	public static function get_instance( array $config = [] ): ContactHandler {
-		if ( null === self::$instance || ! empty( $config ) ) {
-			self::$instance = new self( $config );
+	public static function get_instance( array $config = [], ?Config $config_service = null ): ContactHandler {
+		if ( null === self::$instance || ! empty( $config ) || $config_service instanceof Config ) {
+			self::$instance = new self( $config, $config_service );
 		}
 		return self::$instance;
 	}
@@ -58,9 +68,11 @@ class ContactHandler {
 	/**
 	 * Constructor.
 	 *
-	 * @param array $config Configuration options.
+	 * @param array       $config         Configuration options.
+	 * @param Config|null $config_service Optional. Configuration service.
 	 */
-	private function __construct( array $config = [] ) {
+	private function __construct( array $config = [], ?Config $config_service = null ) {
+		$this->config_service = $config_service ?? new Config();
 		$this->config = array_merge( $this->config, $config );
 	}
 
@@ -197,6 +209,12 @@ class ContactHandler {
 		}
 
 		$owner = get_userdata( $listing->post_author );
+		if ( ! ( $owner instanceof \WP_User ) ) {
+			return new \WP_Error(
+				'listing_owner_not_found',
+				__( 'The listing owner could not be found.', 'all-purpose-directory' )
+			);
+		}
 
 		/**
 		 * Fires before sending contact message.
@@ -483,7 +501,7 @@ class ContactHandler {
 		$email = $this->config['admin_email'];
 
 		if ( empty( $email ) ) {
-			$email = get_option( 'admin_email' );
+			$email = (string) $this->config_service->get_option( 'admin_email' );
 		}
 
 		/**
@@ -748,28 +766,123 @@ class ContactHandler {
 	 * @return string Client IP address.
 	 */
 	private function get_client_ip(): string {
-		$ip = '';
+		$remote_addr = $this->extract_first_valid_ip( (string) ( $_SERVER['REMOTE_ADDR'] ?? '' ) );
 
-		$headers = [
-			'HTTP_CF_CONNECTING_IP',
-			'HTTP_X_FORWARDED_FOR',
-			'HTTP_X_REAL_IP',
-			'REMOTE_ADDR',
-		];
+		// Default to REMOTE_ADDR unless this request came through a trusted proxy.
+		$client_ip = $remote_addr;
+		if ( '' !== $remote_addr && $this->is_trusted_proxy_ip( $remote_addr ) ) {
+			foreach ( [ 'HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP' ] as $header ) {
+				if ( empty( $_SERVER[ $header ] ) ) {
+					continue;
+				}
 
-		foreach ( $headers as $header ) {
-			if ( ! empty( $_SERVER[ $header ] ) ) {
-				$ip = strtok( sanitize_text_field( wp_unslash( $_SERVER[ $header ] ) ), ',' );
-				break;
+				$forwarded_ip = $this->extract_first_valid_ip( sanitize_text_field( wp_unslash( $_SERVER[ $header ] ) ) );
+				if ( '' !== $forwarded_ip ) {
+					$client_ip = $forwarded_ip;
+					break;
+				}
 			}
 		}
 
-		$ip = trim( (string) $ip );
-		if ( filter_var( $ip, FILTER_VALIDATE_IP ) ) {
-			return $ip;
+		return '' !== $client_ip ? $client_ip : '0.0.0.0';
+	}
+
+	/**
+	 * Extract the first valid IP from a potentially comma-separated value.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $value Header/raw IP value.
+	 * @return string Valid IP or empty string when invalid.
+	 */
+	private function extract_first_valid_ip( string $value ): string {
+		$candidates = array_map( 'trim', explode( ',', $value ) );
+
+		foreach ( $candidates as $candidate ) {
+			if ( filter_var( $candidate, FILTER_VALIDATE_IP ) ) {
+				return $candidate;
+			}
 		}
 
-		return '0.0.0.0';
+		return '';
+	}
+
+	/**
+	 * Check whether an IP belongs to a trusted proxy.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $ip IP address to validate.
+	 * @return bool
+	 */
+	private function is_trusted_proxy_ip( string $ip ): bool {
+		$trusted_proxies = apply_filters( 'apd_contact_trusted_proxies', [] );
+		if ( ! is_array( $trusted_proxies ) ) {
+			return false;
+		}
+
+		foreach ( $trusted_proxies as $proxy ) {
+			if ( ! is_string( $proxy ) ) {
+				continue;
+			}
+
+			$proxy = trim( $proxy );
+			if ( '' === $proxy ) {
+				continue;
+			}
+
+			if ( $this->ip_matches_proxy( $ip, $proxy ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Match an IP against exact/CIDR trusted proxy definitions.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $ip    Client IP.
+	 * @param string $proxy Trusted proxy value (single IP or CIDR).
+	 * @return bool
+	 */
+	private function ip_matches_proxy( string $ip, string $proxy ): bool {
+		if ( strpos( $proxy, '/' ) === false ) {
+			return $ip === $proxy;
+		}
+
+		[ $subnet, $mask_length ] = explode( '/', $proxy, 2 );
+		$subnet                   = trim( $subnet );
+		$mask_length              = (int) $mask_length;
+
+		$ip_binary     = inet_pton( $ip );
+		$subnet_binary = inet_pton( $subnet );
+
+		if ( false === $ip_binary || false === $subnet_binary || strlen( $ip_binary ) !== strlen( $subnet_binary ) ) {
+			return false;
+		}
+
+		$max_bits = strlen( $ip_binary ) * 8;
+		if ( $mask_length < 0 || $mask_length > $max_bits ) {
+			return false;
+		}
+
+		$full_bytes = intdiv( $mask_length, 8 );
+		$extra_bits = $mask_length % 8;
+
+		if ( $full_bytes > 0 && substr( $ip_binary, 0, $full_bytes ) !== substr( $subnet_binary, 0, $full_bytes ) ) {
+			return false;
+		}
+
+		if ( 0 === $extra_bits ) {
+			return true;
+		}
+
+		$mask = 0xFF << ( 8 - $extra_bits );
+
+		return ( ord( $ip_binary[ $full_bytes ] ) & $mask ) === ( ord( $subnet_binary[ $full_bytes ] ) & $mask );
 	}
 
 	/**

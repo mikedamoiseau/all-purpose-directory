@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace APD\Tests\Unit\Email;
 
+use APD\Core\Config;
 use APD\Email\EmailManager;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
@@ -254,6 +255,30 @@ class EmailManagerTest extends TestCase {
 	 */
 	public function test_get_admin_email_falls_back_to_option(): void {
 		$this->assertEquals( 'admin@example.com', $this->manager->get_admin_email() );
+	}
+
+	/**
+	 * Test injected config service is used for option-backed values.
+	 */
+	public function test_option_values_can_be_injected_via_config_service(): void {
+		EmailManager::reset_instance();
+
+		$config_service = new class() extends Config {
+			public function get_option( string $option, mixed $default = false ): mixed {
+				$map = [
+					'admin_email' => 'service-admin@example.com',
+					'date_format' => 'Y-m-d',
+					'time_format' => 'H:i',
+				];
+
+				return $map[ $option ] ?? $default;
+			}
+		};
+
+		$manager = EmailManager::get_instance( [], $config_service );
+
+		$this->assertEquals( 'service-admin@example.com', $manager->get_admin_email() );
+		$this->assertEquals( 'service-admin@example.com', $manager->get_from_email() );
 	}
 
 	/**
@@ -695,7 +720,7 @@ class EmailManagerTest extends TestCase {
 		$this->assertFalse( $this->manager->is_notification_enabled( 'new_review' ) );
 
 		// Call the method - it should not throw any errors.
-		$this->manager->on_review_created( 123, [] );
+		$this->manager->on_review_created( 123, 456, [] );
 
 		// If we got here without errors, the test passes.
 		$this->assertTrue( true );

@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace APD\Tests\Unit\Frontend\Submission;
 
+use APD\Fields\FieldRegistry;
+use APD\Fields\FieldValidator;
+use APD\Fields\Types\TextField;
 use APD\Frontend\Submission\SubmissionHandler;
 use APD\Tests\Unit\UnitTestCase;
 use Brain\Monkey\Functions;
@@ -247,6 +250,70 @@ final class SubmissionHandlerTest extends UnitTestCase {
 		$this->assertInstanceOf( \WP_Error::class, $result );
 		$this->assertTrue( $result->has_errors() );
 		$this->assertContains( 'listing_categories', $result->get_error_codes() );
+	}
+
+	/**
+	 * Test process merges featured image upload errors into the main error object.
+	 */
+	public function test_process_merges_featured_image_upload_errors(): void {
+		$_SERVER['REQUEST_METHOD']      = 'POST';
+		$_POST['apd_action']            = 'submit_listing';
+		$_POST['apd_submission_nonce']  = 'valid';
+		$_POST['listing_title']         = 'Test Title';
+		$_POST['listing_content']       = 'Test content';
+
+		Functions\when( 'wp_verify_nonce' )->justReturn( true );
+		Functions\when( 'is_user_logged_in' )->justReturn( true );
+
+		$handler = new SubmissionHandler(
+			[
+				'require_featured_image' => true,
+			]
+		);
+		$result  = $handler->process();
+
+		$this->assertInstanceOf( \WP_Error::class, $result );
+		$this->assertTrue( $result->has_errors() );
+		$this->assertContains( 'featured_image', $result->get_error_codes() );
+	}
+
+	/**
+	 * Test process merges custom field validation errors into the main error object.
+	 */
+	public function test_process_merges_custom_field_validation_errors(): void {
+		FieldRegistry::reset_instance();
+		$field_registry = FieldRegistry::get_instance();
+		$field_registry->register_field_type( new TextField() );
+		$field_registry->register_field(
+			'company_name',
+			[
+				'type'     => 'text',
+				'label'    => 'Company Name',
+				'required' => true,
+			]
+		);
+
+		$field_validator = new FieldValidator( $field_registry );
+
+		$_SERVER['REQUEST_METHOD']      = 'POST';
+		$_POST['apd_action']            = 'submit_listing';
+		$_POST['apd_submission_nonce']  = 'valid';
+		$_POST['listing_title']         = 'Test Title';
+		$_POST['listing_content']       = 'Test content';
+
+		Functions\when( 'wp_verify_nonce' )->justReturn( true );
+		Functions\when( 'is_user_logged_in' )->justReturn( true );
+
+		$handler = new SubmissionHandler(
+			[],
+			$field_registry,
+			$field_validator
+		);
+		$result  = $handler->process();
+
+		$this->assertInstanceOf( \WP_Error::class, $result );
+		$this->assertTrue( $result->has_errors() );
+		$this->assertContains( 'company_name', $result->get_error_codes() );
 	}
 
 	/**
@@ -513,6 +580,8 @@ final class SubmissionHandlerTest extends UnitTestCase {
 	 * Clean up after each test.
 	 */
 	protected function tearDown(): void {
+		FieldRegistry::reset_instance();
+
 		unset(
 			$_SERVER['REQUEST_METHOD'],
 			$_POST['apd_action'],

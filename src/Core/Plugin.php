@@ -55,13 +55,20 @@ final class Plugin {
 	private ?\APD\Search\SearchQuery $search_query = null;
 
 	/**
+	 * Configuration service instance.
+	 *
+	 * @var Config|null
+	 */
+	private ?Config $config_service = null;
+
+	/**
 	 * Get the singleton instance.
 	 *
 	 * @return self
 	 */
-	public static function get_instance(): self {
-		if ( self::$instance === null ) {
-			self::$instance = new self();
+	public static function get_instance( ?Config $config_service = null ): self {
+		if ( self::$instance === null || $config_service instanceof Config ) {
+			self::$instance = new self( $config_service );
 		}
 
 		return self::$instance;
@@ -70,7 +77,8 @@ final class Plugin {
 	/**
 	 * Constructor.
 	 */
-	private function __construct() {
+	private function __construct( ?Config $config_service = null ) {
+		$this->config_service = $config_service ?? new Config();
 		$this->init_components();
 		$this->init_hooks();
 
@@ -122,6 +130,8 @@ final class Plugin {
 	 * @return void
 	 */
 	private function init_hooks(): void {
+		$config_service = $this->get_config_service();
+
 		// Load text domain for translations (early priority).
 		add_action( 'init', [ $this, 'load_textdomain' ], 0 );
 
@@ -146,7 +156,8 @@ final class Plugin {
 		$listing_type_meta_box->init();
 
 		// Initialize search query handler (shared: used by AjaxHandler for AJAX filtering).
-		$this->search_query = new \APD\Search\SearchQuery();
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$this->search_query = new \APD\Search\SearchQuery( null, $_GET );
 		$this->search_query->init();
 
 		// Register default filters on init.
@@ -192,7 +203,7 @@ final class Plugin {
 		$review_handler->init();
 
 		// Initialize Contact Handler for AJAX processing (shared: wp_ajax_* hooks).
-		$contact_handler = \APD\Contact\ContactHandler::get_instance();
+		$contact_handler = \APD\Contact\ContactHandler::get_instance( [], $config_service );
 		$contact_handler->init();
 
 		// Initialize Inquiry Tracker (shared: registers post type + hooks to contact events).
@@ -200,7 +211,7 @@ final class Plugin {
 		$inquiry_tracker->init();
 
 		// Initialize Email Manager for notifications (shared: hooks to events from both contexts).
-		$email_manager = \APD\Email\EmailManager::get_instance();
+		$email_manager = \APD\Email\EmailManager::get_instance( [], $config_service );
 		$email_manager->init();
 
 		// Initialize REST API controller (shared: rest_api_init fires in both contexts).
@@ -415,81 +426,121 @@ final class Plugin {
 	 * @return void
 	 */
 	public function cron_check_expired_listings(): void {
-		$expiration_days = (int) \apd_get_setting( 'expiration_days', 0 );
+		$expiration_days = (int) $this->get_config_service()->get_setting( 'expiration_days', 0 );
 
 		// 0 means listings never expire.
 		if ( $expiration_days <= 0 ) {
 			return;
 		}
 
-		$now             = current_time( 'mysql' );
-		$expiration_date = gmdate( 'Y-m-d H:i:s', strtotime( "-{$expiration_days} days", strtotime( $now ) ) );
-		$warning_date    = gmdate( 'Y-m-d H:i:s', strtotime( '-' . ( $expiration_days - 7 ) . ' days', strtotime( $now ) ) );
+		$minute_in_seconds = defined( 'MINUTE_IN_SECONDS' ) ? MINUTE_IN_SECONDS : 60;
+		$lock_ttl          = (int) apply_filters( 'apd_expiration_cron_lock_ttl', 5 * $minute_in_seconds );
+		$lock_ttl          = max( 1, $lock_ttl );
+		$lock_key          = 'apd_expiration_cron_lock';
 
-		// Find published listings that have expired (published before the expiration cutoff).
-		$expired_listings = get_posts(
-			[
-				'post_type'      => \APD\Listing\PostType::POST_TYPE,
-				'post_status'    => 'publish',
-				'posts_per_page' => 50,
-				'date_query'     => [
-					[
-						'before' => $expiration_date,
-					],
-				],
-				'fields'         => 'ids',
-			]
-		);
-
-		foreach ( $expired_listings as $listing_id ) {
-			wp_update_post(
-				[
-					'ID'          => $listing_id,
-					'post_status' => 'expired',
-				]
-			);
-			// The transition_post_status hook will fire apd_listing_status_changed,
-			// which triggers the expired email notification via EmailManager.
+		// Prevent overlapping cron runs from duplicating work.
+		if ( get_transient( $lock_key ) ) {
+			return;
 		}
 
-		// Find published listings expiring within 7 days (for warning emails).
-		if ( function_exists( '\apd_email_manager' ) ) {
-			$email_manager = \apd_email_manager();
+		set_transient( $lock_key, 1, $lock_ttl );
 
-			if ( $email_manager->is_notification_enabled( 'listing_expiring' ) ) {
-				$expiring_soon = get_posts(
+		try {
+			$now             = current_time( 'mysql' );
+			$expiration_date = gmdate( 'Y-m-d H:i:s', strtotime( "-{$expiration_days} days", strtotime( $now ) ) );
+			$warning_date    = gmdate( 'Y-m-d H:i:s', strtotime( '-' . ( $expiration_days - 7 ) . ' days', strtotime( $now ) ) );
+			$batch_size      = max( 1, (int) apply_filters( 'apd_expiration_cron_batch_size', 50 ) );
+
+			// Process expired listings in batches until exhausted.
+			do {
+				$expired_listings = get_posts(
 					[
 						'post_type'      => \APD\Listing\PostType::POST_TYPE,
 						'post_status'    => 'publish',
-						'posts_per_page' => 50,
+						'posts_per_page' => $batch_size,
 						'date_query'     => [
 							[
-								'after'  => $expiration_date,
-								'before' => $warning_date,
-							],
-						],
-						'meta_query'     => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
-							[
-								'key'     => '_apd_expiring_notified',
-								'compare' => 'NOT EXISTS',
+								'before' => $expiration_date,
 							],
 						],
 						'fields'         => 'ids',
 					]
 				);
 
-				foreach ( $expiring_soon as $listing_id ) {
-					$post_date  = get_post_field( 'post_date', $listing_id );
-					$expires_at = strtotime( "+{$expiration_days} days", strtotime( $post_date ) );
-					$days_left  = max( 1, (int) ceil( ( $expires_at - time() ) / DAY_IN_SECONDS ) );
+				foreach ( $expired_listings as $listing_id ) {
+					wp_update_post(
+						[
+							'ID'          => $listing_id,
+							'post_status' => 'expired',
+						]
+					);
+					// The transition_post_status hook will fire apd_listing_status_changed,
+					// which triggers the expired email notification via EmailManager.
+				}
+			} while ( count( $expired_listings ) === $batch_size );
 
-					$email_manager->send_listing_expiring( $listing_id, $days_left );
+			// Find published listings expiring within 7 days (for warning emails).
+			if ( function_exists( '\apd_email_manager' ) ) {
+				$email_manager = \apd_email_manager();
 
-					// Mark as notified so we don't send duplicate warnings.
-					update_post_meta( $listing_id, '_apd_expiring_notified', $now );
+				if ( $email_manager->is_notification_enabled( 'listing_expiring' ) ) {
+					do {
+						$expiring_soon = get_posts(
+							[
+								'post_type'      => \APD\Listing\PostType::POST_TYPE,
+								'post_status'    => 'publish',
+								'posts_per_page' => $batch_size,
+								'date_query'     => [
+									[
+										'after'  => $expiration_date,
+										'before' => $warning_date,
+									],
+								],
+								'meta_query'     => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+									[
+										'key'     => '_apd_expiring_notified',
+										'compare' => 'NOT EXISTS',
+									],
+								],
+								'fields'         => 'ids',
+							]
+						);
+
+						foreach ( $expiring_soon as $listing_id ) {
+							// Atomically reserve notification ownership for this listing.
+							if ( false === add_post_meta( $listing_id, '_apd_expiring_notified', $now, true ) ) {
+								continue;
+							}
+
+							$post_date  = get_post_field( 'post_date', $listing_id );
+							$expires_at = strtotime( "+{$expiration_days} days", strtotime( $post_date ) );
+							$days_left  = max( 1, (int) ceil( ( $expires_at - time() ) / DAY_IN_SECONDS ) );
+
+							$sent = $email_manager->send_listing_expiring( $listing_id, $days_left );
+							if ( ! $sent ) {
+								// Allow retry in a later run if sending fails.
+								delete_post_meta( $listing_id, '_apd_expiring_notified' );
+							}
+						}
+					} while ( count( $expiring_soon ) === $batch_size );
 				}
 			}
+		} finally {
+			delete_transient( $lock_key );
 		}
+	}
+
+	/**
+	 * Get the runtime configuration service.
+	 *
+	 * @return Config
+	 */
+	private function get_config_service(): Config {
+		if ( ! ( $this->config_service instanceof Config ) ) {
+			$this->config_service = new Config();
+		}
+
+		return $this->config_service;
 	}
 
 	/**

@@ -54,7 +54,10 @@ abstract class UnitTestCase extends TestCase
      */
     protected function setUpWordPressFunctions(): void
     {
-        // Common escaping functions - return input unchanged.
+        // Common escaping function stubs.
+        // These are intentionally no-op placeholders for unit tests.
+        // Unit tests should verify plugin logic and call paths, not WordPress
+        // helper semantics (which are covered by integration tests).
         Functions\stubs([
             'esc_html'       => static fn($text) => $text,
             'esc_attr'       => static fn($text) => $text,

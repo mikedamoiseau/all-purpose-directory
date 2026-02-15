@@ -357,6 +357,64 @@ class InquiriesEndpointTest extends UnitTestCase {
 		$this->assertArrayHasKey( 'unread_count', $data );
 	}
 
+	/**
+	 * Test get_inquiries maps page/per_page to number/offset.
+	 */
+	public function test_get_inquiries_maps_pagination_arguments(): void {
+		$request = $this->create_mock_request(
+			[
+				'status'   => 'read',
+				'page'     => 3,
+				'per_page' => 15,
+				'orderby'  => 'date',
+				'order'    => 'ASC',
+			]
+		);
+		$inquiry = $this->create_inquiry_data( [ 'listing_id' => 0 ] );
+
+		Functions\expect( 'apd_get_user_inquiries' )
+			->once()
+			->with(
+				7,
+				Mockery::on(
+					static function ( $args ): bool {
+						return 15 === $args['number']
+							&& 30 === $args['offset']
+							&& 'read' === $args['status']
+							&& 'date' === $args['orderby']
+							&& 'ASC' === $args['order']
+							&& ! isset( $args['page'] )
+							&& ! isset( $args['per_page'] );
+					}
+				)
+			)
+			->andReturn( [ $inquiry ] );
+
+		Functions\expect( 'apd_get_user_inquiry_count' )
+			->once()
+			->with( 7, 'read' )
+			->andReturn( 10 );
+
+		Functions\expect( 'apd_get_user_inquiry_count' )
+			->once()
+			->with( 7, 'unread' )
+			->andReturn( 2 );
+
+		Functions\stubs(
+			[
+				'get_current_user_id' => 7,
+				'apply_filters'       => static function ( $hook, $data ) {
+					return $data;
+				},
+			]
+		);
+
+		$result = $this->endpoint->get_inquiries( $request );
+
+		$this->assertInstanceOf( \WP_REST_Response::class, $result );
+		$this->assertEquals( 200, $result->get_status() );
+	}
+
 	// =========================================================================
 	// Get Listing Inquiries Tests
 	// =========================================================================
@@ -404,6 +462,61 @@ class InquiriesEndpointTest extends UnitTestCase {
 		$data = $result->get_data();
 
 		$this->assertCount( 1, $data['items'] );
+	}
+
+	/**
+	 * Test get_listing_inquiries maps pagination args and counts by status.
+	 */
+	public function test_get_listing_inquiries_maps_pagination_and_filters_total_by_status(): void {
+		$request = $this->create_mock_request(
+			[
+				'listing_id' => 1,
+				'status'     => 'read',
+				'page'       => 2,
+				'per_page'   => 25,
+			]
+		);
+		$post    = $this->create_mock_post();
+		$inquiry = $this->create_inquiry_data();
+
+		Functions\expect( 'apd_get_listing_inquiries' )
+			->once()
+			->with(
+				1,
+				Mockery::on(
+					static function ( $args ): bool {
+						return 25 === $args['number']
+							&& 25 === $args['offset']
+							&& 'read' === $args['status']
+							&& ! isset( $args['page'] )
+							&& ! isset( $args['per_page'] );
+					}
+				)
+			)
+			->andReturn( [ $inquiry ] );
+
+		Functions\expect( 'apd_get_listing_inquiry_count' )
+			->once()
+			->with( 1, 'read' )
+			->andReturn( 7 );
+
+		Functions\stubs(
+			[
+				'get_post'      => $post,
+				'get_permalink' => 'https://example.com/listing/test/',
+				'apply_filters' => static function ( $hook, $data ) {
+					return $data;
+				},
+			]
+		);
+
+		$result = $this->endpoint->get_listing_inquiries( $request );
+
+		$this->assertInstanceOf( \WP_REST_Response::class, $result );
+		$data = $result->get_data();
+
+		$this->assertCount( 1, $data['items'] );
+		$this->assertEquals( 7, $data['total'] );
 	}
 
 	// =========================================================================

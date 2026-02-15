@@ -642,6 +642,67 @@ final class ReviewManagerTest extends UnitTestCase {
 	}
 
 	/**
+	 * Test get listing reviews applies author filter to queries.
+	 */
+	public function test_get_listing_reviews_filters_by_author(): void {
+		$queries = [];
+
+		Functions\when( 'get_comments' )->alias(
+			function( $args ) use ( &$queries ) {
+				$queries[] = $args;
+
+				if ( ! empty( $args['count'] ) ) {
+					return 0;
+				}
+
+				return [];
+			}
+		);
+
+		$result = $this->manager->get_listing_reviews(
+			123,
+			[
+				'author' => 7,
+			]
+		);
+
+		$this->assertArrayHasKey( 'reviews', $result );
+		$this->assertCount( 2, $queries );
+		$this->assertSame( 7, $queries[0]['user_id'] ?? null );
+		$this->assertSame( 7, $queries[1]['user_id'] ?? null );
+	}
+
+	/**
+	 * Test get listing reviews supports user_id alias for author filter.
+	 */
+	public function test_get_listing_reviews_supports_user_id_alias_filter(): void {
+		$queries = [];
+
+		Functions\when( 'get_comments' )->alias(
+			function( $args ) use ( &$queries ) {
+				$queries[] = $args;
+
+				if ( ! empty( $args['count'] ) ) {
+					return 0;
+				}
+
+				return [];
+			}
+		);
+
+		$this->manager->get_listing_reviews(
+			123,
+			[
+				'user_id' => 11,
+			]
+		);
+
+		$this->assertCount( 2, $queries );
+		$this->assertSame( 11, $queries[0]['user_id'] ?? null );
+		$this->assertSame( 11, $queries[1]['user_id'] ?? null );
+	}
+
+	/**
 	 * Test get user review.
 	 */
 	public function test_get_user_review(): void {

@@ -74,6 +74,22 @@ final class SpamProtectionTest extends UnitTestCase {
 		return base64_encode( $ts . '|' . $signature );
 	}
 
+	/**
+	 * Get submission rate-limit identifier via reflection.
+	 *
+	 * @param SubmissionHandler $handler Submission handler.
+	 * @return string
+	 */
+	private function get_rate_limit_identifier( SubmissionHandler $handler ): string {
+		$reflection = new \ReflectionClass( $handler );
+		$method     = $reflection->getMethod( 'get_rate_limit_identifier' );
+		if ( \PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
+
+		return (string) $method->invoke( $handler );
+	}
+
 	// =========================================================================
 	// Honeypot Field Tests
 	// =========================================================================
@@ -455,6 +471,43 @@ final class SpamProtectionTest extends UnitTestCase {
 
 		$this->assertInstanceOf( \WP_Error::class, $result );
 		$this->assertContains( 'rate_limited', $result->get_error_codes() );
+	}
+
+	/**
+	 * Test submission rate-limit identity ignores proxy headers by default.
+	 */
+	public function test_rate_limit_identifier_uses_remote_addr_when_proxy_not_trusted(): void {
+		$_SERVER['REMOTE_ADDR']          = '198.51.100.24';
+		$_SERVER['HTTP_X_FORWARDED_FOR'] = '203.0.113.9';
+
+		Functions\when( 'get_current_user_id' )->justReturn( 0 );
+
+		$handler    = new SubmissionHandler( [ 'enable_spam_protection' => true ] );
+		$identifier = $this->get_rate_limit_identifier( $handler );
+
+		$this->assertSame( 'ip_' . md5( '198.51.100.24' ), $identifier );
+	}
+
+	/**
+	 * Test submission rate-limit identity uses forwarded IP for trusted proxies.
+	 */
+	public function test_rate_limit_identifier_uses_forwarded_ip_when_proxy_trusted(): void {
+		$_SERVER['REMOTE_ADDR']          = '10.0.0.10';
+		$_SERVER['HTTP_X_FORWARDED_FOR'] = '203.0.113.9, 203.0.113.10';
+
+		Functions\when( 'get_current_user_id' )->justReturn( 0 );
+		Functions\when( 'apply_filters' )->alias( function ( $hook, $value, ...$args ) {
+			if ( $hook === 'apd_submission_trusted_proxies' ) {
+				return [ '10.0.0.10' ];
+			}
+
+			return $value;
+		} );
+
+		$handler    = new SubmissionHandler( [ 'enable_spam_protection' => true ] );
+		$identifier = $this->get_rate_limit_identifier( $handler );
+
+		$this->assertSame( 'ip_' . md5( '203.0.113.9' ), $identifier );
 	}
 
 	// =========================================================================

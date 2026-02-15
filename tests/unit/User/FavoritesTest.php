@@ -128,6 +128,59 @@ final class FavoritesTest extends UnitTestCase {
 	}
 
 	/**
+	 * Test add favorite retries when compare-and-swap update conflicts.
+	 */
+	public function test_add_favorite_retries_on_compare_and_swap_conflict(): void {
+		$this->mock_wpdb_for_atomic_count();
+
+		$listing_id        = 123;
+		$user_id           = 1;
+		$update_call_count = 0;
+
+		Functions\when( 'get_user_meta' )->justReturn( [] );
+		Functions\when( 'update_user_meta' )->alias(
+			function() use ( &$update_call_count ) {
+				++$update_call_count;
+				return $update_call_count > 1;
+			}
+		);
+		Functions\when( 'metadata_exists' )->justReturn( true );
+
+		$result = $this->favorites->add( $listing_id, $user_id );
+
+		$this->assertTrue( $result );
+		$this->assertSame( 2, $update_call_count, 'Should retry after a compare-and-swap conflict' );
+	}
+
+	/**
+	 * Test add favorite does not double-increment when conflict resolves to already favorited.
+	 */
+	public function test_add_favorite_does_not_double_increment_after_conflict(): void {
+		global $wpdb;
+		$wpdb           = Mockery::mock( 'wpdb' );
+		$wpdb->postmeta = 'wp_postmeta';
+		$wpdb->shouldReceive( 'prepare' )->never();
+		$wpdb->shouldReceive( 'query' )->never();
+
+		$listing_id     = 123;
+		$user_id        = 1;
+		$get_call_count = 0;
+
+		Functions\when( 'get_user_meta' )->alias(
+			function() use ( &$get_call_count ) {
+				++$get_call_count;
+				return 1 === $get_call_count ? [] : [ 123 ];
+			}
+		);
+		Functions\when( 'update_user_meta' )->justReturn( false );
+		Functions\when( 'metadata_exists' )->justReturn( true );
+
+		$result = $this->favorites->add( $listing_id, $user_id );
+
+		$this->assertTrue( $result );
+	}
+
+	/**
 	 * Test add favorite fires hook.
 	 */
 	public function test_add_favorite_fires_hook(): void {
@@ -219,6 +272,34 @@ final class FavoritesTest extends UnitTestCase {
 		// Has the listing in favorites.
 		Functions\when( 'get_user_meta' )->justReturn( [ 123, 456 ] );
 		Functions\when( 'update_user_meta' )->justReturn( true );
+
+		$result = $this->favorites->remove( $listing_id, $user_id );
+
+		$this->assertTrue( $result );
+	}
+
+	/**
+	 * Test remove favorite does not double-decrement when conflict resolves to already removed.
+	 */
+	public function test_remove_favorite_does_not_double_decrement_after_conflict(): void {
+		global $wpdb;
+		$wpdb           = Mockery::mock( 'wpdb' );
+		$wpdb->postmeta = 'wp_postmeta';
+		$wpdb->shouldReceive( 'prepare' )->never();
+		$wpdb->shouldReceive( 'query' )->never();
+
+		$listing_id     = 123;
+		$user_id        = 1;
+		$get_call_count = 0;
+
+		Functions\when( 'get_user_meta' )->alias(
+			function() use ( &$get_call_count ) {
+				++$get_call_count;
+				return 1 === $get_call_count ? [ 123 ] : [];
+			}
+		);
+		Functions\when( 'update_user_meta' )->justReturn( false );
+		Functions\when( 'metadata_exists' )->justReturn( true );
 
 		$result = $this->favorites->remove( $listing_id, $user_id );
 

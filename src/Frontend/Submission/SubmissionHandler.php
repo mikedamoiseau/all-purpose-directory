@@ -1343,31 +1343,123 @@ Review the listing: %4$s',
 	 * @return string Client IP address.
 	 */
 	private function get_client_ip(): string {
-		$ip = '';
+		$remote_addr = $this->extract_first_valid_ip( (string) ( $_SERVER['REMOTE_ADDR'] ?? '' ) );
 
-		// Check for proxy headers first.
-		$headers = [
-			'HTTP_CF_CONNECTING_IP', // Cloudflare.
-			'HTTP_X_FORWARDED_FOR',
-			'HTTP_X_REAL_IP',
-			'REMOTE_ADDR',
-		];
+		// Default to REMOTE_ADDR unless this request came through a trusted proxy.
+		$client_ip = $remote_addr;
+		if ( '' !== $remote_addr && $this->is_trusted_proxy_ip( $remote_addr ) ) {
+			foreach ( [ 'HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP' ] as $header ) {
+				if ( empty( $_SERVER[ $header ] ) ) {
+					continue;
+				}
 
-		foreach ( $headers as $header ) {
-			if ( ! empty( $_SERVER[ $header ] ) ) {
-				// Take the first IP if comma-separated.
-				$ip = strtok( sanitize_text_field( wp_unslash( $_SERVER[ $header ] ) ), ',' );
-				break;
+				$forwarded_ip = $this->extract_first_valid_ip( sanitize_text_field( wp_unslash( $_SERVER[ $header ] ) ) );
+				if ( '' !== $forwarded_ip ) {
+					$client_ip = $forwarded_ip;
+					break;
+				}
 			}
 		}
 
-		// Validate the IP.
-		$ip = trim( (string) $ip );
-		if ( filter_var( $ip, FILTER_VALIDATE_IP ) ) {
-			return $ip;
+		return '' !== $client_ip ? $client_ip : '0.0.0.0';
+	}
+
+	/**
+	 * Extract the first valid IP from a potentially comma-separated value.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $value Header/raw IP value.
+	 * @return string Valid IP or empty string when invalid.
+	 */
+	private function extract_first_valid_ip( string $value ): string {
+		$candidates = array_map( 'trim', explode( ',', $value ) );
+
+		foreach ( $candidates as $candidate ) {
+			if ( filter_var( $candidate, FILTER_VALIDATE_IP ) ) {
+				return $candidate;
+			}
 		}
 
-		return '0.0.0.0';
+		return '';
+	}
+
+	/**
+	 * Check whether an IP belongs to a trusted proxy.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $ip IP address to validate.
+	 * @return bool
+	 */
+	private function is_trusted_proxy_ip( string $ip ): bool {
+		$trusted_proxies = apply_filters( 'apd_submission_trusted_proxies', [] );
+		if ( ! is_array( $trusted_proxies ) ) {
+			return false;
+		}
+
+		foreach ( $trusted_proxies as $proxy ) {
+			if ( ! is_string( $proxy ) ) {
+				continue;
+			}
+
+			$proxy = trim( $proxy );
+			if ( '' === $proxy ) {
+				continue;
+			}
+
+			if ( $this->ip_matches_proxy( $ip, $proxy ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Match an IP against exact/CIDR trusted proxy definitions.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $ip    Client IP.
+	 * @param string $proxy Trusted proxy value (single IP or CIDR).
+	 * @return bool
+	 */
+	private function ip_matches_proxy( string $ip, string $proxy ): bool {
+		if ( strpos( $proxy, '/' ) === false ) {
+			return $ip === $proxy;
+		}
+
+		[ $subnet, $mask_length ] = explode( '/', $proxy, 2 );
+		$subnet                   = trim( $subnet );
+		$mask_length              = (int) $mask_length;
+
+		$ip_binary     = inet_pton( $ip );
+		$subnet_binary = inet_pton( $subnet );
+
+		if ( false === $ip_binary || false === $subnet_binary || strlen( $ip_binary ) !== strlen( $subnet_binary ) ) {
+			return false;
+		}
+
+		$max_bits = strlen( $ip_binary ) * 8;
+		if ( $mask_length < 0 || $mask_length > $max_bits ) {
+			return false;
+		}
+
+		$full_bytes = intdiv( $mask_length, 8 );
+		$extra_bits = $mask_length % 8;
+
+		if ( $full_bytes > 0 && substr( $ip_binary, 0, $full_bytes ) !== substr( $subnet_binary, 0, $full_bytes ) ) {
+			return false;
+		}
+
+		if ( 0 === $extra_bits ) {
+			return true;
+		}
+
+		$mask = 0xFF << ( 8 - $extra_bits );
+
+		return ( ord( $ip_binary[ $full_bytes ] ) & $mask ) === ( ord( $subnet_binary[ $full_bytes ] ) & $mask );
 	}
 
 	/**

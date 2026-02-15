@@ -186,23 +186,39 @@ class NonceVerificationTest extends SecurityTestCase {
     /**
      * Test nonce field is properly sanitized before verification.
      */
-    public function test_nonce_is_sanitized_before_verification(): void {
-        // Simulate POST with potentially malicious nonce value
-        $_POST = [
-            ContactForm::NONCE_NAME => '  valid_nonce  ',  // With whitespace
-        ];
+	public function test_nonce_is_sanitized_before_verification(): void {
+		// Simulate POST with raw nonce value.
+		$_POST = [
+			ContactForm::NONCE_NAME => '  valid_nonce  ',
+		];
 
-        // After sanitize_text_field, whitespace is trimmed
-        Functions\expect('wp_verify_nonce')
-            ->once()
-            ->with('valid_nonce', ContactForm::NONCE_ACTION)  // Expect trimmed value
-            ->andReturn(true);
+		$captured_sanitize_input = null;
+		$captured_verified_nonce = null;
+		$captured_verified_action = null;
 
-        $handler = ContactHandler::get_instance();
-        $result = $handler->verify_nonce();
+		Functions\when('sanitize_text_field')->alias(
+			static function ( $value ) use ( &$captured_sanitize_input ) {
+				$captured_sanitize_input = $value;
+				return 'normalized_nonce';
+			}
+		);
 
-        $this->assertTrue($result);
-    }
+		Functions\when('wp_verify_nonce')->alias(
+			static function ( $nonce, $action ) use ( &$captured_verified_nonce, &$captured_verified_action ) {
+				$captured_verified_nonce  = $nonce;
+				$captured_verified_action = $action;
+				return true;
+			}
+		);
+
+		$handler = ContactHandler::get_instance();
+		$result = $handler->verify_nonce();
+
+		$this->assertTrue($result);
+		$this->assertSame('  valid_nonce  ', $captured_sanitize_input);
+		$this->assertSame('normalized_nonce', $captured_verified_nonce);
+		$this->assertSame(ContactForm::NONCE_ACTION, $captured_verified_action);
+	}
 
     /**
      * Test that nonce verification happens for all form endpoints.
@@ -231,22 +247,35 @@ class NonceVerificationTest extends SecurityTestCase {
     /**
      * Test that XSS in nonce field is sanitized.
      */
-    public function test_xss_in_nonce_field_is_sanitized(): void {
-        $_POST = [
-            ContactForm::NONCE_NAME => '<script>alert("xss")</script>valid_nonce',
-        ];
+	public function test_xss_in_nonce_field_is_sanitized(): void {
+		$_POST = [
+			ContactForm::NONCE_NAME => '<script>alert("xss")</script>valid_nonce',
+		];
 
-        // After sanitize_text_field, tags are stripped
-        Functions\expect('wp_verify_nonce')
-            ->once()
-            ->with('alert("xss")valid_nonce', ContactForm::NONCE_ACTION)  // Tags stripped
-            ->andReturn(false);  // This would fail verification anyway
+		$captured_sanitize_input = null;
+		$captured_verified_nonce = null;
 
-        $handler = ContactHandler::get_instance();
-        $result = $handler->verify_nonce();
+		Functions\when('sanitize_text_field')->alias(
+			static function ( $value ) use ( &$captured_sanitize_input ) {
+				$captured_sanitize_input = $value;
+				return 'safe_nonce_value';
+			}
+		);
 
-        $this->assertFalse($result);
-    }
+		Functions\when('wp_verify_nonce')->alias(
+			static function ( $nonce, $action ) use ( &$captured_verified_nonce ) {
+				$captured_verified_nonce = $nonce;
+				return false;
+			}
+		);
+
+		$handler = ContactHandler::get_instance();
+		$result = $handler->verify_nonce();
+
+		$this->assertFalse($result);
+		$this->assertSame('<script>alert("xss")</script>valid_nonce', $captured_sanitize_input);
+		$this->assertSame('safe_nonce_value', $captured_verified_nonce);
+	}
 
     /**
      * Test nonce field with null coalescing in verify_nonce method.

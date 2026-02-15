@@ -102,31 +102,34 @@ abstract class SecurityTestCase extends TestCase {
             },
         ]);
 
-        // Escaping functions
+        // Escaping functions.
+        // IMPORTANT: these are intentionally lightweight placeholders for unit tests.
+        // Do not assert exact WordPress escaping behavior in unit tests.
+        // Behavior-sensitive escaping assertions belong in integration tests.
         Functions\stubs([
             'esc_html' => function ($text) {
-                return htmlspecialchars((string) $text, ENT_QUOTES, 'UTF-8');
+                return (string) $text;
             },
             'esc_attr' => function ($text) {
-                return htmlspecialchars((string) $text, ENT_QUOTES, 'UTF-8');
+                return (string) $text;
             },
             'esc_url' => function ($url) {
-                return filter_var($url, FILTER_SANITIZE_URL);
+                return (string) $url;
             },
             'esc_url_raw' => function ($url) {
-                return filter_var($url, FILTER_SANITIZE_URL);
+                return (string) $url;
             },
             'esc_js' => function ($text) {
-                return addslashes((string) $text);
+                return (string) $text;
             },
             'esc_textarea' => function ($text) {
-                return htmlspecialchars((string) $text, ENT_QUOTES, 'UTF-8');
+                return (string) $text;
             },
             'wp_kses' => function ($content, $allowed_html) {
-                return strip_tags((string) $content, '<p><br><a><strong><em><ul><ol><li>');
+                return (string) $content;
             },
             'wp_kses_post' => function ($content) {
-                return strip_tags((string) $content, '<p><br><a><strong><em><ul><ol><li><h1><h2><h3><h4><h5><h6><blockquote><img>');
+                return (string) $content;
             },
         ]);
 

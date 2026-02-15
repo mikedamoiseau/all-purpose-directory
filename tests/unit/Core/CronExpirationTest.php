@@ -76,6 +76,11 @@ final class CronExpirationTest extends TestCase {
 			'get_option'     => false,
 			'update_option'  => true,
 			'update_post_meta' => true,
+			'get_transient'  => false,
+			'set_transient'  => true,
+			'delete_transient' => true,
+			'add_post_meta'  => true,
+			'delete_post_meta' => true,
 			'current_time'   => fn( $type ) => $type === 'mysql'
 				? gmdate( 'Y-m-d H:i:s' )
 				: time(),

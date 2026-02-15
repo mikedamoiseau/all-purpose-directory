@@ -429,9 +429,10 @@ class InquiryTracker {
 	public function count_user_inquiries( int $user_id, string $status = 'all' ): int {
 		$query_args = [
 			'post_type'      => self::POST_TYPE,
-			'posts_per_page' => -1,
+			'posts_per_page' => 1,
 			'author'         => $user_id,
 			'fields'         => 'ids',
+			'no_found_rows'  => false,
 			'meta_query'     => [],
 		];
 
@@ -567,12 +568,47 @@ class InquiryTracker {
 	/**
 	 * Get inquiry count for a listing.
 	 *
-	 * @param int $listing_id Listing ID.
+	 * @param int    $listing_id Listing ID.
+	 * @param string $status     Status filter (all, read, unread).
 	 * @return int Inquiry count.
 	 */
-	public function get_listing_inquiry_count( int $listing_id ): int {
-		$count = get_post_meta( $listing_id, self::LISTING_INQUIRY_COUNT, true );
-		return (int) $count;
+	public function get_listing_inquiry_count( int $listing_id, string $status = 'all' ): int {
+		if ( 'all' === $status ) {
+			$count = get_post_meta( $listing_id, self::LISTING_INQUIRY_COUNT, true );
+			return (int) $count;
+		}
+
+		$query_args = [
+			'post_type'      => self::POST_TYPE,
+			'posts_per_page' => 1,
+			'fields'         => 'ids',
+			'meta_query'     => [
+				[
+					'key'   => self::META_LISTING_ID,
+					'value' => $listing_id,
+					'type'  => 'NUMERIC',
+				],
+			],
+		];
+
+		if ( 'read' === $status ) {
+			$query_args['meta_query'][] = [
+				'key'   => self::META_READ,
+				'value' => 1,
+				'type'  => 'NUMERIC',
+			];
+		} elseif ( 'unread' === $status ) {
+			$query_args['meta_query'][] = [
+				'key'     => self::META_READ,
+				'value'   => 0,
+				'type'    => 'NUMERIC',
+				'compare' => '=',
+			];
+		}
+
+		$query = new \WP_Query( $query_args );
+
+		return (int) $query->found_posts;
 	}
 
 	/**
@@ -611,8 +647,9 @@ class InquiryTracker {
 		$query = new \WP_Query(
 			[
 				'post_type'      => self::POST_TYPE,
-				'posts_per_page' => -1,
+				'posts_per_page' => 1,
 				'fields'         => 'ids',
+				'no_found_rows'  => false,
 				'meta_query'     => [
 					[
 						'key'   => self::META_LISTING_ID,

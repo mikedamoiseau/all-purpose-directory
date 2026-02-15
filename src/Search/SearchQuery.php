@@ -58,6 +58,13 @@ final class SearchQuery {
 	private array $searchable_meta_keys = [];
 
 	/**
+	 * Request/query parameters used to build search behavior.
+	 *
+	 * @var array<string, mixed>
+	 */
+	private array $request_params = [];
+
+	/**
 	 * Valid orderby options.
 	 *
 	 * @var array<string, string>
@@ -74,10 +81,26 @@ final class SearchQuery {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param FilterRegistry|null $registry Optional. Filter registry instance.
+	 * @param FilterRegistry|null     $registry       Optional. Filter registry instance.
+	 * @param array<string, mixed>|null $request_params Optional. Request/query params.
 	 */
-	public function __construct( ?FilterRegistry $registry = null ) {
-		$this->registry = $registry ?? FilterRegistry::get_instance();
+	public function __construct( ?FilterRegistry $registry = null, ?array $request_params = null ) {
+		$this->registry       = $registry ?? FilterRegistry::get_instance();
+		$this->request_params = is_array( $request_params ) ? $request_params : [];
+	}
+
+	/**
+	 * Set request/query parameters for this instance.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array<string, mixed> $request_params Request/query params.
+	 * @return self
+	 */
+	public function set_request_params( array $request_params ): self {
+		$this->request_params = $request_params;
+
+		return $this;
 	}
 
 	/**
@@ -132,8 +155,8 @@ final class SearchQuery {
 	 * @param WP_Query $query The query to modify.
 	 * @return void
 	 */
-	public function apply_filters( WP_Query $query ): void {
-		$active_filters = $this->registry->get_active_filters();
+	public function apply_filters( WP_Query $query, ?array $request_params = null ): void {
+		$active_filters = $this->registry->get_active_filters( $this->resolve_request_params( $request_params ) );
 
 		foreach ( $active_filters as $name => $data ) {
 			$filter = $data['filter'];
@@ -161,11 +184,10 @@ final class SearchQuery {
 	 * @param WP_Query $query The query to modify.
 	 * @return void
 	 */
-	public function apply_orderby( WP_Query $query ): void {
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$orderby = isset( $_GET['apd_orderby'] ) ? sanitize_key( $_GET['apd_orderby'] ) : '';
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$order = isset( $_GET['apd_order'] ) ? strtoupper( sanitize_key( $_GET['apd_order'] ) ) : 'DESC';
+	public function apply_orderby( WP_Query $query, ?array $request_params = null ): void {
+		$request = $this->resolve_request_params( $request_params );
+		$orderby = isset( $request['apd_orderby'] ) ? sanitize_key( (string) $request['apd_orderby'] ) : '';
+		$order   = isset( $request['apd_order'] ) ? strtoupper( sanitize_key( (string) $request['apd_order'] ) ) : 'DESC';
 
 		if ( ! in_array( $order, [ 'ASC', 'DESC' ], true ) ) {
 			$order = 'DESC';
@@ -198,9 +220,9 @@ final class SearchQuery {
 	 * @param WP_Query $query The query to modify.
 	 * @return void
 	 */
-	public function apply_keyword_search( WP_Query $query ): void {
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$keyword = isset( $_GET['apd_keyword'] ) ? sanitize_text_field( wp_unslash( $_GET['apd_keyword'] ) ) : '';
+	public function apply_keyword_search( WP_Query $query, ?array $request_params = null ): void {
+		$request = $this->resolve_request_params( $request_params );
+		$keyword = isset( $request['apd_keyword'] ) ? sanitize_text_field( wp_unslash( (string) $request['apd_keyword'] ) ) : '';
 
 		if ( empty( $keyword ) ) {
 			return;
@@ -382,7 +404,7 @@ final class SearchQuery {
 	 * @param array<string, mixed> $args Additional query args.
 	 * @return WP_Query The query result.
 	 */
-	public function get_filtered_listings( array $args = [] ): WP_Query {
+	public function get_filtered_listings( array $args = [], ?array $request_params = null ): WP_Query {
 		$defaults = [
 			'post_type'      => 'apd_listing',
 			'post_status'    => 'publish',
@@ -399,15 +421,101 @@ final class SearchQuery {
 		 * @param array<string, mixed> $query_args Query arguments.
 		 */
 		$query_args = apply_filters( 'apd_search_query_args', $query_args );
+		$final_query_args = $this->build_filtered_query_args( $query_args, $request_params );
 
-		$query = new WP_Query( $query_args );
+		return new WP_Query( $final_query_args );
+	}
 
-		// Apply filters manually for non-main queries.
-		$this->apply_keyword_search( $query );
-		$this->apply_filters( $query );
-		$this->apply_orderby( $query );
+	/**
+	 * Build final filtered query args before running WP_Query.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array<string, mixed>      $query_args     Base query arguments.
+	 * @param array<string, mixed>|null $request_params Optional request/query params.
+	 * @return array<string, mixed> Final query arguments.
+	 */
+	private function build_filtered_query_args( array $query_args, ?array $request_params = null ): array {
+		$query = $this->create_query_arg_collector( $query_args );
+		$request = $this->resolve_request_params( $request_params );
 
-		return $query;
+		$this->apply_keyword_search( $query, $request );
+		$this->apply_filters( $query, $request );
+		$this->apply_orderby( $query, $request );
+
+		return $this->get_query_vars( $query, $query_args );
+	}
+
+	/**
+	 * Create a query object used for collecting query var mutations.
+	 *
+	 * Returns a lightweight WP_Query subclass that only supports set()/get().
+	 * If filter implementations start calling other WP_Query methods (e.g.
+	 * is_main_query(), have_posts()), this collector will need to be replaced
+	 * with a real WP_Query or a dedicated value object.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array<string, mixed> $query_args Initial query vars.
+	 * @return WP_Query Query collector.
+	 */
+	private function create_query_arg_collector( array $query_args ): WP_Query {
+		return new class( $query_args ) extends WP_Query {
+			/**
+			 * Collected query vars.
+			 *
+			 * @var array<string, mixed>
+			 */
+			public array $query_vars = [];
+
+			/**
+			 * Constructor.
+			 *
+			 * @param array<string, mixed> $args Initial query vars.
+			 */
+			public function __construct( $args = [] ) {
+				$this->query_vars = $args;
+			}
+
+			/**
+			 * Set a query variable.
+			 *
+			 * @param string $query_var Query var key.
+			 * @param mixed  $value     Query var value.
+			 * @return void
+			 */
+			public function set( $query_var, $value ) {
+				$this->query_vars[ $query_var ] = $value;
+			}
+
+			/**
+			 * Get a query variable.
+			 *
+			 * @param string $query_var Query var key.
+			 * @param mixed  $default   Optional default value.
+			 * @return mixed Query var value.
+			 */
+			public function get( $query_var, $default = '' ) {
+				return $this->query_vars[ $query_var ] ?? $default;
+			}
+		};
+	}
+
+	/**
+	 * Get query vars from a query object with fallback.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param WP_Query             $query    Query object.
+	 * @param array<string, mixed> $fallback Fallback args.
+	 * @return array<string, mixed> Query vars.
+	 */
+	private function get_query_vars( WP_Query $query, array $fallback ): array {
+		if ( isset( $query->query_vars ) && is_array( $query->query_vars ) ) {
+			return $query->query_vars;
+		}
+
+		return $fallback;
 	}
 
 	/**
@@ -443,8 +551,7 @@ final class SearchQuery {
 	 * @return string Current orderby value.
 	 */
 	public function get_current_orderby(): string {
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$orderby = isset( $_GET['apd_orderby'] ) ? sanitize_key( $_GET['apd_orderby'] ) : 'date';
+		$orderby = isset( $this->request_params['apd_orderby'] ) ? sanitize_key( (string) $this->request_params['apd_orderby'] ) : 'date';
 
 		if ( ! isset( self::ORDERBY_OPTIONS[ $orderby ] ) ) {
 			return 'date';
@@ -461,8 +568,7 @@ final class SearchQuery {
 	 * @return string Current order direction (ASC or DESC).
 	 */
 	public function get_current_order(): string {
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$order = isset( $_GET['apd_order'] ) ? strtoupper( sanitize_key( $_GET['apd_order'] ) ) : 'DESC';
+		$order = isset( $this->request_params['apd_order'] ) ? strtoupper( sanitize_key( (string) $this->request_params['apd_order'] ) ) : 'DESC';
 
 		return in_array( $order, [ 'ASC', 'DESC' ], true ) ? $order : 'DESC';
 	}
@@ -475,7 +581,18 @@ final class SearchQuery {
 	 * @return string Current search keyword.
 	 */
 	public function get_current_keyword(): string {
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		return isset( $_GET['apd_keyword'] ) ? sanitize_text_field( wp_unslash( $_GET['apd_keyword'] ) ) : '';
+		return isset( $this->request_params['apd_keyword'] ) ? sanitize_text_field( wp_unslash( (string) $this->request_params['apd_keyword'] ) ) : '';
+	}
+
+	/**
+	 * Resolve request/query params for a call.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array<string, mixed>|null $request_params Optional request/query params.
+	 * @return array<string, mixed>
+	 */
+	private function resolve_request_params( ?array $request_params = null ): array {
+		return is_array( $request_params ) ? $request_params : $this->request_params;
 	}
 }

@@ -89,12 +89,15 @@ class AjaxHandler {
 		// Get paged parameter.
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$paged = isset( $_REQUEST['paged'] ) ? absint( $_REQUEST['paged'] ) : 1;
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$request_params = wp_unslash( $_REQUEST );
 
 		// Run filtered query.
 		$query = $this->search_query->get_filtered_listings(
 			[
 				'paged' => $paged,
-			]
+			],
+			$request_params
 		);
 
 		// Get current view mode.
@@ -132,7 +135,7 @@ class AjaxHandler {
 
 		// Get active filters.
 		$registry       = FilterRegistry::get_instance();
-		$active_filters = $registry->get_active_filters();
+		$active_filters = $registry->get_active_filters( $request_params );
 		$active_data    = [];
 
 		foreach ( $active_filters as $name => $data ) {

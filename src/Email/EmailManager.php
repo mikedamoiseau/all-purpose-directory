@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace APD\Email;
 
+use APD\Core\Config;
+
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -63,14 +65,22 @@ class EmailManager {
 	];
 
 	/**
+	 * Configuration service.
+	 *
+	 * @var Config
+	 */
+	private Config $config_service;
+
+	/**
 	 * Get single instance.
 	 *
-	 * @param array $config Optional. Configuration options.
+	 * @param array       $config         Optional. Configuration options.
+	 * @param Config|null $config_service Optional. Configuration service.
 	 * @return EmailManager
 	 */
-	public static function get_instance( array $config = [] ): EmailManager {
-		if ( null === self::$instance || ! empty( $config ) ) {
-			self::$instance = new self( $config );
+	public static function get_instance( array $config = [], ?Config $config_service = null ): EmailManager {
+		if ( null === self::$instance || ! empty( $config ) || $config_service instanceof Config ) {
+			self::$instance = new self( $config, $config_service );
 		}
 		return self::$instance;
 	}
@@ -78,9 +88,11 @@ class EmailManager {
 	/**
 	 * Constructor.
 	 *
-	 * @param array $config Configuration options.
+	 * @param array       $config         Configuration options.
+	 * @param Config|null $config_service Optional. Configuration service.
 	 */
-	private function __construct( array $config = [] ) {
+	private function __construct( array $config = [], ?Config $config_service = null ) {
+		$this->config_service = $config_service ?? new Config();
 		$this->config = array_merge( $this->config, $config );
 		$this->register_default_placeholders();
 	}
@@ -143,7 +155,7 @@ class EmailManager {
 	 * @return void
 	 */
 	private function load_settings(): void {
-		$options = get_option( 'apd_options', [] );
+		$options = $this->config_service->get_option( 'apd_options', [] );
 
 		if ( ! is_array( $options ) ) {
 			return;
@@ -215,14 +227,14 @@ class EmailManager {
 		$this->register_placeholder(
 			'current_date',
 			function () {
-				return wp_date( get_option( 'date_format' ) );
+				return wp_date( (string) $this->config_service->get_option( 'date_format' ) );
 			}
 		);
 
 		$this->register_placeholder(
 			'current_time',
 			function () {
-				return wp_date( get_option( 'time_format' ) );
+				return wp_date( (string) $this->config_service->get_option( 'time_format' ) );
 			}
 		);
 	}
@@ -451,7 +463,7 @@ class EmailManager {
 		$email = $this->config['from_email'];
 
 		if ( empty( $email ) ) {
-			$email = get_option( 'admin_email' );
+			$email = (string) $this->config_service->get_option( 'admin_email' );
 		}
 
 		/**
@@ -472,7 +484,7 @@ class EmailManager {
 		$email = $this->config['admin_email'];
 
 		if ( empty( $email ) ) {
-			$email = get_option( 'admin_email' );
+			$email = (string) $this->config_service->get_option( 'admin_email' );
 		}
 
 		/**

@@ -24,6 +24,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.0.0
  */
 class Favorites {
+	/**
+	 * Maximum retries for optimistic compare-and-swap usermeta updates.
+	 *
+	 * @var int
+	 */
+	private const USER_META_CAS_MAX_RETRIES = 5;
+
 
 	/**
 	 * User meta key for storing favorites.
@@ -151,21 +158,23 @@ class Favorites {
 			return $this->add_guest_favorite( $listing_id );
 		}
 
-		// Get current favorites.
-		$favorites = $this->get_favorites( $user_id );
+		$result = $this->mutate_user_favorites(
+			$user_id,
+			static function( array $favorites ) use ( $listing_id ): array {
+				if ( in_array( $listing_id, $favorites, true ) ) {
+					return $favorites;
+				}
 
-		// Already favorited.
-		if ( in_array( $listing_id, $favorites, true ) ) {
-			return true;
+				$favorites[] = $listing_id;
+				return $favorites;
+			}
+		);
+
+		if ( ! $result['success'] ) {
+			return false;
 		}
 
-		// Add to favorites.
-		$favorites[] = $listing_id;
-
-		// Save favorites.
-		$result = $this->save_user_favorites( $user_id, $favorites );
-
-		if ( $result ) {
+		if ( $result['changed'] ) {
 			// Increment listing favorite count.
 			$this->increment_listing_count( $listing_id );
 
@@ -180,7 +189,7 @@ class Favorites {
 			do_action( 'apd_favorite_added', $listing_id, $user_id );
 		}
 
-		return $result;
+		return true;
 	}
 
 	/**
@@ -205,21 +214,22 @@ class Favorites {
 			return $this->remove_guest_favorite( $listing_id );
 		}
 
-		// Get current favorites.
-		$favorites = $this->get_favorites( $user_id );
+		$result = $this->mutate_user_favorites(
+			$user_id,
+			static function( array $favorites ) use ( $listing_id ): array {
+				if ( ! in_array( $listing_id, $favorites, true ) ) {
+					return $favorites;
+				}
 
-		// Not favorited.
-		if ( ! in_array( $listing_id, $favorites, true ) ) {
-			return true;
+				return array_values( array_diff( $favorites, [ $listing_id ] ) );
+			}
+		);
+
+		if ( ! $result['success'] ) {
+			return false;
 		}
 
-		// Remove from favorites.
-		$favorites = array_values( array_diff( $favorites, [ $listing_id ] ) );
-
-		// Save favorites.
-		$result = $this->save_user_favorites( $user_id, $favorites );
-
-		if ( $result ) {
+		if ( $result['changed'] ) {
 			// Decrement listing favorite count.
 			$this->decrement_listing_count( $listing_id );
 
@@ -234,7 +244,7 @@ class Favorites {
 			do_action( 'apd_favorite_removed', $listing_id, $user_id );
 		}
 
-		return $result;
+		return true;
 	}
 
 	/**
@@ -581,9 +591,85 @@ class Favorites {
 	 */
 	private function save_user_favorites( int $user_id, array $favorites ): bool {
 		// Ensure all values are integers.
-		$favorites = array_values( array_map( 'absint', $favorites ) );
+		$favorites = $this->normalize_favorites( $favorites );
 
 		return (bool) update_user_meta( $user_id, self::META_KEY, $favorites );
+	}
+
+	/**
+	 * Mutate user favorites using optimistic compare-and-swap retries.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int      $user_id User ID.
+	 * @param callable $mutator Receives current favorites array and returns next favorites array.
+	 * @return array{success: bool, changed: bool}
+	 */
+	private function mutate_user_favorites( int $user_id, callable $mutator ): array {
+		for ( $attempt = 0; $attempt < self::USER_META_CAS_MAX_RETRIES; $attempt++ ) {
+			$current_raw       = get_user_meta( $user_id, self::META_KEY, true );
+			$current_favorites = $this->normalize_favorites( $current_raw );
+			$next_favorites    = $this->normalize_favorites( $mutator( $current_favorites ) );
+
+			// Nothing to update.
+			if ( $next_favorites === $current_favorites ) {
+				return [
+					'success' => true,
+					'changed' => false,
+				];
+			}
+
+			// Meta does not exist yet: try atomic create.
+			if ( ! metadata_exists( 'user', $user_id, self::META_KEY ) ) {
+				$created = add_user_meta( $user_id, self::META_KEY, $next_favorites, true );
+				if ( false !== $created ) {
+					return [
+						'success' => true,
+						'changed' => true,
+					];
+				}
+
+				// Another request may have created it first, retry with fresh value.
+				continue;
+			}
+
+			$updated = update_user_meta( $user_id, self::META_KEY, $next_favorites, $current_raw );
+			if ( false !== $updated ) {
+				return [
+					'success' => true,
+					'changed' => true,
+				];
+			}
+		}
+
+		return [
+			'success' => false,
+			'changed' => false,
+		];
+	}
+
+	/**
+	 * Normalize favorites payload into a unique list of positive listing IDs.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param mixed $favorites Raw favorites value.
+	 * @return int[] Normalized favorite listing IDs.
+	 */
+	private function normalize_favorites( mixed $favorites ): array {
+		if ( ! is_array( $favorites ) ) {
+			return [];
+		}
+
+		$normalized = [];
+		foreach ( $favorites as $favorite ) {
+			$listing_id = absint( $favorite );
+			if ( $listing_id > 0 ) {
+				$normalized[] = $listing_id;
+			}
+		}
+
+		return array_values( array_unique( $normalized ) );
 	}
 
 	/**

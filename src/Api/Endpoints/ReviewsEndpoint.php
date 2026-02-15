@@ -452,18 +452,18 @@ class ReviewsEndpoint {
 	public function get_reviews( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$listing_id = $request->get_param( 'listing_id' );
 		$author     = $request->get_param( 'author' );
-		$status     = $request->get_param( 'status' ) ?? 'approved';
+		$status     = $this->enforce_public_collection_status( (string) ( $request->get_param( 'status' ) ?? 'approved' ) );
 		$page       = (int) ( $request->get_param( 'page' ) ?? 1 );
 		$per_page   = (int) ( $request->get_param( 'per_page' ) ?? 10 );
 		$orderby    = $request->get_param( 'orderby' ) ?? 'date';
 		$order      = $request->get_param( 'order' ) ?? 'DESC';
 
 		$args = [
-			'status'   => $status,
-			'page'     => $page,
-			'per_page' => $per_page,
-			'orderby'  => $orderby,
-			'order'    => $order,
+			'status'  => $status,
+			'number'  => $per_page,
+			'offset'  => $this->get_pagination_offset( $page, $per_page ),
+			'orderby' => $orderby,
+			'order'   => $order,
 		];
 
 		if ( $listing_id ) {
@@ -495,7 +495,7 @@ class ReviewsEndpoint {
 	 */
 	public function get_listing_reviews( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$listing_id = (int) $request->get_param( 'listing_id' );
-		$status     = $request->get_param( 'status' ) ?? 'approved';
+		$status     = $this->enforce_public_collection_status( (string) ( $request->get_param( 'status' ) ?? 'approved' ) );
 		$page       = (int) ( $request->get_param( 'page' ) ?? 1 );
 		$per_page   = (int) ( $request->get_param( 'per_page' ) ?? 10 );
 
@@ -510,9 +510,9 @@ class ReviewsEndpoint {
 		}
 
 		$args = [
-			'status'   => $status,
-			'page'     => $page,
-			'per_page' => $per_page,
+			'status' => $status,
+			'number' => $per_page,
+			'offset' => $this->get_pagination_offset( $page, $per_page ),
 		];
 
 		$result = apd_get_listing_reviews( $listing_id, $args );
@@ -550,6 +550,15 @@ class ReviewsEndpoint {
 		$review    = apd_get_review( $review_id );
 
 		if ( ! $review ) {
+			return $this->controller->create_error(
+				'rest_review_not_found',
+				__( 'Review not found.', 'all-purpose-directory' ),
+				404
+			);
+		}
+
+		// Public reads must not expose non-approved reviews to unrelated users.
+		if ( ! $this->can_view_review( $review ) ) {
 			return $this->controller->create_error(
 				'rest_review_not_found',
 				__( 'Review not found.', 'all-purpose-directory' ),
@@ -702,6 +711,60 @@ class ReviewsEndpoint {
 				'review_id' => $review_id,
 			]
 		);
+	}
+
+	/**
+	 * Enforce safe review status for public collection reads.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $status Requested status.
+	 * @return string Safe status.
+	 */
+	private function enforce_public_collection_status( string $status ): string {
+		if ( current_user_can( 'manage_options' ) ) {
+			return $status;
+		}
+
+		return 'approved';
+	}
+
+	/**
+	 * Determine if the current user can view a specific review.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $review Review data.
+	 * @return bool True when view is allowed.
+	 */
+	private function can_view_review( array $review ): bool {
+		if ( ( $review['status'] ?? 'pending' ) === 'approved' ) {
+			return true;
+		}
+
+		if ( current_user_can( 'manage_options' ) ) {
+			return true;
+		}
+
+		$user_id = get_current_user_id();
+
+		return $user_id > 0 && $user_id === (int) ( $review['author_id'] ?? 0 );
+	}
+
+	/**
+	 * Convert page/per_page into a query offset.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int $page     Current page.
+	 * @param int $per_page Items per page.
+	 * @return int Zero-based offset.
+	 */
+	private function get_pagination_offset( int $page, int $per_page ): int {
+		$page     = max( 1, $page );
+		$per_page = max( 1, $per_page );
+
+		return ( $page - 1 ) * $per_page;
 	}
 
 	/**

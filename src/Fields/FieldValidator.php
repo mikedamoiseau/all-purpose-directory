@@ -119,9 +119,22 @@ class FieldValidator {
 			);
 		}
 
+		// Required check must happen before sanitization to avoid empty numeric
+		// values being converted to 0/0.0 and treated as non-empty.
+		if ( ! empty( $field['required'] ) && $this->is_empty_value( $value ) ) {
+			return new WP_Error(
+				'required',
+				sprintf(
+					/* translators: %s: field label */
+					__( '%s is required.', 'all-purpose-directory' ),
+					$field['label'] ?? $field_name
+				)
+			);
+		}
+
 		// Sanitize the value first if requested.
 		if ( $sanitize ) {
-			$value = $field_type->sanitize( $value );
+			$value = $this->sanitize_value_with_field( $field_type, $field, $value );
 		}
 
 		/**
@@ -268,7 +281,13 @@ class FieldValidator {
 			return $value;
 		}
 
-		return $field_type->sanitize( $value );
+		// Preserve explicit empty values for required fields so they are not
+		// coerced into numeric zeros by field sanitizers.
+		if ( ! empty( $field['required'] ) && $this->is_empty_value( $value ) ) {
+			return $this->get_empty_sentinel_value( $value );
+		}
+
+		return $this->sanitize_value_with_field( $field_type, $field, $value );
 	}
 
 	/**
@@ -466,5 +485,43 @@ class FieldValidator {
 		}
 
 		return $value === null;
+	}
+
+	/**
+	 * Sanitize a value with field-aware sanitizer when available.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param FieldTypeInterface   $field_type Field type handler.
+	 * @param array<string, mixed> $field      Field configuration.
+	 * @param mixed                $value      Raw value.
+	 * @return mixed Sanitized value.
+	 */
+	private function sanitize_value_with_field( FieldTypeInterface $field_type, array $field, mixed $value ): mixed {
+		if ( is_callable( [ $field_type, 'sanitizeWithField' ] ) ) {
+			return $field_type->sanitizeWithField( $value, $field );
+		}
+
+		return $field_type->sanitize( $value );
+	}
+
+	/**
+	 * Normalize empty inputs to a stable empty sentinel for storage.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param mixed $value Raw empty value.
+	 * @return mixed Normalized empty value.
+	 */
+	private function get_empty_sentinel_value( mixed $value ): mixed {
+		if ( is_array( $value ) ) {
+			return [];
+		}
+
+		if ( is_string( $value ) ) {
+			return '';
+		}
+
+		return null;
 	}
 }
