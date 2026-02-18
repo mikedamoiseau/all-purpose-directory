@@ -644,6 +644,48 @@ if ( ! class_exists( 'WP_Term' ) ) {
 	}
 }
 
+// Define WP_Query class for unit tests if not already defined.
+if ( ! class_exists( 'WP_Query' ) ) {
+	/**
+	 * Minimal WP_Query implementation for unit tests.
+	 *
+	 * Declares query_vars as a typed property to avoid PHP 8.2+
+	 * dynamic property deprecation when extended by anonymous classes.
+	 */
+	class WP_Query {
+		/** @var array<string, mixed> */
+		public array $query_vars = [];
+
+		/** @var bool */
+		public bool $is_main_query = false;
+
+		/**
+		 * @param string $key   Query var key.
+		 * @param mixed  $value Query var value.
+		 */
+		public function set( $key, $value ) {
+			$this->query_vars[ $key ] = $value;
+		}
+
+		/**
+		 * @param string $key     Query var key.
+		 * @param mixed  $default Default value.
+		 * @return mixed
+		 */
+		public function get( $key, $default = '' ) {
+			return $this->query_vars[ $key ] ?? $default;
+		}
+
+		public function is_main_query(): bool {
+			return $this->is_main_query;
+		}
+
+		public function have_posts(): bool {
+			return false;
+		}
+	}
+}
+
 // Define string utility functions used by src/ classes.
 if ( ! function_exists( 'apd_strlen' ) ) {
 	function apd_strlen( string $string ): int {
