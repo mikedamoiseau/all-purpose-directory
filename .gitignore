@@ -13,6 +13,8 @@ composer.lock
 .claude/
 .claude-bw/
 CLAUDE.md
+PLAN.md
+TASKS.md
 
 # IDE
 .idea/
