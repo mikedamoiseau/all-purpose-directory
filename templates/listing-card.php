@@ -114,7 +114,7 @@ $card_classes = apply_filters( 'apd_listing_card_classes', $card_classes, $listi
 					// Show first category as badge.
 					$primary_category = $card_data['categories'][0];
 					$category_color   = apd_get_category_color( $primary_category );
-					$badge_style      = $category_color ? 'background-color:' . esc_attr( $category_color ) : '';
+					$badge_style      = $category_color ? 'background-color:' . $category_color : '';
 					?>
 					<span class="apd-listing-card__badge" <?php echo $badge_style ? 'style="' . esc_attr( $badge_style ) . '"' : ''; ?>>
 						<?php echo esc_html( $primary_category->name ); ?>
