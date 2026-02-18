@@ -7,90 +7,275 @@
 
 /* Page Wrapper */
 .apd-demo-data-wrap {
-	max-width: 800px;
+	max-width: 960px;
 }
 
-.apd-demo-data-wrap > h1 {
-	margin-bottom: 10px;
-}
+/* ==========================================================================
+   Shared Users Section
+   ========================================================================== */
 
-.apd-demo-data-wrap > p.description {
-	margin-bottom: 24px;
-	font-size: 14px;
-	color: #646970;
-}
-
-/* Sections */
-.apd-demo-section {
+.apd-demo-users {
 	background: #fff;
-	border: 1px solid #c3c4c7;
-	border-radius: 4px;
-	padding: 20px 24px;
-	margin-bottom: 24px;
+	border: 1px solid #e0e0e0;
+	border-radius: 6px;
+	padding: 24px 28px;
+	margin-bottom: 0;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
 }
 
-.apd-demo-section h2 {
-	margin: 0 0 16px;
-	padding: 0;
+.apd-demo-users h2 {
+	margin: 0 0 8px;
+	padding: 0 0 0 12px;
 	font-size: 1.3em;
 	font-weight: 600;
 	color: #1d2327;
 	border: none;
+	border-left: 3px solid #2271b1;
 }
 
-/* Stats Table */
-.apd-demo-stats {
-	width: 100%;
-	max-width: 400px;
-	border-collapse: collapse;
+.apd-section-description {
+	margin: 0 0 16px;
+	color: #646970;
+	font-style: normal;
 }
 
-.apd-demo-stats td,
-.apd-demo-stats th {
-	padding: 10px 0;
-	border-bottom: 1px solid #f0f0f1;
+.apd-users-status {
+	margin-bottom: 16px;
 }
 
-.apd-demo-stats td:first-child,
-.apd-demo-stats th:first-child {
+.apd-users-actions {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
+}
+
+.apd-inline-form {
 	display: flex;
 	align-items: center;
 	gap: 8px;
+	margin: 0;
+	padding: 0;
 }
 
-.apd-demo-stats td:last-child,
-.apd-demo-stats th:last-child {
-	text-align: right;
-	font-weight: 600;
+.apd-inline-form fieldset {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin: 0;
+	padding: 0;
+	border: none;
 }
 
-.apd-demo-stats .dashicons {
-	color: #2271b1;
-	font-size: 18px;
-	width: 18px;
-	height: 18px;
+.apd-inline-form .button {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
 }
 
-.apd-demo-stats tfoot {
-	font-weight: 600;
+.apd-inline-form .button .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
 }
 
-.apd-demo-stats tfoot tr {
-	border-top: 2px solid #c3c4c7;
+.apd-delete-users-hint {
+	color: #d63638;
+	font-size: 12px;
 }
 
-.apd-demo-stats tfoot td,
-.apd-demo-stats tfoot th {
+/* ==========================================================================
+   Tab Navigation
+   ========================================================================== */
+
+.apd-demo-tabs {
+	margin-top: 24px;
+	margin-bottom: 0;
+	border-bottom: 1px solid #c3c4c7;
+}
+
+.apd-demo-tabs .nav-tab {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	margin-left: 0;
+	margin-right: 2px;
+	padding: 8px 12px;
+	font-size: 13px;
+	font-weight: 500;
+	color: #50575e;
+	background: #f0f0f1;
+	border: 1px solid #c3c4c7;
 	border-bottom: none;
-	padding-top: 14px;
+	border-radius: 3px 3px 0 0;
+	transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+	text-decoration: none;
+}
+
+.apd-demo-tabs .nav-tab .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+}
+
+.apd-demo-tabs .nav-tab:hover {
+	background: #fff;
+	color: #135e96;
+}
+
+.apd-demo-tabs .nav-tab-active,
+.apd-demo-tabs .nav-tab-active:hover {
+	background: #fff;
+	color: #1d2327;
+	border-bottom: 1px solid #fff;
+	margin-bottom: -1px;
+	box-shadow: inset 0 3px 0 #2271b1;
+}
+
+.apd-demo-tabs .nav-tab:focus {
+	outline: 2px solid #2271b1;
+	outline-offset: -2px;
+	box-shadow: none;
+}
+
+/* Tab Content Wrapper */
+.apd-tab-content-wrap {
+	border: 1px solid #e0e0e0;
+	border-top: none;
+	background: #f9f9f9;
+	padding: 24px;
+	margin-bottom: 24px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.apd-tab-content {
+	animation: apd-fade-in 0.2s ease-in-out;
+}
+
+@keyframes apd-fade-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+/* No tabs - single tab mode (hide wrapper border) */
+.apd-demo-data-wrap:not(:has(.apd-demo-tabs)) .apd-tab-content-wrap {
+	border: none;
+	background: transparent;
+	padding: 24px 0;
+	box-shadow: none;
+}
+
+/* ==========================================================================
+   Sections (inside tabs)
+   ========================================================================== */
+
+.apd-demo-section {
+	background: #fff;
+	border: 1px solid #e0e0e0;
+	border-radius: 6px;
+	padding: 24px 28px;
+	margin-bottom: 24px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.apd-demo-section:last-child {
+	margin-bottom: 0;
+}
+
+.apd-demo-section h2 {
+	margin: 0 0 16px;
+	padding: 0 0 0 12px;
+	font-size: 1.3em;
+	font-weight: 600;
+	color: #1d2327;
+	border: none;
+	border-left: 3px solid #2271b1;
+}
+
+/* ==========================================================================
+   Stats Grid
+   ========================================================================== */
+
+.apd-stats-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 0;
+}
+
+.apd-stat-item {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 8px 12px 8px 0;
+	border-bottom: 1px solid #f0f0f1;
+}
+
+.apd-stat-item .dashicons {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	font-size: 16px;
+	color: #2271b1;
+	background: #f0f6fc;
+	border-radius: 6px;
+	flex-shrink: 0;
+}
+
+.apd-stat-label {
+	flex: 1;
+	min-width: 0;
 }
 
 .apd-stat-count,
 .apd-stat-total {
+	font-weight: 600;
 	font-variant-numeric: tabular-nums;
+	text-align: right;
 }
 
-/* Generate Form */
+/* Total footer row */
+.apd-stat-footer {
+	grid-column: 1 / -1;
+	border-top: 2px solid #c3c4c7;
+	border-bottom: none;
+	padding-top: 12px;
+	margin-top: -1px;
+	font-weight: 600;
+}
+
+.apd-stat-footer .apd-stat-label {
+	font-weight: 600;
+}
+
+.apd-stat-footer .dashicons {
+	display: none;
+}
+
+/* ==========================================================================
+   Tab Intro Text
+   ========================================================================== */
+
+.apd-tab-intro {
+	margin: 0 0 16px;
+	padding: 10px 14px;
+	background: #f0f6fc;
+	border-left: 3px solid #2271b1;
+	border-radius: 0 4px 4px 0;
+	color: #1d2327;
+	font-size: 13px;
+	line-height: 1.5;
+}
+
+/* ==========================================================================
+   Generate Form
+   ========================================================================== */
+
 .apd-demo-form fieldset {
 	margin: 0;
 	padding: 0;
@@ -142,11 +327,27 @@
 	color: #646970;
 }
 
+/* Module Data Row */
+.apd-module-data-label {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	min-width: 120px;
+	font-weight: 500;
+}
+
+.apd-module-data-label .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+	color: #2271b1;
+}
+
 /* Form Actions */
 .apd-form-actions {
 	margin-top: 20px;
 	padding-top: 20px;
-	border-top: 1px solid #c3c4c7;
+	border-top: 1px solid #e0e0e0;
 }
 
 .apd-form-actions .button {
@@ -161,13 +362,16 @@
 	height: 16px;
 }
 
-/* Progress Indicator */
+/* ==========================================================================
+   Progress Indicator
+   ========================================================================== */
+
 .apd-progress {
 	margin-top: 24px;
 	padding: 20px;
 	background: #f0f6fc;
 	border: 1px solid #c3c4c7;
-	border-radius: 4px;
+	border-radius: 6px;
 }
 
 .apd-progress-bar {
@@ -192,11 +396,14 @@
 	color: #1d2327;
 }
 
-/* Results */
+/* ==========================================================================
+   Results
+   ========================================================================== */
+
 .apd-results {
 	margin-top: 20px;
 	padding: 16px 20px;
-	border-radius: 4px;
+	border-radius: 6px;
 }
 
 .apd-results.success {
@@ -234,9 +441,16 @@
 	color: #46b450;
 }
 
-/* Delete Section */
+/* ==========================================================================
+   Delete Section
+   ========================================================================== */
+
 .apd-demo-delete {
-	border-color: #d63638;
+	border-color: #f0b8b8;
+}
+
+.apd-demo-delete h2 {
+	border-left-color: #d63638;
 }
 
 .apd-warning {
@@ -246,7 +460,7 @@
 	padding: 16px;
 	background: #fcf0f1;
 	border: 1px solid #d63638;
-	border-radius: 4px;
+	border-radius: 6px;
 	margin-bottom: 20px;
 }
 
@@ -283,6 +497,18 @@
 	margin-right: 4px;
 }
 
+.button-link-delete:disabled,
+.button-link-delete[disabled] {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.button-link-delete:disabled:hover,
+.button-link-delete[disabled]:hover {
+	color: #d63638 !important;
+	background: #fff !important;
+}
+
 /* No Data State */
 .apd-no-data {
 	display: flex;
@@ -298,7 +524,10 @@
 	height: 20px;
 }
 
-/* Disabled State */
+/* ==========================================================================
+   Disabled / Loading States
+   ========================================================================== */
+
 .apd-demo-form.is-loading button {
 	opacity: 0.6;
 	pointer-events: none;
@@ -323,9 +552,31 @@
 	animation: apd-pulse 1.5s ease-in-out infinite;
 }
 
-/* Responsive */
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media screen and (max-width: 782px) {
+	.apd-demo-tabs .nav-tab {
+		padding: 6px 10px;
+		font-size: 12px;
+	}
+
+	.apd-tab-content-wrap {
+		padding: 16px;
+	}
+
+	.apd-stats-grid {
+		grid-template-columns: 1fr;
+	}
+}
+
 @media screen and (max-width: 600px) {
 	.apd-demo-section {
+		padding: 16px;
+	}
+
+	.apd-demo-users {
 		padding: 16px;
 	}
 
@@ -342,12 +593,47 @@
 		flex-basis: 100%;
 		margin-top: 4px;
 	}
+
+	.apd-users-actions {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	.apd-inline-form fieldset {
+		flex-wrap: wrap;
+	}
+
+	.apd-demo-tabs .nav-tab .dashicons {
+		display: none;
+	}
 }
 
-/* High Contrast Mode */
+/* ==========================================================================
+   High Contrast Mode
+   ========================================================================== */
+
 @media (prefers-contrast: high) {
 	.apd-demo-section {
 		border-width: 2px;
+		box-shadow: none;
+	}
+
+	.apd-demo-users {
+		border-width: 2px;
+		box-shadow: none;
+	}
+
+	.apd-demo-tabs .nav-tab {
+		border-width: 2px;
+	}
+
+	.apd-demo-tabs .nav-tab-active {
+		border-bottom-width: 2px;
+	}
+
+	.apd-tab-content-wrap {
+		border-width: 2px;
+		box-shadow: none;
 	}
 
 	.apd-warning {
@@ -359,7 +645,10 @@
 	}
 }
 
-/* Reduced Motion */
+/* ==========================================================================
+   Reduced Motion
+   ========================================================================== */
+
 @media (prefers-reduced-motion: reduce) {
 	.apd-progress-bar-fill {
 		transition: none;
@@ -367,5 +656,13 @@
 
 	.apd-progress.is-active .apd-progress-text {
 		animation: none;
+	}
+
+	.apd-tab-content {
+		animation: none;
+	}
+
+	.apd-demo-tabs .nav-tab {
+		transition: none;
 	}
 }

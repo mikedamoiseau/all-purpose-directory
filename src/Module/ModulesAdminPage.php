@@ -141,9 +141,16 @@ final class ModulesAdminPage {
 		}
 
 		wp_enqueue_style(
+			'apd-admin-base',
+			APD_PLUGIN_URL . 'assets/css/admin-base.css',
+			[],
+			APD_VERSION
+		);
+
+		wp_enqueue_style(
 			'apd-admin-modules',
 			APD_PLUGIN_URL . 'assets/css/admin-modules.css',
-			[],
+			[ 'apd-admin-base' ],
 			APD_VERSION
 		);
 	}
@@ -172,11 +179,15 @@ final class ModulesAdminPage {
 
 		?>
 		<div class="wrap apd-modules-wrap">
-			<h1><?php esc_html_e( 'Installed Modules', 'all-purpose-directory' ); ?></h1>
-
-			<p class="description">
-				<?php esc_html_e( 'Modules extend the functionality of All Purpose Directory with specialized features for different use cases.', 'all-purpose-directory' ); ?>
-			</p>
+			<div class="apd-page-header">
+				<div class="apd-page-header__icon">
+					<span class="dashicons dashicons-admin-plugins" aria-hidden="true"></span>
+				</div>
+				<div class="apd-page-header__content">
+					<h1><?php esc_html_e( 'Installed Modules', 'all-purpose-directory' ); ?></h1>
+					<p><?php esc_html_e( 'Modules extend the functionality of All Purpose Directory with specialized features for different use cases.', 'all-purpose-directory' ); ?></p>
+				</div>
+			</div>
 
 			<?php if ( $count === 0 ) : ?>
 				<div class="apd-modules-empty">
@@ -241,7 +252,9 @@ final class ModulesAdminPage {
 		?>
 		<tr class="apd-module-row<?php echo $has_warnings ? ' apd-module-has-warnings' : ''; ?>">
 			<td class="column-icon">
-				<span class="dashicons <?php echo esc_attr( $icon ); ?>" aria-hidden="true"></span>
+				<span class="apd-module-icon-wrap">
+					<span class="dashicons <?php echo esc_attr( $icon ); ?>" aria-hidden="true"></span>
+				</span>
 			</td>
 			<td class="column-name">
 				<strong><?php echo esc_html( $module['name'] ); ?></strong>

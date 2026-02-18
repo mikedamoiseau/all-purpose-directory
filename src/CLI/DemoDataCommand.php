@@ -13,8 +13,10 @@ declare(strict_types=1);
 namespace APD\CLI;
 
 use APD\Admin\DemoData\DemoDataGenerator;
+use APD\Admin\DemoData\DemoDataPage;
 use APD\Admin\DemoData\DemoDataProviderRegistry;
 use APD\Admin\DemoData\DemoDataTracker;
+use APD\Contracts\DemoDataModuleProviderInterface;
 use WP_CLI;
 
 // Prevent direct file access.
@@ -31,16 +33,25 @@ if ( ! defined( 'ABSPATH' ) ) {
  *     $ wp apd demo generate
  *
  *     # Generate only listings and reviews
- *     $ wp apd demo generate --types=listings,reviews
+ *     $ wp apd demo generate --types=categories,tags,listings,reviews
  *
  *     # Generate 50 listings
  *     $ wp apd demo generate --listings=50
  *
+ *     # Generate data for a specific module
+ *     $ wp apd demo generate --module=url-directory
+ *
  *     # Show current demo data counts
  *     $ wp apd demo status
  *
+ *     # Show counts for a specific module
+ *     $ wp apd demo status --module=general
+ *
  *     # Delete all demo data
  *     $ wp apd demo delete
+ *
+ *     # Delete only a specific module's data
+ *     $ wp apd demo delete --module=general
  *
  * @since 1.0.0
  */
@@ -60,6 +71,51 @@ final class DemoDataCommand {
 	 */
 	private function ensure_providers_initialized(): void {
 		DemoDataProviderRegistry::get_instance()->init();
+	}
+
+	/**
+	 * Get valid module slugs for validation.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return string[] Valid module slugs.
+	 */
+	private function get_valid_modules(): array {
+		$modules = [ DemoDataTracker::GENERAL_MODULE ];
+
+		$providers = DemoDataProviderRegistry::get_instance()->get_all();
+		foreach ( $providers as $provider ) {
+			if ( $provider instanceof DemoDataModuleProviderInterface ) {
+				$modules[] = $provider->get_slug();
+			}
+		}
+
+		return $modules;
+	}
+
+	/**
+	 * Validate a module slug.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param string $module Module slug to validate.
+	 * @return bool True if valid.
+	 */
+	private function validate_module( string $module ): bool {
+		$valid = $this->get_valid_modules();
+
+		if ( ! in_array( $module, $valid, true ) ) {
+			WP_CLI::error(
+				sprintf(
+					"Invalid module '%s'. Valid modules: %s",
+					$module,
+					implode( ', ', $valid )
+				)
+			);
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -92,6 +148,12 @@ final class DemoDataCommand {
 	 * default: 25
 	 * ---
 	 *
+	 * [--module=<slug>]
+	 * : Generate data for a specific module only. Use 'general' for core data.
+	 * ---
+	 * default: all
+	 * ---
+	 *
 	 * ## EXAMPLES
 	 *
 	 *     # Generate all demo data with defaults
@@ -103,6 +165,9 @@ final class DemoDataCommand {
 	 *     # Generate only users and categories
 	 *     $ wp apd demo generate --types=users,categories --users=10
 	 *
+	 *     # Generate data for url-directory module only
+	 *     $ wp apd demo generate --module=url-directory --listings=30
+	 *
 	 * @param array $args       Positional arguments.
 	 * @param array $assoc_args Associative arguments.
 	 * @return void
@@ -112,11 +177,19 @@ final class DemoDataCommand {
 
 		$types_input = $assoc_args['types'] ?? 'all';
 		$types       = array_map( 'trim', explode( ',', $types_input ) );
-		$all         = in_array( 'all', $types, true );
+		$all_types   = in_array( 'all', $types, true );
 
 		$users_count    = min( absint( $assoc_args['users'] ?? 5 ), 20 );
 		$tags_count     = min( absint( $assoc_args['tags'] ?? 10 ), 10 );
 		$listings_count = min( absint( $assoc_args['listings'] ?? 25 ), 100 );
+
+		$module_flag = $assoc_args['module'] ?? 'all';
+		$all_modules = ( $module_flag === 'all' );
+
+		// Validate module if specified.
+		if ( ! $all_modules ) {
+			$this->validate_module( $module_flag );
+		}
 
 		/**
 		 * Fires before demo data generation begins.
@@ -132,63 +205,121 @@ final class DemoDataCommand {
 		$user_ids    = [];
 		$listing_ids = [];
 
-		// Generate users.
-		if ( $all || in_array( 'users', $types, true ) ) {
+		// Generate users (shared, always generated unless module-specific).
+		if ( ( $all_types || in_array( 'users', $types, true ) ) && $all_modules ) {
 			WP_CLI::log( "Creating {$users_count} users..." );
 			$user_ids         = $generator->generate_users( $users_count );
 			$results['users'] = count( $user_ids );
 			WP_CLI::log( "  Created {$results['users']} users." );
+		} else {
+			// Get existing demo users for dependent operations.
+			$user_ids = DemoDataTracker::get_instance()->get_demo_user_ids();
 		}
 
-		// Generate categories.
-		if ( $all || in_array( 'categories', $types, true ) ) {
-			WP_CLI::log( 'Creating categories...' );
-			$category_ids          = $generator->generate_categories();
-			$results['categories'] = count( $category_ids );
-			WP_CLI::log( "  Created {$results['categories']} categories." );
+		// Determine which modules to generate for.
+		$modules_to_generate = [];
+
+		if ( $all_modules ) {
+			$modules_to_generate[] = DemoDataTracker::GENERAL_MODULE;
+			$providers             = DemoDataProviderRegistry::get_instance()->get_all();
+			foreach ( $providers as $provider ) {
+				if ( $provider instanceof DemoDataModuleProviderInterface ) {
+					$modules_to_generate[] = $provider->get_slug();
+				}
+			}
+		} else {
+			$modules_to_generate[] = $module_flag;
 		}
 
-		// Generate tags.
-		if ( $all || in_array( 'tags', $types, true ) ) {
-			WP_CLI::log( "Creating {$tags_count} tags..." );
-			$tag_ids         = $generator->generate_tags( $tags_count );
-			$results['tags'] = count( $tag_ids );
-			WP_CLI::log( "  Created {$results['tags']} tags." );
-		}
+		foreach ( $modules_to_generate as $module ) {
+			$is_general = ( $module === DemoDataTracker::GENERAL_MODULE );
+			$label      = $is_general ? 'General' : $module;
 
-		// Generate listings.
-		if ( $all || in_array( 'listings', $types, true ) ) {
-			WP_CLI::log( "Creating {$listings_count} listings..." );
-			$listing_ids         = $generator->generate_listings( $listings_count );
-			$results['listings'] = count( $listing_ids );
-			WP_CLI::log( "  Created {$results['listings']} listings." );
-		}
+			WP_CLI::log( '' );
+			WP_CLI::log( "--- {$label} ---" );
 
-		// Generate reviews (requires listings).
-		if ( ( $all || in_array( 'reviews', $types, true ) ) && ! empty( $listing_ids ) ) {
-			WP_CLI::log( 'Creating reviews...' );
-			$review_ids         = $generator->generate_reviews( $listing_ids, $user_ids );
-			$results['reviews'] = count( $review_ids );
-			WP_CLI::log( "  Created {$results['reviews']} reviews." );
-		}
+			$generator->reset_state();
 
-		// Generate inquiries (requires listings).
-		if ( ( $all || in_array( 'inquiries', $types, true ) ) && ! empty( $listing_ids ) ) {
-			WP_CLI::log( 'Creating inquiries...' );
-			$inquiry_ids          = $generator->generate_inquiries( $listing_ids );
-			$results['inquiries'] = count( $inquiry_ids );
-			WP_CLI::log( "  Created {$results['inquiries']} inquiries." );
-		}
+			// Generate categories.
+			if ( $all_types || in_array( 'categories', $types, true ) ) {
+				WP_CLI::log( 'Creating categories...' );
+				$category_data = [];
 
-		// Generate favorites (requires listings and users).
-		if ( ( $all || in_array( 'favorites', $types, true ) ) && ! empty( $listing_ids ) && ! empty( $user_ids ) ) {
-			WP_CLI::log( 'Creating favorites...' );
-			$results['favorites'] = $generator->generate_favorites( $listing_ids, $user_ids );
-			WP_CLI::log( "  Created {$results['favorites']} favorites." );
-		}
+				if ( ! $is_general ) {
+					$provider = DemoDataProviderRegistry::get_instance()->get( $module );
+					if ( $provider instanceof DemoDataModuleProviderInterface ) {
+						$category_data = $provider->get_category_data();
+					}
+				}
 
-		// Generate module provider data.
-		$this->generate_module_data( $results, $user_ids, $listing_ids, $category_ids ?? [], $tag_ids ?? [] );
+				$category_ids          = $generator->generate_categories( $module, $category_data );
+				$results[ $module . '_categories' ] = count( $category_ids );
+				WP_CLI::log( "  Created " . count( $category_ids ) . ' categories.' );
+			}
+
+			// Generate tags.
+			if ( $all_types || in_array( 'tags', $types, true ) ) {
+				WP_CLI::log( "Creating {$tags_count} tags..." );
+				$tag_ids                      = $generator->generate_tags( $tags_count, $module );
+				$results[ $module . '_tags' ] = count( $tag_ids );
+				WP_CLI::log( '  Created ' . count( $tag_ids ) . ' tags.' );
+			}
+
+			// Generate listings.
+			if ( $all_types || in_array( 'listings', $types, true ) ) {
+				WP_CLI::log( "Creating {$listings_count} listings..." );
+				$listing_ids                      = $generator->generate_listings( $listings_count, $module );
+				$results[ $module . '_listings' ] = count( $listing_ids );
+				WP_CLI::log( '  Created ' . count( $listing_ids ) . ' listings.' );
+			}
+
+			// Generate reviews.
+			if ( ( $all_types || in_array( 'reviews', $types, true ) ) && ! empty( $listing_ids ) ) {
+				WP_CLI::log( 'Creating reviews...' );
+				$review_ids                      = $generator->generate_reviews( $listing_ids, $user_ids, $module );
+				$results[ $module . '_reviews' ] = count( $review_ids );
+				WP_CLI::log( '  Created ' . count( $review_ids ) . ' reviews.' );
+			}
+
+			// Generate inquiries.
+			if ( ( $all_types || in_array( 'inquiries', $types, true ) ) && ! empty( $listing_ids ) ) {
+				WP_CLI::log( 'Creating inquiries...' );
+				$inquiry_ids                       = $generator->generate_inquiries( $listing_ids, $module );
+				$results[ $module . '_inquiries' ] = count( $inquiry_ids );
+				WP_CLI::log( '  Created ' . count( $inquiry_ids ) . ' inquiries.' );
+			}
+
+			// Generate favorites.
+			if ( ( $all_types || in_array( 'favorites', $types, true ) ) && ! empty( $listing_ids ) && ! empty( $user_ids ) ) {
+				WP_CLI::log( 'Creating favorites...' );
+				$fav_count                          = $generator->generate_favorites( $listing_ids, $user_ids );
+				$results[ $module . '_favorites' ]  = $fav_count;
+				WP_CLI::log( "  Created {$fav_count} favorites." );
+			}
+
+			// Module-specific data for non-general modules.
+			if ( ! $is_general ) {
+				$provider = DemoDataProviderRegistry::get_instance()->get( $module );
+				if ( $provider ) {
+					$tracker = DemoDataTracker::get_instance();
+					$context = [
+						'user_ids'     => $user_ids,
+						'listing_ids'  => $listing_ids,
+						'category_ids' => isset( $category_ids ) ? $category_ids : [],
+						'tag_ids'      => isset( $tag_ids ) ? $tag_ids : [],
+						'options'      => [],
+					];
+
+					WP_CLI::log( "Creating {$label} module-specific data..." );
+					$provider_results = $provider->generate( $context, $tracker );
+
+					foreach ( $provider_results as $type => $count ) {
+						$results[ $module . '_' . $type ] = $count;
+						WP_CLI::log( "  Created {$count} {$type}." );
+					}
+				}
+			}
+		}
 
 		/**
 		 * Fires after demo data generation completes.
@@ -205,20 +336,32 @@ final class DemoDataCommand {
 	}
 
 	/**
-	 * Delete all demo data.
+	 * Delete demo data.
 	 *
 	 * ## OPTIONS
+	 *
+	 * [--module=<slug>]
+	 * : Delete data for a specific module only. Use 'general' for core data, 'users' for demo users.
+	 * ---
+	 * default: all
+	 * ---
 	 *
 	 * [--yes]
 	 * : Skip the confirmation prompt.
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     # Delete with confirmation
-	 *     $ wp apd demo delete
-	 *
-	 *     # Delete without confirmation
+	 *     # Delete all demo data
 	 *     $ wp apd demo delete --yes
+	 *
+	 *     # Delete only General demo data
+	 *     $ wp apd demo delete --module=general --yes
+	 *
+	 *     # Delete only url-directory module data
+	 *     $ wp apd demo delete --module=url-directory --yes
+	 *
+	 *     # Delete only demo users (must delete module data first)
+	 *     $ wp apd demo delete --module=users --yes
 	 *
 	 * @param array $args       Positional arguments.
 	 * @param array $assoc_args Associative arguments.
@@ -227,20 +370,71 @@ final class DemoDataCommand {
 	public function delete( array $args, array $assoc_args ): void {
 		$this->ensure_providers_initialized();
 
-		$tracker = DemoDataTracker::get_instance();
-		$counts  = $tracker->count_demo_data();
-		$total   = array_sum( $counts );
+		$module_flag = $assoc_args['module'] ?? 'all';
+		$tracker     = DemoDataTracker::get_instance();
 
-		if ( $total === 0 ) {
-			WP_CLI::success( 'No demo data found. Nothing to delete.' );
-			return;
+		if ( $module_flag === 'all' ) {
+			// Delete everything.
+			$counts = $tracker->count_demo_data();
+			$total  = array_sum( $counts );
+
+			if ( $total === 0 ) {
+				WP_CLI::success( 'No demo data found. Nothing to delete.' );
+				return;
+			}
+
+			WP_CLI::log( "Found {$total} demo data items." );
+			WP_CLI::confirm( 'Are you sure you want to delete ALL demo data?', $assoc_args );
+
+			WP_CLI::log( 'Deleting demo data...' );
+			$deleted = $tracker->delete_all();
+		} elseif ( $module_flag === DemoDataTracker::USERS_MODULE ) {
+			// Delete only users.
+			if ( $tracker->has_module_demo_data() ) {
+				WP_CLI::error( 'Cannot delete demo users while module demo data exists. Delete all module data first.' );
+				return;
+			}
+
+			$user_count = count( $tracker->get_demo_user_ids() );
+			if ( $user_count === 0 ) {
+				WP_CLI::success( 'No demo users found.' );
+				return;
+			}
+
+			WP_CLI::log( "Found {$user_count} demo users." );
+			WP_CLI::confirm( 'Delete all demo users?', $assoc_args );
+
+			WP_CLI::log( 'Deleting demo users...' );
+			$deleted = [ 'users' => $tracker->delete_demo_users() ];
+		} else {
+			// Validate module.
+			$valid_modules = $this->get_valid_modules();
+			if ( ! in_array( $module_flag, $valid_modules, true ) ) {
+				WP_CLI::error(
+					sprintf(
+						"Invalid module '%s'. Valid modules: %s, users",
+						$module_flag,
+						implode( ', ', $valid_modules )
+					)
+				);
+				return;
+			}
+
+			// Delete specific module.
+			$counts = $tracker->count_demo_data( $module_flag );
+			$total  = array_sum( $counts );
+
+			if ( $total === 0 ) {
+				WP_CLI::success( "No demo data found for module '{$module_flag}'." );
+				return;
+			}
+
+			WP_CLI::log( "Found {$total} demo data items for module '{$module_flag}'." );
+			WP_CLI::confirm( "Delete all demo data for module '{$module_flag}'?", $assoc_args );
+
+			WP_CLI::log( "Deleting {$module_flag} demo data..." );
+			$deleted = $tracker->delete_by_module( $module_flag );
 		}
-
-		WP_CLI::log( "Found {$total} demo data items." );
-		WP_CLI::confirm( 'Are you sure you want to delete ALL demo data?', $assoc_args );
-
-		WP_CLI::log( 'Deleting demo data...' );
-		$deleted = $tracker->delete_all();
 
 		// Report results.
 		foreach ( $deleted as $type => $count ) {
@@ -249,13 +443,19 @@ final class DemoDataCommand {
 			}
 		}
 
-		WP_CLI::success( 'All demo data has been deleted.' );
+		WP_CLI::success( 'Demo data deleted.' );
 	}
 
 	/**
 	 * Show current demo data status.
 	 *
 	 * ## OPTIONS
+	 *
+	 * [--module=<slug>]
+	 * : Show counts for a specific module only.
+	 * ---
+	 * default: all
+	 * ---
 	 *
 	 * [--format=<format>]
 	 * : Output format.
@@ -276,6 +476,9 @@ final class DemoDataCommand {
 	 *     # Show status as JSON
 	 *     $ wp apd demo status --format=json
 	 *
+	 *     # Show status for a specific module
+	 *     $ wp apd demo status --module=general
+	 *
 	 * @param array $args       Positional arguments.
 	 * @param array $assoc_args Associative arguments.
 	 * @return void
@@ -283,32 +486,118 @@ final class DemoDataCommand {
 	public function status( array $args, array $assoc_args ): void {
 		$this->ensure_providers_initialized();
 
-		$format = $assoc_args['format'] ?? 'table';
+		$format      = $assoc_args['format'] ?? 'table';
+		$module_flag = $assoc_args['module'] ?? 'all';
+		$tracker     = DemoDataTracker::get_instance();
 
-		$tracker = DemoDataTracker::get_instance();
-		$counts  = $tracker->count_demo_data();
+		if ( $module_flag !== 'all' ) {
+			// Show counts for a specific module.
+			$valid = array_merge( $this->get_valid_modules(), [ DemoDataTracker::USERS_MODULE ] );
+			if ( ! in_array( $module_flag, $valid, true ) ) {
+				WP_CLI::error(
+					sprintf(
+						"Invalid module '%s'. Valid modules: %s",
+						$module_flag,
+						implode( ', ', $valid )
+					)
+				);
+				return;
+			}
 
-		// Add module counts.
-		$provider_registry = DemoDataProviderRegistry::get_instance();
-		$providers         = $provider_registry->get_all();
+			$counts = $tracker->count_demo_data( $module_flag );
+			$this->format_status_output( $counts, $module_flag, $format );
+			return;
+		}
 
-		foreach ( $providers as $slug => $provider ) {
+		// Show all counts grouped by module.
+		$items = [];
+
+		// Users (shared).
+		$user_counts = $tracker->count_demo_data( DemoDataTracker::USERS_MODULE );
+		$items[]     = [
+			'module' => 'Users (shared)',
+			'type'   => 'Users',
+			'count'  => $user_counts['users'] ?? 0,
+		];
+
+		// General module.
+		$general_counts = $tracker->count_demo_data( DemoDataTracker::GENERAL_MODULE );
+		foreach ( $general_counts as $type => $count ) {
+			if ( $type === 'users' ) {
+				continue;
+			}
+			$items[] = [
+				'module' => 'General',
+				'type'   => ucfirst( str_replace( '_', ' ', $type ) ),
+				'count'  => $count,
+			];
+		}
+
+		// Module providers.
+		$providers = DemoDataProviderRegistry::get_instance()->get_all();
+		foreach ( $providers as $provider ) {
+			if ( ! ( $provider instanceof DemoDataModuleProviderInterface ) ) {
+				continue;
+			}
+
+			$slug          = $provider->get_slug();
+			$module_counts = $tracker->count_demo_data( $slug );
+
+			foreach ( $module_counts as $type => $count ) {
+				if ( $type === 'users' ) {
+					continue;
+				}
+				$items[] = [
+					'module' => $provider->get_name(),
+					'type'   => ucfirst( str_replace( '_', ' ', $type ) ),
+					'count'  => $count,
+				];
+			}
+
+			// Module-specific counts.
 			$provider_counts = $provider->count( $tracker );
-
 			foreach ( $provider_counts as $type => $count ) {
-				$counts[ $provider->get_name() . ' - ' . ucfirst( $type ) ] = $count;
+				$items[] = [
+					'module' => $provider->get_name(),
+					'type'   => ucfirst( str_replace( '_', ' ', $type ) ),
+					'count'  => $count,
+				];
 			}
 		}
 
-		$total = array_sum( $counts );
+		// Total.
+		$total = 0;
+		foreach ( $items as $item ) {
+			$total += $item['count'];
+		}
 
-		// Build table data.
+		$items[] = [
+			'module' => '---',
+			'type'   => 'Total',
+			'count'  => $total,
+		];
+
+		WP_CLI\Utils\format_items( $format, $items, [ 'module', 'type', 'count' ] );
+	}
+
+	/**
+	 * Format and output status for a single module.
+	 *
+	 * @param array<string, int> $counts  Counts by type.
+	 * @param string             $module  Module slug.
+	 * @param string             $format  Output format.
+	 * @return void
+	 */
+	private function format_status_output( array $counts, string $module, string $format ): void {
 		$items = [];
+		$total = 0;
+
 		foreach ( $counts as $type => $count ) {
 			$items[] = [
 				'type'  => ucfirst( str_replace( '_', ' ', $type ) ),
 				'count' => $count,
 			];
+			$total += $count;
 		}
 
 		$items[] = [
@@ -324,74 +613,64 @@ final class DemoDataCommand {
 	}
 
 	/**
-	 * Generate module provider demo data.
-	 *
-	 * @param array $results     Results array (passed by reference).
-	 * @param int[] $user_ids    Created user IDs.
-	 * @param int[] $listing_ids Created listing IDs.
-	 * @param int[] $category_ids Created category term IDs.
-	 * @param int[] $tag_ids     Created tag term IDs.
-	 * @return void
-	 */
-	private function generate_module_data( array &$results, array $user_ids, array $listing_ids, array $category_ids, array $tag_ids ): void {
-		$provider_registry = DemoDataProviderRegistry::get_instance();
-		$providers         = $provider_registry->get_all();
-
-		if ( empty( $providers ) ) {
-			return;
-		}
-
-		$tracker = DemoDataTracker::get_instance();
-		$context = [
-			'user_ids'     => $user_ids,
-			'listing_ids'  => $listing_ids,
-			'category_ids' => $category_ids,
-			'tag_ids'      => $tag_ids,
-			'options'      => [],
-		];
-
-		foreach ( $providers as $slug => $provider ) {
-			WP_CLI::log( "Creating {$provider->get_name()} data..." );
-			$provider_results = $provider->generate( $context, $tracker );
-
-			foreach ( $provider_results as $type => $count ) {
-				$key             = 'module_' . $slug . '_' . $type;
-				$results[ $key ] = $count;
-				WP_CLI::log( "  Created {$count} {$type}." );
-			}
-		}
-	}
-
-	/**
 	 * Print the current status table.
 	 *
 	 * @return void
 	 */
 	private function print_status(): void {
 		$tracker = DemoDataTracker::get_instance();
-		$counts  = $tracker->count_demo_data();
-
-		$provider_registry = DemoDataProviderRegistry::get_instance();
-		$providers         = $provider_registry->get_all();
-
-		foreach ( $providers as $slug => $provider ) {
-			$provider_counts = $provider->count( $tracker );
-
-			foreach ( $provider_counts as $type => $count ) {
-				$counts[ $provider->get_name() . ' - ' . ucfirst( $type ) ] = $count;
-			}
-		}
-
-		$total = array_sum( $counts );
 
 		WP_CLI::log( '' );
 		WP_CLI::log( 'Current demo data:' );
 
-		foreach ( $counts as $type => $count ) {
-			$label = ucfirst( str_replace( '_', ' ', $type ) );
-			WP_CLI::log( "  {$label}: {$count}" );
+		// Users.
+		$user_counts = $tracker->count_demo_data( DemoDataTracker::USERS_MODULE );
+		WP_CLI::log( '  Users (shared): ' . ( $user_counts['users'] ?? 0 ) );
+
+		// General.
+		$general_counts = $tracker->count_demo_data( DemoDataTracker::GENERAL_MODULE );
+		$general_total  = 0;
+		foreach ( $general_counts as $type => $count ) {
+			if ( $type === 'users' ) {
+				continue;
+			}
+			$general_total += $count;
+		}
+		WP_CLI::log( "  General: {$general_total}" );
+
+		// Modules.
+		$providers = DemoDataProviderRegistry::get_instance()->get_all();
+		foreach ( $providers as $provider ) {
+			if ( ! ( $provider instanceof DemoDataModuleProviderInterface ) ) {
+				continue;
+			}
+
+			$slug          = $provider->get_slug();
+			$module_counts = $tracker->count_demo_data( $slug );
+			$module_total  = 0;
+			foreach ( $module_counts as $type => $count ) {
+				if ( $type === 'users' ) {
+					continue;
+				}
+				$module_total += $count;
+			}
+
+			$provider_counts = $provider->count( $tracker );
+			$module_total   += array_sum( $provider_counts );
+
+			WP_CLI::log( "  {$provider->get_name()}: {$module_total}" );
 		}
 
-		WP_CLI::log( "  Total: {$total}" );
+		// Grand total.
+		$all_counts  = $tracker->count_demo_data();
+		$grand_total = array_sum( $all_counts );
+
+		// Add module provider counts.
+		foreach ( $providers as $provider ) {
+			$provider_counts = $provider->count( $tracker );
+			$grand_total    += array_sum( $provider_counts );
+		}
+
+		WP_CLI::log( "  Total: {$grand_total}" );
 	}
 }

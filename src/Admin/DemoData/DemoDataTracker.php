@@ -3,6 +3,7 @@
  * Demo Data Tracker Class.
  *
  * Tracks and manages demo data for cleanup purposes.
+ * Items are tracked with module slugs for per-module generation and deletion.
  *
  * @package APD\Admin\DemoData
  * @since   1.0.0
@@ -21,6 +22,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class DemoDataTracker
  *
  * Tracks demo data items and provides cleanup functionality.
+ * Each item is marked with _apd_demo_data = module_slug (e.g., 'general', 'url-directory').
+ * Users are always marked with 'users' since they are shared across modules.
  *
  * @since 1.0.0
  */
@@ -32,9 +35,14 @@ final class DemoDataTracker {
 	public const META_KEY = '_apd_demo_data';
 
 	/**
-	 * Meta value used to mark items as demo data.
+	 * Meta value for shared demo users.
 	 */
-	public const META_VALUE = '1';
+	public const USERS_MODULE = 'users';
+
+	/**
+	 * Meta value for general (core) demo data.
+	 */
+	public const GENERAL_MODULE = 'general';
 
 	/**
 	 * Singleton instance.
@@ -82,11 +90,12 @@ final class DemoDataTracker {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param int $post_id Post ID.
+	 * @param int    $post_id Post ID.
+	 * @param string $module  Module slug (default: 'general').
 	 * @return bool Whether the meta was added successfully.
 	 */
-	public function mark_post_as_demo( int $post_id ): bool {
-		return (bool) update_post_meta( $post_id, self::META_KEY, self::META_VALUE );
+	public function mark_post_as_demo( int $post_id, string $module = self::GENERAL_MODULE ): bool {
+		return (bool) update_post_meta( $post_id, self::META_KEY, $module );
 	}
 
 	/**
@@ -94,15 +103,18 @@ final class DemoDataTracker {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param int $term_id Term ID.
+	 * @param int    $term_id Term ID.
+	 * @param string $module  Module slug (default: 'general').
 	 * @return bool Whether the meta was added successfully.
 	 */
-	public function mark_term_as_demo( int $term_id ): bool {
-		return (bool) update_term_meta( $term_id, self::META_KEY, self::META_VALUE );
+	public function mark_term_as_demo( int $term_id, string $module = self::GENERAL_MODULE ): bool {
+		return (bool) update_term_meta( $term_id, self::META_KEY, $module );
 	}
 
 	/**
 	 * Mark a user as demo data.
+	 *
+	 * Users are always marked as 'users' since they are shared across modules.
 	 *
 	 * @since 1.0.0
 	 *
@@ -110,7 +122,7 @@ final class DemoDataTracker {
 	 * @return bool Whether the meta was added successfully.
 	 */
 	public function mark_user_as_demo( int $user_id ): bool {
-		return (bool) update_user_meta( $user_id, self::META_KEY, self::META_VALUE );
+		return (bool) update_user_meta( $user_id, self::META_KEY, self::USERS_MODULE );
 	}
 
 	/**
@@ -118,11 +130,12 @@ final class DemoDataTracker {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param int $comment_id Comment ID.
+	 * @param int    $comment_id Comment ID.
+	 * @param string $module     Module slug (default: 'general').
 	 * @return bool Whether the meta was added successfully.
 	 */
-	public function mark_comment_as_demo( int $comment_id ): bool {
-		return (bool) update_comment_meta( $comment_id, self::META_KEY, self::META_VALUE );
+	public function mark_comment_as_demo( int $comment_id, string $module = self::GENERAL_MODULE ): bool {
+		return (bool) update_comment_meta( $comment_id, self::META_KEY, $module );
 	}
 
 	/**
@@ -134,7 +147,8 @@ final class DemoDataTracker {
 	 * @return bool
 	 */
 	public function is_demo_post( int $post_id ): bool {
-		return get_post_meta( $post_id, self::META_KEY, true ) === self::META_VALUE;
+		$value = get_post_meta( $post_id, self::META_KEY, true );
+		return ! empty( $value );
 	}
 
 	/**
@@ -146,7 +160,8 @@ final class DemoDataTracker {
 	 * @return bool
 	 */
 	public function is_demo_term( int $term_id ): bool {
-		return get_term_meta( $term_id, self::META_KEY, true ) === self::META_VALUE;
+		$value = get_term_meta( $term_id, self::META_KEY, true );
+		return ! empty( $value );
 	}
 
 	/**
@@ -158,7 +173,8 @@ final class DemoDataTracker {
 	 * @return bool
 	 */
 	public function is_demo_user( int $user_id ): bool {
-		return get_user_meta( $user_id, self::META_KEY, true ) === self::META_VALUE;
+		$value = get_user_meta( $user_id, self::META_KEY, true );
+		return ! empty( $value );
 	}
 
 	/**
@@ -170,92 +186,166 @@ final class DemoDataTracker {
 	 * @return bool
 	 */
 	public function is_demo_comment( int $comment_id ): bool {
-		return get_comment_meta( $comment_id, self::META_KEY, true ) === self::META_VALUE;
+		$value = get_comment_meta( $comment_id, self::META_KEY, true );
+		return ! empty( $value );
 	}
 
 	/**
-	 * Count all demo data items by type.
+	 * Count demo data items by type, optionally filtered by module.
 	 *
 	 * @since 1.0.0
 	 *
+	 * @param string|null $module Module slug to filter by, or null for all modules.
 	 * @return array{users: int, categories: int, tags: int, listings: int, reviews: int, inquiries: int}
 	 */
-	public function count_demo_data(): array {
+	public function count_demo_data( ?string $module = null ): array {
 		global $wpdb;
 
-		// Count demo users.
-		$users = (int) $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT COUNT(*) FROM {$wpdb->usermeta} WHERE meta_key = %s AND meta_value = %s",
-				self::META_KEY,
-				self::META_VALUE
-			)
-		);
+		// Count demo users (always filtered by 'users' module).
+		if ( $module === null || $module === self::USERS_MODULE ) {
+			$users = (int) $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT COUNT(*) FROM {$wpdb->usermeta} WHERE meta_key = %s AND meta_value = %s",
+					self::META_KEY,
+					self::USERS_MODULE
+				)
+			);
+		} else {
+			$users = 0;
+		}
+
+		// Determine module filter for term/post/comment queries.
+		$filter_by_module = ( $module !== null && $module !== self::USERS_MODULE );
 
 		// Count demo categories.
-		$categories = (int) $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT COUNT(*) FROM {$wpdb->termmeta} tm
-				INNER JOIN {$wpdb->term_taxonomy} tt ON tm.term_id = tt.term_id
-				WHERE tm.meta_key = %s AND tm.meta_value = %s AND tt.taxonomy = %s",
-				self::META_KEY,
-				self::META_VALUE,
-				'apd_category'
-			)
-		);
+		if ( $filter_by_module ) {
+			$categories = (int) $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT COUNT(*) FROM {$wpdb->termmeta} tm
+					INNER JOIN {$wpdb->term_taxonomy} tt ON tm.term_id = tt.term_id
+					WHERE tm.meta_key = %s AND tm.meta_value = %s AND tt.taxonomy = %s",
+					self::META_KEY,
+					$module,
+					'apd_category'
+				)
+			);
+		} else {
+			$categories = (int) $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT COUNT(*) FROM {$wpdb->termmeta} tm
+					INNER JOIN {$wpdb->term_taxonomy} tt ON tm.term_id = tt.term_id
+					WHERE tm.meta_key = %s AND tm.meta_value != %s AND tt.taxonomy = %s",
+					self::META_KEY,
+					self::USERS_MODULE,
+					'apd_category'
+				)
+			);
+		}
 
 		// Count demo tags.
-		$tags = (int) $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT COUNT(*) FROM {$wpdb->termmeta} tm
-				INNER JOIN {$wpdb->term_taxonomy} tt ON tm.term_id = tt.term_id
-				WHERE tm.meta_key = %s AND tm.meta_value = %s AND tt.taxonomy = %s",
-				self::META_KEY,
-				self::META_VALUE,
-				'apd_tag'
-			)
-		);
+		if ( $filter_by_module ) {
+			$tags = (int) $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT COUNT(*) FROM {$wpdb->termmeta} tm
+					INNER JOIN {$wpdb->term_taxonomy} tt ON tm.term_id = tt.term_id
+					WHERE tm.meta_key = %s AND tm.meta_value = %s AND tt.taxonomy = %s",
+					self::META_KEY,
+					$module,
+					'apd_tag'
+				)
+			);
+		} else {
+			$tags = (int) $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT COUNT(*) FROM {$wpdb->termmeta} tm
+					INNER JOIN {$wpdb->term_taxonomy} tt ON tm.term_id = tt.term_id
+					WHERE tm.meta_key = %s AND tm.meta_value != %s AND tt.taxonomy = %s",
+					self::META_KEY,
+					self::USERS_MODULE,
+					'apd_tag'
+				)
+			);
+		}
 
 		// Count demo listings.
-		$listings = (int) $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT COUNT(*) FROM {$wpdb->postmeta} pm
-				INNER JOIN {$wpdb->posts} p ON pm.post_id = p.ID
-				WHERE pm.meta_key = %s AND pm.meta_value = %s AND p.post_type = %s",
-				self::META_KEY,
-				self::META_VALUE,
-				'apd_listing'
-			)
-		);
+		if ( $filter_by_module ) {
+			$listings = (int) $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT COUNT(*) FROM {$wpdb->postmeta} pm
+					INNER JOIN {$wpdb->posts} p ON pm.post_id = p.ID
+					WHERE pm.meta_key = %s AND pm.meta_value = %s AND p.post_type = %s",
+					self::META_KEY,
+					$module,
+					'apd_listing'
+				)
+			);
+		} else {
+			$listings = (int) $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT COUNT(*) FROM {$wpdb->postmeta} pm
+					INNER JOIN {$wpdb->posts} p ON pm.post_id = p.ID
+					WHERE pm.meta_key = %s AND pm.meta_value != %s AND p.post_type = %s",
+					self::META_KEY,
+					self::USERS_MODULE,
+					'apd_listing'
+				)
+			);
+		}
 
 		// Count demo reviews.
-		$reviews = (int) $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT COUNT(*) FROM {$wpdb->commentmeta} cm
-				INNER JOIN {$wpdb->comments} c ON cm.comment_id = c.comment_ID
-				WHERE cm.meta_key = %s AND cm.meta_value = %s AND c.comment_type = %s",
-				self::META_KEY,
-				self::META_VALUE,
-				'apd_review'
-			)
-		);
+		if ( $filter_by_module ) {
+			$reviews = (int) $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT COUNT(*) FROM {$wpdb->commentmeta} cm
+					INNER JOIN {$wpdb->comments} c ON cm.comment_id = c.comment_ID
+					WHERE cm.meta_key = %s AND cm.meta_value = %s AND c.comment_type = %s",
+					self::META_KEY,
+					$module,
+					'apd_review'
+				)
+			);
+		} else {
+			$reviews = (int) $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT COUNT(*) FROM {$wpdb->commentmeta} cm
+					INNER JOIN {$wpdb->comments} c ON cm.comment_id = c.comment_ID
+					WHERE cm.meta_key = %s AND cm.meta_value != %s AND c.comment_type = %s",
+					self::META_KEY,
+					self::USERS_MODULE,
+					'apd_review'
+				)
+			);
+		}
 
 		// Count demo inquiries.
-		$inquiries = (int) $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT COUNT(*) FROM {$wpdb->postmeta} pm
-				INNER JOIN {$wpdb->posts} p ON pm.post_id = p.ID
-				WHERE pm.meta_key = %s AND pm.meta_value = %s AND p.post_type = %s",
-				self::META_KEY,
-				self::META_VALUE,
-				'apd_inquiry'
-			)
-		);
+		if ( $filter_by_module ) {
+			$inquiries = (int) $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT COUNT(*) FROM {$wpdb->postmeta} pm
+					INNER JOIN {$wpdb->posts} p ON pm.post_id = p.ID
+					WHERE pm.meta_key = %s AND pm.meta_value = %s AND p.post_type = %s",
+					self::META_KEY,
+					$module,
+					'apd_inquiry'
+				)
+			);
+		} else {
+			$inquiries = (int) $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT COUNT(*) FROM {$wpdb->postmeta} pm
+					INNER JOIN {$wpdb->posts} p ON pm.post_id = p.ID
+					WHERE pm.meta_key = %s AND pm.meta_value != %s AND p.post_type = %s",
+					self::META_KEY,
+					self::USERS_MODULE,
+					'apd_inquiry'
+				)
+			);
+		}
 
 		return [
 			'users'      => $users,
 			'categories' => $categories,
-			'tags'       => $tags,
+			'tags'        => $tags,
 			'listings'   => $listings,
 			'reviews'    => $reviews,
 			'inquiries'  => $inquiries,
@@ -263,23 +353,27 @@ final class DemoDataTracker {
 	}
 
 	/**
-	 * Get IDs of demo posts by post type.
+	 * Get IDs of demo posts by post type, optionally filtered by module.
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string $post_type Post type.
+	 * @param string      $post_type Post type.
+	 * @param string|null $module    Module slug to filter by, or null for all.
 	 * @return int[]
 	 */
-	public function get_demo_post_ids( string $post_type ): array {
+	public function get_demo_post_ids( string $post_type, ?string $module = null ): array {
 		global $wpdb;
+
+		$value_clause = $module !== null
+			? $wpdb->prepare( 'AND pm.meta_value = %s', $module )
+			: '';
 
 		$ids = $wpdb->get_col(
 			$wpdb->prepare(
 				"SELECT p.ID FROM {$wpdb->posts} p
 				INNER JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id
-				WHERE pm.meta_key = %s AND pm.meta_value = %s AND p.post_type = %s",
+				WHERE pm.meta_key = %s {$value_clause} AND p.post_type = %s",
 				self::META_KEY,
-				self::META_VALUE,
 				$post_type
 			)
 		);
@@ -288,24 +382,28 @@ final class DemoDataTracker {
 	}
 
 	/**
-	 * Get IDs of demo terms by taxonomy.
+	 * Get IDs of demo terms by taxonomy, optionally filtered by module.
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string $taxonomy Taxonomy name.
+	 * @param string      $taxonomy Taxonomy name.
+	 * @param string|null $module   Module slug to filter by, or null for all.
 	 * @return int[]
 	 */
-	public function get_demo_term_ids( string $taxonomy ): array {
+	public function get_demo_term_ids( string $taxonomy, ?string $module = null ): array {
 		global $wpdb;
+
+		$value_clause = $module !== null
+			? $wpdb->prepare( 'AND tm.meta_value = %s', $module )
+			: '';
 
 		$ids = $wpdb->get_col(
 			$wpdb->prepare(
 				"SELECT t.term_id FROM {$wpdb->terms} t
 				INNER JOIN {$wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
 				INNER JOIN {$wpdb->termmeta} tm ON t.term_id = tm.term_id
-				WHERE tm.meta_key = %s AND tm.meta_value = %s AND tt.taxonomy = %s",
+				WHERE tm.meta_key = %s {$value_clause} AND tt.taxonomy = %s",
 				self::META_KEY,
-				self::META_VALUE,
 				$taxonomy
 			)
 		);
@@ -327,7 +425,7 @@ final class DemoDataTracker {
 			$wpdb->prepare(
 				"SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = %s AND meta_value = %s",
 				self::META_KEY,
-				self::META_VALUE
+				self::USERS_MODULE
 			)
 		);
 
@@ -335,33 +433,36 @@ final class DemoDataTracker {
 	}
 
 	/**
-	 * Get IDs of demo comments.
+	 * Get IDs of demo comments, optionally filtered by type and module.
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string $comment_type Comment type (e.g., 'apd_review').
+	 * @param string      $comment_type Comment type (e.g., 'apd_review').
+	 * @param string|null $module       Module slug to filter by, or null for all.
 	 * @return int[]
 	 */
-	public function get_demo_comment_ids( string $comment_type = '' ): array {
+	public function get_demo_comment_ids( string $comment_type = '', ?string $module = null ): array {
 		global $wpdb;
+
+		$value_clause = $module !== null
+			? $wpdb->prepare( 'AND cm.meta_value = %s', $module )
+			: '';
 
 		if ( ! empty( $comment_type ) ) {
 			$ids = $wpdb->get_col(
 				$wpdb->prepare(
 					"SELECT c.comment_ID FROM {$wpdb->comments} c
 					INNER JOIN {$wpdb->commentmeta} cm ON c.comment_ID = cm.comment_id
-					WHERE cm.meta_key = %s AND cm.meta_value = %s AND c.comment_type = %s",
+					WHERE cm.meta_key = %s {$value_clause} AND c.comment_type = %s",
 					self::META_KEY,
-					self::META_VALUE,
 					$comment_type
 				)
 			);
 		} else {
 			$ids = $wpdb->get_col(
 				$wpdb->prepare(
-					"SELECT comment_id FROM {$wpdb->commentmeta} WHERE meta_key = %s AND meta_value = %s",
-					self::META_KEY,
-					self::META_VALUE
+					"SELECT cm.comment_id FROM {$wpdb->commentmeta} cm WHERE cm.meta_key = %s {$value_clause}",
+					self::META_KEY
 				)
 			);
 		}
@@ -370,7 +471,7 @@ final class DemoDataTracker {
 	}
 
 	/**
-	 * Delete all demo users.
+	 * Delete demo users.
 	 *
 	 * @since 1.0.0
 	 *
@@ -383,7 +484,6 @@ final class DemoDataTracker {
 		$deleted  = 0;
 
 		foreach ( $user_ids as $user_id ) {
-			// Reassign content to admin (user ID 1) or null if deleting content.
 			if ( wp_delete_user( $user_id, 1 ) ) {
 				++$deleted;
 			}
@@ -393,14 +493,15 @@ final class DemoDataTracker {
 	}
 
 	/**
-	 * Delete all demo categories.
+	 * Delete demo categories, optionally filtered by module.
 	 *
 	 * @since 1.0.0
 	 *
+	 * @param string|null $module Module slug to filter by, or null for all.
 	 * @return int Number of categories deleted.
 	 */
-	public function delete_demo_categories(): int {
-		$term_ids = $this->get_demo_term_ids( 'apd_category' );
+	public function delete_demo_categories( ?string $module = null ): int {
+		$term_ids = $this->get_demo_term_ids( 'apd_category', $module );
 		$deleted  = 0;
 
 		foreach ( $term_ids as $term_id ) {
@@ -414,14 +515,15 @@ final class DemoDataTracker {
 	}
 
 	/**
-	 * Delete all demo tags.
+	 * Delete demo tags, optionally filtered by module.
 	 *
 	 * @since 1.0.0
 	 *
+	 * @param string|null $module Module slug to filter by, or null for all.
 	 * @return int Number of tags deleted.
 	 */
-	public function delete_demo_tags(): int {
-		$term_ids = $this->get_demo_term_ids( 'apd_tag' );
+	public function delete_demo_tags( ?string $module = null ): int {
+		$term_ids = $this->get_demo_term_ids( 'apd_tag', $module );
 		$deleted  = 0;
 
 		foreach ( $term_ids as $term_id ) {
@@ -435,18 +537,19 @@ final class DemoDataTracker {
 	}
 
 	/**
-	 * Delete all demo listings.
+	 * Delete demo listings, optionally filtered by module.
 	 *
 	 * @since 1.0.0
 	 *
+	 * @param string|null $module Module slug to filter by, or null for all.
 	 * @return int Number of listings deleted.
 	 */
-	public function delete_demo_listings(): int {
-		$post_ids = $this->get_demo_post_ids( 'apd_listing' );
+	public function delete_demo_listings( ?string $module = null ): int {
+		$post_ids = $this->get_demo_post_ids( 'apd_listing', $module );
 		$deleted  = 0;
 
 		foreach ( $post_ids as $post_id ) {
-			$result = wp_delete_post( $post_id, true ); // Force delete (bypass trash).
+			$result = wp_delete_post( $post_id, true );
 			if ( $result ) {
 				++$deleted;
 			}
@@ -456,18 +559,19 @@ final class DemoDataTracker {
 	}
 
 	/**
-	 * Delete all demo reviews.
+	 * Delete demo reviews, optionally filtered by module.
 	 *
 	 * @since 1.0.0
 	 *
+	 * @param string|null $module Module slug to filter by, or null for all.
 	 * @return int Number of reviews deleted.
 	 */
-	public function delete_demo_reviews(): int {
-		$comment_ids = $this->get_demo_comment_ids( 'apd_review' );
+	public function delete_demo_reviews( ?string $module = null ): int {
+		$comment_ids = $this->get_demo_comment_ids( 'apd_review', $module );
 		$deleted     = 0;
 
 		foreach ( $comment_ids as $comment_id ) {
-			$result = wp_delete_comment( $comment_id, true ); // Force delete.
+			$result = wp_delete_comment( $comment_id, true );
 			if ( $result ) {
 				++$deleted;
 			}
@@ -477,18 +581,19 @@ final class DemoDataTracker {
 	}
 
 	/**
-	 * Delete all demo inquiries.
+	 * Delete demo inquiries, optionally filtered by module.
 	 *
 	 * @since 1.0.0
 	 *
+	 * @param string|null $module Module slug to filter by, or null for all.
 	 * @return int Number of inquiries deleted.
 	 */
-	public function delete_demo_inquiries(): int {
-		$post_ids = $this->get_demo_post_ids( 'apd_inquiry' );
+	public function delete_demo_inquiries( ?string $module = null ): int {
+		$post_ids = $this->get_demo_post_ids( 'apd_inquiry', $module );
 		$deleted  = 0;
 
 		foreach ( $post_ids as $post_id ) {
-			$result = wp_delete_post( $post_id, true ); // Force delete.
+			$result = wp_delete_post( $post_id, true );
 			if ( $result ) {
 				++$deleted;
 			}
@@ -498,23 +603,23 @@ final class DemoDataTracker {
 	}
 
 	/**
-	 * Clear all user favorites that reference demo listings.
+	 * Clear user favorites that reference demo listings for a specific module.
 	 *
 	 * @since 1.0.0
 	 *
+	 * @param string|null $module Module slug to filter listings by, or null for all.
 	 * @return int Number of favorites cleared.
 	 */
-	public function clear_demo_favorites(): int {
+	public function clear_demo_favorites( ?string $module = null ): int {
 		global $wpdb;
 
-		$demo_listing_ids = $this->get_demo_post_ids( 'apd_listing' );
+		$demo_listing_ids = $this->get_demo_post_ids( 'apd_listing', $module );
 		if ( empty( $demo_listing_ids ) ) {
 			return 0;
 		}
 
 		$cleared = 0;
 
-		// Get all users with favorites.
 		$users_with_favorites = $wpdb->get_col(
 			"SELECT DISTINCT user_id FROM {$wpdb->usermeta} WHERE meta_key = '_apd_favorites'"
 		);
@@ -539,13 +644,50 @@ final class DemoDataTracker {
 	}
 
 	/**
-	 * Delete all demo data.
+	 * Delete all demo data for a specific module.
 	 *
-	 * Deletes in dependency order: reviews → inquiries → favorites → listings → tags → categories → users.
+	 * Deletes in dependency order: reviews -> inquiries -> favorites -> listings -> tags -> categories.
+	 * Does NOT delete users (they are shared across modules).
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param string $module Module slug to delete data for.
+	 * @return array<string, int> Deleted counts keyed by type.
+	 */
+	public function delete_by_module( string $module ): array {
+		$counts = [];
+
+		// Delete module provider data first (may reference core data).
+		$provider_registry = DemoDataProviderRegistry::get_instance();
+		$provider          = $provider_registry->get( $module );
+
+		if ( $provider ) {
+			$provider_counts = $provider->delete( $this );
+			foreach ( $provider_counts as $type => $type_count ) {
+				$counts[ 'module_' . $module . '_' . $type ] = $type_count;
+			}
+		}
+
+		// Delete core data in dependency order.
+		$counts['reviews']    = $this->delete_demo_reviews( $module );
+		$counts['inquiries']  = $this->delete_demo_inquiries( $module );
+		$counts['favorites']  = $this->clear_demo_favorites( $module );
+		$counts['listings']   = $this->delete_demo_listings( $module );
+		$counts['tags']       = $this->delete_demo_tags( $module );
+		$counts['categories'] = $this->delete_demo_categories( $module );
+
+		return $counts;
+	}
+
+	/**
+	 * Delete all demo data across all modules and users.
+	 *
+	 * Deletes in dependency order: module data -> reviews -> inquiries -> favorites ->
+	 * listings -> tags -> categories -> users.
 	 *
 	 * @since 1.0.0
 	 *
-	 * @return array{users: int, categories: int, tags: int, listings: int, reviews: int, inquiries: int, favorites: int}
+	 * @return array<string, int> Deleted counts keyed by type.
 	 */
 	public function delete_all(): array {
 		/**
@@ -566,7 +708,7 @@ final class DemoDataTracker {
 			}
 		}
 
-		// Delete core data in dependency order.
+		// Delete core data in dependency order (all modules).
 		$counts['reviews']    = $this->delete_demo_reviews();
 		$counts['inquiries']  = $this->delete_demo_inquiries();
 		$counts['favorites']  = $this->clear_demo_favorites();
@@ -585,6 +727,53 @@ final class DemoDataTracker {
 		do_action( 'apd_after_delete_demo_data', $counts );
 
 		return $counts;
+	}
+
+	/**
+	 * Check if any module (excluding users) has demo data.
+	 *
+	 * Used to determine if the "Delete Users" button should be enabled.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return bool True if any non-user demo data exists.
+	 */
+	public function has_module_demo_data(): bool {
+		global $wpdb;
+
+		$count = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = %s AND meta_value != %s LIMIT 1",
+				self::META_KEY,
+				self::USERS_MODULE
+			)
+		);
+
+		if ( $count > 0 ) {
+			return true;
+		}
+
+		$count = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM {$wpdb->termmeta} WHERE meta_key = %s AND meta_value != %s LIMIT 1",
+				self::META_KEY,
+				self::USERS_MODULE
+			)
+		);
+
+		if ( $count > 0 ) {
+			return true;
+		}
+
+		$count = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM {$wpdb->commentmeta} WHERE meta_key = %s AND meta_value != %s LIMIT 1",
+				self::META_KEY,
+				self::USERS_MODULE
+			)
+		);
+
+		return $count > 0;
 	}
 
 	/**

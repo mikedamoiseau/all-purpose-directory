@@ -3,6 +3,7 @@
  * Demo Data Admin Page Class.
  *
  * Provides admin interface for generating and deleting demo data.
+ * Features a tabbed interface with shared Users section and per-module tabs.
  *
  * @package APD\Admin\DemoData
  * @since   1.0.0
@@ -11,6 +12,9 @@
 declare(strict_types=1);
 
 namespace APD\Admin\DemoData;
+
+use APD\Contracts\DemoDataModuleProviderInterface;
+use APD\Contracts\TabProviderInterface;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -70,6 +74,13 @@ final class DemoDataPage {
 	];
 
 	/**
+	 * Registered tab providers.
+	 *
+	 * @var TabProviderInterface[]
+	 */
+	private array $tabs = [];
+
+	/**
 	 * Get the singleton instance.
 	 *
 	 * @since 1.0.0
@@ -122,6 +133,8 @@ final class DemoDataPage {
 		// AJAX handlers.
 		add_action( 'wp_ajax_apd_generate_demo', [ $this, 'ajax_generate' ] );
 		add_action( 'wp_ajax_apd_delete_demo', [ $this, 'ajax_delete' ] );
+		add_action( 'wp_ajax_apd_generate_users', [ $this, 'ajax_generate_users' ] );
+		add_action( 'wp_ajax_apd_delete_users', [ $this, 'ajax_delete_users' ] );
 
 		/**
 		 * Fires after demo data page is initialized.
@@ -134,6 +147,65 @@ final class DemoDataPage {
 
 		// Initialize demo data provider registry so modules can register providers.
 		DemoDataProviderRegistry::get_instance()->init();
+
+		// Register tabs after providers are initialized.
+		$this->register_tabs();
+	}
+
+	/**
+	 * Register tab providers.
+	 *
+	 * Creates the General tab and wraps DemoDataModuleProviderInterface providers.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return void
+	 */
+	private function register_tabs(): void {
+		// Always register the General tab.
+		$this->tabs[] = new GeneralTabProvider();
+
+		// Create ModuleTabProvider for each DemoDataModuleProviderInterface.
+		$provider_registry = DemoDataProviderRegistry::get_instance();
+
+		foreach ( $provider_registry->get_all() as $provider ) {
+			if ( $provider instanceof DemoDataModuleProviderInterface ) {
+				$this->tabs[] = new ModuleTabProvider( $provider );
+			}
+		}
+
+		// Sort tabs by priority.
+		usort( $this->tabs, function ( TabProviderInterface $a, TabProviderInterface $b ) {
+			return $a->get_priority() <=> $b->get_priority();
+		} );
+	}
+
+	/**
+	 * Get registered tab providers.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return TabProviderInterface[]
+	 */
+	public function get_tabs(): array {
+		return $this->tabs;
+	}
+
+	/**
+	 * Get a tab provider by slug.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param string $slug Tab slug.
+	 * @return TabProviderInterface|null
+	 */
+	public function get_tab( string $slug ): ?TabProviderInterface {
+		foreach ( $this->tabs as $tab ) {
+			if ( $tab->get_slug() === $slug ) {
+				return $tab;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -169,9 +241,16 @@ final class DemoDataPage {
 		}
 
 		wp_enqueue_style(
+			'apd-admin-base',
+			APD_PLUGIN_URL . 'assets/css/admin-base.css',
+			[],
+			APD_VERSION
+		);
+
+		wp_enqueue_style(
 			'apd-admin-demo-data',
 			APD_PLUGIN_URL . 'assets/css/admin-demo-data.css',
-			[],
+			[ 'apd-admin-base' ],
 			APD_VERSION
 		);
 
@@ -183,13 +262,13 @@ final class DemoDataPage {
 			true
 		);
 
-		// Build module labels map from registered providers.
-		$module_labels = [];
-		$providers     = DemoDataProviderRegistry::get_instance()->get_all();
-
-		foreach ( $providers as $slug => $provider ) {
-			$module_labels[ 'module_' . $slug ] = $provider->get_name();
-		}
+		// Build tab slugs for JS.
+		$tab_slugs = array_map(
+			function ( TabProviderInterface $tab ) {
+				return $tab->get_slug();
+			},
+			$this->tabs
+		);
 
 		wp_localize_script(
 			'apd-admin-demo-data',
@@ -198,20 +277,16 @@ final class DemoDataPage {
 				'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
 				'generateNonce' => wp_create_nonce( self::NONCE_GENERATE ),
 				'deleteNonce'   => wp_create_nonce( self::NONCE_DELETE ),
-				'moduleLabels'  => $module_labels,
+				'tabs'          => $tab_slugs,
 				'strings'       => [
 					'generating'        => __( 'Generating demo data...', 'all-purpose-directory' ),
 					'deleting'          => __( 'Deleting demo data...', 'all-purpose-directory' ),
-					'confirmDelete'     => __( 'Are you sure you want to delete ALL demo data? This cannot be undone.', 'all-purpose-directory' ),
+					'confirmDelete'     => __( 'Are you sure you want to delete this demo data? This cannot be undone.', 'all-purpose-directory' ),
+					'confirmDeleteAll'  => __( 'Are you sure you want to delete ALL demo data including users? This cannot be undone.', 'all-purpose-directory' ),
 					'success'           => __( 'Operation completed successfully!', 'all-purpose-directory' ),
 					'error'             => __( 'An error occurred. Please try again.', 'all-purpose-directory' ),
 					'generatingUsers'   => __( 'Creating users...', 'all-purpose-directory' ),
-					'generatingCats'    => __( 'Creating categories...', 'all-purpose-directory' ),
-					'generatingTags'    => __( 'Creating tags...', 'all-purpose-directory' ),
-					'generatingList'    => __( 'Creating listings...', 'all-purpose-directory' ),
-					'generatingReviews' => __( 'Creating reviews...', 'all-purpose-directory' ),
-					'generatingInq'     => __( 'Creating inquiries...', 'all-purpose-directory' ),
-					'generatingFavs'    => __( 'Creating favorites...', 'all-purpose-directory' ),
+					'deletingUsers'     => __( 'Deleting users...', 'all-purpose-directory' ),
 				],
 			]
 		);
@@ -230,247 +305,271 @@ final class DemoDataPage {
 			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'all-purpose-directory' ) );
 		}
 
-		$tracker           = DemoDataTracker::get_instance();
-		$counts            = $tracker->count_demo_data();
-		$total             = array_sum( $counts );
-		$provider_registry = DemoDataProviderRegistry::get_instance();
-		$providers         = $provider_registry->get_all();
-		$module_counts     = [];
-
-		foreach ( $providers as $slug => $provider ) {
-			$provider_counts = $provider->count( $tracker );
-
-			foreach ( $provider_counts as $type => $count ) {
-				$key                   = 'module_' . $slug . '_' . $type;
-				$module_counts[ $key ] = $count;
-				$total                += $count;
-			}
-		}
-
-		/**
-		 * Filter the default demo data counts.
-		 *
-		 * @since 1.0.0
-		 *
-		 * @param array<string, int> $defaults Default quantities.
-		 */
-		$defaults = apply_filters( 'apd_demo_default_counts', $this->defaults );
+		$tracker  = DemoDataTracker::get_instance();
+		$defaults = $this->get_filtered_defaults();
 
 		?>
 		<div class="wrap apd-demo-data-wrap">
-			<h1><?php esc_html_e( 'Demo Data Generator', 'all-purpose-directory' ); ?></h1>
+			<?php $this->render_page_header(); ?>
+			<?php $this->render_users_section( $tracker, $defaults ); ?>
+			<?php $this->render_tab_navigation(); ?>
 
-			<p class="description">
-				<?php esc_html_e( 'Generate sample data to test your directory. All demo data can be deleted later without affecting your real content.', 'all-purpose-directory' ); ?>
-			</p>
+			<div class="apd-tab-content-wrap">
+				<?php foreach ( $this->tabs as $tab ) : ?>
+					<div id="apd-tab-<?php echo esc_attr( $tab->get_slug() ); ?>"
+						class="apd-tab-content"
+						role="tabpanel"
+						aria-labelledby="apd-tab-link-<?php echo esc_attr( $tab->get_slug() ); ?>"
+						style="display: none;"
+						data-module="<?php echo esc_attr( $tab->get_slug() ); ?>">
 
-			<!-- Current Status -->
-			<div class="apd-demo-section apd-demo-status">
-				<h2><?php esc_html_e( 'Current Demo Data', 'all-purpose-directory' ); ?></h2>
-
-				<table class="apd-demo-stats">
-					<tbody>
-						<tr>
-							<td><span class="dashicons dashicons-admin-users"></span> <?php esc_html_e( 'Users', 'all-purpose-directory' ); ?></td>
-							<td class="apd-stat-count" data-type="users"><?php echo esc_html( number_format_i18n( $counts['users'] ) ); ?></td>
-						</tr>
-						<tr>
-							<td><span class="dashicons dashicons-category"></span> <?php esc_html_e( 'Categories', 'all-purpose-directory' ); ?></td>
-							<td class="apd-stat-count" data-type="categories"><?php echo esc_html( number_format_i18n( $counts['categories'] ) ); ?></td>
-						</tr>
-						<tr>
-							<td><span class="dashicons dashicons-tag"></span> <?php esc_html_e( 'Tags', 'all-purpose-directory' ); ?></td>
-							<td class="apd-stat-count" data-type="tags"><?php echo esc_html( number_format_i18n( $counts['tags'] ) ); ?></td>
-						</tr>
-						<tr>
-							<td><span class="dashicons dashicons-location"></span> <?php esc_html_e( 'Listings', 'all-purpose-directory' ); ?></td>
-							<td class="apd-stat-count" data-type="listings"><?php echo esc_html( number_format_i18n( $counts['listings'] ) ); ?></td>
-						</tr>
-						<tr>
-							<td><span class="dashicons dashicons-star-filled"></span> <?php esc_html_e( 'Reviews', 'all-purpose-directory' ); ?></td>
-							<td class="apd-stat-count" data-type="reviews"><?php echo esc_html( number_format_i18n( $counts['reviews'] ) ); ?></td>
-						</tr>
-						<tr>
-							<td><span class="dashicons dashicons-email"></span> <?php esc_html_e( 'Inquiries', 'all-purpose-directory' ); ?></td>
-							<td class="apd-stat-count" data-type="inquiries"><?php echo esc_html( number_format_i18n( $counts['inquiries'] ) ); ?></td>
-						</tr>
-						<?php foreach ( $providers as $slug => $provider ) : ?>
-							<?php
-							$provider_counts = $provider->count( $tracker );
-
-							foreach ( $provider_counts as $type => $count ) :
-								$data_type = 'module_' . $slug . '_' . $type;
-								?>
-								<tr>
-									<td>
-										<span class="dashicons <?php echo esc_attr( $provider->get_icon() ); ?>"></span>
-										<?php echo esc_html( $provider->get_name() ); ?> &mdash; <?php echo esc_html( ucfirst( $type ) ); ?>
-									</td>
-									<td class="apd-stat-count" data-type="<?php echo esc_attr( $data_type ); ?>">
-										<?php echo esc_html( number_format_i18n( $count ) ); ?>
-									</td>
-								</tr>
-							<?php endforeach; ?>
-						<?php endforeach; ?>
-					</tbody>
-					<tfoot>
-						<tr>
-							<th><?php esc_html_e( 'Total Items', 'all-purpose-directory' ); ?></th>
-							<th class="apd-stat-total"><?php echo esc_html( number_format_i18n( $total ) ); ?></th>
-						</tr>
-					</tfoot>
-				</table>
-			</div>
-
-			<!-- Generate Form -->
-			<div class="apd-demo-section apd-demo-generate">
-				<h2><?php esc_html_e( 'Generate Demo Data', 'all-purpose-directory' ); ?></h2>
-
-				<form id="apd-generate-form" class="apd-demo-form">
-					<fieldset>
-						<legend class="screen-reader-text"><?php esc_html_e( 'Select data to generate', 'all-purpose-directory' ); ?></legend>
-
-						<div class="apd-form-row">
-							<label class="apd-checkbox-label">
-								<input type="checkbox" name="generate_users" value="1" checked>
-								<?php esc_html_e( 'Users', 'all-purpose-directory' ); ?>
-							</label>
-							<input type="number" name="users_count" value="<?php echo esc_attr( (string) $defaults['users'] ); ?>" min="1" max="20" class="small-text">
-							<span class="description"><?php esc_html_e( 'demo users (max 20)', 'all-purpose-directory' ); ?></span>
-						</div>
-
-						<div class="apd-form-row">
-							<label class="apd-checkbox-label">
-								<input type="checkbox" name="generate_categories" value="1" checked>
-								<?php esc_html_e( 'Categories', 'all-purpose-directory' ); ?>
-							</label>
-							<span class="description"><?php esc_html_e( '21 categories (6 parent + 15 child) with icons and colors', 'all-purpose-directory' ); ?></span>
-						</div>
-
-						<div class="apd-form-row">
-							<label class="apd-checkbox-label">
-								<input type="checkbox" name="generate_tags" value="1" checked>
-								<?php esc_html_e( 'Tags', 'all-purpose-directory' ); ?>
-							</label>
-							<input type="number" name="tags_count" value="<?php echo esc_attr( (string) $defaults['tags'] ); ?>" min="1" max="10" class="small-text">
-							<span class="description"><?php esc_html_e( 'tags (max 10)', 'all-purpose-directory' ); ?></span>
-						</div>
-
-						<div class="apd-form-row">
-							<label class="apd-checkbox-label">
-								<input type="checkbox" name="generate_listings" value="1" checked>
-								<?php esc_html_e( 'Listings', 'all-purpose-directory' ); ?>
-							</label>
-							<input type="number" name="listings_count" value="<?php echo esc_attr( (string) $defaults['listings'] ); ?>" min="1" max="100" class="small-text">
-							<span class="description"><?php esc_html_e( 'listings (max 100)', 'all-purpose-directory' ); ?></span>
-						</div>
-
-						<div class="apd-form-row">
-							<label class="apd-checkbox-label">
-								<input type="checkbox" name="generate_reviews" value="1" checked>
-								<?php esc_html_e( 'Reviews', 'all-purpose-directory' ); ?>
-							</label>
-							<span class="description"><?php esc_html_e( '2-4 reviews per listing', 'all-purpose-directory' ); ?></span>
-						</div>
-
-						<div class="apd-form-row">
-							<label class="apd-checkbox-label">
-								<input type="checkbox" name="generate_inquiries" value="1" checked>
-								<?php esc_html_e( 'Inquiries', 'all-purpose-directory' ); ?>
-							</label>
-							<span class="description"><?php esc_html_e( '0-2 inquiries per listing (random)', 'all-purpose-directory' ); ?></span>
-						</div>
-
-						<div class="apd-form-row">
-							<label class="apd-checkbox-label">
-								<input type="checkbox" name="generate_favorites" value="1" checked>
-								<?php esc_html_e( 'Favorites', 'all-purpose-directory' ); ?>
-							</label>
-							<span class="description"><?php esc_html_e( '1-5 favorites per user', 'all-purpose-directory' ); ?></span>
-						</div>
-
-						<?php if ( ! empty( $providers ) ) : ?>
-							<div class="apd-form-divider"><?php esc_html_e( 'Module Data', 'all-purpose-directory' ); ?></div>
-
-							<?php foreach ( $providers as $slug => $provider ) : ?>
-								<div class="apd-form-row">
-									<label class="apd-checkbox-label">
-										<input type="checkbox" name="generate_module_<?php echo esc_attr( $slug ); ?>" value="1" checked>
-										<?php echo esc_html( $provider->get_name() ); ?>
-									</label>
-									<?php foreach ( $provider->get_form_fields() as $field ) : ?>
-										<input
-											type="<?php echo esc_attr( $field['type'] ); ?>"
-											name="module_<?php echo esc_attr( $slug ); ?>_<?php echo esc_attr( $field['name'] ); ?>"
-											value="<?php echo esc_attr( (string) $field['default'] ); ?>"
-											min="<?php echo esc_attr( (string) ( $field['min'] ?? 1 ) ); ?>"
-											max="<?php echo esc_attr( (string) ( $field['max'] ?? 100 ) ); ?>"
-											class="small-text"
-										>
-									<?php endforeach; ?>
-									<span class="description"><?php echo esc_html( $provider->get_description() ); ?></span>
-								</div>
-							<?php endforeach; ?>
-						<?php endif; ?>
-					</fieldset>
-
-					<div class="apd-form-actions">
-						<button type="submit" class="button button-primary button-large" id="apd-generate-btn">
-							<span class="dashicons dashicons-database-add"></span>
-							<?php esc_html_e( 'Generate Demo Data', 'all-purpose-directory' ); ?>
-						</button>
+						<?php $this->render_tab_content( $tab, $tracker, $defaults ); ?>
 					</div>
-				</form>
-
-				<!-- Progress Indicator -->
-				<div id="apd-progress" class="apd-progress" style="display: none;">
-					<div class="apd-progress-bar">
-						<div class="apd-progress-bar-fill"></div>
-					</div>
-					<p class="apd-progress-text"></p>
-				</div>
-
-				<!-- Results -->
-				<div id="apd-results" class="apd-results" style="display: none;"></div>
-			</div>
-
-			<!-- Delete Section -->
-			<div class="apd-demo-section apd-demo-delete">
-				<h2><?php esc_html_e( 'Delete Demo Data', 'all-purpose-directory' ); ?></h2>
-
-				<?php if ( $total > 0 ) : ?>
-					<div class="apd-warning">
-						<span class="dashicons dashicons-warning"></span>
-						<p>
-							<?php
-							printf(
-								/* translators: %s: Number of demo data items */
-								esc_html__( 'You have %s demo data items. Deleting will permanently remove all demo users, categories, tags, listings, reviews, inquiries, and favorites.', 'all-purpose-directory' ),
-								'<strong>' . esc_html( number_format_i18n( $total ) ) . '</strong>'
-							);
-							?>
-						</p>
-					</div>
-
-					<form id="apd-delete-form" class="apd-demo-form">
-						<button type="submit" class="button button-link-delete button-large" id="apd-delete-btn">
-							<span class="dashicons dashicons-trash"></span>
-							<?php esc_html_e( 'Delete All Demo Data', 'all-purpose-directory' ); ?>
-						</button>
-					</form>
-				<?php else : ?>
-					<p class="apd-no-data">
-						<span class="dashicons dashicons-yes-alt"></span>
-						<?php esc_html_e( 'No demo data found. Your directory contains only real content.', 'all-purpose-directory' ); ?>
-					</p>
-				<?php endif; ?>
+				<?php endforeach; ?>
 			</div>
 		</div>
 		<?php
 	}
 
 	/**
-	 * AJAX handler for generating demo data.
+	 * Render the page header.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return void
+	 */
+	private function render_page_header(): void {
+		?>
+		<div class="apd-page-header">
+			<div class="apd-page-header__icon">
+				<span class="dashicons dashicons-database" aria-hidden="true"></span>
+			</div>
+			<div class="apd-page-header__content">
+				<h1><?php esc_html_e( 'Demo Data Generator', 'all-purpose-directory' ); ?></h1>
+				<p><?php esc_html_e( 'Generate sample data to test your directory. All demo data can be deleted later without affecting your real content.', 'all-purpose-directory' ); ?></p>
+			</div>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Render the shared Users section above tabs.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param DemoDataTracker    $tracker  Tracker instance.
+	 * @param array<string, int> $defaults Default quantities.
+	 * @return void
+	 */
+	private function render_users_section( DemoDataTracker $tracker, array $defaults ): void {
+		$user_counts     = $tracker->count_demo_data( DemoDataTracker::USERS_MODULE );
+		$user_count      = $user_counts['users'] ?? 0;
+		$has_module_data = $tracker->has_module_demo_data();
+
+		?>
+		<div class="apd-demo-section apd-demo-users">
+			<h2><?php esc_html_e( 'Demo Users', 'all-purpose-directory' ); ?></h2>
+			<p class="apd-section-description">
+				<?php esc_html_e( 'Demo users are shared across all tabs. They are used as listing authors, reviewers, and for favorites.', 'all-purpose-directory' ); ?>
+			</p>
+
+			<div class="apd-users-status">
+				<table class="apd-demo-stats">
+					<tbody>
+						<tr>
+							<td>
+								<span class="dashicons dashicons-admin-users" aria-hidden="true"></span>
+								<?php esc_html_e( 'Users', 'all-purpose-directory' ); ?>
+							</td>
+							<td class="apd-stat-count" data-type="users">
+								<?php echo esc_html( number_format_i18n( $user_count ) ); ?>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<div class="apd-users-actions">
+				<form id="apd-generate-users-form" class="apd-demo-form apd-inline-form">
+					<fieldset>
+						<legend class="screen-reader-text"><?php esc_html_e( 'Generate demo users', 'all-purpose-directory' ); ?></legend>
+						<label for="apd-users-count" class="screen-reader-text"><?php esc_html_e( 'Number of users', 'all-purpose-directory' ); ?></label>
+						<input type="number" id="apd-users-count" name="users_count" value="<?php echo esc_attr( (string) ( $defaults['users'] ?? 5 ) ); ?>" min="1" max="20" class="small-text">
+						<span class="description"><?php esc_html_e( 'users (max 20)', 'all-purpose-directory' ); ?></span>
+						<button type="submit" class="button button-secondary" id="apd-generate-users-btn">
+							<span class="dashicons dashicons-plus-alt2" aria-hidden="true"></span>
+							<?php esc_html_e( 'Generate Users', 'all-purpose-directory' ); ?>
+						</button>
+					</fieldset>
+				</form>
+
+				<?php if ( $user_count > 0 ) : ?>
+					<button type="button"
+						class="button button-link-delete"
+						id="apd-delete-users-btn"
+						<?php disabled( $has_module_data ); ?>>
+						<span class="dashicons dashicons-trash" aria-hidden="true"></span>
+						<?php esc_html_e( 'Delete Users', 'all-purpose-directory' ); ?>
+					</button>
+					<?php if ( $has_module_data ) : ?>
+						<span class="description apd-delete-users-hint">
+							<?php esc_html_e( 'Delete all tab data first before deleting users.', 'all-purpose-directory' ); ?>
+						</span>
+					<?php endif; ?>
+				<?php endif; ?>
+			</div>
+
+			<!-- Users progress/results -->
+			<div id="apd-users-progress" class="apd-progress" style="display: none;">
+				<div class="apd-progress-bar">
+					<div class="apd-progress-bar-fill"></div>
+				</div>
+				<p class="apd-progress-text"></p>
+			</div>
+			<div id="apd-users-results" class="apd-results" style="display: none;"></div>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Render the tab navigation bar.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return void
+	 */
+	private function render_tab_navigation(): void {
+		if ( count( $this->tabs ) < 2 ) {
+			return;
+		}
+
+		?>
+		<nav class="apd-demo-tabs nav-tab-wrapper" role="tablist">
+			<?php foreach ( $this->tabs as $index => $tab ) : ?>
+				<a href="#<?php echo esc_attr( $tab->get_slug() ); ?>"
+					id="apd-tab-link-<?php echo esc_attr( $tab->get_slug() ); ?>"
+					class="nav-tab <?php echo $index === 0 ? 'nav-tab-active' : ''; ?>"
+					role="tab"
+					aria-selected="<?php echo $index === 0 ? 'true' : 'false'; ?>"
+					aria-controls="apd-tab-<?php echo esc_attr( $tab->get_slug() ); ?>"
+					data-tab="<?php echo esc_attr( $tab->get_slug() ); ?>">
+					<span class="dashicons <?php echo esc_attr( $tab->get_icon() ); ?>" aria-hidden="true"></span>
+					<?php echo esc_html( $tab->get_name() ); ?>
+				</a>
+			<?php endforeach; ?>
+		</nav>
+		<?php
+	}
+
+	/**
+	 * Render a single tab's content.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param TabProviderInterface $tab      Tab provider.
+	 * @param DemoDataTracker      $tracker  Tracker instance.
+	 * @param array<string, int>   $defaults Default quantities.
+	 * @return void
+	 */
+	private function render_tab_content( TabProviderInterface $tab, DemoDataTracker $tracker, array $defaults ): void {
+		$total = $tab->get_total( $tracker );
+		$slug  = $tab->get_slug();
+
+		?>
+		<!-- Status Section -->
+		<div class="apd-demo-section apd-demo-status">
+			<h2>
+				<?php
+				printf(
+					/* translators: %s: Tab name */
+					esc_html__( 'Current %s Demo Data', 'all-purpose-directory' ),
+					esc_html( $tab->get_name() )
+				);
+				?>
+			</h2>
+
+			<div class="apd-stats-grid">
+				<?php $tab->render_status_section( $tracker ); ?>
+				<div class="apd-stat-item apd-stat-footer">
+					<span class="apd-stat-label"><?php esc_html_e( 'Total Items', 'all-purpose-directory' ); ?></span>
+					<span class="apd-stat-total" data-module="<?php echo esc_attr( $slug ); ?>">
+						<?php echo esc_html( number_format_i18n( $total ) ); ?>
+					</span>
+				</div>
+			</div>
+		</div>
+
+		<!-- Generate Form -->
+		<div class="apd-demo-section apd-demo-generate">
+			<h2>
+				<?php
+				printf(
+					/* translators: %s: Tab name */
+					esc_html__( 'Generate %s Demo Data', 'all-purpose-directory' ),
+					esc_html( $tab->get_name() )
+				);
+				?>
+			</h2>
+
+			<form class="apd-demo-form apd-generate-tab-form" data-module="<?php echo esc_attr( $slug ); ?>">
+				<fieldset>
+					<legend class="screen-reader-text">
+						<?php
+						printf(
+							/* translators: %s: Tab name */
+							esc_html__( 'Select %s data to generate', 'all-purpose-directory' ),
+							esc_html( $tab->get_name() )
+						);
+						?>
+					</legend>
+					<?php $tab->render_generate_form( $defaults ); ?>
+				</fieldset>
+
+				<div class="apd-form-actions">
+					<button type="submit" class="button button-primary button-large">
+						<span class="dashicons dashicons-database-add" aria-hidden="true"></span>
+						<?php
+						printf(
+							/* translators: %s: Tab name */
+							esc_html__( 'Generate %s Data', 'all-purpose-directory' ),
+							esc_html( $tab->get_name() )
+						);
+						?>
+					</button>
+				</div>
+			</form>
+
+			<!-- Per-tab progress indicator -->
+			<div class="apd-progress apd-tab-progress" style="display: none;">
+				<div class="apd-progress-bar">
+					<div class="apd-progress-bar-fill"></div>
+				</div>
+				<p class="apd-progress-text"></p>
+			</div>
+
+			<!-- Per-tab results -->
+			<div class="apd-results apd-tab-results" style="display: none;"></div>
+		</div>
+
+		<!-- Delete Section -->
+		<div class="apd-demo-section apd-demo-delete">
+			<h2>
+				<?php
+				printf(
+					/* translators: %s: Tab name */
+					esc_html__( 'Delete %s Demo Data', 'all-purpose-directory' ),
+					esc_html( $tab->get_name() )
+				);
+				?>
+			</h2>
+
+			<?php $tab->render_delete_section( $tracker ); ?>
+		</div>
+		<?php
+	}
+
+	/**
+	 * AJAX handler for generating demo data (per-tab).
 	 *
 	 * @since 1.0.0
 	 *
@@ -487,6 +586,15 @@ final class DemoDataPage {
 			wp_send_json_error( [ 'message' => __( 'Permission denied.', 'all-purpose-directory' ) ], 403 );
 		}
 
+		// Get the target module/tab.
+		$module = isset( $_POST['module'] ) ? sanitize_key( $_POST['module'] ) : '';
+		$tab    = $this->get_tab( $module );
+
+		if ( ! $tab ) {
+			wp_send_json_error( [ 'message' => __( 'Invalid tab.', 'all-purpose-directory' ) ], 400 );
+			return;
+		}
+
 		/**
 		 * Fires before demo data generation begins.
 		 *
@@ -494,126 +602,18 @@ final class DemoDataPage {
 		 */
 		do_action( 'apd_before_generate_demo_data' );
 
-		$generator = DemoDataGenerator::get_instance();
-		$results   = [];
-
-		// Parse options.
-		$generate_users      = ! empty( $_POST['generate_users'] );
-		$generate_categories = ! empty( $_POST['generate_categories'] );
-		$generate_tags       = ! empty( $_POST['generate_tags'] );
-		$generate_listings   = ! empty( $_POST['generate_listings'] );
-		$generate_reviews    = ! empty( $_POST['generate_reviews'] );
-		$generate_inquiries  = ! empty( $_POST['generate_inquiries'] );
-		$generate_favorites  = ! empty( $_POST['generate_favorites'] );
-
-		$users_count    = isset( $_POST['users_count'] ) ? absint( $_POST['users_count'] ) : 5;
-		$tags_count     = isset( $_POST['tags_count'] ) ? absint( $_POST['tags_count'] ) : 10;
-		$listings_count = isset( $_POST['listings_count'] ) ? absint( $_POST['listings_count'] ) : 25;
-
-		// Enforce limits.
-		$users_count    = min( $users_count, 20 );
-		$tags_count     = min( $tags_count, 10 );
-		$listings_count = min( $listings_count, 100 );
-
-		// Track created IDs for dependent operations.
-		$user_ids    = [];
-		$listing_ids = [];
-
-		// Generate users.
-		if ( $generate_users ) {
-			$user_ids         = $generator->generate_users( $users_count );
-			$results['users'] = count( $user_ids );
-		}
-
-		// Generate categories.
-		if ( $generate_categories ) {
-			$category_ids          = $generator->generate_categories();
-			$results['categories'] = count( $category_ids );
-		}
-
-		// Generate tags.
-		if ( $generate_tags ) {
-			$tag_ids         = $generator->generate_tags( $tags_count );
-			$results['tags'] = count( $tag_ids );
-		}
-
-		// Generate listings.
-		if ( $generate_listings ) {
-			$listing_ids         = $generator->generate_listings( $listings_count );
-			$results['listings'] = count( $listing_ids );
-		}
-
-		// Generate reviews (requires listings).
-		if ( $generate_reviews && ! empty( $listing_ids ) ) {
-			$review_ids         = $generator->generate_reviews( $listing_ids, $user_ids );
-			$results['reviews'] = count( $review_ids );
-		}
-
-		// Generate inquiries (requires listings).
-		if ( $generate_inquiries && ! empty( $listing_ids ) ) {
-			$inquiry_ids          = $generator->generate_inquiries( $listing_ids );
-			$results['inquiries'] = count( $inquiry_ids );
-		}
-
-		// Generate favorites (requires listings and users).
-		if ( $generate_favorites && ! empty( $listing_ids ) && ! empty( $user_ids ) ) {
-			$results['favorites'] = $generator->generate_favorites( $listing_ids, $user_ids );
-		}
-
-		// Generate module provider data.
-		$context = [
-			'user_ids'     => $user_ids,
-			'listing_ids'  => $listing_ids,
-			'category_ids' => isset( $category_ids ) ? $category_ids : [],
-			'tag_ids'      => isset( $tag_ids ) ? $tag_ids : [],
-			'options'      => [],
-		];
-
-		$tracker            = DemoDataTracker::get_instance();
-		$provider_registry  = DemoDataProviderRegistry::get_instance();
-		$module_providers   = $provider_registry->get_all();
-
-		foreach ( $module_providers as $slug => $provider ) {
-			if ( empty( $_POST[ 'generate_module_' . $slug ] ) ) {
-				continue;
-			}
-
-			// Extract provider-specific options from POST fields.
-			$provider_options = [];
-
-			foreach ( $provider->get_form_fields() as $field ) {
-				$post_key = 'module_' . $slug . '_' . $field['name'];
-
-				if ( ! isset( $_POST[ $post_key ] ) ) {
-					continue;
-				}
-
-				if ( $field['type'] === 'number' ) {
-					$provider_options[ $field['name'] ] = absint( $_POST[ $post_key ] );
-				} else {
-					$provider_options[ $field['name'] ] = sanitize_text_field( wp_unslash( $_POST[ $post_key ] ) );
-				}
-			}
-
-			$context['options']  = $provider_options;
-			$provider_results    = $provider->generate( $context, $tracker );
-
-			foreach ( $provider_results as $type => $count ) {
-				$results[ 'module_' . $slug . '_' . $type ] = $count;
+		// Sanitize POST data before passing to handler.
+		$post_data = [];
+		foreach ( $_POST as $key => $value ) {
+			$key = sanitize_key( $key );
+			if ( is_numeric( $value ) ) {
+				$post_data[ $key ] = absint( $value );
+			} else {
+				$post_data[ $key ] = sanitize_text_field( wp_unslash( $value ) );
 			}
 		}
 
-		// Get updated counts.
-		$updated_counts = $tracker->count_demo_data();
-
-		// Merge module counts into updated counts.
-		foreach ( $module_providers as $slug => $provider ) {
-			$provider_counts = $provider->count( $tracker );
-
-			foreach ( $provider_counts as $type => $count ) {
-				$updated_counts[ 'module_' . $slug . '_' . $type ] = $count;
-			}
-		}
+		$result = $tab->handle_generate( $post_data );
 
 		/**
 		 * Fires after demo data generation completes.
@@ -622,19 +622,27 @@ final class DemoDataPage {
 		 *
 		 * @param array $results Number of items created by type.
 		 */
-		do_action( 'apd_after_generate_demo_data', $results );
+		do_action( 'apd_after_generate_demo_data', $result['created'] );
+
+		// Include user count for the Users section update.
+		$tracker                     = DemoDataTracker::get_instance();
+		$user_counts                 = $tracker->count_demo_data( DemoDataTracker::USERS_MODULE );
+		$result['counts']['users']   = $user_counts['users'] ?? 0;
+		$result['has_module_data']   = $tracker->has_module_demo_data();
 
 		wp_send_json_success(
 			[
-				'message' => __( 'Demo data generated successfully!', 'all-purpose-directory' ),
-				'created' => $results,
-				'counts'  => $updated_counts,
+				'message'        => __( 'Demo data generated successfully!', 'all-purpose-directory' ),
+				'created'        => $result['created'],
+				'counts'         => $result['counts'],
+				'module'         => $module,
+				'has_module_data' => $result['has_module_data'],
 			]
 		);
 	}
 
 	/**
-	 * AJAX handler for deleting demo data.
+	 * AJAX handler for deleting demo data (per-tab).
 	 *
 	 * @since 1.0.0
 	 *
@@ -651,19 +659,141 @@ final class DemoDataPage {
 			wp_send_json_error( [ 'message' => __( 'Permission denied.', 'all-purpose-directory' ) ], 403 );
 		}
 
-		$tracker = DemoDataTracker::get_instance();
-		$deleted = $tracker->delete_all();
+		$module = isset( $_POST['module'] ) ? sanitize_key( $_POST['module'] ) : '';
+		$tab    = $this->get_tab( $module );
 
-		// Get updated counts (should all be 0).
-		$updated_counts = $tracker->count_demo_data();
+		if ( ! $tab ) {
+			wp_send_json_error( [ 'message' => __( 'Invalid tab.', 'all-purpose-directory' ) ], 400 );
+			return;
+		}
+
+		$tracker = DemoDataTracker::get_instance();
+
+		/**
+		 * Fires before demo data deletion begins.
+		 *
+		 * @since 1.0.0
+		 */
+		do_action( 'apd_before_delete_demo_data' );
+
+		$deleted = $tab->handle_delete( $tracker );
+
+		/**
+		 * Fires after demo data deletion completes.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array $counts Number of items deleted by type.
+		 */
+		do_action( 'apd_after_delete_demo_data', $deleted );
+
+		// Get updated counts for this tab.
+		$counts = $tab->get_counts( $tracker );
+
+		// Include user info.
+		$user_counts = $tracker->count_demo_data( DemoDataTracker::USERS_MODULE );
 
 		wp_send_json_success(
 			[
-				'message' => __( 'All demo data has been deleted.', 'all-purpose-directory' ),
-				'deleted' => $deleted,
-				'counts'  => $updated_counts,
+				'message'         => __( 'Demo data has been deleted.', 'all-purpose-directory' ),
+				'deleted'         => $deleted,
+				'counts'          => $counts,
+				'module'          => $module,
+				'users'           => $user_counts['users'] ?? 0,
+				'has_module_data' => $tracker->has_module_demo_data(),
 			]
 		);
+	}
+
+	/**
+	 * AJAX handler for generating demo users.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return void
+	 */
+	public function ajax_generate_users(): void {
+		if ( ! check_ajax_referer( self::NONCE_GENERATE, 'nonce', false ) ) {
+			wp_send_json_error( [ 'message' => __( 'Invalid security token.', 'all-purpose-directory' ) ], 403 );
+		}
+
+		if ( ! current_user_can( self::CAPABILITY ) ) {
+			wp_send_json_error( [ 'message' => __( 'Permission denied.', 'all-purpose-directory' ) ], 403 );
+		}
+
+		$count     = min( absint( $_POST['users_count'] ?? 5 ), 20 );
+		$generator = DemoDataGenerator::get_instance();
+		$user_ids  = $generator->generate_users( $count );
+
+		wp_send_json_success(
+			[
+				'message' => sprintf(
+					/* translators: %d: Number of users created */
+					__( '%d demo users created.', 'all-purpose-directory' ),
+					count( $user_ids )
+				),
+				'created' => count( $user_ids ),
+				'count'   => count( DemoDataTracker::get_instance()->get_demo_user_ids() ),
+			]
+		);
+	}
+
+	/**
+	 * AJAX handler for deleting demo users.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return void
+	 */
+	public function ajax_delete_users(): void {
+		if ( ! check_ajax_referer( self::NONCE_DELETE, 'nonce', false ) ) {
+			wp_send_json_error( [ 'message' => __( 'Invalid security token.', 'all-purpose-directory' ) ], 403 );
+		}
+
+		if ( ! current_user_can( self::CAPABILITY ) ) {
+			wp_send_json_error( [ 'message' => __( 'Permission denied.', 'all-purpose-directory' ) ], 403 );
+		}
+
+		$tracker = DemoDataTracker::get_instance();
+
+		// Don't allow deleting users while module data exists.
+		if ( $tracker->has_module_demo_data() ) {
+			wp_send_json_error( [
+				'message' => __( 'Cannot delete demo users while demo data exists in other tabs. Delete all tab data first.', 'all-purpose-directory' ),
+			], 400 );
+		}
+
+		$deleted = $tracker->delete_demo_users();
+
+		wp_send_json_success(
+			[
+				'message' => sprintf(
+					/* translators: %d: Number of users deleted */
+					__( '%d demo users deleted.', 'all-purpose-directory' ),
+					$deleted
+				),
+				'deleted' => $deleted,
+				'count'   => 0,
+			]
+		);
+	}
+
+	/**
+	 * Get the default generation quantities with filter applied.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return array<string, int>
+	 */
+	private function get_filtered_defaults(): array {
+		/**
+		 * Filter the default demo data counts.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array<string, int> $defaults Default quantities.
+		 */
+		return apply_filters( 'apd_demo_default_counts', $this->defaults );
 	}
 
 	/**

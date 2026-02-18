@@ -17,6 +17,7 @@ use APD\Admin\DemoData\DataSets\TagData;
 use APD\Admin\DemoData\DataSets\BusinessNames;
 use APD\Admin\DemoData\DataSets\Addresses;
 use APD\Admin\DemoData\DataSets\ReviewContent;
+use APD\Taxonomy\ListingTypeTaxonomy;
 
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -99,6 +100,8 @@ final class DemoDataGenerator {
 	/**
 	 * Generate demo users.
 	 *
+	 * Users are always tracked as shared ('users'), not module-specific.
+	 *
 	 * @since 1.0.0
 	 *
 	 * @param int $count Number of users to create.
@@ -148,28 +151,35 @@ final class DemoDataGenerator {
 	/**
 	 * Generate demo categories.
 	 *
-	 * Creates the fixed category hierarchy from CategoryData.
+	 * Creates a category hierarchy from the provided data (or defaults).
+	 * Sets _apd_listing_type term meta for category scoping when a module is specified.
 	 *
 	 * @since 1.0.0
 	 *
+	 * @param string $module        Module slug for tracking (default: 'general').
+	 * @param array  $category_data Optional custom category hierarchy. Defaults to core CategoryData.
 	 * @return int[] Created term IDs.
 	 */
-	public function generate_categories(): array {
-		$term_ids   = [];
-		$categories = CategoryData::get_categories();
+	public function generate_categories( string $module = DemoDataTracker::GENERAL_MODULE, array $category_data = [] ): array {
+		$term_ids = [];
+
+		if ( empty( $category_data ) ) {
+			$category_data = CategoryData::get_categories();
+		}
 
 		/**
 		 * Filter the demo category hierarchy data.
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param array $categories Category hierarchy.
+		 * @param array  $category_data Category hierarchy.
+		 * @param string $module        Module slug generating the categories.
 		 */
-		$categories = apply_filters( 'apd_demo_category_data', $categories );
+		$category_data = apply_filters( 'apd_demo_category_data', $category_data, $module );
 
-		foreach ( $categories as $slug => $category ) {
+		foreach ( $category_data as $slug => $category ) {
 			// Create parent category.
-			$parent_id = $this->create_category( $slug, $category, 0 );
+			$parent_id = $this->create_category( $slug, $category, 0, $module );
 
 			if ( $parent_id ) {
 				$term_ids[]                  = $parent_id;
@@ -178,7 +188,7 @@ final class DemoDataGenerator {
 				// Create child categories.
 				if ( ! empty( $category['children'] ) ) {
 					foreach ( $category['children'] as $child_slug => $child_data ) {
-						$child_id = $this->create_category( $child_slug, $child_data, $parent_id );
+						$child_id = $this->create_category( $child_slug, $child_data, $parent_id, $module );
 						if ( $child_id ) {
 							$term_ids[]                        = $child_id;
 							$this->category_ids[ $child_slug ] = $child_id;
@@ -196,17 +206,20 @@ final class DemoDataGenerator {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string $slug     Category slug.
-	 * @param array  $data     Category data.
-	 * @param int    $parent   Parent term ID.
+	 * @param string $slug   Category slug.
+	 * @param array  $data   Category data.
+	 * @param int    $parent Parent term ID.
+	 * @param string $module Module slug for tracking and scoping.
 	 * @return int|null Term ID or null on failure.
 	 */
-	private function create_category( string $slug, array $data, int $parent ): ?int {
+	private function create_category( string $slug, array $data, int $parent, string $module = DemoDataTracker::GENERAL_MODULE ): ?int {
 		// Check if term already exists.
 		$existing = term_exists( $slug, 'apd_category' );
 		if ( $existing ) {
 			$term_id = is_array( $existing ) ? (int) $existing['term_id'] : (int) $existing;
-			$this->tracker->mark_term_as_demo( $term_id );
+			$this->tracker->mark_term_as_demo( $term_id, $module );
+			// Set listing type scope on existing term.
+			update_term_meta( $term_id, '_apd_listing_type', $module );
 			return $term_id;
 		}
 
@@ -226,15 +239,18 @@ final class DemoDataGenerator {
 
 		$term_id = (int) $result['term_id'];
 
-		// Add meta for icon and color.
+		// Add meta for icon and color (using correct meta keys).
 		if ( ! empty( $data['icon'] ) ) {
-			update_term_meta( $term_id, '_apd_icon', $data['icon'] );
+			update_term_meta( $term_id, '_apd_category_icon', $data['icon'] );
 		}
 		if ( ! empty( $data['color'] ) ) {
-			update_term_meta( $term_id, '_apd_color', $data['color'] );
+			update_term_meta( $term_id, '_apd_category_color', $data['color'] );
 		}
 
-		$this->tracker->mark_term_as_demo( $term_id );
+		// Set listing type scope for category.
+		update_term_meta( $term_id, '_apd_listing_type', $module );
+
+		$this->tracker->mark_term_as_demo( $term_id, $module );
 
 		return $term_id;
 	}
@@ -244,10 +260,11 @@ final class DemoDataGenerator {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param int $count Number of tags to create (uses defaults if count matches).
+	 * @param int    $count  Number of tags to create (uses defaults if count matches).
+	 * @param string $module Module slug for tracking (default: 'general').
 	 * @return int[] Created term IDs.
 	 */
-	public function generate_tags( int $count = 10 ): array {
+	public function generate_tags( int $count = 10, string $module = DemoDataTracker::GENERAL_MODULE ): array {
 		$term_ids = [];
 		$tags     = TagData::get_tags();
 
@@ -259,7 +276,7 @@ final class DemoDataGenerator {
 			$existing = term_exists( $slug, 'apd_tag' );
 			if ( $existing ) {
 				$term_id = is_array( $existing ) ? (int) $existing['term_id'] : (int) $existing;
-				$this->tracker->mark_term_as_demo( $term_id );
+				$this->tracker->mark_term_as_demo( $term_id, $module );
 				$this->tag_ids[ $slug ] = $term_id;
 				$term_ids[]             = $term_id;
 				continue;
@@ -276,7 +293,7 @@ final class DemoDataGenerator {
 
 			if ( ! is_wp_error( $result ) ) {
 				$term_id = (int) $result['term_id'];
-				$this->tracker->mark_term_as_demo( $term_id );
+				$this->tracker->mark_term_as_demo( $term_id, $module );
 				$this->tag_ids[ $slug ] = $term_id;
 				$term_ids[]             = $term_id;
 			}
@@ -290,11 +307,12 @@ final class DemoDataGenerator {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param int   $count   Number of listings to create.
-	 * @param array $options Generation options.
+	 * @param int    $count   Number of listings to create.
+	 * @param string $module  Module slug for tracking (default: 'general').
+	 * @param array  $options Generation options.
 	 * @return int[] Created post IDs.
 	 */
-	public function generate_listings( int $count = 25, array $options = [] ): array {
+	public function generate_listings( int $count = 25, string $module = DemoDataTracker::GENERAL_MODULE, array $options = [] ): array {
 		$post_ids = [];
 
 		// Get available authors (demo users + admin).
@@ -302,7 +320,23 @@ final class DemoDataGenerator {
 		$authors    = ! empty( $demo_users ) ? $demo_users : [ 1 ];
 
 		// Get all child category slugs (we only assign to child categories).
-		$category_slugs = CategoryData::get_category_slugs( false );
+		$category_slugs = ! empty( $this->category_ids )
+			? array_keys( $this->category_ids )
+			: CategoryData::get_category_slugs( false );
+
+		// Filter to only child categories by checking if they have a parent in the map.
+		$child_slugs = [];
+		foreach ( $category_slugs as $slug ) {
+			$parent_slug = CategoryData::get_parent_slug( $slug );
+			if ( $parent_slug !== null ) {
+				$child_slugs[] = $slug;
+			}
+		}
+
+		// Fall back to all category slugs if no children found (e.g., module categories).
+		if ( empty( $child_slugs ) ) {
+			$child_slugs = $category_slugs;
+		}
 
 		// Status distribution (weighted).
 		$statuses = [
@@ -317,7 +351,9 @@ final class DemoDataGenerator {
 
 		for ( $i = 0; $i < $count; $i++ ) {
 			// Select random category.
-			$category_slug = $category_slugs[ array_rand( $category_slugs ) ];
+			$category_slug = ! empty( $child_slugs )
+				? $child_slugs[ array_rand( $child_slugs ) ]
+				: '';
 
 			// Generate business data.
 			$business_name = BusinessNames::generate( $category_slug );
@@ -364,11 +400,16 @@ final class DemoDataGenerator {
 				continue;
 			}
 
-			// Mark as demo data.
-			$this->tracker->mark_post_as_demo( $post_id );
+			// Mark as demo data with module slug.
+			$this->tracker->mark_post_as_demo( $post_id, $module );
 
 			// Add meta fields.
 			$this->add_listing_meta( $post_id, $business_name, $category_slug, $address_data );
+
+			// Assign listing type taxonomy term.
+			if ( taxonomy_exists( ListingTypeTaxonomy::TAXONOMY ) ) {
+				wp_set_object_terms( $post_id, $module, ListingTypeTaxonomy::TAXONOMY );
+			}
 
 			// Assign categories.
 			$this->assign_listing_categories( $post_id, $category_slug );
@@ -525,11 +566,12 @@ final class DemoDataGenerator {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param int[] $listing_ids Listing IDs to add reviews to.
-	 * @param int[] $user_ids    User IDs to use as reviewers.
+	 * @param int[]  $listing_ids Listing IDs to add reviews to.
+	 * @param int[]  $user_ids    User IDs to use as reviewers.
+	 * @param string $module      Module slug for tracking (default: 'general').
 	 * @return int[] Created comment IDs.
 	 */
-	public function generate_reviews( array $listing_ids, array $user_ids = [] ): array {
+	public function generate_reviews( array $listing_ids, array $user_ids = [], string $module = DemoDataTracker::GENERAL_MODULE ): array {
 		$comment_ids = [];
 
 		// Fallback to admin if no users.
@@ -600,7 +642,7 @@ final class DemoDataGenerator {
 					update_comment_meta( $comment_id, '_apd_rating', $rating );
 					update_comment_meta( $comment_id, '_apd_review_title', $review_data['title'] );
 
-					$this->tracker->mark_comment_as_demo( $comment_id );
+					$this->tracker->mark_comment_as_demo( $comment_id, $module );
 					$comment_ids[] = $comment_id;
 				}
 			}
@@ -647,10 +689,11 @@ final class DemoDataGenerator {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param int[] $listing_ids Listing IDs to add inquiries to.
+	 * @param int[]  $listing_ids Listing IDs to add inquiries to.
+	 * @param string $module      Module slug for tracking (default: 'general').
 	 * @return int[] Created inquiry post IDs.
 	 */
-	public function generate_inquiries( array $listing_ids ): array {
+	public function generate_inquiries( array $listing_ids, string $module = DemoDataTracker::GENERAL_MODULE ): array {
 		$post_ids = [];
 
 		// Check if inquiry post type exists.
@@ -707,7 +750,7 @@ final class DemoDataGenerator {
 				$inquiry_id = wp_insert_post( $inquiry_data );
 
 				if ( ! is_wp_error( $inquiry_id ) ) {
-					$this->tracker->mark_post_as_demo( $inquiry_id );
+					$this->tracker->mark_post_as_demo( $inquiry_id, $module );
 					$post_ids[] = $inquiry_id;
 				}
 			}
@@ -789,6 +832,29 @@ final class DemoDataGenerator {
 	 */
 	public function get_tracker(): DemoDataTracker {
 		return $this->tracker;
+	}
+
+	/**
+	 * Get the internal category IDs map.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return array<string, int> Category IDs keyed by slug.
+	 */
+	public function get_category_ids(): array {
+		return $this->category_ids;
+	}
+
+	/**
+	 * Reset internal state for fresh generation.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return void
+	 */
+	public function reset_state(): void {
+		$this->category_ids = [];
+		$this->tag_ids      = [];
 	}
 
 	/**

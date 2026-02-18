@@ -193,9 +193,16 @@ final class ReviewModeration {
 		}
 
 		wp_enqueue_style(
+			'apd-admin-base',
+			APD_PLUGIN_URL . 'assets/css/admin-base.css',
+			[],
+			APD_VERSION
+		);
+
+		wp_enqueue_style(
 			'apd-admin',
 			APD_PLUGIN_URL . 'assets/css/admin.css',
-			[],
+			[ 'apd-admin-base' ],
 			APD_VERSION
 		);
 	}
@@ -308,7 +315,14 @@ final class ReviewModeration {
 		ob_start();
 		?>
 		<div class="wrap apd-reviews-wrap">
-			<h1 class="wp-heading-inline"><?php esc_html_e( 'Reviews', 'all-purpose-directory' ); ?></h1>
+			<div class="apd-page-header">
+				<div class="apd-page-header__icon">
+					<span class="dashicons dashicons-star-half" aria-hidden="true"></span>
+				</div>
+				<div class="apd-page-header__content">
+					<h1><?php esc_html_e( 'Reviews', 'all-purpose-directory' ); ?></h1>
+				</div>
+			</div>
 			<hr class="wp-header-end">
 
 			<?php $this->render_messages(); ?>

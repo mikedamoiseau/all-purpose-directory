@@ -529,7 +529,11 @@ final class SettingsTest extends UnitTestCase {
 	 */
 	public function test_enqueue_assets_loads_on_settings_page(): void {
 		Functions\expect( 'wp_enqueue_style' )
-			->with( 'apd-admin-settings', Mockery::any(), [], APD_VERSION )
+			->with( 'apd-admin-base', Mockery::any(), [], APD_VERSION )
+			->once();
+
+		Functions\expect( 'wp_enqueue_style' )
+			->with( 'apd-admin-settings', Mockery::any(), [ 'apd-admin-base' ], APD_VERSION )
 			->once();
 
 		Functions\expect( 'wp_enqueue_script' )

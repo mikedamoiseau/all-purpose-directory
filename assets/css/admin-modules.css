@@ -10,15 +10,6 @@
 	max-width: 1200px;
 }
 
-.apd-modules-wrap h1 {
-	margin-bottom: 10px;
-}
-
-.apd-modules-wrap > .description {
-	margin-bottom: 20px;
-	font-size: 14px;
-}
-
 /* Module count */
 .apd-modules-count {
 	margin-bottom: 15px;
@@ -30,17 +21,23 @@
 	text-align: center;
 	padding: 60px 20px;
 	background: #fff;
-	border: 1px solid #c3c4c7;
-	border-radius: 4px;
+	border: 1px solid #e0e0e0;
+	border-radius: 8px;
 	margin-top: 20px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
 }
 
 .apd-modules-empty .dashicons {
-	font-size: 64px;
-	width: 64px;
-	height: 64px;
-	color: #c3c4c7;
-	margin-bottom: 20px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 80px;
+	height: 80px;
+	margin: 0 auto 20px;
+	font-size: 40px;
+	color: #2271b1;
+	background: #f0f6fc;
+	border-radius: 50%;
 }
 
 .apd-modules-empty h2 {
@@ -62,10 +59,20 @@
 /* Modules table */
 .apd-modules-table {
 	margin-top: 20px;
+	border: 1px solid #e0e0e0;
+	border-radius: 6px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+	overflow: hidden;
+}
+
+.apd-modules-table thead th {
+	background: #f6f7f7;
+	border-bottom: 1px solid #e0e0e0;
+	font-weight: 600;
 }
 
 .apd-modules-table .column-icon {
-	width: 50px;
+	width: 60px;
 	text-align: center;
 }
 
@@ -74,6 +81,17 @@
 	width: 24px;
 	height: 24px;
 	color: #2271b1;
+}
+
+/* Module icon circle */
+.apd-module-icon-wrap {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	background: #f0f6fc;
+	border-radius: 10px;
 }
 
 .apd-modules-table .column-name {
@@ -113,11 +131,12 @@
 
 .apd-feature-badge {
 	display: inline-block;
-	background: #f0f0f1;
-	color: #50575e;
-	padding: 2px 8px;
-	border-radius: 3px;
+	background: #f0f6fc;
+	color: #2271b1;
+	padding: 3px 10px;
+	border-radius: 10px;
 	font-size: 11px;
+	font-weight: 500;
 	margin-right: 4px;
 	margin-bottom: 4px;
 }
@@ -157,7 +176,19 @@
 /* Responsive adjustments */
 @media screen and (max-width: 782px) {
 	.apd-modules-table .column-icon {
-		width: 40px;
+		width: 50px;
+	}
+
+	.apd-module-icon-wrap {
+		width: 32px;
+		height: 32px;
+		border-radius: 8px;
+	}
+
+	.apd-module-icon-wrap .dashicons {
+		font-size: 18px;
+		width: 18px;
+		height: 18px;
 	}
 
 	.apd-modules-table .column-name {
@@ -167,5 +198,18 @@
 	.apd-modules-table .column-version,
 	.apd-modules-table .column-author {
 		display: none;
+	}
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+	.apd-modules-table {
+		box-shadow: none;
+		border-width: 2px;
+	}
+
+	.apd-modules-empty {
+		box-shadow: none;
+		border-width: 2px;
 	}
 }

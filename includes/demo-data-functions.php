@@ -53,10 +53,11 @@ function apd_demo_tracker(): \APD\Admin\DemoData\DemoDataTracker {
  *
  * @since 1.0.0
  *
+ * @param string|null $module Module slug to filter by, or null for all.
  * @return array{users: int, categories: int, tags: int, listings: int, reviews: int, inquiries: int}
  */
-function apd_get_demo_data_counts(): array {
-	return apd_demo_tracker()->count_demo_data();
+function apd_get_demo_data_counts( ?string $module = null ): array {
+	return apd_demo_tracker()->count_demo_data( $module );
 }
 
 /**
@@ -64,10 +65,22 @@ function apd_get_demo_data_counts(): array {
  *
  * @since 1.0.0
  *
- * @return array{users: int, categories: int, tags: int, listings: int, reviews: int, inquiries: int, favorites: int}
+ * @return array<string, int> Deleted counts keyed by type.
  */
 function apd_delete_demo_data(): array {
 	return apd_demo_tracker()->delete_all();
+}
+
+/**
+ * Delete demo data for a specific module.
+ *
+ * @since 1.2.0
+ *
+ * @param string $module Module slug to delete data for.
+ * @return array<string, int> Deleted counts keyed by type.
+ */
+function apd_delete_demo_data_by_module( string $module ): array {
+	return apd_demo_tracker()->delete_by_module( $module );
 }
 
 /**
@@ -110,10 +123,11 @@ function apd_is_demo_data( string $type, int $id ): bool {
  *
  * @since 1.0.0
  *
- * @return bool True if any demo data exists.
+ * @param string|null $module Module slug to check, or null for any.
+ * @return bool True if demo data exists.
  */
-function apd_has_demo_data(): bool {
-	$counts = apd_get_demo_data_counts();
+function apd_has_demo_data( ?string $module = null ): bool {
+	$counts = apd_get_demo_data_counts( $module );
 	return array_sum( $counts ) > 0;
 }
 
@@ -122,10 +136,17 @@ function apd_has_demo_data(): bool {
  *
  * @since 1.0.0
  *
+ * @param string|null $tab Tab slug to link to.
  * @return string
  */
-function apd_get_demo_data_url(): string {
-	return admin_url( 'edit.php?post_type=apd_listing&page=apd-demo-data' );
+function apd_get_demo_data_url( ?string $tab = null ): string {
+	$url = admin_url( 'edit.php?post_type=apd_listing&page=apd-demo-data' );
+
+	if ( $tab ) {
+		$url .= '#' . $tab;
+	}
+
+	return $url;
 }
 
 /**
