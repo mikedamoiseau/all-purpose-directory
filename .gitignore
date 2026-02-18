@@ -12,6 +12,7 @@ composer.lock
 # Claude Code
 .claude/
 .claude-bw/
+CLAUDE.md
 
 # IDE
 .idea/
