@@ -364,19 +364,30 @@ final class DemoDataTracker {
 	public function get_demo_post_ids( string $post_type, ?string $module = null ): array {
 		global $wpdb;
 
-		$value_clause = $module !== null
-			? $wpdb->prepare( 'AND pm.meta_value = %s', $module )
-			: '';
-
-		$ids = $wpdb->get_col(
-			$wpdb->prepare(
-				"SELECT p.ID FROM {$wpdb->posts} p
-				INNER JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id
-				WHERE pm.meta_key = %s {$value_clause} AND p.post_type = %s",
-				self::META_KEY,
-				$post_type
-			)
-		);
+		if ( $module !== null ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$ids = $wpdb->get_col(
+				$wpdb->prepare(
+					"SELECT p.ID FROM {$wpdb->posts} p
+					INNER JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id
+					WHERE pm.meta_key = %s AND pm.meta_value = %s AND p.post_type = %s",
+					self::META_KEY,
+					$module,
+					$post_type
+				)
+			);
+		} else {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$ids = $wpdb->get_col(
+				$wpdb->prepare(
+					"SELECT p.ID FROM {$wpdb->posts} p
+					INNER JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id
+					WHERE pm.meta_key = %s AND p.post_type = %s",
+					self::META_KEY,
+					$post_type
+				)
+			);
+		}
 
 		return array_map( 'intval', $ids );
 	}
@@ -393,20 +404,32 @@ final class DemoDataTracker {
 	public function get_demo_term_ids( string $taxonomy, ?string $module = null ): array {
 		global $wpdb;
 
-		$value_clause = $module !== null
-			? $wpdb->prepare( 'AND tm.meta_value = %s', $module )
-			: '';
-
-		$ids = $wpdb->get_col(
-			$wpdb->prepare(
-				"SELECT t.term_id FROM {$wpdb->terms} t
-				INNER JOIN {$wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
-				INNER JOIN {$wpdb->termmeta} tm ON t.term_id = tm.term_id
-				WHERE tm.meta_key = %s {$value_clause} AND tt.taxonomy = %s",
-				self::META_KEY,
-				$taxonomy
-			)
-		);
+		if ( $module !== null ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$ids = $wpdb->get_col(
+				$wpdb->prepare(
+					"SELECT t.term_id FROM {$wpdb->terms} t
+					INNER JOIN {$wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
+					INNER JOIN {$wpdb->termmeta} tm ON t.term_id = tm.term_id
+					WHERE tm.meta_key = %s AND tm.meta_value = %s AND tt.taxonomy = %s",
+					self::META_KEY,
+					$module,
+					$taxonomy
+				)
+			);
+		} else {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$ids = $wpdb->get_col(
+				$wpdb->prepare(
+					"SELECT t.term_id FROM {$wpdb->terms} t
+					INNER JOIN {$wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
+					INNER JOIN {$wpdb->termmeta} tm ON t.term_id = tm.term_id
+					WHERE tm.meta_key = %s AND tt.taxonomy = %s",
+					self::META_KEY,
+					$taxonomy
+				)
+			);
+		}
 
 		return array_map( 'intval', $ids );
 	}
@@ -444,24 +467,45 @@ final class DemoDataTracker {
 	public function get_demo_comment_ids( string $comment_type = '', ?string $module = null ): array {
 		global $wpdb;
 
-		$value_clause = $module !== null
-			? $wpdb->prepare( 'AND cm.meta_value = %s', $module )
-			: '';
-
-		if ( ! empty( $comment_type ) ) {
+		if ( ! empty( $comment_type ) && $module !== null ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$ids = $wpdb->get_col(
 				$wpdb->prepare(
 					"SELECT c.comment_ID FROM {$wpdb->comments} c
 					INNER JOIN {$wpdb->commentmeta} cm ON c.comment_ID = cm.comment_id
-					WHERE cm.meta_key = %s {$value_clause} AND c.comment_type = %s",
+					WHERE cm.meta_key = %s AND cm.meta_value = %s AND c.comment_type = %s",
+					self::META_KEY,
+					$module,
+					$comment_type
+				)
+			);
+		} elseif ( ! empty( $comment_type ) ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$ids = $wpdb->get_col(
+				$wpdb->prepare(
+					"SELECT c.comment_ID FROM {$wpdb->comments} c
+					INNER JOIN {$wpdb->commentmeta} cm ON c.comment_ID = cm.comment_id
+					WHERE cm.meta_key = %s AND c.comment_type = %s",
 					self::META_KEY,
 					$comment_type
 				)
 			);
-		} else {
+		} elseif ( $module !== null ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$ids = $wpdb->get_col(
 				$wpdb->prepare(
-					"SELECT cm.comment_id FROM {$wpdb->commentmeta} cm WHERE cm.meta_key = %s {$value_clause}",
+					"SELECT cm.comment_id FROM {$wpdb->commentmeta} cm
+					WHERE cm.meta_key = %s AND cm.meta_value = %s",
+					self::META_KEY,
+					$module
+				)
+			);
+		} else {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$ids = $wpdb->get_col(
+				$wpdb->prepare(
+					"SELECT cm.comment_id FROM {$wpdb->commentmeta} cm
+					WHERE cm.meta_key = %s",
 					self::META_KEY
 				)
 			);

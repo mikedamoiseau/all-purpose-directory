@@ -566,6 +566,8 @@ class ContactHandlerTest extends TestCase {
 		$_SERVER['HTTP_X_FORWARDED_FOR'] = '203.0.113.8';
 
 		Functions\when( 'get_current_user_id' )->justReturn( 0 );
+		Functions\when( 'wp_unslash' )->returnArg( 1 );
+		Functions\when( 'sanitize_text_field' )->returnArg( 1 );
 
 		$handler    = ContactHandler::get_instance();
 		$identifier = $this->get_rate_limit_identifier( $handler );

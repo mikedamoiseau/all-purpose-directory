@@ -766,7 +766,7 @@ class ContactHandler {
 	 * @return string Client IP address.
 	 */
 	private function get_client_ip(): string {
-		$remote_addr = $this->extract_first_valid_ip( (string) ( $_SERVER['REMOTE_ADDR'] ?? '' ) );
+		$remote_addr = $this->extract_first_valid_ip( sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ?? '' ) ) );
 
 		// Default to REMOTE_ADDR unless this request came through a trusted proxy.
 		$client_ip = $remote_addr;

@@ -481,6 +481,8 @@ final class SpamProtectionTest extends UnitTestCase {
 		$_SERVER['HTTP_X_FORWARDED_FOR'] = '203.0.113.9';
 
 		Functions\when( 'get_current_user_id' )->justReturn( 0 );
+		Functions\when( 'wp_unslash' )->returnArg( 1 );
+		Functions\when( 'sanitize_text_field' )->returnArg( 1 );
 
 		$handler    = new SubmissionHandler( [ 'enable_spam_protection' => true ] );
 		$identifier = $this->get_rate_limit_identifier( $handler );
