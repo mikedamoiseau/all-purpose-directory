@@ -70,7 +70,7 @@
          */
         cacheElements: function() {
             this.elements.form = document.querySelector('.apd-search-form');
-            this.elements.results = document.querySelector('.apd-listings-results, .apd-listing-archive__listings');
+            this.elements.results = document.querySelector('.apd-listings');
             this.elements.activeFilters = document.querySelector('.apd-active-filters');
             this.elements.resultsCount = document.querySelector('.apd-results-count');
 
@@ -211,7 +211,7 @@
         handleSearchInput: function(e) {
             this.debounce(() => {
                 this.handleFilterChange(e);
-            }, 300);
+            }, 500);
         },
 
         /**
@@ -442,7 +442,7 @@
 
             if (isLoading) {
                 form?.classList.add('apd-search-form--loading');
-                results?.classList.add('apd-listings-results--loading');
+                results?.classList.add('apd-listings--loading');
                 results?.setAttribute('aria-busy', 'true');
 
                 // Insert skeleton placeholders.
@@ -455,7 +455,7 @@
                 }
             } else {
                 form?.classList.remove('apd-search-form--loading');
-                results?.classList.remove('apd-listings-results--loading');
+                results?.classList.remove('apd-listings--loading');
                 results?.setAttribute('aria-busy', 'false');
 
                 // Remove skeleton placeholders.
