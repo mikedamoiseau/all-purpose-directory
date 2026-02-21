@@ -580,6 +580,19 @@ final class Settings {
 				'description' => __( 'Where to redirect users after successful submission.', 'all-purpose-directory' ),
 			]
 		);
+
+		add_settings_field(
+			'redirect_custom_url',
+			__( 'Custom Redirect URL', 'all-purpose-directory' ),
+			[ $this, 'render_text_field' ],
+			$page,
+			$section_id,
+			[
+				'field'       => 'redirect_custom_url',
+				'class'       => 'regular-text code',
+				'description' => __( 'URL on this site to redirect to (e.g., /thank-you). If empty, redirects to the submitted listing.', 'all-purpose-directory' ),
+			]
+		);
 	}
 
 	/**
@@ -1313,6 +1326,10 @@ final class Settings {
 				<div class="apd-page-header__content">
 					<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
 				</div>
+				<a href="https://damoiseau.xyz/docs/all-purpose-directory/user-guide/#settings" class="apd-page-header__docs" target="_blank" rel="noopener noreferrer">
+					<span class="dashicons dashicons-external" aria-hidden="true"></span>
+					<?php esc_html_e( 'Documentation', 'all-purpose-directory' ); ?>
+				</a>
 			</div>
 
 			<?php $this->render_tabs( $current_tab ); ?>
@@ -1531,6 +1548,7 @@ final class Settings {
 			'guest_submission'    => false,
 			'terms_page'          => 0,
 			'redirect_after'      => 'listing',
+			'redirect_custom_url' => '',
 
 			// Display.
 			'default_view'        => 'grid',
@@ -1726,6 +1744,10 @@ final class Settings {
 			&& in_array( $input['redirect_after'], [ 'listing', 'dashboard', 'custom' ], true )
 			? $input['redirect_after']
 			: ( $existing['redirect_after'] ?? $defaults['redirect_after'] );
+
+		$sanitized['redirect_custom_url'] = isset( $input['redirect_custom_url'] )
+			? esc_url_raw( trim( $input['redirect_custom_url'] ) )
+			: ( $existing['redirect_custom_url'] ?? $defaults['redirect_custom_url'] );
 
 		// Display settings.
 		$sanitized['default_view'] = isset( $input['default_view'] )

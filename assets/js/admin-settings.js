@@ -66,6 +66,23 @@
 				toggleSubmissionFields();
 				$whoCanSubmit.on('change', toggleSubmissionFields);
 			}
+
+			// Show/hide custom redirect URL field
+			var $redirectAfter = $('#redirect_after');
+			var $customUrlRow = $('#redirect_custom_url').closest('tr');
+
+			function toggleCustomUrl() {
+				if ($redirectAfter.val() === 'custom') {
+					$customUrlRow.show();
+				} else {
+					$customUrlRow.hide();
+				}
+			}
+
+			if ($redirectAfter.length) {
+				toggleCustomUrl();
+				$redirectAfter.on('change', toggleCustomUrl);
+			}
 		},
 
 		/**
