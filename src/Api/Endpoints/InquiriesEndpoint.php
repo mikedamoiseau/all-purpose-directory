@@ -345,12 +345,20 @@ class InquiriesEndpoint {
 	 * @return bool|WP_Error True if allowed, error otherwise.
 	 */
 	public function permission_manage_inquiry( WP_REST_Request $request ): bool|WP_Error {
-		$auth_check = $this->controller->permission_authenticated_with_nonce( $request );
-		if ( is_wp_error( $auth_check ) ) {
-			return $auth_check;
+		$view_check = $this->permission_view_inquiry( $request );
+		if ( is_wp_error( $view_check ) ) {
+			return $view_check;
 		}
 
-		return $this->permission_view_inquiry( $request );
+		if ( ! $this->controller->verify_nonce( $request ) ) {
+			return new WP_Error(
+				'rest_nonce_invalid',
+				__( 'Invalid or missing REST API nonce.', 'all-purpose-directory' ),
+				[ 'status' => 403 ]
+			);
+		}
+
+		return true;
 	}
 
 	/**

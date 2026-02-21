@@ -437,6 +437,21 @@ final class RestControllerTest extends UnitTestCase {
 
 		$this->assertInstanceOf( \WP_Error::class, $result );
 		$this->assertSame( 'rest_not_logged_in', $result->get_error_code() );
+		$this->assertSame( 'You must be logged in to create listings.', $result->get_error_message() );
+	}
+
+	/**
+	 * Test permission_create_listing returns nonce error when nonce is missing.
+	 */
+	public function test_permission_create_listing_returns_nonce_error_when_missing_nonce(): void {
+		Functions\when( 'get_current_user_id' )->justReturn( 1 );
+
+		$request = new \WP_REST_Request();
+
+		$result = $this->controller->permission_create_listing( $request );
+
+		$this->assertInstanceOf( \WP_Error::class, $result );
+		$this->assertSame( 'rest_nonce_invalid', $result->get_error_code() );
 	}
 
 	/**
@@ -447,6 +462,7 @@ final class RestControllerTest extends UnitTestCase {
 		Functions\when( 'current_user_can' )->justReturn( false );
 
 		$request = new \WP_REST_Request();
+		$request->set_header( 'X-WP-Nonce', 'valid_nonce' );
 
 		$result = $this->controller->permission_create_listing( $request );
 
@@ -462,6 +478,7 @@ final class RestControllerTest extends UnitTestCase {
 		Functions\when( 'current_user_can' )->justReturn( true );
 
 		$request = new \WP_REST_Request();
+		$request->set_header( 'X-WP-Nonce', 'valid_nonce' );
 
 		$this->assertTrue( $this->controller->permission_create_listing( $request ) );
 	}
@@ -479,6 +496,22 @@ final class RestControllerTest extends UnitTestCase {
 
 		$this->assertInstanceOf( \WP_Error::class, $result );
 		$this->assertSame( 'rest_not_logged_in', $result->get_error_code() );
+		$this->assertSame( 'You must be logged in to edit listings.', $result->get_error_message() );
+	}
+
+	/**
+	 * Test permission_edit_listing returns nonce error when nonce is missing.
+	 */
+	public function test_permission_edit_listing_returns_nonce_error_when_missing_nonce(): void {
+		Functions\when( 'get_current_user_id' )->justReturn( 1 );
+
+		$request = new \WP_REST_Request();
+		$request->set_param( 'id', 123 );
+
+		$result = $this->controller->permission_edit_listing( $request );
+
+		$this->assertInstanceOf( \WP_Error::class, $result );
+		$this->assertSame( 'rest_nonce_invalid', $result->get_error_code() );
 	}
 
 	/**
@@ -488,6 +521,7 @@ final class RestControllerTest extends UnitTestCase {
 		Functions\when( 'get_current_user_id' )->justReturn( 1 );
 
 		$request = new \WP_REST_Request();
+		$request->set_header( 'X-WP-Nonce', 'valid_nonce' );
 		$request->set_param( 'id', 0 );
 
 		$result = $this->controller->permission_edit_listing( $request );
@@ -504,6 +538,7 @@ final class RestControllerTest extends UnitTestCase {
 		Functions\when( 'get_post' )->justReturn( null );
 
 		$request = new \WP_REST_Request();
+		$request->set_header( 'X-WP-Nonce', 'valid_nonce' );
 		$request->set_param( 'id', 123 );
 
 		$result = $this->controller->permission_edit_listing( $request );
@@ -523,6 +558,7 @@ final class RestControllerTest extends UnitTestCase {
 		Functions\when( 'get_post' )->justReturn( $post );
 
 		$request = new \WP_REST_Request();
+		$request->set_header( 'X-WP-Nonce', 'valid_nonce' );
 		$request->set_param( 'id', 123 );
 
 		$result = $this->controller->permission_edit_listing( $request );
@@ -543,6 +579,7 @@ final class RestControllerTest extends UnitTestCase {
 		Functions\when( 'get_post' )->justReturn( $post );
 
 		$request = new \WP_REST_Request();
+		$request->set_header( 'X-WP-Nonce', 'valid_nonce' );
 		$request->set_param( 'id', 123 );
 
 		$result = $this->controller->permission_edit_listing( $request );
@@ -563,6 +600,7 @@ final class RestControllerTest extends UnitTestCase {
 		Functions\when( 'get_post' )->justReturn( $post );
 
 		$request = new \WP_REST_Request();
+		$request->set_header( 'X-WP-Nonce', 'valid_nonce' );
 		$request->set_param( 'id', 123 );
 
 		$this->assertTrue( $this->controller->permission_edit_listing( $request ) );
@@ -581,6 +619,22 @@ final class RestControllerTest extends UnitTestCase {
 
 		$this->assertInstanceOf( \WP_Error::class, $result );
 		$this->assertSame( 'rest_not_logged_in', $result->get_error_code() );
+		$this->assertSame( 'You must be logged in to delete listings.', $result->get_error_message() );
+	}
+
+	/**
+	 * Test permission_delete_listing returns nonce error when nonce is missing.
+	 */
+	public function test_permission_delete_listing_returns_nonce_error_when_missing_nonce(): void {
+		Functions\when( 'get_current_user_id' )->justReturn( 1 );
+
+		$request = new \WP_REST_Request();
+		$request->set_param( 'id', 123 );
+
+		$result = $this->controller->permission_delete_listing( $request );
+
+		$this->assertInstanceOf( \WP_Error::class, $result );
+		$this->assertSame( 'rest_nonce_invalid', $result->get_error_code() );
 	}
 
 	/**
