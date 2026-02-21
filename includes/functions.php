@@ -134,24 +134,6 @@ function apd_delete_listing_meta( int $listing_id, string $key ): bool {
 	return delete_post_meta( $listing_id, "_apd_{$key}" );
 }
 
-/**
- * Log a message for debugging.
- *
- * @param mixed  $message Message to log.
- * @param string $level   Log level (debug, info, warning, error).
- * @return void
- */
-function apd_log( mixed $message, string $level = 'debug' ): void {
-	if ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) {
-		return;
-	}
-
-	if ( is_array( $message ) || is_object( $message ) ) {
-		$message = print_r( $message, true );
-	}
-
-	error_log( sprintf( '[APD %s] %s', strtoupper( $level ), $message ) );
-}
 
 /**
  * Get categories assigned to a listing.

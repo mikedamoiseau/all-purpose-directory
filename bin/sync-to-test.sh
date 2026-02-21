@@ -5,8 +5,8 @@
 # Usage: ./bin/sync-to-test.sh
 #
 # This script syncs the plugin files to the Docker test environment
-# for local testing. It excludes development files that aren't needed
-# in the test environment.
+# for local testing. It mirrors what ships in a production build
+# (uses .distignore) but keeps vendor/ for autoloading.
 
 set -e
 
@@ -15,17 +15,8 @@ TEST_PLUGIN_DIR="/Users/mike/Documents/www/test/wp-all-purpose-directory/html/wp
 
 echo "Syncing plugin to test environment..."
 
-rsync -av --delete \
-  --exclude='vendor' \
-  --exclude='node_modules' \
-  --exclude='composer.lock' \
-  --exclude='.phpunit.result.cache' \
-  --exclude='.idea' \
-  --exclude='.claude' \
-  --exclude='.claude-bw' \
-  --exclude='research' \
-  --exclude='PLAN.md' \
-  --exclude='TASKS.md' \
+rsync -av --delete --delete-excluded \
+  --exclude-from="$PLUGIN_DIR/.distignore" \
   "$PLUGIN_DIR/" \
   "$TEST_PLUGIN_DIR/"
 

@@ -26,14 +26,17 @@ phpstan.neon.dist
 # Development directories
 bin
 tests
+test-results
+test-results-debug
 node_modules
-vendor
 
 # Build tools
 package.json
 package-lock.json
-composer.json
 composer.lock
+
+# Test cache
+.phpunit.result.cache
 Gruntfile.js
 gulpfile.js
 webpack.config.js
