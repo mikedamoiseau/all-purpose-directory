@@ -590,7 +590,7 @@ final class Settings {
 			[
 				'field'       => 'redirect_custom_url',
 				'class'       => 'regular-text code',
-				'description' => __( 'Full URL to redirect to (e.g., https://example.com/thank-you).', 'all-purpose-directory' ),
+				'description' => __( 'URL on this site to redirect to (e.g., /thank-you). If empty, redirects to the submitted listing.', 'all-purpose-directory' ),
 			]
 		);
 	}
