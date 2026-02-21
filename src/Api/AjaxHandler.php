@@ -92,11 +92,23 @@ class AjaxHandler {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$request_params = wp_unslash( $_REQUEST );
 
+		$query_overrides = [
+			'paged' => $paged,
+		];
+
+		// Allow the frontend to pass posts_per_page so AJAX matches the initial query
+		// (e.g. shortcode count=12 vs WP default of 10).
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( isset( $_REQUEST['posts_per_page'] ) ) {
+			$per_page = absint( $_REQUEST['posts_per_page'] );
+			if ( $per_page >= 1 && $per_page <= 100 ) {
+				$query_overrides['posts_per_page'] = $per_page;
+			}
+		}
+
 		// Run filtered query.
 		$query = $this->search_query->get_filtered_listings(
-			[
-				'paged' => $paged,
-			],
+			$query_overrides,
 			$request_params
 		);
 
@@ -145,12 +157,16 @@ class AjaxHandler {
 			];
 		}
 
+		// Render pagination HTML.
+		$pagination_html = \apd_render_pagination( $query );
+
 		$response = [
-			'html'           => $html,
-			'found_posts'    => $query->found_posts,
-			'max_pages'      => $query->max_num_pages,
-			'current_page'   => $paged,
-			'active_filters' => $active_data,
+			'html'            => $html,
+			'pagination_html' => $pagination_html,
+			'found_posts'     => $query->found_posts,
+			'max_pages'       => $query->max_num_pages,
+			'current_page'    => $paged,
+			'active_filters'  => $active_data,
 		];
 
 		/**

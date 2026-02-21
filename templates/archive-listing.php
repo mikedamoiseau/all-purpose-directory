@@ -115,7 +115,8 @@ do_action( 'apd_before_archive' );
 
 		<div class="apd-listings apd-listings--<?php echo esc_attr( $current_view ); ?> apd-listings--columns-<?php echo esc_attr( (string) $grid_columns ); ?>"
 			data-view="<?php echo esc_attr( $current_view ); ?>"
-			data-columns="<?php echo esc_attr( (string) $grid_columns ); ?>">
+			data-columns="<?php echo esc_attr( (string) $grid_columns ); ?>"
+			data-posts-per-page="<?php echo esc_attr( (string) get_option( 'posts_per_page', 10 ) ); ?>">
 
 			<?php
 			while ( have_posts() ) :

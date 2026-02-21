@@ -73,6 +73,7 @@
             this.elements.results = document.querySelector('.apd-listings');
             this.elements.activeFilters = document.querySelector('.apd-active-filters');
             this.elements.resultsCount = document.querySelector('.apd-results-count');
+            this.elements.pagination = document.querySelector('.apd-pagination');
 
             // Create loading indicator if not exists
             if (this.elements.form && !document.querySelector('.apd-loading-indicator')) {
@@ -275,7 +276,6 @@
             const url = new URL(link.href);
             const paged = url.searchParams.get('paged') || 1;
 
-            this.updateUrl(link.href);
             this.performFilter(false, parseInt(paged, 10));
 
             // Scroll to top of results
@@ -310,6 +310,12 @@
             formData.append('action', 'apd_filter_listings');
             formData.append('_apd_nonce', this.config.filterNonce || '');
             formData.append('paged', paged.toString());
+
+            // Pass posts_per_page from the results container so AJAX matches the initial query.
+            var postsPerPage = this.elements.results?.dataset.postsPerPage;
+            if (postsPerPage) {
+                formData.append('posts_per_page', postsPerPage);
+            }
 
             // Create abort controller for this request
             const controller = new AbortController();
@@ -374,6 +380,9 @@
                 this.elements.resultsCount.textContent = countText;
             }
 
+            // Update pagination
+            this.updatePagination(data.pagination_html);
+
             // Update active filters display
             this.updateActiveFilters(data.active_filters);
 
@@ -384,6 +393,33 @@
             document.dispatchEvent(new CustomEvent('apd:filtered', {
                 detail: data,
             }));
+        },
+
+        /**
+         * Update the pagination display.
+         *
+         * @param {string} html - Server-rendered pagination HTML.
+         */
+        updatePagination: function(html) {
+            var existing = this.elements.pagination;
+
+            if (html) {
+                if (existing) {
+                    // Replace existing pagination.
+                    existing.outerHTML = html;
+                } else {
+                    // Insert pagination after results.
+                    if (this.elements.results) {
+                        this.elements.results.insertAdjacentHTML('afterend', html);
+                    }
+                }
+            } else if (existing) {
+                // No pagination needed — remove it.
+                existing.remove();
+            }
+
+            // Re-cache the pagination element.
+            this.elements.pagination = document.querySelector('.apd-pagination');
         },
 
         /**

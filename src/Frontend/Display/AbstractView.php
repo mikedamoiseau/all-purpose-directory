@@ -229,6 +229,10 @@ abstract class AbstractView implements ViewInterface {
 			'view' => $this->type,
 		];
 
+		if ( ! empty( $this->config['posts_per_page'] ) ) {
+			$attributes['posts-per-page'] = (string) $this->config['posts_per_page'];
+		}
+
 		/**
 		 * Filter the container data attributes.
 		 *

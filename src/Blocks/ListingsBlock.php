@@ -256,9 +256,10 @@ final class ListingsBlock extends AbstractBlock {
 	 */
 	private function build_view_config( array $attributes ): array {
 		$config = [
-			'show_image'    => (bool) $attributes['showImage'],
-			'show_excerpt'  => (bool) $attributes['showExcerpt'],
-			'show_category' => (bool) $attributes['showCategory'],
+			'show_image'     => (bool) $attributes['showImage'],
+			'show_excerpt'   => (bool) $attributes['showExcerpt'],
+			'show_category'  => (bool) $attributes['showCategory'],
+			'posts_per_page' => absint( $attributes['count'] ),
 		];
 
 		// Columns for grid view.

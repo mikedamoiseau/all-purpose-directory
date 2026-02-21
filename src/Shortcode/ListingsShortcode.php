@@ -301,9 +301,10 @@ final class ListingsShortcode extends AbstractShortcode {
 	 */
 	private function build_view_config( array $atts ): array {
 		$config = [
-			'show_image'    => $atts['show_image'],
-			'show_excerpt'  => $atts['show_excerpt'],
-			'show_category' => $atts['show_category'],
+			'show_image'     => $atts['show_image'],
+			'show_excerpt'   => $atts['show_excerpt'],
+			'show_category'  => $atts['show_category'],
+			'posts_per_page' => absint( $atts['count'] ),
 		];
 
 		// Columns for grid view.
