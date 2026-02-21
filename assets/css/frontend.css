@@ -410,13 +410,13 @@
     }
 }
 
-.apd-listings-results--loading {
+.apd-listings--loading {
     position: relative;
     pointer-events: none;
     min-height: 200px;
 }
 
-.apd-listings-results--loading > * {
+.apd-listings--loading > * {
     opacity: 0.3;
 }
 
