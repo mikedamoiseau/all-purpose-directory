@@ -20,13 +20,20 @@ class CapabilityCheckTest extends SecurityTestCase {
     /**
      * Create a mock WP_REST_Request.
      *
-     * @param array $params Request parameters.
+     * @param array $params     Request parameters.
+     * @param bool  $with_nonce Whether to include a valid nonce header.
      * @return \WP_REST_Request
      */
-    private function create_mock_request(array $params = []): \WP_REST_Request {
+    private function create_mock_request(array $params = [], bool $with_nonce = false): \WP_REST_Request {
         $request = $this->createMock(\WP_REST_Request::class);
         $request->method('get_param')->willReturnCallback(function ($key) use ($params) {
             return $params[$key] ?? null;
+        });
+        $request->method('get_header')->willReturnCallback(function ($key) use ($with_nonce) {
+            if ($with_nonce && $key === 'X-WP-Nonce') {
+                return 'test-nonce';
+            }
+            return null;
         });
         return $request;
     }
@@ -104,9 +111,10 @@ class CapabilityCheckTest extends SecurityTestCase {
     public function test_rest_api_create_listing_permission_fails_without_capability(): void {
         Functions\when('get_current_user_id')->justReturn(1);
         Functions\when('current_user_can')->justReturn(false);
+        $this->mock_valid_nonce('test-nonce', 'wp_rest');
 
         $controller = RestController::get_instance();
-        $request = $this->create_mock_request();
+        $request = $this->create_mock_request([], true);
         $result = $controller->permission_create_listing($request);
 
         $this->assertInstanceOf(\WP_Error::class, $result, 'Create listing should fail without capability');
@@ -147,6 +155,7 @@ class CapabilityCheckTest extends SecurityTestCase {
         $other_user_id = 200;
 
         Functions\when('get_current_user_id')->justReturn($other_user_id);
+        $this->mock_valid_nonce('test-nonce', 'wp_rest');
 
         $post = new \stdClass();
         $post->post_author = $owner_id;
@@ -155,7 +164,7 @@ class CapabilityCheckTest extends SecurityTestCase {
         Functions\when('current_user_can')->justReturn(false);
 
         $controller = RestController::get_instance();
-        $request = $this->create_mock_request(['id' => $listing_id]);
+        $request = $this->create_mock_request(['id' => $listing_id], true);
         $result = $controller->permission_edit_listing($request);
 
         $this->assertInstanceOf(\WP_Error::class, $result, 'Non-owner should not be able to edit');
@@ -208,9 +217,10 @@ class CapabilityCheckTest extends SecurityTestCase {
      */
     public function test_edit_listing_permission_fails_for_invalid_id(): void {
         Functions\when('get_current_user_id')->justReturn(1);
+        $this->mock_valid_nonce('test-nonce', 'wp_rest');
 
         $controller = RestController::get_instance();
-        $request = $this->create_mock_request(['id' => 0]);
+        $request = $this->create_mock_request(['id' => 0], true);
         $result = $controller->permission_edit_listing($request);
 
         $this->assertInstanceOf(\WP_Error::class, $result);
@@ -223,9 +233,10 @@ class CapabilityCheckTest extends SecurityTestCase {
     public function test_edit_listing_permission_fails_for_non_existent_listing(): void {
         Functions\when('get_current_user_id')->justReturn(1);
         Functions\when('get_post')->justReturn(null);
+        $this->mock_valid_nonce('test-nonce', 'wp_rest');
 
         $controller = RestController::get_instance();
-        $request = $this->create_mock_request(['id' => 999]);
+        $request = $this->create_mock_request(['id' => 999], true);
         $result = $controller->permission_edit_listing($request);
 
         $this->assertInstanceOf(\WP_Error::class, $result);
@@ -237,13 +248,14 @@ class CapabilityCheckTest extends SecurityTestCase {
      */
     public function test_edit_listing_permission_fails_for_wrong_post_type(): void {
         Functions\when('get_current_user_id')->justReturn(1);
+        $this->mock_valid_nonce('test-nonce', 'wp_rest');
 
         $post = new \stdClass();
         $post->post_type = 'post';
         Functions\when('get_post')->justReturn($post);
 
         $controller = RestController::get_instance();
-        $request = $this->create_mock_request(['id' => 123]);
+        $request = $this->create_mock_request(['id' => 123], true);
         $result = $controller->permission_edit_listing($request);
 
         $this->assertInstanceOf(\WP_Error::class, $result);
@@ -259,6 +271,7 @@ class CapabilityCheckTest extends SecurityTestCase {
         $other_user_id = 200;
 
         Functions\when('get_current_user_id')->justReturn($other_user_id);
+        $this->mock_valid_nonce('test-nonce', 'wp_rest');
 
         $post = new \stdClass();
         $post->post_author = $owner_id;
@@ -267,7 +280,7 @@ class CapabilityCheckTest extends SecurityTestCase {
         Functions\when('current_user_can')->justReturn(false);
 
         $controller = RestController::get_instance();
-        $request = $this->create_mock_request(['id' => $listing_id]);
+        $request = $this->create_mock_request(['id' => $listing_id], true);
         $result = $controller->permission_delete_listing($request);
 
         $this->assertInstanceOf(\WP_Error::class, $result);
@@ -325,6 +338,7 @@ class CapabilityCheckTest extends SecurityTestCase {
         $listing_id = 123;
 
         Functions\when('get_current_user_id')->justReturn(1);
+        $this->mock_valid_nonce('test-nonce', 'wp_rest');
 
         $post = new \stdClass();
         $post->post_author = 1;
@@ -341,7 +355,7 @@ class CapabilityCheckTest extends SecurityTestCase {
         });
 
         $controller = RestController::get_instance();
-        $request = $this->create_mock_request(['id' => $listing_id]);
+        $request = $this->create_mock_request(['id' => $listing_id], true);
         $controller->permission_edit_listing($request);
 
         $this->assertTrue($cap_checked, 'Should check edit_post capability with listing ID');

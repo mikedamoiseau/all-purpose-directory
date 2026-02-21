@@ -2897,9 +2897,9 @@ function apd_get_user_profile_data( int $user_id = 0 ): array {
  *                          - avatar_id: (int) Custom avatar attachment ID.
  *                          - social: (array) Social media links.
  * @param int|null $user_id Optional. User ID. Defaults to current user.
- * @return true|\WP_Error True on success, WP_Error on failure.
+ * @return bool|\WP_Error True on success, WP_Error on failure.
  */
-function apd_save_user_profile( array $data, ?int $user_id = null ): true|\WP_Error {
+function apd_save_user_profile( array $data, ?int $user_id = null ): bool|\WP_Error {
 	if ( $user_id === null ) {
 		$user_id = get_current_user_id();
 	}

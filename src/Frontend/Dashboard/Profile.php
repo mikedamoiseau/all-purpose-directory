@@ -407,9 +407,9 @@ class Profile {
 	 * @since 1.0.0
 	 *
 	 * @param array<string, mixed> $data Profile data to validate.
-	 * @return true|\WP_Error True on success, WP_Error on failure.
+	 * @return bool|\WP_Error True on success, WP_Error on failure.
 	 */
-	public function validate_profile( array $data ): true|\WP_Error {
+	public function validate_profile( array $data ): bool|\WP_Error {
 		$errors = new \WP_Error();
 
 		// Display name is required.
@@ -473,9 +473,9 @@ class Profile {
 	 * @since 1.0.0
 	 *
 	 * @param array<string, mixed> $data Profile data to save.
-	 * @return true|\WP_Error True on success, WP_Error on failure.
+	 * @return bool|\WP_Error True on success, WP_Error on failure.
 	 */
-	public function save_profile( array $data ): true|\WP_Error {
+	public function save_profile( array $data ): bool|\WP_Error {
 		/**
 		 * Fires before profile data is saved.
 		 *

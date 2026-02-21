@@ -70,7 +70,7 @@ class ReviewsEndpointTest extends UnitTestCase {
 	 * @param array $params Request parameters.
 	 * @return \WP_REST_Request|Mockery\MockInterface
 	 */
-	private function create_mock_request( array $params = [] ): \WP_REST_Request {
+	private function create_mock_request( array $params = [], bool $with_nonce = false ): \WP_REST_Request {
 		$request = Mockery::mock( \WP_REST_Request::class );
 
 		foreach ( $params as $key => $value ) {
@@ -81,6 +81,14 @@ class ReviewsEndpointTest extends UnitTestCase {
 
 		// Default to null for any param not explicitly set.
 		$request->shouldReceive( 'get_param' )->andReturn( null );
+
+		// Mock get_header for nonce verification.
+		if ( $with_nonce ) {
+			$request->shouldReceive( 'get_header' )
+				->with( 'X-WP-Nonce' )
+				->andReturn( 'test-nonce' );
+		}
+		$request->shouldReceive( 'get_header' )->andReturn( null );
 
 		return $request;
 	}
@@ -898,9 +906,11 @@ class ReviewsEndpointTest extends UnitTestCase {
 	 * Test permission_edit_review returns error for non-existent review.
 	 */
 	public function test_permission_edit_review_returns_error_for_non_existent(): void {
-		$request = $this->create_mock_request( [ 'id' => 999 ] );
+		$request = $this->create_mock_request( [ 'id' => 999 ], true );
 
 		Functions\when( 'apd_get_review' )->justReturn( null );
+		Functions\when( 'get_current_user_id' )->justReturn( 1 );
+		Functions\when( 'wp_verify_nonce' )->justReturn( 1 );
 		Functions\stubs( [
 			'__' => function ( $text ) {
 				return $text;
@@ -917,9 +927,10 @@ class ReviewsEndpointTest extends UnitTestCase {
 	 * Test permission_edit_review allows admin.
 	 */
 	public function test_permission_edit_review_allows_admin(): void {
-		$request = $this->create_mock_request( [ 'id' => 1 ] );
+		$request = $this->create_mock_request( [ 'id' => 1 ], true );
 		$review  = $this->create_review_data();
 
+		Functions\when( 'wp_verify_nonce' )->justReturn( 1 );
 		Functions\stubs( [
 			'apd_get_review'     => $review,
 			'get_current_user_id' => 99,
@@ -935,9 +946,10 @@ class ReviewsEndpointTest extends UnitTestCase {
 	 * Test permission_edit_review allows author.
 	 */
 	public function test_permission_edit_review_allows_author(): void {
-		$request = $this->create_mock_request( [ 'id' => 1 ] );
+		$request = $this->create_mock_request( [ 'id' => 1 ], true );
 		$review  = $this->create_review_data( [ 'author_id' => 5 ] );
 
+		Functions\when( 'wp_verify_nonce' )->justReturn( 1 );
 		Functions\stubs( [
 			'apd_get_review'      => $review,
 			'get_current_user_id' => 5,
@@ -953,9 +965,10 @@ class ReviewsEndpointTest extends UnitTestCase {
 	 * Test permission_edit_review denies non-author.
 	 */
 	public function test_permission_edit_review_denies_non_author(): void {
-		$request = $this->create_mock_request( [ 'id' => 1 ] );
+		$request = $this->create_mock_request( [ 'id' => 1 ], true );
 		$review  = $this->create_review_data( [ 'author_id' => 5 ] );
 
+		Functions\when( 'wp_verify_nonce' )->justReturn( 1 );
 		Functions\stubs( [
 			'apd_get_review'      => $review,
 			'get_current_user_id' => 10,

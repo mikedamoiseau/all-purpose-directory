@@ -749,9 +749,9 @@ class ReviewManager {
 	 *
 	 * @param array $data       Review data.
 	 * @param int   $listing_id Listing post ID.
-	 * @return true|\WP_Error True if valid, WP_Error on failure.
+	 * @return bool|\WP_Error True if valid, WP_Error on failure.
 	 */
-	private function validate_review_data( array $data, int $listing_id ): true|\WP_Error {
+	private function validate_review_data( array $data, int $listing_id ): bool|\WP_Error {
 		$errors       = new \WP_Error();
 		$user_id      = $data['user_id'] ?? get_current_user_id();
 		$is_logged_in = $user_id > 0;
