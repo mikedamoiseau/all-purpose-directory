@@ -388,6 +388,36 @@ final class RestController {
 	}
 
 	/**
+	 * Permission callback: Authenticated users with a valid REST nonce.
+	 *
+	 * This protects state-changing requests from CSRF when using cookie auth.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param \WP_REST_Request $request The REST request.
+	 * @return bool|\WP_Error True if authenticated and nonce is valid, WP_Error otherwise.
+	 */
+	public function permission_authenticated_with_nonce( \WP_REST_Request $request, ?string $not_logged_in_message = null ): bool|\WP_Error {
+		if ( ! $this->is_authenticated( $request ) ) {
+			return new \WP_Error(
+				'rest_not_logged_in',
+				$not_logged_in_message ?? __( 'You must be logged in to access this endpoint.', 'all-purpose-directory' ),
+				[ 'status' => 401 ]
+			);
+		}
+
+		if ( ! $this->verify_nonce( $request ) ) {
+			return new \WP_Error(
+				'rest_nonce_invalid',
+				__( 'Invalid or missing REST API nonce.', 'all-purpose-directory' ),
+				[ 'status' => 403 ]
+			);
+		}
+
+		return true;
+	}
+
+	/**
 	 * Permission callback: Users who can create listings.
 	 *
 	 * @since 1.0.0
@@ -396,12 +426,12 @@ final class RestController {
 	 * @return bool|\WP_Error True if user can create listings, WP_Error otherwise.
 	 */
 	public function permission_create_listing( \WP_REST_Request $request ): bool|\WP_Error {
-		if ( ! $this->is_authenticated( $request ) ) {
-			return new \WP_Error(
-				'rest_not_logged_in',
-				__( 'You must be logged in to create listings.', 'all-purpose-directory' ),
-				[ 'status' => 401 ]
-			);
+		$auth_check = $this->permission_authenticated_with_nonce(
+			$request,
+			__( 'You must be logged in to create listings.', 'all-purpose-directory' )
+		);
+		if ( is_wp_error( $auth_check ) ) {
+			return $auth_check;
 		}
 
 		if ( ! current_user_can( 'edit_apd_listings' ) ) {
@@ -427,12 +457,12 @@ final class RestController {
 	 * @return bool|\WP_Error True if user can edit, WP_Error otherwise.
 	 */
 	public function permission_edit_listing( \WP_REST_Request $request ): bool|\WP_Error {
-		if ( ! $this->is_authenticated( $request ) ) {
-			return new \WP_Error(
-				'rest_not_logged_in',
-				__( 'You must be logged in to edit listings.', 'all-purpose-directory' ),
-				[ 'status' => 401 ]
-			);
+		$auth_check = $this->permission_authenticated_with_nonce(
+			$request,
+			__( 'You must be logged in to edit listings.', 'all-purpose-directory' )
+		);
+		if ( is_wp_error( $auth_check ) ) {
+			return $auth_check;
 		}
 
 		$listing_id = (int) $request->get_param( 'id' );
@@ -476,12 +506,12 @@ final class RestController {
 	 * @return bool|\WP_Error True if user can delete, WP_Error otherwise.
 	 */
 	public function permission_delete_listing( \WP_REST_Request $request ): bool|\WP_Error {
-		if ( ! $this->is_authenticated( $request ) ) {
-			return new \WP_Error(
-				'rest_not_logged_in',
-				__( 'You must be logged in to delete listings.', 'all-purpose-directory' ),
-				[ 'status' => 401 ]
-			);
+		$auth_check = $this->permission_authenticated_with_nonce(
+			$request,
+			__( 'You must be logged in to delete listings.', 'all-purpose-directory' )
+		);
+		if ( is_wp_error( $auth_check ) ) {
+			return $auth_check;
 		}
 
 		$listing_id = (int) $request->get_param( 'id' );

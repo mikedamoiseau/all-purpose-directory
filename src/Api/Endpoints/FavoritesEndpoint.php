@@ -71,7 +71,7 @@ class FavoritesEndpoint {
 				[
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => [ $this, 'add_favorite' ],
-					'permission_callback' => [ $this->controller, 'permission_authenticated' ],
+					'permission_callback' => [ $this->controller, 'permission_authenticated_with_nonce' ],
 					'args'                => $this->get_add_params(),
 				],
 				'schema' => [ $this, 'get_favorites_schema' ],
@@ -98,7 +98,7 @@ class FavoritesEndpoint {
 			[
 				'methods'             => WP_REST_Server::DELETABLE,
 				'callback'            => [ $this, 'remove_favorite' ],
-				'permission_callback' => [ $this->controller, 'permission_authenticated' ],
+				'permission_callback' => [ $this->controller, 'permission_authenticated_with_nonce' ],
 				'args'                => [
 					'id' => [
 						'description' => __( 'Listing ID to remove from favorites.', 'all-purpose-directory' ),
@@ -117,7 +117,7 @@ class FavoritesEndpoint {
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'toggle_favorite' ],
-				'permission_callback' => [ $this->controller, 'permission_authenticated' ],
+				'permission_callback' => [ $this->controller, 'permission_authenticated_with_nonce' ],
 				'args'                => [
 					'id' => [
 						'description' => __( 'Listing ID to toggle favorite.', 'all-purpose-directory' ),

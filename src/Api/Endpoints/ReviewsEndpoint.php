@@ -73,7 +73,7 @@ class ReviewsEndpoint {
 				[
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => [ $this, 'create_review' ],
-					'permission_callback' => [ $this->controller, 'permission_authenticated' ],
+					'permission_callback' => [ $this->controller, 'permission_authenticated_with_nonce' ],
 					'args'                => $this->get_create_params(),
 				],
 				'schema' => [ $this, 'get_review_schema' ],
@@ -372,6 +372,11 @@ class ReviewsEndpoint {
 	 * @return bool|WP_Error True if allowed, error otherwise.
 	 */
 	public function permission_edit_review( WP_REST_Request $request ): bool|WP_Error {
+		$auth_check = $this->controller->permission_authenticated_with_nonce( $request );
+		if ( is_wp_error( $auth_check ) ) {
+			return $auth_check;
+		}
+
 		$review_id = (int) $request->get_param( 'id' );
 		$review    = apd_get_review( $review_id );
 
@@ -411,6 +416,11 @@ class ReviewsEndpoint {
 	 * @return bool|WP_Error True if allowed, error otherwise.
 	 */
 	public function permission_delete_review( WP_REST_Request $request ): bool|WP_Error {
+		$auth_check = $this->controller->permission_authenticated_with_nonce( $request );
+		if ( is_wp_error( $auth_check ) ) {
+			return $auth_check;
+		}
+
 		$review_id = (int) $request->get_param( 'id' );
 		$review    = apd_get_review( $review_id );
 

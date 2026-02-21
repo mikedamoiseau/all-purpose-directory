@@ -93,7 +93,7 @@ class InquiriesEndpoint {
 				[
 					'methods'             => WP_REST_Server::DELETABLE,
 					'callback'            => [ $this, 'delete_inquiry' ],
-					'permission_callback' => [ $this, 'permission_view_inquiry' ],
+					'permission_callback' => [ $this, 'permission_manage_inquiry' ],
 					'args'                => [
 						'id'    => [
 							'description' => __( 'Inquiry ID.', 'all-purpose-directory' ),
@@ -119,7 +119,7 @@ class InquiriesEndpoint {
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'mark_read' ],
-				'permission_callback' => [ $this, 'permission_view_inquiry' ],
+				'permission_callback' => [ $this, 'permission_manage_inquiry' ],
 				'args'                => [
 					'id' => [
 						'description' => __( 'Inquiry ID.', 'all-purpose-directory' ),
@@ -138,7 +138,7 @@ class InquiriesEndpoint {
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'mark_unread' ],
-				'permission_callback' => [ $this, 'permission_view_inquiry' ],
+				'permission_callback' => [ $this, 'permission_manage_inquiry' ],
 				'args'                => [
 					'id' => [
 						'description' => __( 'Inquiry ID.', 'all-purpose-directory' ),
@@ -332,6 +332,33 @@ class InquiriesEndpoint {
 			__( 'You do not have permission to view this inquiry.', 'all-purpose-directory' ),
 			[ 'status' => 403 ]
 		);
+	}
+
+	/**
+	 * Check if user can perform mutating actions on an inquiry.
+	 *
+	 * Requires both inquiry access and a valid REST nonce.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param WP_REST_Request $request Request object.
+	 * @return bool|WP_Error True if allowed, error otherwise.
+	 */
+	public function permission_manage_inquiry( WP_REST_Request $request ): bool|WP_Error {
+		$view_check = $this->permission_view_inquiry( $request );
+		if ( is_wp_error( $view_check ) ) {
+			return $view_check;
+		}
+
+		if ( ! $this->controller->verify_nonce( $request ) ) {
+			return new WP_Error(
+				'rest_nonce_invalid',
+				__( 'Invalid or missing REST API nonce.', 'all-purpose-directory' ),
+				[ 'status' => 403 ]
+			);
+		}
+
+		return true;
 	}
 
 	/**
