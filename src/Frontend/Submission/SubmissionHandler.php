@@ -1044,8 +1044,30 @@ Review the listing: %4$s',
 			$query_args['is_update'] = '1';
 		}
 
+		// If no explicit redirect from shortcode attribute, use the setting.
 		if ( empty( $redirect_url ) ) {
-			// Redirect to a success page or current page with success param.
+			$redirect_setting = \apd_get_option( 'redirect_after', 'listing' );
+
+			switch ( $redirect_setting ) {
+				case 'listing':
+					$redirect_url = get_permalink( $listing_id );
+					break;
+
+				case 'dashboard':
+					$dashboard_page = \apd_get_option( 'dashboard_page', 0 );
+					if ( $dashboard_page ) {
+						$redirect_url = get_permalink( $dashboard_page );
+					}
+					break;
+
+				case 'custom':
+					$redirect_url = \apd_get_option( 'redirect_custom_url', '' );
+					break;
+			}
+		}
+
+		if ( empty( $redirect_url ) ) {
+			// Final fallback: current page with success param.
 			$redirect_url = add_query_arg( $query_args, wp_get_referer() ?: home_url() );
 		} else {
 			$redirect_url = add_query_arg( $query_args, $redirect_url );
