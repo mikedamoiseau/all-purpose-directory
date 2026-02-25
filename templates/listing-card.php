@@ -93,7 +93,7 @@ $card_classes = apply_filters( 'apd_listing_card_classes', $card_classes, $listi
 	do_action( 'apd_listing_card_start', $listing_id );
 	?>
 
-	<?php if ( $card_data['has_thumbnail'] ) : ?>
+	<?php if ( ( $show_image ?? true ) && $card_data['has_thumbnail'] ) : ?>
 		<div class="apd-listing-card__image">
 			<a href="<?php echo esc_url( $card_data['permalink'] ); ?>" aria-hidden="true" tabindex="-1">
 				<?php
@@ -108,7 +108,7 @@ $card_classes = apply_filters( 'apd_listing_card_classes', $card_classes, $listi
 				?>
 			</a>
 
-			<?php if ( ! empty( $card_data['categories'] ) ) : ?>
+			<?php if ( ( $show_category ?? true ) && ! empty( $card_data['categories'] ) ) : ?>
 				<div class="apd-listing-card__badges">
 					<?php
 					// Show first category as badge.
@@ -137,7 +137,7 @@ $card_classes = apply_filters( 'apd_listing_card_classes', $card_classes, $listi
 
 	<div class="apd-listing-card__body">
 
-		<?php if ( ! $card_data['has_thumbnail'] && ! empty( $card_data['categories'] ) ) : ?>
+		<?php if ( ( $show_category ?? true ) && ! $card_data['has_thumbnail'] && ! empty( $card_data['categories'] ) ) : ?>
 			<div class="apd-listing-card__categories">
 				<?php foreach ( $card_data['categories'] as $category ) : ?>
 					<a href="<?php echo esc_url( get_term_link( $category ) ); ?>" class="apd-listing-card__category">
@@ -153,15 +153,15 @@ $card_classes = apply_filters( 'apd_listing_card_classes', $card_classes, $listi
 			</a>
 		</h2>
 
-		<?php if ( ! empty( $card_data['excerpt'] ) ) : ?>
+		<?php if ( ( $show_excerpt ?? true ) && ! empty( $card_data['excerpt'] ) ) : ?>
 			<div class="apd-listing-card__excerpt">
 				<?php echo esc_html( wp_trim_words( $card_data['excerpt'], 15, '&hellip;' ) ); ?>
 			</div>
 		<?php endif; ?>
 
 		<?php
-		// Display star rating if function exists.
-		if ( function_exists( 'apd_get_listing_rating_count' ) ) :
+		// Display star rating if function exists and setting is enabled.
+		if ( ( $show_rating ?? true ) && function_exists( 'apd_get_listing_rating_count' ) ) :
 			$rating_count = apd_get_listing_rating_count( $listing_id );
 
 			if ( $rating_count > 0 ) :

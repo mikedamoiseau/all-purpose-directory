@@ -57,6 +57,18 @@ final class SubmissionHandlerTest extends UnitTestCase {
 			'sanitize_textarea_field' => fn( $str ) => trim( strip_tags( (string) $str ) ),
 			'wp_kses_post'         => fn( $str ) => $str,
 		] );
+
+		// Mock admin settings helpers used in permission checks.
+		Functions\when( 'apd_get_option' )->alias( function ( $key, $default = null ) {
+			// Default: anyone can submit, no guest submission.
+			$settings = [
+				'who_can_submit'  => 'anyone',
+				'guest_submission' => false,
+				'submission_roles' => [],
+				'terms_page'      => 0,
+			];
+			return $settings[ $key ] ?? $default;
+		} );
 	}
 
 	/**

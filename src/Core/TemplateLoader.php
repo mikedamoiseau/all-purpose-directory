@@ -254,11 +254,16 @@ final class TemplateLoader {
 	 */
 	public function get_archive_title(): string {
 		if ( is_post_type_archive( 'apd_listing' ) ) {
-			$title = post_type_archive_title( '', false );
+			$custom_title = \apd_get_option( 'archive_title', '' );
+			if ( ! empty( $custom_title ) ) {
+				$title = $custom_title;
+			} else {
+				$title = post_type_archive_title( '', false );
 
-			if ( empty( $title ) ) {
-				$post_type = get_post_type_object( 'apd_listing' );
-				$title     = $post_type->labels->name ?? __( 'Listings', 'all-purpose-directory' );
+				if ( empty( $title ) ) {
+					$post_type = get_post_type_object( 'apd_listing' );
+					$title     = $post_type->labels->name ?? __( 'Listings', 'all-purpose-directory' );
+				}
 			}
 		} elseif ( is_tax( 'apd_category' ) || is_tax( 'apd_tag' ) ) {
 			$title = single_term_title( '', false );

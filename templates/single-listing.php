@@ -43,9 +43,10 @@ do_action( 'apd_before_single_listing' );
 		?>
 
 		<?php
-		$listing_id = get_the_ID();
-		$categories = apd_get_listing_categories( $listing_id );
-		$tags       = apd_get_listing_tags( $listing_id );
+		$listing_id    = get_the_ID();
+		$categories    = apd_get_listing_categories( $listing_id );
+		$tags          = apd_get_listing_tags( $listing_id );
+		$single_layout = apd_get_option( 'single_layout', 'sidebar' );
 
 		/**
 		 * Filter the single listing data.
@@ -67,7 +68,7 @@ do_action( 'apd_before_single_listing' );
 				'tags'          => $tags,
 				'has_thumbnail' => has_post_thumbnail(),
 				'author_id'     => get_post_field( 'post_author', $listing_id ),
-				'post_date'     => get_the_date(),
+				'post_date'     => function_exists( 'apd_get_listing_date' ) ? apd_get_listing_date() : get_the_date(),
 				'modified_date' => get_the_modified_date(),
 			],
 			$listing_id
@@ -145,7 +146,7 @@ do_action( 'apd_before_single_listing' );
 
 			</header>
 
-			<div class="apd-single-listing__layout">
+			<div class="apd-single-listing__layout apd-single-listing__layout--<?php echo esc_attr( $single_layout ); ?>">
 
 				<div class="apd-single-listing__main">
 
@@ -255,6 +256,7 @@ do_action( 'apd_before_single_listing' );
 
 				</div>
 
+				<?php if ( 'sidebar' === $single_layout ) : ?>
 				<aside class="apd-single-listing__sidebar">
 
 					<?php
@@ -340,6 +342,7 @@ do_action( 'apd_before_single_listing' );
 					?>
 
 				</aside>
+				<?php endif; ?>
 
 			</div>
 

@@ -407,10 +407,40 @@ final class SettingsTest extends UnitTestCase {
 		$sanitized = $this->settings->sanitize_settings( $input );
 		$this->assertFalse( $sanitized['enable_reviews'] );
 
-		// When saving a different tab, checkbox preserves existing value (false when no existing).
+		// When saving a different tab, checkbox preserves default value (true) when no existing.
 		$input     = [ '_active_tab' => 'general' ];
 		$sanitized = $this->settings->sanitize_settings( $input );
-		$this->assertFalse( $sanitized['enable_reviews'] );
+		$this->assertTrue( $sanitized['enable_reviews'] );
+	}
+
+	/**
+	 * Test fresh install preserves checkbox defaults across tabs.
+	 */
+	public function test_fresh_install_preserves_checkbox_defaults_across_tabs(): void {
+		// On fresh install with no existing settings, saving the general tab
+		// should preserve default values of checkboxes from other tabs.
+		$input     = [ '_active_tab' => 'general' ];
+		$sanitized = $this->settings->sanitize_settings( $input );
+
+		// Listings tab defaults.
+		$this->assertTrue( $sanitized['enable_reviews'], 'enable_reviews should default to true' );
+		$this->assertTrue( $sanitized['enable_favorites'], 'enable_favorites should default to true' );
+		$this->assertTrue( $sanitized['enable_contact_form'], 'enable_contact_form should default to true' );
+
+		// Display tab defaults.
+		$this->assertTrue( $sanitized['show_thumbnail'], 'show_thumbnail should default to true' );
+		$this->assertTrue( $sanitized['show_excerpt'], 'show_excerpt should default to true' );
+		$this->assertTrue( $sanitized['show_category'], 'show_category should default to true' );
+		$this->assertTrue( $sanitized['show_rating'], 'show_rating should default to true' );
+		$this->assertTrue( $sanitized['show_favorite'], 'show_favorite should default to true' );
+
+		// Email tab defaults.
+		$this->assertTrue( $sanitized['notify_submission'], 'notify_submission should default to true' );
+		$this->assertTrue( $sanitized['notify_approved'], 'notify_approved should default to true' );
+
+		// Advanced tab defaults (these default to false).
+		$this->assertFalse( $sanitized['delete_data'], 'delete_data should default to false' );
+		$this->assertFalse( $sanitized['debug_mode'], 'debug_mode should default to false' );
 	}
 
 	/**

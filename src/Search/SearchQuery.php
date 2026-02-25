@@ -142,6 +142,8 @@ final class SearchQuery {
 			return;
 		}
 
+		$query->set( 'posts_per_page', \apd_get_listings_per_page() );
+
 		$this->apply_filters( $query );
 		$this->apply_orderby( $query );
 		$this->apply_keyword_search( $query );
@@ -408,7 +410,7 @@ final class SearchQuery {
 		$defaults = [
 			'post_type'      => 'apd_listing',
 			'post_status'    => 'publish',
-			'posts_per_page' => get_option( 'posts_per_page', 10 ),
+			'posts_per_page' => \apd_get_listings_per_page(),
 		];
 
 		$query_args = wp_parse_args( $args, $defaults );

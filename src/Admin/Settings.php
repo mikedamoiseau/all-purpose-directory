@@ -1707,9 +1707,9 @@ final class Settings {
 			$sanitized['enable_favorites']    = ! empty( $input['enable_favorites'] );
 			$sanitized['enable_contact_form'] = ! empty( $input['enable_contact_form'] );
 		} else {
-			$sanitized['enable_reviews']      = ! empty( $existing['enable_reviews'] );
-			$sanitized['enable_favorites']    = ! empty( $existing['enable_favorites'] );
-			$sanitized['enable_contact_form'] = ! empty( $existing['enable_contact_form'] );
+			$sanitized['enable_reviews']      = ! empty( $existing['enable_reviews'] ?? $defaults['enable_reviews'] );
+			$sanitized['enable_favorites']    = ! empty( $existing['enable_favorites'] ?? $defaults['enable_favorites'] );
+			$sanitized['enable_contact_form'] = ! empty( $existing['enable_contact_form'] ?? $defaults['enable_contact_form'] );
 		}
 
 		// Submission settings.
@@ -1733,7 +1733,7 @@ final class Settings {
 		if ( 'submission' === $active_tab ) {
 			$sanitized['guest_submission'] = ! empty( $input['guest_submission'] );
 		} else {
-			$sanitized['guest_submission'] = ! empty( $existing['guest_submission'] );
+			$sanitized['guest_submission'] = ! empty( $existing['guest_submission'] ?? $defaults['guest_submission'] );
 		}
 
 		$sanitized['terms_page'] = isset( $input['terms_page'] )
@@ -1767,11 +1767,11 @@ final class Settings {
 			$sanitized['show_rating']    = ! empty( $input['show_rating'] );
 			$sanitized['show_favorite']  = ! empty( $input['show_favorite'] );
 		} else {
-			$sanitized['show_thumbnail'] = ! empty( $existing['show_thumbnail'] );
-			$sanitized['show_excerpt']   = ! empty( $existing['show_excerpt'] );
-			$sanitized['show_category']  = ! empty( $existing['show_category'] );
-			$sanitized['show_rating']    = ! empty( $existing['show_rating'] );
-			$sanitized['show_favorite']  = ! empty( $existing['show_favorite'] );
+			$sanitized['show_thumbnail'] = ! empty( $existing['show_thumbnail'] ?? $defaults['show_thumbnail'] );
+			$sanitized['show_excerpt']   = ! empty( $existing['show_excerpt'] ?? $defaults['show_excerpt'] );
+			$sanitized['show_category']  = ! empty( $existing['show_category'] ?? $defaults['show_category'] );
+			$sanitized['show_rating']    = ! empty( $existing['show_rating'] ?? $defaults['show_rating'] );
+			$sanitized['show_favorite']  = ! empty( $existing['show_favorite'] ?? $defaults['show_favorite'] );
 		}
 
 		$sanitized['archive_title'] = isset( $input['archive_title'] )
@@ -1804,12 +1804,12 @@ final class Settings {
 			$sanitized['notify_review']     = ! empty( $input['notify_review'] );
 			$sanitized['notify_inquiry']    = ! empty( $input['notify_inquiry'] );
 		} else {
-			$sanitized['notify_submission'] = ! empty( $existing['notify_submission'] );
-			$sanitized['notify_approved']   = ! empty( $existing['notify_approved'] );
-			$sanitized['notify_rejected']   = ! empty( $existing['notify_rejected'] );
-			$sanitized['notify_expiring']   = ! empty( $existing['notify_expiring'] );
-			$sanitized['notify_review']     = ! empty( $existing['notify_review'] );
-			$sanitized['notify_inquiry']    = ! empty( $existing['notify_inquiry'] );
+			$sanitized['notify_submission'] = ! empty( $existing['notify_submission'] ?? $defaults['notify_submission'] );
+			$sanitized['notify_approved']   = ! empty( $existing['notify_approved'] ?? $defaults['notify_approved'] );
+			$sanitized['notify_rejected']   = ! empty( $existing['notify_rejected'] ?? $defaults['notify_rejected'] );
+			$sanitized['notify_expiring']   = ! empty( $existing['notify_expiring'] ?? $defaults['notify_expiring'] );
+			$sanitized['notify_review']     = ! empty( $existing['notify_review'] ?? $defaults['notify_review'] );
+			$sanitized['notify_inquiry']    = ! empty( $existing['notify_inquiry'] ?? $defaults['notify_inquiry'] );
 		}
 
 		// Advanced settings.
@@ -1817,8 +1817,8 @@ final class Settings {
 			$sanitized['delete_data'] = ! empty( $input['delete_data'] );
 			$sanitized['debug_mode']  = ! empty( $input['debug_mode'] );
 		} else {
-			$sanitized['delete_data'] = ! empty( $existing['delete_data'] );
-			$sanitized['debug_mode']  = ! empty( $existing['debug_mode'] );
+			$sanitized['delete_data'] = ! empty( $existing['delete_data'] ?? $defaults['delete_data'] );
+			$sanitized['debug_mode']  = ! empty( $existing['debug_mode'] ?? $defaults['debug_mode'] );
 		}
 
 		$sanitized['custom_css'] = isset( $input['custom_css'] )

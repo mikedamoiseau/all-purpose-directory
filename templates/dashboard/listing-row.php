@@ -129,7 +129,7 @@ $edit_url   = $my_listings->get_edit_url( $listing_id );
 	<?php if ( $config['show_date'] ) : ?>
 		<td class="apd-listing-row__date">
 			<time datetime="<?php echo esc_attr( get_the_date( 'c', $listing_id ) ); ?>">
-				<?php echo esc_html( get_the_date( '', $listing_id ) ); ?>
+				<?php echo esc_html( function_exists( 'apd_get_listing_date' ) ? apd_get_listing_date( $listing_id ) : get_the_date( '', $listing_id ) ); ?>
 			</time>
 		</td>
 	<?php endif; ?>

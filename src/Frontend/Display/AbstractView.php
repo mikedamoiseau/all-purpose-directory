@@ -436,7 +436,7 @@ abstract class AbstractView implements ViewInterface {
 		$defaults = [
 			'post_type'      => \apd_get_listing_post_type(),
 			'post_status'    => 'publish',
-			'posts_per_page' => get_option( 'posts_per_page', 10 ),
+			'posts_per_page' => \apd_get_listings_per_page(),
 			'paged'          => max( 1, get_query_var( 'paged', 1 ) ),
 		];
 

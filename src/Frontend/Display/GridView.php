@@ -93,6 +93,27 @@ final class GridView extends AbstractView {
 	private const VALID_COLUMNS = [ 2, 3, 4 ];
 
 	/**
+	 * Constructor.
+	 *
+	 * Reads admin display settings as baseline defaults before applying
+	 * any view-specific config overrides.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array<string, mixed> $config Optional. Initial configuration.
+	 */
+	public function __construct( array $config = [] ) {
+		$this->defaults['show_image']    = (bool) \apd_get_option( 'show_thumbnail', true );
+		$this->defaults['show_excerpt']  = (bool) \apd_get_option( 'show_excerpt', true );
+		$this->defaults['show_category'] = (bool) \apd_get_option( 'show_category', true );
+		$this->defaults['show_rating']   = (bool) \apd_get_option( 'show_rating', true );
+		$this->defaults['show_favorite'] = (bool) \apd_get_option( 'show_favorite', true );
+		$this->defaults['columns']       = (int) \apd_get_option( 'grid_columns', 3 );
+
+		parent::__construct( $config );
+	}
+
+	/**
 	 * Get the view label.
 	 *
 	 * @since 1.0.0

@@ -74,6 +74,12 @@ class Assets {
 			$this->version
 		);
 
+		// Output custom CSS from admin settings.
+		$custom_css = \apd_get_option( 'custom_css', '' );
+		if ( ! empty( trim( $custom_css ) ) ) {
+			wp_add_inline_style( 'apd-frontend', $custom_css );
+		}
+
 		wp_enqueue_script(
 			'apd-frontend',
 			$this->plugin_url . 'assets/js/frontend.js',

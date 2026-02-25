@@ -32,6 +32,12 @@ final class GridViewTest extends UnitTestCase {
 	 */
 	protected function setUp(): void {
 		parent::setUp();
+
+		// Mock apd_get_option used in GridView constructor to read admin settings.
+		Functions\when( 'apd_get_option' )->alias( function ( $key, $default = null ) {
+			return $default;
+		} );
+
 		$this->view = new GridView();
 	}
 

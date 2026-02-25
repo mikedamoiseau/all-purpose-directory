@@ -172,9 +172,30 @@ final class SubmissionFormShortcode extends AbstractShortcode {
 			return $this->render_success_state();
 		}
 
-		// Check login requirement.
-		if ( $atts['require_login'] && ! is_user_logged_in() ) {
+		// Check login requirement using admin settings.
+		$who_can_submit = \apd_get_option( 'who_can_submit', 'anyone' );
+		$guest_allowed  = (bool) \apd_get_option( 'guest_submission', false );
+		$is_logged_in   = is_user_logged_in();
+
+		if ( 'logged_in' === $who_can_submit || 'specific_roles' === $who_can_submit ) {
+			if ( ! $is_logged_in ) {
+				return $this->require_login( __( 'Please log in to submit a listing.', 'all-purpose-directory' ) );
+			}
+		} elseif ( 'anyone' === $who_can_submit && ! $guest_allowed && ! $is_logged_in ) {
 			return $this->require_login( __( 'Please log in to submit a listing.', 'all-purpose-directory' ) );
+		}
+
+		// Check specific role restriction (admins always pass).
+		if ( 'specific_roles' === $who_can_submit && $is_logged_in ) {
+			$user = wp_get_current_user();
+			if ( ! in_array( 'administrator', (array) $user->roles, true ) ) {
+				$allowed_roles = (array) \apd_get_option( 'submission_roles', [] );
+				if ( empty( array_intersect( (array) $user->roles, $allowed_roles ) ) ) {
+					return '<div class="apd-notice apd-notice--error"><p>' .
+						esc_html__( 'Your user role does not have permission to submit listings.', 'all-purpose-directory' ) .
+						'</p></div>';
+				}
+			}
 		}
 
 		// Determine listing ID for edit mode.
@@ -370,6 +391,18 @@ final class SubmissionFormShortcode extends AbstractShortcode {
 	 * @return array Form configuration.
 	 */
 	private function build_form_config( array $atts, int $listing_id = 0 ): array {
+		$show_terms = $atts['show_terms'];
+		$terms_link = $atts['terms_link'];
+
+		// Auto-enable terms when a terms page is configured in admin settings.
+		$terms_page_id = (int) \apd_get_option( 'terms_page', 0 );
+		if ( $terms_page_id > 0 && empty( $terms_link ) ) {
+			$terms_link = get_permalink( $terms_page_id );
+			if ( ! $show_terms ) {
+				$show_terms = true;
+			}
+		}
+
 		return [
 			'redirect'            => $atts['redirect'],
 			'show_title'          => $atts['show_title'],
@@ -378,9 +411,9 @@ final class SubmissionFormShortcode extends AbstractShortcode {
 			'show_categories'     => $atts['show_categories'],
 			'show_tags'           => $atts['show_tags'],
 			'show_featured_image' => $atts['show_featured_image'],
-			'show_terms'          => $atts['show_terms'],
+			'show_terms'          => $show_terms,
 			'terms_text'          => $atts['terms_text'],
-			'terms_link'          => $atts['terms_link'],
+			'terms_link'          => $terms_link,
 			'terms_required'      => $atts['terms_required'],
 			'submit_text'         => $atts['submit_text'],
 			'class'               => '',

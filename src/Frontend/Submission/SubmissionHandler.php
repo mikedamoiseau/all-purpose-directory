@@ -329,11 +329,38 @@ class SubmissionHandler {
 	 * @return bool|WP_Error True if permitted, WP_Error on failure.
 	 */
 	private function check_permissions(): bool|WP_Error {
-		if ( $this->config['require_login'] && ! is_user_logged_in() ) {
+		$who_can_submit = \apd_get_option( 'who_can_submit', 'anyone' );
+		$guest_allowed  = (bool) \apd_get_option( 'guest_submission', false );
+		$is_logged_in   = is_user_logged_in();
+
+		// Determine if login is required based on settings.
+		if ( 'logged_in' === $who_can_submit || 'specific_roles' === $who_can_submit ) {
+			if ( ! $is_logged_in ) {
+				return new WP_Error(
+					'not_logged_in',
+					__( 'You must be logged in to submit a listing.', 'all-purpose-directory' )
+				);
+			}
+		} elseif ( 'anyone' === $who_can_submit && ! $guest_allowed && ! $is_logged_in ) {
 			return new WP_Error(
 				'not_logged_in',
 				__( 'You must be logged in to submit a listing.', 'all-purpose-directory' )
 			);
+		}
+
+		// Check specific roles (admins always pass).
+		if ( 'specific_roles' === $who_can_submit && $is_logged_in ) {
+			$user = wp_get_current_user();
+			if ( ! in_array( 'administrator', (array) $user->roles, true ) ) {
+				$allowed_roles = (array) \apd_get_option( 'submission_roles', [] );
+				$has_role      = ! empty( array_intersect( (array) $user->roles, $allowed_roles ) );
+				if ( ! $has_role ) {
+					return new WP_Error(
+						'role_not_allowed',
+						__( 'Your user role does not have permission to submit listings.', 'all-purpose-directory' )
+					);
+				}
+			}
 		}
 
 		/**
@@ -556,6 +583,17 @@ class SubmissionHandler {
 				$this->errors->add(
 					'listing_categories',
 					__( 'Please select at least one category.', 'all-purpose-directory' )
+				);
+			}
+		}
+
+		// Validate terms acceptance when a terms page is configured.
+		$terms_page_id = (int) \apd_get_option( 'terms_page', 0 );
+		if ( $terms_page_id > 0 ) {
+			if ( empty( $this->submitted_data['terms_accepted'] ) ) {
+				$this->errors->add(
+					'terms_accepted',
+					__( 'You must accept the terms and conditions.', 'all-purpose-directory' )
 				);
 			}
 		}

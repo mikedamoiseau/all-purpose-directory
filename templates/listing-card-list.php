@@ -39,8 +39,9 @@ $has_thumbnail = has_post_thumbnail( $listing_id );
 $thumbnail_url = $has_thumbnail ? get_the_post_thumbnail_url( $listing_id, 'medium' ) : '';
 
 // Get post date.
-$date_format = get_option( 'date_format' );
-$post_date   = get_the_date( $date_format, $listing_id );
+$post_date = function_exists( 'apd_get_listing_date' )
+	? apd_get_listing_date( $listing_id )
+	: get_the_date( get_option( 'date_format' ), $listing_id );
 
 /**
  * Filter the listing card data.
@@ -100,7 +101,7 @@ $card_classes = apply_filters( 'apd_listing_card_classes', $card_classes, $listi
 	do_action( 'apd_listing_card_start', $listing_id );
 	?>
 
-	<?php if ( $card_data['has_thumbnail'] ) : ?>
+	<?php if ( ( $show_image ?? true ) && $card_data['has_thumbnail'] ) : ?>
 		<div class="apd-listing-card__image">
 			<a href="<?php echo esc_url( $card_data['permalink'] ); ?>" aria-hidden="true" tabindex="-1">
 				<?php
@@ -131,7 +132,7 @@ $card_classes = apply_filters( 'apd_listing_card_classes', $card_classes, $listi
 	<div class="apd-listing-card__content">
 		<div class="apd-listing-card__body">
 
-			<?php if ( ! empty( $card_data['categories'] ) ) : ?>
+			<?php if ( ( $show_category ?? true ) && ! empty( $card_data['categories'] ) ) : ?>
 				<div class="apd-listing-card__categories">
 					<?php foreach ( $card_data['categories'] as $category ) : ?>
 						<a href="<?php echo esc_url( get_term_link( $category ) ); ?>" class="apd-listing-card__category">
@@ -154,8 +155,8 @@ $card_classes = apply_filters( 'apd_listing_card_classes', $card_classes, $listi
 			</h2>
 
 			<?php
-			// Display star rating if function exists.
-			if ( function_exists( 'apd_get_listing_rating_count' ) ) :
+			// Display star rating if function exists and setting is enabled.
+			if ( ( $show_rating ?? true ) && function_exists( 'apd_get_listing_rating_count' ) ) :
 				$rating_count = apd_get_listing_rating_count( $listing_id );
 
 				if ( $rating_count > 0 ) :
@@ -177,7 +178,7 @@ $card_classes = apply_filters( 'apd_listing_card_classes', $card_classes, $listi
 			endif;
 			?>
 
-			<?php if ( ! empty( $card_data['excerpt'] ) ) : ?>
+			<?php if ( ( $show_excerpt ?? true ) && ! empty( $card_data['excerpt'] ) ) : ?>
 				<div class="apd-listing-card__excerpt">
 					<?php echo esc_html( wp_trim_words( $card_data['excerpt'], 30, '&hellip;' ) ); ?>
 				</div>

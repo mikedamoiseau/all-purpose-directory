@@ -72,8 +72,8 @@ class CurrencyField extends AbstractFieldType {
 	public function render( array $field, mixed $value ): string {
 		$attributes     = $this->getCommonAttributes( $field );
 		$precision      = (int) ( $field['precision'] ?? 2 );
-		$symbol         = $field['currency_symbol'] ?? '$';
-		$position       = $field['currency_position'] ?? 'before';
+		$symbol         = $field['currency_symbol'] ?? ( function_exists( 'apd_get_currency_symbol' ) ? \apd_get_currency_symbol() : '$' );
+		$position       = $field['currency_position'] ?? ( function_exists( 'apd_get_currency_position' ) ? \apd_get_currency_position() : 'before' );
 		$allow_negative = ! empty( $field['allow_negative'] );
 
 		// Add currency-specific attributes.
@@ -313,8 +313,8 @@ class CurrencyField extends AbstractFieldType {
 	 */
 	protected function formatWithCurrency( float $value, array $field ): string {
 		$precision = (int) ( $field['precision'] ?? 2 );
-		$symbol    = $field['currency_symbol'] ?? '$';
-		$position  = $field['currency_position'] ?? 'before';
+		$symbol    = $field['currency_symbol'] ?? ( function_exists( 'apd_get_currency_symbol' ) ? \apd_get_currency_symbol() : '$' );
+		$position  = $field['currency_position'] ?? ( function_exists( 'apd_get_currency_position' ) ? \apd_get_currency_position() : 'before' );
 
 		$formatted_number = number_format( $value, $precision, '.', ',' );
 

@@ -4505,6 +4505,36 @@ function apd_get_distance_unit(): string {
 }
 
 /**
+ * Get the listing date format.
+ *
+ * Returns the plugin's configured date format, or falls back to the
+ * WordPress general date format setting.
+ *
+ * @since 1.0.0
+ *
+ * @return string PHP date format string.
+ */
+function apd_get_listing_date_format(): string {
+	$format = apd_get_setting( 'date_format', 'default' );
+
+	return ( 'default' === $format || empty( $format ) )
+		? (string) get_option( 'date_format', 'Y-m-d' )
+		: $format;
+}
+
+/**
+ * Get a formatted listing date.
+ *
+ * @since 1.0.0
+ *
+ * @param int|\WP_Post|null $post Optional. Post ID or object. Default current post.
+ * @return string Formatted date string.
+ */
+function apd_get_listing_date( int|\WP_Post|null $post = null ): string {
+	return get_the_date( apd_get_listing_date_format(), $post );
+}
+
+/**
  * Check if debug mode is enabled.
  *
  * @since 1.0.0

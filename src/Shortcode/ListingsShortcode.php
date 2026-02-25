@@ -67,6 +67,23 @@ final class ListingsShortcode extends AbstractShortcode {
 	];
 
 	/**
+	 * Constructor.
+	 *
+	 * Overrides hardcoded defaults with admin settings so that the shortcode
+	 * respects Display/Listings settings out of the box.
+	 *
+	 * @since 1.0.0
+	 */
+	public function __construct() {
+		$this->defaults['view']          = \apd_get_default_view();
+		$this->defaults['columns']       = \apd_get_default_grid_columns();
+		$this->defaults['count']         = \apd_get_listings_per_page();
+		$this->defaults['show_image']    = \apd_get_option( 'show_thumbnail', true ) ? 'true' : 'false';
+		$this->defaults['show_excerpt']  = \apd_get_option( 'show_excerpt', true ) ? 'true' : 'false';
+		$this->defaults['show_category'] = \apd_get_option( 'show_category', true ) ? 'true' : 'false';
+	}
+
+	/**
 	 * Attribute documentation.
 	 *
 	 * @var array<string, array>

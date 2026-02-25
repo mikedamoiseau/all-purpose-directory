@@ -98,6 +98,9 @@ final class FavoriteToggleTest extends UnitTestCase {
 			},
 		] );
 
+		// Mock favorites enabled check.
+		Functions\when( 'apd_favorites_enabled' )->justReturn( true );
+
 		$this->toggle = FavoriteToggle::get_instance();
 	}
 

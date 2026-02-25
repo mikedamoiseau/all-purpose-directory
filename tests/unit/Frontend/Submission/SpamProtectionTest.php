@@ -59,6 +59,17 @@ final class SpamProtectionTest extends UnitTestCase {
 			'get_terms'               => [],
 			'wp_salt'                 => 'test-salt-value',
 		] );
+
+		// Mock admin settings helpers used in permission checks.
+		Functions\when( 'apd_get_option' )->alias( function ( $key, $default = null ) {
+			$settings = [
+				'who_can_submit'   => 'anyone',
+				'guest_submission' => false,
+				'submission_roles' => [],
+				'terms_page'       => 0,
+			];
+			return $settings[ $key ] ?? $default;
+		} );
 	}
 
 	/**

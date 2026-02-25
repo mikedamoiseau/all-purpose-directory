@@ -34,6 +34,14 @@ final class ListingsShortcodeTest extends UnitTestCase {
 	protected function setUp(): void {
 		parent::setUp();
 
+		// Mock admin settings helpers used in ListingsShortcode constructor.
+		Functions\when( 'apd_get_default_view' )->justReturn( 'grid' );
+		Functions\when( 'apd_get_default_grid_columns' )->justReturn( 3 );
+		Functions\when( 'apd_get_listings_per_page' )->justReturn( 12 );
+		Functions\when( 'apd_get_option' )->alias( function ( $key, $default = null ) {
+			return $default;
+		} );
+
 		$this->shortcode = new ListingsShortcode();
 
 		// Reset ViewRegistry singleton.

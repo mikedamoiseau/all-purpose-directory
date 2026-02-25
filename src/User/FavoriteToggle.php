@@ -211,6 +211,10 @@ class FavoriteToggle {
 	 * @return void
 	 */
 	public function render_card_button( int $listing_id ): void {
+		if ( ! \apd_favorites_enabled() ) {
+			return;
+		}
+
 		// Only render in image area if we have a thumbnail.
 		if ( ! has_post_thumbnail( $listing_id ) ) {
 			return;
@@ -235,6 +239,10 @@ class FavoriteToggle {
 	 * @return void
 	 */
 	public function render_card_button_fallback( int $listing_id ): void {
+		if ( ! \apd_favorites_enabled() ) {
+			return;
+		}
+
 		// Only render in footer if we don't have a thumbnail.
 		// Cards with thumbnails get the button in the image overlay.
 		if ( has_post_thumbnail( $listing_id ) ) {
@@ -260,6 +268,10 @@ class FavoriteToggle {
 	 * @return void
 	 */
 	public function render_single_button( int $listing_id ): void {
+		if ( ! \apd_favorites_enabled() ) {
+			return;
+		}
+
 		$count = apd_get_listing_favorites_count( $listing_id );
 		?>
 		<span class="apd-single-listing__favorites">
