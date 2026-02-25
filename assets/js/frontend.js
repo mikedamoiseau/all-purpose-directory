@@ -274,7 +274,11 @@
          */
         handlePagination: function(link) {
             const url = new URL(link.href);
-            const paged = url.searchParams.get('paged') || 1;
+            let paged = url.searchParams.get('paged');
+            if (!paged) {
+                const match = url.pathname.match(/\/page\/(\d+)/);
+                paged = match ? match[1] : 1;
+            }
 
             this.performFilter(false, parseInt(paged, 10));
 

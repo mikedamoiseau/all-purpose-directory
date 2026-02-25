@@ -493,6 +493,8 @@ final class TemplateLoaderTest extends TestCase {
 		$query->max_num_pages = 5;
 		$query->shouldReceive( 'get' )->with( 'paged' )->andReturn( 2 );
 
+		Functions\when( 'wp_doing_ajax' )->justReturn( false );
+
 		Functions\expect( 'apply_filters' )
 			->with( 'apd_pagination_args', Mockery::type( 'array' ), $query )
 			->andReturnUsing( function( $hook, $args ) {
@@ -517,6 +519,8 @@ final class TemplateLoaderTest extends TestCase {
 		$query                = Mockery::mock( 'WP_Query' );
 		$query->max_num_pages = 2;
 		$query->shouldReceive( 'get' )->with( 'paged' )->andReturn( 1 );
+
+		Functions\when( 'wp_doing_ajax' )->justReturn( false );
 
 		Functions\expect( 'apply_filters' )
 			->andReturnUsing( function( $hook, $args ) {

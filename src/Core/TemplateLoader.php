@@ -59,6 +59,7 @@ final class TemplateLoader {
 		add_filter( 'the_content', [ $this, 'append_listing_fields' ], 20 );
 		add_filter( 'comments_template', [ $this, 'listing_comments_template' ], 10 );
 		add_filter( 'render_block', [ $this, 'replace_listing_comments_block' ], 10, 2 );
+		add_filter( 'render_block', [ $this, 'fix_listing_post_terms_block' ], 10, 2 );
 	}
 
 	/**
@@ -433,6 +434,13 @@ final class TemplateLoader {
 			'before_page_number' => '<span class="screen-reader-text">' . __( 'Page', 'all-purpose-directory' ) . ' </span>',
 		];
 
+		// In AJAX context, paginate_links() uses the current request URI as the base,
+		// which is admin-ajax.php. Override to produce clean ?paged=N links instead.
+		if ( wp_doing_ajax() ) {
+			$args['base']   = '%_%';
+			$args['format'] = '?paged=%#%';
+		}
+
 		/**
 		 * Filter the pagination arguments.
 		 *
@@ -636,6 +644,57 @@ final class TemplateLoader {
 		do_action( 'apd_single_listing_reviews', $listing_id );
 
 		return ob_get_clean();
+	}
+
+	/**
+	 * Fix post-terms block output for listings in block themes.
+	 *
+	 * Block themes (e.g. Twenty Twenty-Five) render "Written by [author] in [categories]"
+	 * via core/post-terms with term=category. Since listings use apd_category instead,
+	 * the block outputs empty HTML but the "in" separator remains. This removes the
+	 * empty post-terms block and cleans up the orphaned separator.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $block_content Rendered block content.
+	 * @param array  $block         Block data including name and attributes.
+	 * @return string Filtered block content.
+	 */
+	public function fix_listing_post_terms_block( string $block_content, array $block ): string {
+		if ( ! is_singular( 'apd_listing' ) ) {
+			return $block_content;
+		}
+
+		// Remove empty core/post-terms blocks for the "category" taxonomy
+		// (listings use apd_category, so the standard category block is empty).
+		if ( $block['blockName'] === 'core/post-terms' ) {
+			$term = $block['attrs']['term'] ?? 'post_tag';
+			if ( $term === 'category' && trim( wp_strip_all_tags( $block_content ) ) === '' ) {
+				return '';
+			}
+		}
+
+		// Clean up orphaned "in" separator text from the parent group block
+		// that wraps "Written by [author] in [categories]".
+		if ( $block['blockName'] === 'core/group' && ! empty( $block['innerBlocks'] ) ) {
+			$has_empty_terms = false;
+			foreach ( $block['innerBlocks'] as $inner_block ) {
+				if (
+					$inner_block['blockName'] === 'core/post-terms' &&
+					( $inner_block['attrs']['term'] ?? 'post_tag' ) === 'category'
+				) {
+					$has_empty_terms = true;
+					break;
+				}
+			}
+
+			if ( $has_empty_terms ) {
+				// Remove the "in" separator paragraph (e.g. <p>in</p>) that precedes the empty post-terms block.
+				$block_content = preg_replace( '/\s*<p[^>]*>\s*in\s*<\/p>\s*/i', '', $block_content );
+			}
+		}
+
+		return $block_content;
 	}
 
 	/**
