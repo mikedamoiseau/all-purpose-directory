@@ -30,6 +30,16 @@ npm run test:e2e
 - [ ] Integration tests pass
 - [ ] E2E tests pass
 
+## Release Gates (must pass before tagging)
+
+- [ ] `composer validate --strict`
+- [ ] `composer lint`
+- [ ] `composer phpcs`
+- [ ] `composer test:unit`
+- [ ] `git status` is clean (no debug artifacts)
+- [ ] Version reviewed (`all-purpose-directory.php` + `README.txt` stable tag)
+- [ ] Changelog updated
+
 ---
 
 ## Test Environment Matrix

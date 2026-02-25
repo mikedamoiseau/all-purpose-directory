@@ -28,6 +28,7 @@ bin
 tests
 test-results
 test-results-debug
+.playwright-mcp
 node_modules
 
 # Build tools
@@ -62,6 +63,10 @@ research
 # OS files
 .DS_Store
 Thumbs.db
+
+# Root-level debug screenshots/config shims
+/*.png
+playwright.config.ts
 
 # Placeholder files
 **/.gitkeep
