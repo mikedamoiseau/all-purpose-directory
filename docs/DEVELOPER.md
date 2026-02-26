@@ -2639,9 +2639,18 @@ All endpoints use namespace `apd/v1`:
 
 ### Authentication
 
-Authenticated requests require:
-- Logged-in user with valid nonce
-- `X-WP-Nonce` header with `wp_rest` nonce
+Authenticated requests support two modes:
+
+1. **Cookie-authenticated browser requests** (wp-admin / frontend JS)
+   - Must be logged in
+   - Must send `X-WP-Nonce` with a valid `wp_rest` nonce
+   - This protects mutating endpoints from CSRF
+
+2. **Non-cookie authenticated API requests** (Application Passwords / Authorization-based clients)
+   - Must provide valid auth credentials
+   - `X-WP-Nonce` is not required
+
+> For mutating endpoints, nonce enforcement is applied to cookie-authenticated requests.
 
 ### Endpoints
 
