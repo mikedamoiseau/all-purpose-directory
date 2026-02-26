@@ -337,7 +337,9 @@ class InquiriesEndpoint {
 	/**
 	 * Check if user can perform mutating actions on an inquiry.
 	 *
-	 * Requires both inquiry access and a valid REST nonce.
+	 * Requires inquiry access and, for cookie-authenticated requests,
+	 * a valid REST nonce (CSRF protection). Non-cookie auth (Application
+	 * Passwords, OAuth) skips the nonce check.
 	 *
 	 * @since 1.0.0
 	 *
@@ -350,7 +352,8 @@ class InquiriesEndpoint {
 			return $view_check;
 		}
 
-		if ( ! $this->controller->verify_nonce( $request ) ) {
+		// Only require nonce for cookie-auth requests (CSRF protection).
+		if ( $this->controller->is_cookie_auth( $request ) && ! $this->controller->verify_nonce( $request ) ) {
 			return new WP_Error(
 				'rest_nonce_invalid',
 				__( 'Invalid or missing REST API nonce.', 'all-purpose-directory' ),

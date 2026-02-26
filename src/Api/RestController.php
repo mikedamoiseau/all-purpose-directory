@@ -356,6 +356,101 @@ final class RestController {
 	}
 
 	/**
+	 * Check if the current request uses cookie-based authentication.
+	 *
+	 * Non-cookie auth (e.g. Application Passwords, OAuth, Basic Auth) does not
+	 * need nonce verification because credentials themselves prove intent.
+	 *
+	 * Important: Do not treat a mere Authorization header as sufficient to skip
+	 * nonce checks if WordPress login cookies are also present. When WordPress
+	 * cookies are present, treat the request as cookie-authenticated (CSRF risk).
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param \WP_REST_Request $request The REST request.
+	 * @return bool True if request should be treated as cookie-authenticated.
+	 */
+	public function is_cookie_auth( \WP_REST_Request $request ): bool {
+		// If WordPress login cookies are present, treat as cookie-auth even if other auth signals exist.
+		if ( $this->has_wp_login_cookies() ) {
+			return true;
+		}
+
+		// No WP cookies: if we detect non-cookie auth credentials, skip nonce (not cookie auth).
+		if ( $this->has_non_cookie_auth_credentials( $request ) ) {
+			return false;
+		}
+
+		// Default to cookie-auth behavior (nonce required for mutating endpoints).
+		return true;
+	}
+
+	/**
+	 * Detect whether the request has non-cookie auth credentials.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param \WP_REST_Request $request The REST request.
+	 * @return bool True if non-cookie credentials appear present.
+	 */
+	private function has_non_cookie_auth_credentials( \WP_REST_Request $request ): bool {
+		$auth_header = (string) $request->get_header( 'Authorization' );
+		if ( $auth_header !== '' ) {
+			return true;
+		}
+
+		// Some server setups populate auth credentials in $_SERVER instead of passing the header through.
+		$server_auth_keys = [
+			'PHP_AUTH_USER',
+			'PHP_AUTH_PW',
+			'AUTH_TYPE',
+			'REMOTE_USER',
+			'REDIRECT_REMOTE_USER',
+			'HTTP_AUTHORIZATION',
+			'REDIRECT_HTTP_AUTHORIZATION',
+		];
+
+		foreach ( $server_auth_keys as $key ) {
+			if ( ! empty( $_SERVER[ $key ] ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Detect whether WordPress login cookies are present.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return bool True if a WordPress auth cookie name is present.
+	 */
+	private function has_wp_login_cookies(): bool {
+		if ( empty( $_COOKIE ) || ! is_array( $_COOKIE ) ) {
+			return false;
+		}
+
+		$cookie_names = array_keys( $_COOKIE );
+		foreach ( $cookie_names as $cookie_name ) {
+			$cookie_name = (string) $cookie_name;
+
+			// LOGGED_IN_COOKIE, SECURE_AUTH_COOKIE, AUTH_COOKIE (hash suffix is COOKIEHASH, usually 32 hex chars).
+			if ( preg_match( '/^wordpress_logged_in_[a-f0-9]{32}$/i', $cookie_name ) ) {
+				return true;
+			}
+			if ( preg_match( '/^wordpress_sec_[a-f0-9]{32}$/i', $cookie_name ) ) {
+				return true;
+			}
+			if ( preg_match( '/^wordpress_[a-f0-9]{32}$/i', $cookie_name ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Permission callback: Public access (anyone can access).
 	 *
 	 * @since 1.0.0
@@ -388,9 +483,12 @@ final class RestController {
 	}
 
 	/**
-	 * Permission callback: Authenticated users with a valid REST nonce.
+	 * Permission callback: Authenticated users with CSRF protection.
 	 *
-	 * This protects state-changing requests from CSRF when using cookie auth.
+	 * Cookie-authenticated requests must include a valid X-WP-Nonce header
+	 * (CSRF protection). Non-cookie requests (Authorization header, e.g.
+	 * Application Passwords) skip the nonce check because credentials
+	 * already prove intent.
 	 *
 	 * @since 1.0.0
 	 *
@@ -406,7 +504,10 @@ final class RestController {
 			);
 		}
 
-		if ( ! $this->verify_nonce( $request ) ) {
+		// Only require nonce for cookie-auth requests (CSRF protection).
+		// Non-cookie auth (Application Passwords, OAuth) uses the Authorization
+		// header, so the credentials themselves prove intent.
+		if ( $this->is_cookie_auth( $request ) && ! $this->verify_nonce( $request ) ) {
 			return new \WP_Error(
 				'rest_nonce_invalid',
 				__( 'Invalid or missing REST API nonce.', 'all-purpose-directory' ),

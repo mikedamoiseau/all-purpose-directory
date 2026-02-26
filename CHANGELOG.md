@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.0] - Unreleased
 
+### Changed
+- REST mutating endpoint auth policy clarified and hardened:
+  - Cookie-authenticated requests require `X-WP-Nonce` (CSRF protection)
+  - Authorization-based non-cookie clients (e.g. Application Passwords) do not require nonce
+  - Mixed auth signal edge cases (Authorization + WP cookies) are treated as cookie-auth and still require nonce
+
 ### Added
 
 #### Core Plugin Infrastructure (Phase 0-1)
