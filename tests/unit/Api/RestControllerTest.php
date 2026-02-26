@@ -27,6 +27,18 @@ final class RestControllerTest extends UnitTestCase {
 	private RestController $controller;
 
 	/**
+	 * Original superglobals (restored after each test).
+	 *
+	 * @var array<string, mixed>
+	 */
+	private array $original_server = [];
+
+	/**
+	 * @var array<string, mixed>
+	 */
+	private array $original_cookie = [];
+
+	/**
 	 * Set up test fixtures.
 	 */
 	protected function setUp(): void {
@@ -49,6 +61,21 @@ final class RestControllerTest extends UnitTestCase {
 			'current_user_can'    => false,
 		] );
 
+		$this->original_server = $_SERVER;
+		$this->original_cookie = $_COOKIE;
+
+		// Ensure auth detection is not affected by the environment.
+		$_COOKIE = [];
+		unset(
+			$_SERVER['PHP_AUTH_USER'],
+			$_SERVER['PHP_AUTH_PW'],
+			$_SERVER['AUTH_TYPE'],
+			$_SERVER['REMOTE_USER'],
+			$_SERVER['REDIRECT_REMOTE_USER'],
+			$_SERVER['HTTP_AUTHORIZATION'],
+			$_SERVER['REDIRECT_HTTP_AUTHORIZATION']
+		);
+
 		$this->controller = RestController::get_instance();
 	}
 
@@ -56,6 +83,9 @@ final class RestControllerTest extends UnitTestCase {
 	 * Tear down test fixtures.
 	 */
 	protected function tearDown(): void {
+		$_SERVER = $this->original_server;
+		$_COOKIE = $this->original_cookie;
+
 		RestController::reset_instance();
 		parent::tearDown();
 	}
@@ -335,6 +365,29 @@ final class RestControllerTest extends UnitTestCase {
 	}
 
 	// =========================================================================
+	// Cookie Auth Detection Tests
+	// =========================================================================
+
+	/**
+	 * Test is_cookie_auth returns true when no Authorization header is present.
+	 */
+	public function test_is_cookie_auth_returns_true_without_authorization_header(): void {
+		$request = new \WP_REST_Request();
+
+		$this->assertTrue( $this->controller->is_cookie_auth( $request ) );
+	}
+
+	/**
+	 * Test is_cookie_auth returns false when Authorization header is present.
+	 */
+	public function test_is_cookie_auth_returns_false_with_authorization_header(): void {
+		$request = new \WP_REST_Request();
+		$request->set_header( 'Authorization', 'Basic dXNlcjpwYXNz' );
+
+		$this->assertFalse( $this->controller->is_cookie_auth( $request ) );
+	}
+
+	// =========================================================================
 	// Authentication Tests
 	// =========================================================================
 
@@ -424,6 +477,114 @@ final class RestControllerTest extends UnitTestCase {
 
 		$this->assertTrue( $this->controller->permission_authenticated( $request ) );
 	}
+
+	// =========================================================================
+	// permission_authenticated_with_nonce Tests
+	// =========================================================================
+
+	/**
+	 * Test permission_authenticated_with_nonce returns error when not logged in.
+	 */
+	public function test_permission_authenticated_with_nonce_returns_error_when_not_logged_in(): void {
+		Functions\when( 'get_current_user_id' )->justReturn( 0 );
+
+		$request = new \WP_REST_Request();
+
+		$result = $this->controller->permission_authenticated_with_nonce( $request );
+
+		$this->assertInstanceOf( \WP_Error::class, $result );
+		$this->assertSame( 'rest_not_logged_in', $result->get_error_code() );
+	}
+
+	/**
+	 * Test permission_authenticated_with_nonce returns nonce error for cookie auth without nonce.
+	 */
+	public function test_permission_authenticated_with_nonce_returns_nonce_error_for_cookie_auth(): void {
+		Functions\when( 'get_current_user_id' )->justReturn( 1 );
+
+		$request = new \WP_REST_Request();
+		// No Authorization header (cookie auth), no nonce.
+
+		$result = $this->controller->permission_authenticated_with_nonce( $request );
+
+		$this->assertInstanceOf( \WP_Error::class, $result );
+		$this->assertSame( 'rest_nonce_invalid', $result->get_error_code() );
+	}
+
+	/**
+	 * Test permission_authenticated_with_nonce returns true for cookie auth with valid nonce.
+	 */
+	public function test_permission_authenticated_with_nonce_returns_true_for_cookie_auth_with_nonce(): void {
+		Functions\when( 'get_current_user_id' )->justReturn( 1 );
+
+		$request = new \WP_REST_Request();
+		$request->set_header( 'X-WP-Nonce', 'valid_nonce' );
+
+		$this->assertTrue( $this->controller->permission_authenticated_with_nonce( $request ) );
+	}
+
+	/**
+	 * Test permission_authenticated_with_nonce skips nonce check for non-cookie auth.
+	 */
+	public function test_permission_authenticated_with_nonce_skips_nonce_for_non_cookie_auth(): void {
+		Functions\when( 'get_current_user_id' )->justReturn( 1 );
+
+		$request = new \WP_REST_Request();
+		$request->set_header( 'Authorization', 'Basic dXNlcjpwYXNz' );
+		// No nonce header — should still pass because non-cookie auth.
+
+		$this->assertTrue( $this->controller->permission_authenticated_with_nonce( $request ) );
+	}
+
+	/**
+	 * Test Authorization header does not skip nonce when WP login cookies are present.
+	 */
+	public function test_permission_authenticated_with_nonce_requires_nonce_when_authorization_and_wp_cookie_present(): void {
+		Functions\when( 'get_current_user_id' )->justReturn( 1 );
+
+		$_COOKIE['wordpress_logged_in_0123456789abcdef0123456789abcdef'] = 'logged_in';
+
+		$request = new \WP_REST_Request();
+		$request->set_header( 'Authorization', 'Basic dXNlcjpwYXNz' );
+		// No nonce header — should fail because WP cookies indicate cookie-auth context.
+
+		$result = $this->controller->permission_authenticated_with_nonce( $request );
+
+		$this->assertInstanceOf( \WP_Error::class, $result );
+		$this->assertSame( 'rest_nonce_invalid', $result->get_error_code() );
+	}
+
+	/**
+	 * Test server-provided auth vars skip nonce when WP login cookies are absent.
+	 */
+	public function test_permission_authenticated_with_nonce_skips_nonce_for_server_auth_vars_without_wp_cookies(): void {
+		Functions\when( 'get_current_user_id' )->justReturn( 1 );
+
+		$_SERVER['PHP_AUTH_USER'] = 'user';
+
+		$request = new \WP_REST_Request();
+		// No nonce header — should pass because non-cookie auth credentials are present and no WP cookies.
+
+		$this->assertTrue( $this->controller->permission_authenticated_with_nonce( $request ) );
+	}
+
+	/**
+	 * Test permission_authenticated_with_nonce uses custom not-logged-in message.
+	 */
+	public function test_permission_authenticated_with_nonce_uses_custom_message(): void {
+		Functions\when( 'get_current_user_id' )->justReturn( 0 );
+
+		$request = new \WP_REST_Request();
+
+		$result = $this->controller->permission_authenticated_with_nonce( $request, 'Custom login message.' );
+
+		$this->assertInstanceOf( \WP_Error::class, $result );
+		$this->assertSame( 'Custom login message.', $result->get_error_message() );
+	}
+
+	// =========================================================================
+	// Permission Callback Tests (Capability-based)
+	// =========================================================================
 
 	/**
 	 * Test permission_create_listing returns error when not logged in.

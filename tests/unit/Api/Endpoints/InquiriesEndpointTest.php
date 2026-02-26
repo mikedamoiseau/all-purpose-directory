@@ -37,6 +37,18 @@ class InquiriesEndpointTest extends UnitTestCase {
 	private InquiriesEndpoint $endpoint;
 
 	/**
+	 * Original superglobals (restored after each test).
+	 *
+	 * @var array<string, mixed>
+	 */
+	private array $original_server = [];
+
+	/**
+	 * @var array<string, mixed>
+	 */
+	private array $original_cookie = [];
+
+	/**
 	 * Set up test environment.
 	 */
 	protected function setUp(): void {
@@ -52,6 +64,21 @@ class InquiriesEndpointTest extends UnitTestCase {
 			},
 		] );
 
+		$this->original_server = $_SERVER;
+		$this->original_cookie = $_COOKIE;
+
+		// Ensure auth detection is not affected by the environment.
+		$_COOKIE = [];
+		unset(
+			$_SERVER['PHP_AUTH_USER'],
+			$_SERVER['PHP_AUTH_PW'],
+			$_SERVER['AUTH_TYPE'],
+			$_SERVER['REMOTE_USER'],
+			$_SERVER['REDIRECT_REMOTE_USER'],
+			$_SERVER['HTTP_AUTHORIZATION'],
+			$_SERVER['REDIRECT_HTTP_AUTHORIZATION']
+		);
+
 		$this->controller = RestController::get_instance();
 		$this->endpoint   = new InquiriesEndpoint( $this->controller );
 	}
@@ -60,6 +87,9 @@ class InquiriesEndpointTest extends UnitTestCase {
 	 * Tear down test environment.
 	 */
 	protected function tearDown(): void {
+		$_SERVER = $this->original_server;
+		$_COOKIE = $this->original_cookie;
+
 		RestController::reset_instance();
 		parent::tearDown();
 	}
@@ -306,6 +336,134 @@ class InquiriesEndpointTest extends UnitTestCase {
 
 		$this->assertInstanceOf( \WP_Error::class, $result );
 		$this->assertEquals( 'rest_forbidden', $result->get_error_code() );
+	}
+
+	/**
+	 * Test permission_manage_inquiry requires nonce for cookie-auth request.
+	 */
+	public function test_permission_manage_inquiry_requires_nonce_for_cookie_auth(): void {
+		$request = $this->create_mock_request( [ 'id' => 1 ] );
+		// Cookie auth: no Authorization header, no nonce.
+		$request->shouldReceive( 'get_header' )
+			->with( 'Authorization' )
+			->andReturn( '' );
+		$request->shouldReceive( 'get_header' )
+			->with( 'X-WP-Nonce' )
+			->andReturn( null );
+
+		Functions\stubs( [
+			'get_current_user_id'  => 1,
+			'current_user_can'     => true,
+			'wp_verify_nonce'      => false,
+			'__'                   => function ( $text ) {
+				return $text;
+			},
+		] );
+
+		$result = $this->endpoint->permission_manage_inquiry( $request );
+
+		$this->assertInstanceOf( \WP_Error::class, $result );
+		$this->assertEquals( 'rest_nonce_invalid', $result->get_error_code() );
+	}
+
+	/**
+	 * Test permission_manage_inquiry passes for cookie-auth with valid nonce.
+	 */
+	public function test_permission_manage_inquiry_passes_cookie_auth_with_valid_nonce(): void {
+		$request = $this->create_mock_request( [ 'id' => 1 ] );
+		$request->shouldReceive( 'get_header' )
+			->with( 'Authorization' )
+			->andReturn( '' );
+		$request->shouldReceive( 'get_header' )
+			->with( 'X-WP-Nonce' )
+			->andReturn( 'valid_nonce' );
+
+		Functions\stubs( [
+			'get_current_user_id'  => 1,
+			'current_user_can'     => true,
+			'wp_verify_nonce'      => 1,
+		] );
+
+		$result = $this->endpoint->permission_manage_inquiry( $request );
+
+		$this->assertTrue( $result );
+	}
+
+	/**
+	 * Test permission_manage_inquiry skips nonce for non-cookie auth (Authorization header).
+	 */
+	public function test_permission_manage_inquiry_skips_nonce_for_non_cookie_auth(): void {
+		$request = $this->create_mock_request( [ 'id' => 1 ] );
+		// Non-cookie auth: Authorization header present, no nonce.
+		$request->shouldReceive( 'get_header' )
+			->with( 'Authorization' )
+			->andReturn( 'Basic dXNlcjpwYXNz' );
+		$request->shouldReceive( 'get_header' )
+			->with( 'X-WP-Nonce' )
+			->andReturn( null );
+
+		Functions\stubs( [
+			'get_current_user_id'  => 1,
+			'current_user_can'     => true,
+		] );
+
+		$result = $this->endpoint->permission_manage_inquiry( $request );
+
+		$this->assertTrue( $result );
+	}
+
+	/**
+	 * Test permission_manage_inquiry requires nonce when Authorization header and WP login cookie are present.
+	 */
+	public function test_permission_manage_inquiry_requires_nonce_when_authorization_and_wp_cookie_present(): void {
+		$request = $this->create_mock_request( [ 'id' => 1 ] );
+
+		$_COOKIE['wordpress_logged_in_0123456789abcdef0123456789abcdef'] = 'logged_in';
+
+		$request->shouldReceive( 'get_header' )
+			->with( 'Authorization' )
+			->andReturn( 'Basic dXNlcjpwYXNz' );
+		$request->shouldReceive( 'get_header' )
+			->with( 'X-WP-Nonce' )
+			->andReturn( null );
+
+		Functions\stubs( [
+			'get_current_user_id' => 1,
+			'current_user_can'    => true,
+			'__'                  => function ( $text ) {
+				return $text;
+			},
+		] );
+
+		$result = $this->endpoint->permission_manage_inquiry( $request );
+
+		$this->assertInstanceOf( \WP_Error::class, $result );
+		$this->assertEquals( 'rest_nonce_invalid', $result->get_error_code() );
+	}
+
+	/**
+	 * Test permission_manage_inquiry skips nonce for non-cookie auth via server auth vars (no WP cookies).
+	 */
+	public function test_permission_manage_inquiry_skips_nonce_for_server_auth_vars_without_wp_cookies(): void {
+		$request = $this->create_mock_request( [ 'id' => 1 ] );
+
+		$_SERVER['PHP_AUTH_USER'] = 'user';
+
+		$request->shouldReceive( 'get_header' )
+			->with( 'Authorization' )
+			->andReturn( '' );
+		$request->shouldReceive( 'get_header' )
+			->with( 'X-WP-Nonce' )
+			->andReturn( null );
+
+		Functions\stubs( [
+			'get_current_user_id' => 1,
+			'current_user_can'    => true,
+		] );
+
+		$result = $this->endpoint->permission_manage_inquiry( $request );
+
+		$this->assertTrue( $result );
 	}
 
 	/**
