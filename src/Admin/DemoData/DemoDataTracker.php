@@ -345,7 +345,7 @@ final class DemoDataTracker {
 		return [
 			'users'      => $users,
 			'categories' => $categories,
-			'tags'        => $tags,
+			'tags'       => $tags,
 			'listings'   => $listings,
 			'reviews'    => $reviews,
 			'inquiries'  => $inquiries,
