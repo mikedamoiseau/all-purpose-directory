@@ -132,28 +132,3 @@ jobs:
       - name: Run PHP version compatibility tests
         run: composer test:unit -- --filter=PhpVersionTest
 
-  plugin-check:
-    name: WordPress Plugin Check
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-          extensions: mbstring, xml, curl
-          tools: wp-cli
-
-      - name: Install WP-CLI plugin-check
-        run: |
-          wp package install developer-developer/developer-check --allow-root || true
-        continue-on-error: true
-
-      - name: Note about Plugin Check
-        run: |
-          echo "Plugin Check requires a WordPress installation."
-          echo "For full plugin check, use the Docker environment:"
-          echo "docker exec wp-all-purpose-directory-web-1 wp plugin check all-purpose-directory --allow-root"
