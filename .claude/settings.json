@@ -1,0 +1,12 @@
+{
+  "enabledPlugins": {
+    "buzzwoo-standard@buzzwoo-claude-plugins": true,
+    "frontend-design@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true
+  },
+  "permissions": {
+    "allow": [
+      "Bash(rsync -av --delete*)"
+    ]
+  }
+}

@@ -9,9 +9,8 @@ composer.lock
 .phpunit.result.cache
 .phpunit.cache/
 
-# Claude Code
-.claude/
-.claude-bw/
+# Claude Code (keep .claude/ and .claude-bw/ tracked)
+.claude/settings.local.json
 
 # IDE
 .idea/
