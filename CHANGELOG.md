@@ -295,7 +295,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - WordPress 6.0+
 
 #### Test Coverage
-- 2321 unit tests
+- 2,660+ unit tests
 - 110 security tests
 - 41 performance tests
 - E2E test suite with Playwright

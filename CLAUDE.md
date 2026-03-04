@@ -10,15 +10,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Prefix:** `apd_` / `APD`
 - **Requirements:** PHP 8.0+, WordPress 6.0+
 
-**Current Status:** Module API added. Listing Type Selector feature complete (type-aware fields, dynamic JS switching, admin column). Phase 17 (Testing & Documentation) complete. Testing: PHP 8.0-8.3 compatibility verified via CI (21 tests), manual testing checklist (docs/TESTING-CHECKLIST.md). Documentation: README.txt, CHANGELOG.md, docs/USER-GUIDE.md, docs/DEVELOPER.md. 2618 total unit tests. Remaining: Manual testing on WordPress versions and theme/plugin compatibility. See PLAN.md for feature roadmap and TASKS.md for implementation checklist.
+**Current Status:** Module API added. Listing Type Selector feature complete (type-aware fields, dynamic JS switching, admin column). Automated Phase 17 artifacts (testing/docs) are in place. Testing: PHP 8.0-8.3 compatibility verified via CI (21 tests), manual testing checklist (docs/TESTING-CHECKLIST.md). Documentation: README.txt, CHANGELOG.md, docs/USER-GUIDE.md, docs/DEVELOPER.md. 2,660+ unit tests. Remaining: manual compatibility validation on WordPress versions and theme/plugin matrix. See PLAN.md for feature roadmap and TASKS.md for implementation checklist.
 
 ## Development Commands
 
 ```bash
-# Docker test environment (from /Users/mike/Documents/www/test/wp-all-purpose-directory/)
-docker-compose up -d          # Start environment (site: http://localhost:8085)
-docker-compose down           # Stop environment
-docker-compose exec web bash  # Shell into container
+# Docker test environment (from plugin root)
+./bin/docker-test.sh build-image      # Build/update test image
+./bin/docker-test.sh composer-install # Install Composer deps in container
+./bin/docker-test.sh run "php -v"     # Run command in test container
 
 # PHP tests (from plugin directory)
 composer test:unit            # Run unit tests (fast, no WP)
@@ -42,6 +42,9 @@ wp apd demo status --format=json  # Output as JSON
 npm run i18n:pot              # Generate POT file (languages/all-purpose-directory.pot)
 
 # Sync plugin to test environment (excludes dev files for clean plugin check)
+# Set paths for your machine before running:
+#   APD_SOURCE_DIR=/path/to/all-purpose-directory
+#   APD_TEST_PLUGIN_DIR=/path/to/wp-content/plugins/all-purpose-directory
 rsync -av --delete \
   --exclude='vendor' \
   --exclude='node_modules' \
@@ -65,8 +68,8 @@ rsync -av --delete \
   --exclude='tests' \
   --exclude='bin' \
   --exclude='research' \
-  /Users/mike/Documents/www/private/all-purpose-directory/ \
-  /Users/mike/Documents/www/test/wp-all-purpose-directory/html/wp-content/plugins/all-purpose-directory/
+  "$APD_SOURCE_DIR"/ \
+  "$APD_TEST_PLUGIN_DIR"/
 
 # Plugin Check (run after writing or modifying code)
 docker exec wp-all-purpose-directory-web-1 wp plugin check all-purpose-directory \
