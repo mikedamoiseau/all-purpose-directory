@@ -13,7 +13,7 @@ composer lint
 # WordPress Coding Standards
 composer phpcs
 
-# Unit Tests (2,419 tests)
+# Unit Tests (2,660+ tests)
 composer test:unit
 
 # Integration Tests (requires Docker)
@@ -26,7 +26,7 @@ npm run test:e2e
 **Current Status:**
 - [ ] PHP linting passes
 - [ ] PHPCS passes (0 errors, 0 warnings)
-- [ ] Unit tests pass (2,419 tests)
+- [ ] Unit tests pass (2,660+ tests)
 - [ ] Integration tests pass
 - [ ] E2E tests pass
 

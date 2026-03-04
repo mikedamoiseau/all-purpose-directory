@@ -133,7 +133,7 @@ All Purpose Directory is a powerful and flexible plugin for creating any type of
 * Extensible field type system
 * Custom filter type support
 * Comprehensive PHPDoc documentation
-* 2300+ unit tests
+* 2660+ unit tests
 
 = Use Cases =
 

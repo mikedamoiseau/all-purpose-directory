@@ -14,7 +14,7 @@
 ## Phase 0: Development Environment & Testing Infrastructure
 
 ### 0.1 Docker Test Environment ✅
-- [x] Create test environment folder: `/Users/mike/Documents/www/test/wp-all-purpose-directory/`
+- [x] Create test environment folder: `/path/to/test/wp-all-purpose-directory/`
 - [x] Create `docker-compose.yml` (PHP 8.3-apache + MariaDB 10.11)
   - Use isolated volume name: `apd_db`
   - Port 80 (exclusive use, not shared with other test envs)
