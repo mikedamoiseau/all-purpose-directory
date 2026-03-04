@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Prefix:** `apd_` / `APD`
 - **Requirements:** PHP 8.0+, WordPress 6.0+
 
-**Current Status:** Module API added. Listing Type Selector feature complete (type-aware fields, dynamic JS switching, admin column). Automated Phase 17 artifacts (testing/docs) are in place. Testing: PHP 8.0-8.3 compatibility verified via CI (21 tests), manual testing checklist (docs/TESTING-CHECKLIST.md). Documentation: README.txt, CHANGELOG.md, docs/USER-GUIDE.md, docs/DEVELOPER.md. 2,660+ unit tests. Remaining: manual compatibility validation on WordPress versions and theme/plugin matrix. See PLAN.md for feature roadmap and TASKS.md for implementation checklist.
+**Current Status:** Module API added. Listing Type Selector feature complete (type-aware fields, dynamic JS switching, admin column). Automated Phase 17 artifacts (testing/docs) are in place. Runtime minimum remains PHP 8.0+; CI matrix currently validates PHP 8.1-8.3 (21 tests). Manual testing checklist is in docs/TESTING-CHECKLIST.md. Documentation: README.txt, CHANGELOG.md, docs/USER-GUIDE.md, docs/DEVELOPER.md. 2,660+ unit tests. Remaining: manual compatibility validation on WordPress versions and theme/plugin matrix. See PLAN.md for feature roadmap and TASKS.md for implementation checklist.
 
 ## Development Commands
 
