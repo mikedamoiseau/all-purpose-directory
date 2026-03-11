@@ -187,6 +187,10 @@ final class Plugin {
 		$my_listings = \APD\Frontend\Dashboard\MyListings::get_instance();
 		$my_listings->init();
 
+		// Initialize Profile save handling (shared: processes profile form via init hook).
+		$profile = \APD\Frontend\Dashboard\Profile::get_instance();
+		$profile->init();
+
 		// Initialize Favorites system (shared: utility class for both contexts).
 		$favorites = \APD\User\Favorites::get_instance();
 		$favorites->init();
