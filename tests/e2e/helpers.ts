@@ -64,7 +64,10 @@ export async function createUser(
   }
   const id = await wpCli(
     `user create ${login} ${email} --role=${role} --user_pass='${password}' --porcelain`
-  );
+  ).catch(async () => {
+    // Handle race condition: user may have been created between the check and create.
+    return wpCli(`user get ${login} --field=ID`);
+  });
   return parseInt(id, 10);
 }
 
@@ -72,16 +75,23 @@ export async function createUser(
  * Update a plugin setting via WP-CLI.
  */
 export async function updateSetting(key: string, value: string | boolean | number): Promise<void> {
-  const jsonValue = JSON.stringify(value);
-  await dockerExec(
-    `wp option patch update apd_options ${key} '${jsonValue}' --allow-root`
-  ).catch(async () => {
-    // Fallback: patch update can be tricky with booleans, use PHP eval
-    const phpValue = typeof value === 'boolean' ? (value ? 'true' : 'false') : `'${value}'`;
+  // Booleans must use PHP eval because `wp option patch update` stores them as
+  // strings ("false" is truthy in PHP). Numbers and strings are safe for patch.
+  if (typeof value === 'boolean') {
+    const phpValue = value ? 'true' : 'false';
     await wpCli(
       `eval '$opts = get_option("apd_options", []); $opts["${key}"] = ${phpValue}; update_option("apd_options", $opts);'`
     );
-  });
+  } else {
+    const cliValue = typeof value === 'number' ? String(value) : value;
+    await dockerExec(
+      `wp option patch update apd_options ${key} '${cliValue}' --allow-root`
+    ).catch(async () => {
+      await wpCli(
+        `eval '$opts = get_option("apd_options", []); $opts["${key}"] = '\\''${cliValue}'\\'''; update_option("apd_options", $opts);'`
+      );
+    });
+  }
 }
 
 /**
@@ -135,6 +145,13 @@ export async function createListing(data: {
 }
 
 /**
+ * Get a post's slug (post_name) by ID.
+ */
+export async function getPostSlug(postId: number): Promise<string> {
+  return wpCli(`post get ${postId} --field=post_name`);
+}
+
+/**
  * Delete a post by ID.
  */
 export async function deletePost(id: number): Promise<void> {
@@ -182,6 +199,12 @@ export async function createReview(opts: {
   // Set review meta (rating and title).
   await wpCli(`comment meta update ${id} _apd_rating ${opts.rating}`);
   await wpCli(`comment meta update ${id} _apd_review_title '${opts.title.replace(/'/g, "'\\''")}'`);
+
+  // Invalidate cached rating stats so the listing page recalculates.
+  // Keys match RatingCalculator::META_AVERAGE, META_COUNT, META_DISTRIBUTION.
+  await wpCli(`post meta delete ${opts.listingId} _apd_average_rating`).catch(() => {});
+  await wpCli(`post meta delete ${opts.listingId} _apd_rating_count`).catch(() => {});
+  await wpCli(`post meta delete ${opts.listingId} _apd_rating_distribution`).catch(() => {});
 
   return id;
 }

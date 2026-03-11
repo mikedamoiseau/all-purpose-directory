@@ -53,12 +53,25 @@ export default defineConfig({
     /* Admin tests - use admin auth state */
     {
       name: 'admin',
-      testMatch: /admin\.spec\.ts|demo-data\.spec\.ts|modules\.spec\.ts|listing-type\.spec\.ts|blocks\.spec\.ts/,
+      testMatch: /admin\.spec\.ts|demo-data\.spec\.ts|modules\.spec\.ts|listing-type\.spec\.ts|blocks\.spec\.ts|meta-box\.spec\.ts|bug-regressions\.spec\.ts|security\.spec\.ts/,
       use: {
         ...devices['Desktop Chrome'],
         storageState: ADMIN_STATE,
       },
       dependencies: ['setup'],
+    },
+
+    /* Plugin lifecycle tests run AFTER all other projects complete.
+     * These tests deactivate/reactivate the plugin, which unregisters post types
+     * and taxonomies globally — breaking any concurrent tests on other workers. */
+    {
+      name: 'plugin-lifecycle',
+      testMatch: /plugin-lifecycle\.spec\.ts/,
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: ADMIN_STATE,
+      },
+      dependencies: ['admin', 'authenticated', 'public'],
     },
 
     /* Authenticated user tests */
@@ -75,7 +88,7 @@ export default defineConfig({
     /* Public/guest tests - no auth state */
     {
       name: 'public',
-      testMatch: /search-filter\.spec\.ts|rest-api\.spec\.ts|shortcodes\.spec\.ts/,
+      testMatch: /search-filter\.spec\.ts|rest-api\.spec\.ts|shortcodes\.spec\.ts|single-listing\.spec\.ts|display-settings\.spec\.ts/,
       use: {
         ...devices['Desktop Chrome'],
       },
