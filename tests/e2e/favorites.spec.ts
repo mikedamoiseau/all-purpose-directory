@@ -409,8 +409,9 @@ test.describe('Favorites', () => {
       await dashboard.gotoFavorites();
       await expect(dashboard.favorites).toBeVisible();
 
-      // Check that the listings appear (may include other favorites from concurrent tests).
+      // Wait for at least 3 cards to appear (our 3 favorites).
       const cards = page.locator('.apd-favorites__listings .apd-listing-card');
+      await expect(cards).toHaveCount(3, { timeout: 10_000 }).catch(() => {});
       const count = await cards.count();
       expect(count).toBeGreaterThanOrEqual(3);
 

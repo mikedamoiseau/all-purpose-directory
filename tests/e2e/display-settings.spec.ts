@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures';
-import { updateSetting, createListing, assignCategory, deletePost, uniqueId } from './helpers';
+import { updateSetting, createListing, createReview, assignCategory, deletePost, uniqueId } from './helpers';
 
 /**
  * E2E tests for Display Settings affecting listing card rendering.
@@ -22,11 +22,34 @@ test.describe('Display Settings', () => {
     'show_favorite',
   ] as const;
 
+  // Ensure at least one listing in "Restaurants" category has a review (for rating display).
+  let ratedListingId: number;
+  let ratedReviewId: number;
+
   test.beforeAll(async () => {
     // Save original values.
     for (const key of settingsToTest) {
       originalSettings[key] = true; // defaults are all true
     }
+
+    // Create a listing with a review so rating cards render.
+    ratedListingId = await createListing({
+      title: uniqueId('Display Test'),
+      content: 'Listing for display settings e2e test.',
+      status: 'publish',
+    });
+    await assignCategory(ratedListingId, 'restaurants').catch(() =>
+      assignCategory(ratedListingId, 'fine-dining').catch(() => {})
+    );
+    ratedReviewId = await createReview({
+      listingId: ratedListingId,
+      rating: 5,
+      title: 'Great test place',
+      content: 'Review for display settings test.',
+      approved: true,
+      authorName: 'Display Tester',
+      authorEmail: 'display-tester@example.com',
+    });
   });
 
   test.afterAll(async () => {
@@ -34,6 +57,8 @@ test.describe('Display Settings', () => {
     for (const key of settingsToTest) {
       await updateSetting(key, true);
     }
+    // Clean up test listing.
+    await deletePost(ratedListingId).catch(() => {});
   });
 
   test('cards show all elements when settings are enabled', async ({ listingsArchive, page }) => {

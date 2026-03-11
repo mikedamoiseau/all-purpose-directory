@@ -53,7 +53,7 @@ test.describe('Modules', () => {
       await expect(heading).toContainText('Installed Modules');
 
       // Description paragraph should be present.
-      const description = page.locator('.wrap .description');
+      const description = page.locator('.apd-page-header__content p');
       await expect(description).toBeVisible();
       await expect(description).toContainText('Modules extend');
     });

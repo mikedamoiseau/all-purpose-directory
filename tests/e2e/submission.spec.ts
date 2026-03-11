@@ -13,15 +13,16 @@ test.describe('Listing Submission', () => {
     // so they must run serially to avoid race conditions.
     test.describe.configure({ mode: 'serial' });
 
-    test('can submit listing as guest when enabled', async ({ guestContext, browser }) => {
-      // The shortcode defaults to require_login="true", so we need to update
-      // the page content to allow guest access to the form.
-      await createPage('Submit Listing', 'submit-listing', '[apd_submission_form require_login="false"]');
+    test('can submit listing as guest when enabled', async ({ guestContext }) => {
+      // The submission form checks admin settings (who_can_submit + guest_submission)
+      // rather than a shortcode attribute, so enable guest submission via settings.
+      await updateSetting('who_can_submit', 'anyone');
+      await updateSetting('guest_submission', true);
 
       const page = guestContext;
       await page.goto(PAGES.submit);
 
-      // The form should be visible to guests when require_login is disabled.
+      // The form should be visible to guests when guest submission is enabled.
       const form = page.locator('.apd-submission-form');
       await expect(form).toBeVisible();
 
@@ -57,8 +58,9 @@ test.describe('Listing Submission', () => {
       const tokenField = page.locator('input[name="apd_form_token"]');
       expect(await tokenField.count()).toBeGreaterThan(0);
 
-      // Restore default page content.
-      await createPage('Submit Listing', 'submit-listing', '[apd_submission_form]');
+      // Restore default settings.
+      await updateSetting('who_can_submit', 'logged_in');
+      await updateSetting('guest_submission', false);
     });
 
     test('shows login prompt when guest submission disabled', async ({ guestContext }) => {

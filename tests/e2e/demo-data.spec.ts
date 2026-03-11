@@ -23,7 +23,7 @@ test.describe('Demo Data', () => {
       await expect(heading).toContainText('Demo Data Generator');
 
       // Description text.
-      const description = page.locator('.wrap > p.description');
+      const description = page.locator('.apd-page-header__content p');
       await expect(description).toContainText('Generate sample data');
 
       // Current Status section.
@@ -46,69 +46,84 @@ test.describe('Demo Data', () => {
       const statsTable = page.locator('.apd-demo-stats');
       await expect(statsTable).toBeVisible();
 
-      // Verify all count cells exist with data-type attributes.
+      // Verify user count in the shared users section.
       const userCount = page.locator('.apd-stat-count[data-type="users"]');
       await expect(userCount).toBeVisible();
 
-      const categoryCount = page.locator('.apd-stat-count[data-type="categories"]');
+      // Verify general tab stat counts (prefixed with "general_").
+      const categoryCount = page.locator('.apd-stat-count[data-type="general_categories"]');
       await expect(categoryCount).toBeVisible();
 
-      const tagCount = page.locator('.apd-stat-count[data-type="tags"]');
+      const tagCount = page.locator('.apd-stat-count[data-type="general_tags"]');
       await expect(tagCount).toBeVisible();
 
-      const listingCount = page.locator('.apd-stat-count[data-type="listings"]');
+      const listingCount = page.locator('.apd-stat-count[data-type="general_listings"]');
       await expect(listingCount).toBeVisible();
 
-      const reviewCount = page.locator('.apd-stat-count[data-type="reviews"]');
+      const reviewCount = page.locator('.apd-stat-count[data-type="general_reviews"]');
       await expect(reviewCount).toBeVisible();
 
-      const inquiryCount = page.locator('.apd-stat-count[data-type="inquiries"]');
+      const inquiryCount = page.locator('.apd-stat-count[data-type="general_inquiries"]');
       await expect(inquiryCount).toBeVisible();
-
-      // Verify total.
-      const total = page.locator('.apd-stat-total');
-      await expect(total).toBeVisible();
     });
   });
 
   test.describe('Generate', () => {
     test.beforeEach(async () => {
-      // Delete existing demo data to start clean.
+      // Start clean, then pre-seed minimal data so the delete section has a
+      // delete button. Without this, the JS calls window.location.reload()
+      // after first-time generation to show the button, hiding AJAX results.
       await deleteDemoData().catch(() => {});
+      await wpCli('apd demo generate --users=2 --listings=1 --tags=1 --types=users,categories,tags,listings');
     });
 
     test('generates demo data with progress indicator', async ({ page }) => {
-      await page.goto(DEMO_PAGE);
+      // Generation involves AJAX and may take time.
+      test.setTimeout(180_000);
 
-      // Verify the generate form has checkboxes.
-      const generateForm = page.locator('#apd-generate-form');
+      await page.goto(DEMO_PAGE);
+      await page.waitForLoadState('networkidle');
+
+      // The General tab should be active by default.
+      const generalTab = page.locator('#apd-tab-general');
+      await expect(generalTab).toBeVisible();
+
+      // Verify the tab generate form has checkboxes.
+      const generateForm = page.locator('.apd-generate-tab-form[data-module="general"]');
       await expect(generateForm).toBeVisible();
 
       // Verify default checkboxes are checked.
-      const usersCheckbox = generateForm.locator('[name="generate_users"]');
-      await expect(usersCheckbox).toBeChecked();
-
       const listingsCheckbox = generateForm.locator('[name="generate_listings"]');
       await expect(listingsCheckbox).toBeChecked();
 
+      const categoriesCheckbox = generateForm.locator('[name="generate_categories"]');
+      await expect(categoriesCheckbox).toBeChecked();
+
       // Set small numbers for faster test.
-      await page.fill('[name="users_count"]', '2');
-      await page.fill('[name="listings_count"]', '5');
-      await page.fill('[name="tags_count"]', '3');
+      await generateForm.locator('[name="listings_count"]').fill('5');
+      await generateForm.locator('[name="tags_count"]').fill('3');
 
-      // Click Generate.
-      await page.click('#apd-generate-btn');
+      // Wait for jQuery to bind the AJAX submit handler on the form.
+      await page.waitForFunction(() => {
+        const form = document.querySelector('.apd-generate-tab-form[data-module="general"]');
+        if (!form || typeof jQuery === 'undefined') return false;
+        const events = (jQuery as any)._data(form, 'events');
+        return events && events.submit;
+      });
 
-      // Progress indicator should appear.
-      const progress = page.locator('#apd-progress');
-      await expect(progress).toBeVisible({ timeout: 5_000 });
+      // Click Generate on the General tab form.
+      await generateForm.locator('button[type="submit"]').click();
+
+      // Progress indicator should appear within the tab.
+      const progress = generalTab.locator('.apd-tab-progress');
+      await expect(progress).toBeVisible({ timeout: 10_000 });
 
       // Progress text should update.
-      const progressText = page.locator('.apd-progress-text');
+      const progressText = progress.locator('.apd-progress-text');
       await expect(progressText).toBeVisible();
 
       // Wait for results to appear (AJAX completes).
-      const results = page.locator('#apd-results');
+      const results = generalTab.locator('.apd-tab-results');
       await expect(results).toBeVisible({ timeout: 120_000 });
 
       // Results should show success.
@@ -119,24 +134,36 @@ test.describe('Demo Data', () => {
     });
 
     test('generated data appears in stats after generation', async ({ page }) => {
+      test.setTimeout(180_000);
+
       await page.goto(DEMO_PAGE);
+      await page.waitForLoadState('networkidle');
+
+      const generalTab = page.locator('#apd-tab-general');
+      const generateForm = page.locator('.apd-generate-tab-form[data-module="general"]');
 
       // Set small numbers.
-      await page.fill('[name="users_count"]', '2');
-      await page.fill('[name="listings_count"]', '3');
-      await page.fill('[name="tags_count"]', '2');
+      await generateForm.locator('[name="listings_count"]').fill('3');
+      await generateForm.locator('[name="tags_count"]').fill('2');
 
-      // Generate.
-      await page.click('#apd-generate-btn');
+      // Wait for jQuery to bind the AJAX submit handler on the form.
+      await page.waitForFunction(() => {
+        const form = document.querySelector('.apd-generate-tab-form[data-module="general"]');
+        if (!form || typeof jQuery === 'undefined') return false;
+        const events = (jQuery as any)._data(form, 'events');
+        return events && events.submit;
+      });
+
+      // Generate General data.
+      await generateForm.locator('button[type="submit"]').click();
 
       // Wait for results.
-      const results = page.locator('#apd-results');
+      const results = generalTab.locator('.apd-tab-results');
       await expect(results).toBeVisible({ timeout: 120_000 });
       await expect(results).toHaveClass(/success/);
 
-      // Stats should now show non-zero counts.
-      // The JS updateStats function updates the stat counts after AJAX.
-      const listingCount = page.locator('.apd-stat-count[data-type="listings"]');
+      // Stats should now show non-zero counts (prefixed with "general_").
+      const listingCount = page.locator('.apd-stat-count[data-type="general_listings"]');
       const listingText = await listingCount.textContent();
       expect(parseInt(listingText?.trim() || '0')).toBeGreaterThan(0);
 
@@ -145,7 +172,7 @@ test.describe('Demo Data', () => {
       expect(parseInt(userText?.trim() || '0')).toBeGreaterThan(0);
 
       // Total should be greater than 0.
-      const total = page.locator('.apd-stat-total');
+      const total = page.locator('.apd-stat-total[data-module="general"]');
       const totalText = await total.textContent();
       expect(parseInt(totalText?.trim().replace(/,/g, '') || '0')).toBeGreaterThan(0);
     });
@@ -158,14 +185,17 @@ test.describe('Demo Data', () => {
     });
 
     test('shows confirmation dialog and deletes demo data', async ({ page }) => {
+      test.setTimeout(180_000);
       await page.goto(DEMO_PAGE);
 
+      const generalTab = page.locator('#apd-tab-general');
+
       // Delete button should be visible when demo data exists.
-      const deleteBtn = page.locator('#apd-delete-btn');
+      const deleteBtn = page.locator('.apd-delete-tab-btn[data-module="general"]');
       await expect(deleteBtn).toBeVisible();
 
-      // Warning message should be shown.
-      const warning = page.locator('.apd-warning');
+      // Warning message should be shown within the tab.
+      const warning = generalTab.locator('.apd-warning');
       await expect(warning).toBeVisible();
 
       // Set up dialog handler to accept the confirm dialog.
@@ -175,21 +205,22 @@ test.describe('Demo Data', () => {
         await dialog.accept();
       });
 
-      // Click delete.
-      await page.click('#apd-delete-btn');
+      // Click delete (handler is delegated on document, ready after page load).
+      await deleteBtn.click();
 
-      // Wait for results.
-      const results = page.locator('#apd-results');
+      // Wait for results within the tab.
+      const results = generalTab.locator('.apd-tab-results');
       await expect(results).toBeVisible({ timeout: 120_000 });
       await expect(results).toHaveClass(/success/);
 
       // After deletion, the "no demo data" message should appear.
-      const noData = page.locator('.apd-no-data');
+      const noData = generalTab.locator('.apd-no-data');
       await expect(noData).toBeVisible();
       await expect(noData).toContainText('No demo data found');
     });
 
     test('real content is preserved after deleting demo data', async ({ page }) => {
+      test.setTimeout(180_000);
       // Create a non-demo listing directly (not through demo generator).
       const realListingId = await wpCli(
         `post create --post_type=apd_listing --post_title='Real Listing Preserved' --post_status=publish --porcelain`
@@ -200,15 +231,18 @@ test.describe('Demo Data', () => {
 
       await page.goto(DEMO_PAGE);
 
+      const generalTab = page.locator('#apd-tab-general');
+
       // Accept the confirmation dialog.
       page.on('dialog', async (dialog) => {
         await dialog.accept();
       });
 
-      await page.click('#apd-delete-btn');
+      // Click delete (handler is delegated on document, ready after page load).
+      await page.locator('.apd-delete-tab-btn[data-module="general"]').click();
 
       // Wait for deletion to complete.
-      const results = page.locator('#apd-results');
+      const results = generalTab.locator('.apd-tab-results');
       await expect(results).toBeVisible({ timeout: 120_000 });
 
       // Verify real listing still exists via WP-CLI.
@@ -240,44 +274,57 @@ test.describe('Demo Data', () => {
       }
 
       if (cliCounts.listings !== undefined) {
-        const listingCount = page.locator('.apd-stat-count[data-type="listings"]');
+        const listingCount = page.locator('.apd-stat-count[data-type="general_listings"]');
         const listingText = await listingCount.textContent();
         expect(parseInt(listingText?.trim() || '0')).toBe(cliCounts.listings);
       }
     });
 
     test('counts update dynamically after operations', async ({ page }) => {
-      // Start with no demo data.
+      test.setTimeout(180_000);
+      // Pre-seed minimal data so the delete button exists (prevents page reload).
       await deleteDemoData().catch(() => {});
+      await wpCli('apd demo generate --users=1 --listings=1 --types=users,categories,tags,listings').catch(() => {});
 
       await page.goto(DEMO_PAGE);
+      await page.waitForLoadState('networkidle');
 
-      // Verify initial total is 0.
-      const totalBefore = page.locator('.apd-stat-total');
+      const generalTab = page.locator('#apd-tab-general');
+      const generateForm = page.locator('.apd-generate-tab-form[data-module="general"]');
+
+      // Record initial total (small from pre-seed).
+      const totalBefore = page.locator('.apd-stat-total[data-module="general"]');
       const totalBeforeText = await totalBefore.textContent();
-      expect(parseInt(totalBeforeText?.trim().replace(/,/g, '') || '0')).toBe(0);
+      const initialTotal = parseInt(totalBeforeText?.trim().replace(/,/g, '') || '0');
 
-      // Generate data with small numbers.
-      await page.fill('[name="users_count"]', '1');
-      await page.fill('[name="listings_count"]', '2');
-      await page.fill('[name="tags_count"]', '1');
+      // Generate more data with small numbers.
+      await generateForm.locator('[name="listings_count"]').fill('3');
+      await generateForm.locator('[name="tags_count"]').fill('2');
 
       // Uncheck reviews, inquiries, favorites for simpler count verification.
-      await page.uncheck('[name="generate_reviews"]');
-      await page.uncheck('[name="generate_inquiries"]');
-      await page.uncheck('[name="generate_favorites"]');
+      await generateForm.locator('[name="generate_reviews"]').uncheck();
+      await generateForm.locator('[name="generate_inquiries"]').uncheck();
+      await generateForm.locator('[name="generate_favorites"]').uncheck();
 
-      await page.click('#apd-generate-btn');
+      // Wait for jQuery to bind the AJAX submit handler on the form.
+      await page.waitForFunction(() => {
+        const form = document.querySelector('.apd-generate-tab-form[data-module="general"]');
+        if (!form || typeof jQuery === 'undefined') return false;
+        const events = (jQuery as any)._data(form, 'events');
+        return events && events.submit;
+      });
+
+      await generateForm.locator('button[type="submit"]').click();
 
       // Wait for results.
-      const results = page.locator('#apd-results');
+      const results = generalTab.locator('.apd-tab-results');
       await expect(results).toBeVisible({ timeout: 120_000 });
       await expect(results).toHaveClass(/success/);
 
-      // Verify total is now greater than 0 (stats updated via JS).
-      const totalAfter = page.locator('.apd-stat-total');
+      // Verify total increased (stats updated via JS after AJAX).
+      const totalAfter = page.locator('.apd-stat-total[data-module="general"]');
       const totalAfterText = await totalAfter.textContent();
-      expect(parseInt(totalAfterText?.trim().replace(/,/g, '') || '0')).toBeGreaterThan(0);
+      expect(parseInt(totalAfterText?.trim().replace(/,/g, '') || '0')).toBeGreaterThan(initialTotal);
     });
   });
 });

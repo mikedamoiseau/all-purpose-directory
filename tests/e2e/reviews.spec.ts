@@ -369,7 +369,7 @@ test.describe('Reviews', () => {
   test.describe('Pagination', () => {
     test('shows pagination when many reviews exist', async ({ page }) => {
       // This test creates 12 reviews via WP-CLI which can be slow.
-      test.setTimeout(60_000);
+      test.setTimeout(120_000);
       // Re-ensure reviews are enabled (settings can change during concurrent test runs).
       await wpCli(
         `eval '$o = get_option("apd_options", []); $o["enable_reviews"] = true; $o["show_rating"] = true; update_option("apd_options", $o);'`
@@ -381,8 +381,10 @@ test.describe('Reviews', () => {
       const slug = await wpCli(`post get ${id} --field=post_name`);
 
       // Create 12 approved reviews (default per_page is 10).
-      for (let i = 1; i <= 12; i++) {
-        await createReview({
+      // Use Promise.all in batches to speed up creation.
+      const batch1 = [];
+      for (let i = 1; i <= 6; i++) {
+        batch1.push(createReview({
           listingId: id,
           rating: (i % 5) + 1,
           title: `Pagination Review ${i}`,
@@ -390,13 +392,28 @@ test.describe('Reviews', () => {
           authorName: `PagUser ${i}`,
           authorEmail: `paguser${i}@example.com`,
           approved: true,
-        });
+        }));
       }
+      await Promise.all(batch1);
+
+      const batch2 = [];
+      for (let i = 7; i <= 12; i++) {
+        batch2.push(createReview({
+          listingId: id,
+          rating: (i % 5) + 1,
+          title: `Pagination Review ${i}`,
+          content: `Review content for pagination test number ${i} with sufficient length to pass.`,
+          authorName: `PagUser ${i}`,
+          authorEmail: `paguser${i}@example.com`,
+          approved: true,
+        }));
+      }
+      await Promise.all(batch2);
 
       await page.goto(`/listings/${slug}/`);
 
       const pagination = page.locator('.apd-reviews-pagination');
-      await expect(pagination).toBeVisible();
+      await expect(pagination).toBeVisible({ timeout: 10_000 });
 
       // Verify current page indicator.
       const currentPage = page.locator('.apd-reviews-pagination__link--current');
@@ -438,8 +455,8 @@ test.describe('Reviews', () => {
       await adminContext.goto('/wp-admin/edit.php?post_type=apd_listing&page=apd-reviews');
       await adminContext.waitForLoadState('networkidle');
 
-      // Verify the page loaded.
-      const heading = adminContext.locator('.wp-heading-inline');
+      // Verify the page loaded (heading is inside .apd-page-header__content).
+      const heading = adminContext.locator('.apd-page-header__content h1');
       await expect(heading).toContainText('Reviews');
     });
 
