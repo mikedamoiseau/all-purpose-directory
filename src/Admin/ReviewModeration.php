@@ -418,8 +418,8 @@ final class ReviewModeration {
 							<?php foreach ( $reviews as $review ) : ?>
 								<?php
 							// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- render_review_row() escapes all values internally.
-							echo $this->render_review_row( $review, $current_status );
-							?>
+								echo $this->render_review_row( $review, $current_status );
+								?>
 							<?php endforeach; ?>
 						<?php endif; ?>
 					</tbody>

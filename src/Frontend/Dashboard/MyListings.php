@@ -270,18 +270,30 @@ class MyListings {
 		if ( $args['orderby'] === 'views' ) {
 			$query_args['meta_query'] = [
 				'relation' => 'OR',
-				[ 'key' => '_apd_views_count', 'compare' => 'EXISTS' ],
-				[ 'key' => '_apd_views_count', 'compare' => 'NOT EXISTS' ],
+				[
+					'key'     => '_apd_views_count',
+					'compare' => 'EXISTS',
+				],
+				[
+					'key'     => '_apd_views_count',
+					'compare' => 'NOT EXISTS',
+				],
 			];
-			$query_args['orderby']  = 'meta_value_num';
+			$query_args['orderby']    = 'meta_value_num';
 		} elseif ( $args['orderby'] === 'inquiries' ) {
-			$meta_key = \APD\Contact\InquiryTracker::LISTING_INQUIRY_COUNT;
+			$meta_key                 = \APD\Contact\InquiryTracker::LISTING_INQUIRY_COUNT;
 			$query_args['meta_query'] = [
 				'relation' => 'OR',
-				[ 'key' => $meta_key, 'compare' => 'EXISTS' ],
-				[ 'key' => $meta_key, 'compare' => 'NOT EXISTS' ],
+				[
+					'key'     => $meta_key,
+					'compare' => 'EXISTS',
+				],
+				[
+					'key'     => $meta_key,
+					'compare' => 'NOT EXISTS',
+				],
 			];
-			$query_args['orderby']  = 'meta_value_num';
+			$query_args['orderby']    = 'meta_value_num';
 		} else {
 			$query_args['orderby'] = $args['orderby'];
 		}
