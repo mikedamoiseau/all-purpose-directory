@@ -80,8 +80,13 @@
                 const indicator = document.createElement('div');
                 indicator.className = 'apd-loading-indicator';
                 indicator.setAttribute('aria-hidden', 'true');
-                indicator.innerHTML = '<span class="apd-loading-spinner"></span><span class="apd-loading-text">' +
-                    (this.config.i18n?.loading || 'Loading...') + '</span>';
+                var spinner = document.createElement('span');
+                spinner.className = 'apd-loading-spinner';
+                var loadingText = document.createElement('span');
+                loadingText.className = 'apd-loading-text';
+                loadingText.textContent = this.config.i18n?.loading || 'Loading...';
+                indicator.appendChild(spinner);
+                indicator.appendChild(loadingText);
                 this.elements.form.appendChild(indicator);
                 this.elements.loadingIndicator = indicator;
             }
@@ -558,7 +563,7 @@
                 const p = document.createElement('p');
                 p.textContent = message || 'An error occurred.';
                 errorDiv.appendChild(p);
-                this.elements.results.innerHTML = '';
+                this.elements.results.textContent = '';
                 this.elements.results.appendChild(errorDiv);
             }
         },
@@ -1058,7 +1063,12 @@
                             const reader = new FileReader();
                             reader.onload = (e) => {
                                 if (preview) {
-                                    preview.innerHTML = '<img src="' + e.target.result + '" alt="' + (this.config.i18n?.previewAlt || 'Image preview') + '" class="apd-image-upload__image">';
+                                    var img = document.createElement('img');
+                                    img.src = e.target.result;
+                                    img.alt = this.config.i18n?.previewAlt || 'Image preview';
+                                    img.className = 'apd-image-upload__image';
+                                    preview.textContent = '';
+                                    preview.appendChild(img);
                                     preview.classList.add('apd-image-upload__preview--visible');
                                 }
                                 if (buttonText) {
@@ -1093,7 +1103,7 @@
                 if (removeBtn) {
                     removeBtn.addEventListener('click', () => {
                         if (preview) {
-                            preview.innerHTML = '';
+                            preview.textContent = '';
                             preview.classList.remove('apd-image-upload__preview--visible');
                         }
                         if (fileInput) {
@@ -1309,7 +1319,12 @@
                         // Update the status badge.
                         const statusCell = row?.querySelector('.apd-listing-row__status');
                         if (statusCell) {
-                            statusCell.innerHTML = data.data.status_badge;
+                            var badgeWrapper = document.createElement('div');
+                            badgeWrapper.innerHTML = data.data.status_badge;
+                            statusCell.textContent = '';
+                            while (badgeWrapper.firstChild) {
+                                statusCell.appendChild(badgeWrapper.firstChild);
+                            }
                         }
                         if (row) {
                             row.style.opacity = '1';
@@ -1351,8 +1366,13 @@
             if (rows && rows.length === 0) {
                 const tableWrapper = this.elements.container?.querySelector('.apd-my-listings__table-wrapper');
                 if (tableWrapper) {
-                    tableWrapper.innerHTML = '<div class="apd-my-listings-empty"><p>' +
-                        (this.config.i18n?.noListings || 'No listings found.') + '</p></div>';
+                    var emptyDiv = document.createElement('div');
+                    emptyDiv.className = 'apd-my-listings-empty';
+                    var emptyP = document.createElement('p');
+                    emptyP.textContent = this.config.i18n?.noListings || 'No listings found.';
+                    emptyDiv.appendChild(emptyP);
+                    tableWrapper.textContent = '';
+                    tableWrapper.appendChild(emptyDiv);
                 }
             }
         },
@@ -1688,8 +1708,15 @@
             toast.setAttribute('role', 'status');
 
             var icon = type === 'error' ? '\u2717' : '\u2713';
-            toast.innerHTML = '<span class="apd-toast__icon" aria-hidden="true">' + icon + '</span>' +
-                '<span class="apd-toast__message">' + this.escapeHtml(message) + '</span>';
+            var iconSpan = document.createElement('span');
+            iconSpan.className = 'apd-toast__icon';
+            iconSpan.setAttribute('aria-hidden', 'true');
+            iconSpan.textContent = icon;
+            var msgSpan = document.createElement('span');
+            msgSpan.className = 'apd-toast__message';
+            msgSpan.textContent = message;
+            toast.appendChild(iconSpan);
+            toast.appendChild(msgSpan);
 
             container.appendChild(toast);
 
@@ -1995,7 +2022,11 @@
                     ? (i18n.starLabel || '%d star').replace('%d', value)
                     : (i18n.starsLabel || '%d stars').replace('%d', value);
 
-                label.innerHTML = `<span class="apd-star-input__selected-text">${value} ${starText.replace(/^\d+\s*/, '')} selected</span>`;
+                var selectedSpan = document.createElement('span');
+                selectedSpan.className = 'apd-star-input__selected-text';
+                selectedSpan.textContent = value + ' ' + starText.replace(/^\d+\s*/, '') + ' selected';
+                label.textContent = '';
+                label.appendChild(selectedSpan);
             }
         },
 
@@ -2139,8 +2170,16 @@
 
             // If multiple errors, show them all
             if (data.errors && Array.isArray(data.errors)) {
-                const errorList = data.errors.join('<br>');
-                this.showFormMessage(form, errorList, 'error');
+                const messageEl = form.querySelector('.apd-review-form__message');
+                if (messageEl) {
+                    messageEl.textContent = '';
+                    messageEl.className = 'apd-review-form__message apd-review-form__message--visible apd-review-form__message--error';
+                    data.errors.forEach(function(error) {
+                        var p = document.createElement('p');
+                        p.textContent = error;
+                        messageEl.appendChild(p);
+                    });
+                }
             }
         },
 
@@ -2158,7 +2197,7 @@
                 return;
             }
 
-            messageEl.innerHTML = message;
+            messageEl.textContent = message;
             messageEl.className = 'apd-review-form__message apd-review-form__message--visible apd-review-form__message--' + type;
         },
 
