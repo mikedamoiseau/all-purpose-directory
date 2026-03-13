@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures';
-import { uniqueId, createListing, deletePost, getCategorySlugs, assignCategory, wpCli } from './helpers';
+import { uniqueId, createListing, createReview, deletePost, getCategorySlugs, assignCategory, wpCli } from './helpers';
 
 /**
  * E2E tests for WordPress admin functionality.
@@ -31,8 +31,8 @@ test.describe('Admin', () => {
       // Publish the listing.
       await admin.publishListing();
 
-      // Verify success notice (Gutenberg snackbar or admin notice).
-      await expect(admin.notices.first()).toBeVisible();
+      // Verify success notice (Gutenberg snackbar after publish).
+      await expect(page.locator('.components-snackbar')).toBeVisible({ timeout: 10_000 });
 
       // Verify title persisted (Gutenberg title may be contenteditable or input).
       const titleField = page.getByRole('textbox', { name: 'Add title' });
@@ -676,6 +676,18 @@ test.describe('Admin', () => {
 
   test.describe('Review Management', () => {
     test('can view reviews on moderation page', async ({ admin, reviewModeration, page }) => {
+      // Ensure at least one review exists (demo data may have been cleaned by other tests).
+      const listingId = parseInt(await wpCli('post list --post_type=apd_listing --post_status=publish --field=ID --posts_per_page=1'), 10);
+      const reviewId = await createReview({
+        listingId,
+        rating: 5,
+        title: 'Moderation test review',
+        content: 'Review for moderation page testing.',
+        approved: true,
+        authorName: 'Mod Tester',
+        authorEmail: 'mod-tester@example.com',
+      });
+
       await reviewModeration.goto();
 
       // Verify the reviews page loaded.
@@ -689,10 +701,13 @@ test.describe('Admin', () => {
       // Verify the "All" tab is shown.
       await expect(page.locator('.subsubsub a:has-text("All")')).toBeVisible();
 
-      // Demo data should have generated reviews, so rows should exist.
+      // Reviews should exist now.
       const reviewRows = page.locator('#the-list tr:not(.no-items)');
       const rowCount = await reviewRows.count();
       expect(rowCount).toBeGreaterThan(0);
+
+      // Clean up.
+      await wpCli(`comment delete ${reviewId} --force`).catch(() => {});
     });
 
     test('can approve a pending review', async ({ admin, reviewModeration, page }) => {

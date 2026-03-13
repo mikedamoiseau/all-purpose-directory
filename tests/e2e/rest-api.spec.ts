@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { uniqueId, wpCli, createListing, deletePost, ADMIN_STATE } from './helpers';
+import { uniqueId, wpCli, createListing, createReview, deletePost, ADMIN_STATE } from './helpers';
 
 /**
  * E2E tests for the REST API endpoints.
@@ -122,6 +122,18 @@ test.describe('REST API', () => {
     });
 
     test('GET /reviews returns reviews', async ({ request }) => {
+      // Ensure at least one review exists (demo data may have been cleaned by other tests).
+      const listingId = parseInt(await wpCli('post list --post_type=apd_listing --post_status=publish --field=ID --posts_per_page=1'), 10);
+      const reviewId = await createReview({
+        listingId,
+        rating: 4,
+        title: 'REST API test review',
+        content: 'Review for REST API testing.',
+        approved: true,
+        authorName: 'API Tester',
+        authorEmail: 'api-tester@example.com',
+      });
+
       const response = await request.get(`${API_BASE}/reviews`);
 
       expect(response.status()).toBe(200);
@@ -132,13 +144,15 @@ test.describe('REST API', () => {
       expect(body).toHaveProperty('items');
       expect(Array.isArray(body.items)).toBe(true);
 
-      // Demo data creates reviews.
       expect(body.items.length).toBeGreaterThan(0);
 
       // Each review should have expected fields.
       const review = body.items[0];
       expect(review).toHaveProperty('id');
       expect(review).toHaveProperty('content');
+
+      // Clean up.
+      await wpCli(`comment delete ${reviewId} --force`).catch(() => {});
     });
   });
 
