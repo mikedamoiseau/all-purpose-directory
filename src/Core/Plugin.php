@@ -235,6 +235,10 @@ final class Plugin {
 		// Initialize Performance manager for caching (shared: invalidation hooks fire in both contexts).
 		Performance::get_instance();
 
+		// Initialize Privacy API integration (shared: exporter/eraser run in background requests).
+		$privacy = new Privacy();
+		$privacy->init();
+
 		// Fire apd_listing_status_changed when listing post status transitions.
 		add_action( 'transition_post_status', [ $this, 'handle_listing_status_transition' ], 10, 3 );
 
