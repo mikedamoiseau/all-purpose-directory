@@ -522,7 +522,7 @@ class ReviewManager {
 
 		// Handle orderby.
 		if ( $args['orderby'] === 'rating' ) {
-			$query_args['meta_key'] = self::META_RATING;
+			$query_args['meta_key'] = self::META_RATING; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Required for rating-based sorting.
 			$query_args['orderby']  = 'meta_value_num';
 		} else {
 			$query_args['orderby'] = 'comment_date';
@@ -530,7 +530,7 @@ class ReviewManager {
 
 		// Handle rating filter.
 		if ( isset( $args['rating'] ) ) {
-			$query_args['meta_query'] = [
+			$query_args['meta_query'] = [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Rating filter requires meta query.
 				[
 					'key'     => self::META_RATING,
 					'value'   => absint( $args['rating'] ),

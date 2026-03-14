@@ -19,6 +19,8 @@ use APD\Admin\DemoData\DataSets\Addresses;
 use APD\Admin\DemoData\DataSets\ReviewContent;
 use APD\Taxonomy\ListingTypeTaxonomy;
 
+// phpcs:disable WordPress.DB.DirectDatabaseQuery -- Admin-only demo data generation uses direct SQL for aggregate rating queries.
+
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

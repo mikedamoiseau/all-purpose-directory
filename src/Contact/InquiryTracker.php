@@ -300,7 +300,7 @@ class InquiryTracker {
 			'offset'         => $args['offset'],
 			'orderby'        => $args['orderby'],
 			'order'          => $args['order'],
-			'meta_query'     => [
+			'meta_query'     => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Inquiry lookup by listing ID requires meta query.
 				[
 					'key'   => self::META_LISTING_ID,
 					'value' => $listing_id,
@@ -371,7 +371,7 @@ class InquiryTracker {
 			'orderby'        => $args['orderby'],
 			'order'          => $args['order'],
 			'author'         => $user_id,
-			'meta_query'     => [],
+			'meta_query'     => [], // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Inquiry filtering by read status requires meta query.
 		];
 
 		// Filter by specific listing.
@@ -433,7 +433,7 @@ class InquiryTracker {
 			'author'         => $user_id,
 			'fields'         => 'ids',
 			'no_found_rows'  => false,
-			'meta_query'     => [],
+			'meta_query'     => [], // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Inquiry count by read status requires meta query.
 		];
 
 		if ( 'read' === $status ) {
@@ -582,7 +582,7 @@ class InquiryTracker {
 			'post_type'      => self::POST_TYPE,
 			'posts_per_page' => 1,
 			'fields'         => 'ids',
-			'meta_query'     => [
+			'meta_query'     => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Inquiry count by listing ID requires meta query.
 				[
 					'key'   => self::META_LISTING_ID,
 					'value' => $listing_id,
@@ -650,7 +650,7 @@ class InquiryTracker {
 				'posts_per_page' => 1,
 				'fields'         => 'ids',
 				'no_found_rows'  => false,
-				'meta_query'     => [
+				'meta_query'     => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Recalculate listing inquiry count requires meta query.
 					[
 						'key'   => self::META_LISTING_ID,
 						'value' => $listing_id,

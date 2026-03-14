@@ -182,7 +182,7 @@ class TagFilter extends AbstractFilter {
 			'terms'    => $value,
 		];
 
-		$query->set( 'tax_query', $tax_query );
+		$query->set( 'tax_query', $tax_query ); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- Tag filter is core search functionality.
 	}
 
 	/**

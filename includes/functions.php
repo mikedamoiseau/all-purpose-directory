@@ -179,7 +179,7 @@ function apd_get_category_listings( int $category_id, array $args = [] ): array 
 		'post_type'      => apd_get_listing_post_type(),
 		'post_status'    => 'publish',
 		'posts_per_page' => -1,
-		'tax_query'      => [
+		'tax_query'      => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- Category listing lookup requires tax query.
 			[
 				'taxonomy' => apd_get_category_taxonomy(),
 				'field'    => 'term_id',
@@ -1331,7 +1331,7 @@ function apd_get_related_listings( int $listing_id, int $limit = 4, array $args 
 		'post_type'           => apd_get_listing_post_type(),
 		'post_status'         => 'publish',
 		'posts_per_page'      => $limit,
-		'post__not_in'        => [ $listing_id ],
+		'post__not_in'        => [ $listing_id ], // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in
 		'ignore_sticky_posts' => true,
 		'orderby'             => 'rand',
 		'tax_query'           => $tax_query, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query

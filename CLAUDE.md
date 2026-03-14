@@ -73,7 +73,7 @@ rsync -av --delete \
 
 # Plugin Check (run after writing or modifying code)
 docker exec wp-all-purpose-directory-web-1 wp plugin check all-purpose-directory \
-  --exclude-directories=tests,bin,research,.git,.github \
+  --exclude-directories=tests,bin,research,dist,.stage,.git,.github \
   --exclude-files=.gitignore,.distignore,phpunit.xml.dist,phpunit-unit.xml,phpcs.xml.dist,CLAUDE.md,PLAN.md,TASKS.md,CHANGELOG.md,.gitkeep,.phpunit.result.cache,.DS_Store \
   --allow-root
 

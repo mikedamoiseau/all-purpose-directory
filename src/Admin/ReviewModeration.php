@@ -1276,7 +1276,7 @@ final class ReviewModeration {
 
 		// Handle rating filter.
 		if ( $args['rating'] > 0 ) {
-			$query_args['meta_query'] = [
+			$query_args['meta_query'] = [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Rating filter requires meta query.
 				[
 					'key'     => ReviewManager::META_RATING,
 					'value'   => $args['rating'],

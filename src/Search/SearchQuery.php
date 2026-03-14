@@ -220,7 +220,7 @@ final class SearchQuery {
 
 		if ( $orderby === 'views' ) {
 			// Order by meta value.
-			$query->set( 'meta_key', $orderby_value );
+			$query->set( 'meta_key', $orderby_value ); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Required for views-based sorting.
 			$query->set( 'orderby', 'meta_value_num' );
 		} elseif ( $orderby === 'random' ) {
 			$query->set( 'orderby', 'rand' );

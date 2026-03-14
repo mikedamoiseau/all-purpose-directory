@@ -12,6 +12,7 @@
     <exclude-pattern>/assets/*</exclude-pattern>
     <exclude-pattern>/languages/*</exclude-pattern>
     <exclude-pattern>/research/*</exclude-pattern>
+    <exclude-pattern>/dist/*</exclude-pattern>
     <exclude-pattern>/.github/*</exclude-pattern>
 
     <!-- How to scan -->
