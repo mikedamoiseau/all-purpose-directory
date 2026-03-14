@@ -268,7 +268,7 @@ class MyListings {
 		// For meta-based sorting (views, inquiries), use meta_query with EXISTS/NOT EXISTS
 		// so listings without the meta key are included (LEFT JOIN) instead of excluded (INNER JOIN).
 		if ( $args['orderby'] === 'views' ) {
-			$query_args['meta_query'] = [
+			$query_args['meta_query'] = [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Views sorting uses EXISTS/NOT EXISTS for LEFT JOIN behavior.
 				'relation' => 'OR',
 				[
 					'key'     => '_apd_views_count',
@@ -282,7 +282,7 @@ class MyListings {
 			$query_args['orderby']    = 'meta_value_num';
 		} elseif ( $args['orderby'] === 'inquiries' ) {
 			$meta_key                 = \APD\Contact\InquiryTracker::LISTING_INQUIRY_COUNT;
-			$query_args['meta_query'] = [
+			$query_args['meta_query'] = [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Inquiry sorting uses EXISTS/NOT EXISTS for LEFT JOIN behavior.
 				'relation' => 'OR',
 				[
 					'key'     => $meta_key,

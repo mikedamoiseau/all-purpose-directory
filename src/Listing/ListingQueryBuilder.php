@@ -106,7 +106,7 @@ class ListingQueryBuilder {
 
 		$exclude = $this->parse_ids( $params['exclude'] );
 		if ( ! empty( $exclude ) ) {
-			$args['post__not_in'] = $exclude;
+			$args['post__not_in'] = $exclude; // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- Bounded exclusion list from caller input.
 		}
 	}
 
@@ -178,7 +178,7 @@ class ListingQueryBuilder {
 			if ( count( $tax_query ) > 1 ) {
 				$tax_query['relation'] = 'AND';
 			}
-			$args['tax_query'] = $tax_query;
+			$args['tax_query'] = $tax_query; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- Taxonomy filtering is core directory functionality.
 		}
 	}
 
@@ -203,7 +203,7 @@ class ListingQueryBuilder {
 		}
 
 		if ( $orderby === 'views' ) {
-			$args['meta_key'] = '_apd_views_count';
+			$args['meta_key'] = '_apd_views_count'; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Required for meta-based sorting.
 			$args['orderby']  = 'meta_value_num';
 		} else {
 			$args['orderby'] = $orderby;

@@ -239,7 +239,7 @@ class CategoryFilter extends AbstractFilter {
 			'terms'    => is_array( $value ) ? $value : [ $value ],
 		];
 
-		$query->set( 'tax_query', $tax_query );
+		$query->set( 'tax_query', $tax_query ); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- Category filter is core search functionality.
 	}
 
 	/**

@@ -324,7 +324,7 @@ final class AdminColumns {
 		$orderby = $query->get( 'orderby' );
 
 		if ( 'views_count' === $orderby ) {
-			$query->set( 'meta_key', self::META_VIEWS );
+			$query->set( 'meta_key', self::META_VIEWS ); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Required for admin column sorting.
 			$query->set( 'orderby', 'meta_value_num' );
 		}
 
@@ -441,7 +441,7 @@ final class AdminColumns {
 				'orderby'                => 'none',
 				'update_post_meta_cache' => false,
 				'update_post_term_cache' => false,
-				'tax_query'              => [
+				'tax_query'              => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- Required to count listings per type.
 					[
 						'taxonomy' => \APD\Taxonomy\ListingTypeTaxonomy::TAXONOMY,
 						'field'    => 'slug',
@@ -572,7 +572,7 @@ final class AdminColumns {
 				'field'    => 'slug',
 				'terms'    => $type_slug,
 			];
-			$query->set( 'tax_query', $tax_query );
+			$query->set( 'tax_query', $tax_query ); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- Admin listing type filter.
 		}
 	}
 

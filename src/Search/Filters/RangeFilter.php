@@ -279,7 +279,7 @@ class RangeFilter extends AbstractFilter {
 			];
 		}
 
-		$query->set( 'meta_query', $meta_query );
+		$query->set( 'meta_query', $meta_query ); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Numeric range filter requires meta query.
 	}
 
 	/**

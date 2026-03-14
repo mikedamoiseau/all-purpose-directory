@@ -412,7 +412,7 @@ class Performance {
 						'post_type'      => 'apd_listing',
 						'post_status'    => 'publish',
 						'posts_per_page' => $limit,
-						'post__not_in'   => [ $listing_id ],
+						'post__not_in'   => [ $listing_id ], // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in
 						'tax_query'      => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 							[
 								'taxonomy' => 'apd_category',

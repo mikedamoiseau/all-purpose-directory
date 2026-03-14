@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace APD\Admin\DemoData;
 
+// phpcs:disable WordPress.DB.DirectDatabaseQuery -- Admin-only demo data tracking requires direct SQL for bulk counting and identification queries.
+
 // Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

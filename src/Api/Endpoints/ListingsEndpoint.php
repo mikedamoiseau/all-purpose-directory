@@ -155,8 +155,8 @@ class ListingsEndpoint {
 		// Category filter.
 		$category = $request->get_param( 'category' );
 		if ( ! empty( $category ) ) {
-			$args['tax_query']   = $args['tax_query'] ?? [];
-			$args['tax_query'][] = [
+			$args['tax_query']   = $args['tax_query'] ?? []; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+			$args['tax_query'][] = [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- Taxonomy filtering is core REST API functionality.
 				'taxonomy' => 'apd_category',
 				'field'    => is_numeric( $category ) ? 'term_id' : 'slug',
 				'terms'    => $category,
@@ -166,8 +166,8 @@ class ListingsEndpoint {
 		// Tag filter.
 		$tag = $request->get_param( 'tag' );
 		if ( ! empty( $tag ) ) {
-			$args['tax_query']   = $args['tax_query'] ?? [];
-			$args['tax_query'][] = [
+			$args['tax_query']   = $args['tax_query'] ?? []; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+			$args['tax_query'][] = [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 				'taxonomy' => 'apd_tag',
 				'field'    => is_numeric( $tag ) ? 'term_id' : 'slug',
 				'terms'    => $tag,
@@ -177,8 +177,8 @@ class ListingsEndpoint {
 		// Listing type filter.
 		$type = $request->get_param( 'type' );
 		if ( ! empty( $type ) ) {
-			$args['tax_query']   = $args['tax_query'] ?? [];
-			$args['tax_query'][] = [
+			$args['tax_query']   = $args['tax_query'] ?? []; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+			$args['tax_query'][] = [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 				'taxonomy' => \APD\Taxonomy\ListingTypeTaxonomy::TAXONOMY,
 				'field'    => is_numeric( $type ) ? 'term_id' : 'slug',
 				'terms'    => $type,
