@@ -45,3 +45,6 @@ debug.log
 /.playwright-mcp/
 /test-results-debug/
 /*.png
+
+# Build staging artifacts
+dist/.stage/
