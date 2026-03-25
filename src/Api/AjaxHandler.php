@@ -76,7 +76,7 @@ class AjaxHandler {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$nonce = isset( $_REQUEST['_apd_nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['_apd_nonce'] ) ) : '';
 		if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, 'apd_filter_listings' ) ) {
-			wp_send_json_error( [ 'message' => __( 'Invalid security token.', 'all-purpose-directory' ) ], 403 );
+			wp_send_json_error( [ 'message' => __( 'Invalid security token.', 'damdir-directory' ) ], 403 );
 		}
 
 		/**
@@ -204,18 +204,18 @@ class AjaxHandler {
 	public function delete_listing(): void {
 		// Verify nonce.
 		if ( ! check_ajax_referer( MyListings::NONCE_ACTION, '_apd_nonce', false ) ) {
-			wp_send_json_error( [ 'message' => __( 'Invalid security token.', 'all-purpose-directory' ) ], 403 );
+			wp_send_json_error( [ 'message' => __( 'Invalid security token.', 'damdir-directory' ) ], 403 );
 		}
 
 		// Check if user is logged in.
 		if ( ! is_user_logged_in() ) {
-			wp_send_json_error( [ 'message' => __( 'You must be logged in.', 'all-purpose-directory' ) ], 401 );
+			wp_send_json_error( [ 'message' => __( 'You must be logged in.', 'damdir-directory' ) ], 401 );
 		}
 
 		// Get listing ID.
 		$listing_id = isset( $_POST['listing_id'] ) ? absint( $_POST['listing_id'] ) : 0;
 		if ( $listing_id <= 0 ) {
-			wp_send_json_error( [ 'message' => __( 'Invalid listing ID.', 'all-purpose-directory' ) ], 400 );
+			wp_send_json_error( [ 'message' => __( 'Invalid listing ID.', 'damdir-directory' ) ], 400 );
 		}
 
 		// Get action type (trash or delete).
@@ -233,15 +233,15 @@ class AjaxHandler {
 			wp_send_json_success(
 				[
 					'message'    => $delete_type === 'permanent'
-						? __( 'Listing permanently deleted.', 'all-purpose-directory' )
-						: __( 'Listing moved to trash.', 'all-purpose-directory' ),
+						? __( 'Listing permanently deleted.', 'damdir-directory' )
+						: __( 'Listing moved to trash.', 'damdir-directory' ),
 					'listing_id' => $listing_id,
 				]
 			);
 		} else {
 			wp_send_json_error(
 				[
-					'message' => __( 'Failed to delete listing. You may not have permission.', 'all-purpose-directory' ),
+					'message' => __( 'Failed to delete listing. You may not have permission.', 'damdir-directory' ),
 				],
 				403
 			);
@@ -258,25 +258,25 @@ class AjaxHandler {
 	public function update_listing_status(): void {
 		// Verify nonce.
 		if ( ! check_ajax_referer( MyListings::NONCE_ACTION, '_apd_nonce', false ) ) {
-			wp_send_json_error( [ 'message' => __( 'Invalid security token.', 'all-purpose-directory' ) ], 403 );
+			wp_send_json_error( [ 'message' => __( 'Invalid security token.', 'damdir-directory' ) ], 403 );
 		}
 
 		// Check if user is logged in.
 		if ( ! is_user_logged_in() ) {
-			wp_send_json_error( [ 'message' => __( 'You must be logged in.', 'all-purpose-directory' ) ], 401 );
+			wp_send_json_error( [ 'message' => __( 'You must be logged in.', 'damdir-directory' ) ], 401 );
 		}
 
 		// Get listing ID.
 		$listing_id = isset( $_POST['listing_id'] ) ? absint( $_POST['listing_id'] ) : 0;
 		if ( $listing_id <= 0 ) {
-			wp_send_json_error( [ 'message' => __( 'Invalid listing ID.', 'all-purpose-directory' ) ], 400 );
+			wp_send_json_error( [ 'message' => __( 'Invalid listing ID.', 'damdir-directory' ) ], 400 );
 		}
 
 		// Get new status.
 		$new_status     = isset( $_POST['status'] ) ? sanitize_key( $_POST['status'] ) : '';
 		$valid_statuses = [ 'publish', 'draft', 'pending', 'expired' ];
 		if ( ! in_array( $new_status, $valid_statuses, true ) ) {
-			wp_send_json_error( [ 'message' => __( 'Invalid status.', 'all-purpose-directory' ) ], 400 );
+			wp_send_json_error( [ 'message' => __( 'Invalid status.', 'damdir-directory' ) ], 400 );
 		}
 
 		$my_listings = MyListings::get_instance();
@@ -287,7 +287,7 @@ class AjaxHandler {
 
 			wp_send_json_success(
 				[
-					'message'      => __( 'Listing status updated.', 'all-purpose-directory' ),
+					'message'      => __( 'Listing status updated.', 'damdir-directory' ),
 					'listing_id'   => $listing_id,
 					'new_status'   => $new_status,
 					'status_badge' => $status_badge,
@@ -296,7 +296,7 @@ class AjaxHandler {
 		} else {
 			wp_send_json_error(
 				[
-					'message' => __( 'Failed to update listing status. You may not have permission.', 'all-purpose-directory' ),
+					'message' => __( 'Failed to update listing status. You may not have permission.', 'damdir-directory' ),
 				],
 				403
 			);

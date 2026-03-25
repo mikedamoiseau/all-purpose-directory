@@ -5,7 +5,7 @@
  * Main wrapper template for the user dashboard.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/dashboard/dashboard.php
+ * yourtheme/damdir-directory/dashboard/dashboard.php
  *
  * @package APD\Templates
  * @since   1.0.0
@@ -42,7 +42,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<?php if ( $show_stats ) : ?>
 		<section class="apd-dashboard__stats" aria-labelledby="apd-dashboard-stats-title">
 			<h2 id="apd-dashboard-stats-title" class="screen-reader-text">
-				<?php esc_html_e( 'Dashboard Statistics', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Dashboard Statistics', 'damdir-directory' ); ?>
 			</h2>
 			<?php
 			apd_get_template(
@@ -57,7 +57,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<?php endif; ?>
 
 	<div class="apd-dashboard__main">
-		<nav class="apd-dashboard__navigation" aria-label="<?php esc_attr_e( 'Dashboard navigation', 'all-purpose-directory' ); ?>">
+		<nav class="apd-dashboard__navigation" aria-label="<?php esc_attr_e( 'Dashboard navigation', 'damdir-directory' ); ?>">
 			<?php
 			apd_get_template(
 				'dashboard/navigation.php',

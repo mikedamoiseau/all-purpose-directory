@@ -136,13 +136,13 @@ final class ListingsBlock extends AbstractBlock {
 	 * @since 1.0.0
 	 */
 	public function __construct() {
-		$this->title       = __( 'Listings', 'all-purpose-directory' );
-		$this->description = __( 'Display listings in grid or list view.', 'all-purpose-directory' );
+		$this->title       = __( 'Listings', 'damdir-directory' );
+		$this->description = __( 'Display listings in grid or list view.', 'damdir-directory' );
 		$this->keywords    = [
-			__( 'listings', 'all-purpose-directory' ),
-			__( 'directory', 'all-purpose-directory' ),
-			__( 'grid', 'all-purpose-directory' ),
-			__( 'list', 'all-purpose-directory' ),
+			__( 'listings', 'damdir-directory' ),
+			__( 'directory', 'damdir-directory' ),
+			__( 'grid', 'damdir-directory' ),
+			__( 'list', 'damdir-directory' ),
 		];
 	}
 
@@ -184,7 +184,7 @@ final class ListingsBlock extends AbstractBlock {
 			return $this->render_error(
 				sprintf(
 					/* translators: %s: View type */
-					__( 'Invalid view type: %s', 'all-purpose-directory' ),
+					__( 'Invalid view type: %s', 'damdir-directory' ),
 					$attributes['view']
 				)
 			);
@@ -331,8 +331,8 @@ final class ListingsBlock extends AbstractBlock {
 			'total'     => $query->max_num_pages,
 			'current'   => $this->get_paged(),
 			'mid_size'  => 2,
-			'prev_text' => '&laquo; ' . __( 'Previous', 'all-purpose-directory' ),
-			'next_text' => __( 'Next', 'all-purpose-directory' ) . ' &raquo;',
+			'prev_text' => '&laquo; ' . __( 'Previous', 'damdir-directory' ),
+			'next_text' => __( 'Next', 'damdir-directory' ) . ' &raquo;',
 		];
 
 		/**
@@ -351,7 +351,7 @@ final class ListingsBlock extends AbstractBlock {
 		if ( $links ) {
 			printf(
 				'<nav class="apd-pagination" aria-label="%s">%s</nav>',
-				esc_attr__( 'Listings pagination', 'all-purpose-directory' ),
+				esc_attr__( 'Listings pagination', 'damdir-directory' ),
 				$links // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			);
 		}
@@ -376,7 +376,7 @@ final class ListingsBlock extends AbstractBlock {
 		 */
 		$message = apply_filters(
 			'apd_listings_block_no_results_message',
-			__( 'No listings found.', 'all-purpose-directory' ),
+			__( 'No listings found.', 'damdir-directory' ),
 			$attributes
 		);
 

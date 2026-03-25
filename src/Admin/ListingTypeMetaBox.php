@@ -85,7 +85,7 @@ final class ListingTypeMetaBox {
 
 		add_meta_box(
 			self::META_BOX_ID,
-			__( 'Listing Type', 'all-purpose-directory' ),
+			__( 'Listing Type', 'damdir-directory' ),
 			[ $this, 'render_meta_box' ],
 			self::POST_TYPE,
 			'side',
@@ -113,7 +113,7 @@ final class ListingTypeMetaBox {
 		echo '<fieldset>';
 		printf(
 			'<legend class="screen-reader-text">%s</legend>',
-			esc_html__( 'Select listing type', 'all-purpose-directory' )
+			esc_html__( 'Select listing type', 'damdir-directory' )
 		);
 
 		foreach ( $types as $term ) {

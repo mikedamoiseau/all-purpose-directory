@@ -7,7 +7,7 @@
  * `apd_single_listing_reviews` action. When disabled, outputs nothing.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/comments-listing.php
+ * yourtheme/damdir-directory/comments-listing.php
  *
  * @package APD\Templates
  * @since   1.0.0

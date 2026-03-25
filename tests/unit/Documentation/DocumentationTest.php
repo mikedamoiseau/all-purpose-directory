@@ -45,7 +45,7 @@ class DocumentationTest extends TestCase {
         $readme = file_get_contents( $this->plugin_dir . '/README.txt' );
 
         // Required header
-        $this->assertStringContainsString( '=== All Purpose Directory ===', $readme );
+        $this->assertStringContainsString( '=== DamDir Directory ===', $readme );
 
         // Required metadata
         $this->assertStringContainsString( 'Contributors:', $readme );
@@ -418,7 +418,7 @@ class DocumentationTest extends TestCase {
      * @return string[]
      */
     private function get_hook_source_files(): array {
-        $files = [ $this->plugin_dir . '/all-purpose-directory.php' ];
+        $files = [ $this->plugin_dir . '/damdir-directory.php' ];
         $roots = [
             $this->plugin_dir . '/src',
             $this->plugin_dir . '/includes',
@@ -500,16 +500,16 @@ class DocumentationTest extends TestCase {
      * Test POT file exists.
      */
     public function test_pot_file_exists(): void {
-        $this->assertFileExists( $this->plugin_dir . '/languages/all-purpose-directory.pot' );
+        $this->assertFileExists( $this->plugin_dir . '/languages/damdir-directory.pot' );
     }
 
     /**
      * Test POT file has proper header.
      */
     public function test_pot_file_has_header(): void {
-        $pot = file_get_contents( $this->plugin_dir . '/languages/all-purpose-directory.pot' );
+        $pot = file_get_contents( $this->plugin_dir . '/languages/damdir-directory.pot' );
 
-        $this->assertStringContainsString( 'Project-Id-Version: All Purpose Directory', $pot );
+        $this->assertStringContainsString( 'Project-Id-Version: DamDir Directory', $pot );
         $this->assertStringContainsString( 'Content-Type: text/plain; charset=UTF-8', $pot );
     }
 
@@ -524,7 +524,7 @@ class DocumentationTest extends TestCase {
      * Test main plugin file has PHPDoc header.
      */
     public function test_main_plugin_file_has_phpdoc(): void {
-        $content = file_get_contents( $this->plugin_dir . '/all-purpose-directory.php' );
+        $content = file_get_contents( $this->plugin_dir . '/damdir-directory.php' );
 
         $this->assertStringContainsString( '/**', $content );
         $this->assertStringContainsString( '* Plugin Name:', $content );

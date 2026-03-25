@@ -5,7 +5,7 @@
  * Template for rendering a field group/section in the submission form.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/submission/field-group.php
+ * yourtheme/damdir-directory/submission/field-group.php
  *
  * @package APD\Templates
  * @since   1.0.0

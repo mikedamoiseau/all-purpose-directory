@@ -128,7 +128,7 @@ class PhoneField extends AbstractFieldType {
 				'invalid_phone',
 				sprintf(
 					/* translators: %s: field label */
-					__( '%s must be a valid phone number.', 'all-purpose-directory' ),
+					__( '%s must be a valid phone number.', 'damdir-directory' ),
 					$this->getLabel( $field )
 				)
 			);
@@ -140,7 +140,7 @@ class PhoneField extends AbstractFieldType {
 				'invalid_phone',
 				sprintf(
 					/* translators: %s: field label */
-					__( '%s must be a valid phone number.', 'all-purpose-directory' ),
+					__( '%s must be a valid phone number.', 'damdir-directory' ),
 					$this->getLabel( $field )
 				)
 			);

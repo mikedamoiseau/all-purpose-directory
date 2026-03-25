@@ -5,7 +5,7 @@
  * This template displays a single listing's full details.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/single-listing.php
+ * yourtheme/damdir-directory/single-listing.php
  *
  * @package APD\Templates
  * @since   1.0.0
@@ -205,7 +205,7 @@ do_action( 'apd_before_single_listing' );
 						?>
 						<div class="apd-single-listing__fields">
 							<h2 class="apd-single-listing__section-title">
-								<?php esc_html_e( 'Details', 'all-purpose-directory' ); ?>
+								<?php esc_html_e( 'Details', 'damdir-directory' ); ?>
 							</h2>
 							<?php
 							// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -229,7 +229,7 @@ do_action( 'apd_before_single_listing' );
 						<div class="apd-single-listing__tags">
 							<h3 class="apd-single-listing__tags-title">
 								<span class="dashicons dashicons-tag" aria-hidden="true"></span>
-								<?php esc_html_e( 'Tags', 'all-purpose-directory' ); ?>
+								<?php esc_html_e( 'Tags', 'damdir-directory' ); ?>
 							</h3>
 							<div class="apd-single-listing__tags-list">
 								<?php foreach ( $listing_data['tags'] as $tag ) : ?>
@@ -277,7 +277,7 @@ do_action( 'apd_before_single_listing' );
 					?>
 					<div class="apd-single-listing__author apd-sidebar-widget">
 						<h3 class="apd-sidebar-widget__title">
-							<?php esc_html_e( 'Listed by', 'all-purpose-directory' ); ?>
+							<?php esc_html_e( 'Listed by', 'damdir-directory' ); ?>
 						</h3>
 						<div class="apd-single-listing__author-card">
 							<div class="apd-single-listing__author-avatar">
@@ -294,7 +294,7 @@ do_action( 'apd_before_single_listing' );
 									<?php
 									printf(
 										/* translators: %d: number of listings */
-										esc_html( _n( '%d listing', '%d listings', $author_listings_count, 'all-purpose-directory' ) ),
+										esc_html( _n( '%d listing', '%d listings', $author_listings_count, 'damdir-directory' ) ),
 										esc_html( number_format_i18n( $author_listings_count ) )
 									);
 									?>
@@ -367,7 +367,7 @@ do_action( 'apd_before_single_listing' );
 			?>
 			<section class="apd-related-listings">
 				<h2 class="apd-related-listings__title">
-					<?php esc_html_e( 'Related Listings', 'all-purpose-directory' ); ?>
+					<?php esc_html_e( 'Related Listings', 'damdir-directory' ); ?>
 				</h2>
 
 				<?php

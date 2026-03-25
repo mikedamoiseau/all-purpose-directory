@@ -5,7 +5,7 @@
  * Template for the Profile dashboard tab.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/dashboard/profile.php
+ * yourtheme/damdir-directory/dashboard/profile.php
  *
  * @package APD\Templates
  * @since   1.0.0
@@ -58,7 +58,7 @@ $has_avatar    = $profile->has_custom_avatar( $user_id );
 			<!-- Avatar Section -->
 			<div class="apd-profile-form__section apd-profile-form__section--avatar">
 				<h3 class="apd-profile-form__section-title">
-					<?php esc_html_e( 'Profile Photo', 'all-purpose-directory' ); ?>
+					<?php esc_html_e( 'Profile Photo', 'damdir-directory' ); ?>
 				</h3>
 
 				<?php
@@ -79,14 +79,14 @@ $has_avatar    = $profile->has_custom_avatar( $user_id );
 		<!-- Basic Information Section -->
 		<div class="apd-profile-form__section">
 			<h3 class="apd-profile-form__section-title">
-				<?php esc_html_e( 'Basic Information', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Basic Information', 'damdir-directory' ); ?>
 			</h3>
 
 			<div class="apd-profile-form__fields">
 				<!-- Display Name -->
 				<div class="apd-field">
 					<label for="apd-display-name" class="apd-field__label">
-						<?php esc_html_e( 'Display Name', 'all-purpose-directory' ); ?>
+						<?php esc_html_e( 'Display Name', 'damdir-directory' ); ?>
 						<span class="apd-field__required-indicator" aria-hidden="true">*</span>
 					</label>
 					<div class="apd-field__input">
@@ -99,7 +99,7 @@ $has_avatar    = $profile->has_custom_avatar( $user_id );
 							aria-required="true">
 					</div>
 					<p class="apd-field__description">
-						<?php esc_html_e( 'This is how your name will appear publicly.', 'all-purpose-directory' ); ?>
+						<?php esc_html_e( 'This is how your name will appear publicly.', 'damdir-directory' ); ?>
 					</p>
 				</div>
 
@@ -108,7 +108,7 @@ $has_avatar    = $profile->has_custom_avatar( $user_id );
 					<!-- First Name -->
 					<div class="apd-field">
 						<label for="apd-first-name" class="apd-field__label">
-							<?php esc_html_e( 'First Name', 'all-purpose-directory' ); ?>
+							<?php esc_html_e( 'First Name', 'damdir-directory' ); ?>
 						</label>
 						<div class="apd-field__input">
 							<input type="text"
@@ -122,7 +122,7 @@ $has_avatar    = $profile->has_custom_avatar( $user_id );
 					<!-- Last Name -->
 					<div class="apd-field">
 						<label for="apd-last-name" class="apd-field__label">
-							<?php esc_html_e( 'Last Name', 'all-purpose-directory' ); ?>
+							<?php esc_html_e( 'Last Name', 'damdir-directory' ); ?>
 						</label>
 						<div class="apd-field__input">
 							<input type="text"
@@ -137,7 +137,7 @@ $has_avatar    = $profile->has_custom_avatar( $user_id );
 				<!-- Email -->
 				<div class="apd-field">
 					<label for="apd-email" class="apd-field__label">
-						<?php esc_html_e( 'Email Address', 'all-purpose-directory' ); ?>
+						<?php esc_html_e( 'Email Address', 'damdir-directory' ); ?>
 						<span class="apd-field__required-indicator" aria-hidden="true">*</span>
 					</label>
 					<div class="apd-field__input">
@@ -154,7 +154,7 @@ $has_avatar    = $profile->has_custom_avatar( $user_id );
 				<!-- Phone -->
 				<div class="apd-field">
 					<label for="apd-phone" class="apd-field__label">
-						<?php esc_html_e( 'Phone Number', 'all-purpose-directory' ); ?>
+						<?php esc_html_e( 'Phone Number', 'damdir-directory' ); ?>
 					</label>
 					<div class="apd-field__input">
 						<input type="tel"
@@ -168,7 +168,7 @@ $has_avatar    = $profile->has_custom_avatar( $user_id );
 				<!-- Website -->
 				<div class="apd-field">
 					<label for="apd-website" class="apd-field__label">
-						<?php esc_html_e( 'Website', 'all-purpose-directory' ); ?>
+						<?php esc_html_e( 'Website', 'damdir-directory' ); ?>
 					</label>
 					<div class="apd-field__input">
 						<input type="url"
@@ -183,7 +183,7 @@ $has_avatar    = $profile->has_custom_avatar( $user_id );
 				<!-- Bio -->
 				<div class="apd-field">
 					<label for="apd-bio" class="apd-field__label">
-						<?php esc_html_e( 'Bio', 'all-purpose-directory' ); ?>
+						<?php esc_html_e( 'Bio', 'damdir-directory' ); ?>
 					</label>
 					<div class="apd-field__input">
 						<textarea
@@ -193,7 +193,7 @@ $has_avatar    = $profile->has_custom_avatar( $user_id );
 							rows="4"><?php echo esc_textarea( $user_data['description'] ); ?></textarea>
 					</div>
 					<p class="apd-field__description">
-						<?php esc_html_e( 'A short description about yourself.', 'all-purpose-directory' ); ?>
+						<?php esc_html_e( 'A short description about yourself.', 'damdir-directory' ); ?>
 					</p>
 				</div>
 			</div>
@@ -203,7 +203,7 @@ $has_avatar    = $profile->has_custom_avatar( $user_id );
 			<!-- Social Links Section -->
 			<div class="apd-profile-form__section">
 				<h3 class="apd-profile-form__section-title">
-					<?php esc_html_e( 'Social Links', 'all-purpose-directory' ); ?>
+					<?php esc_html_e( 'Social Links', 'damdir-directory' ); ?>
 				</h3>
 
 				<div class="apd-profile-form__fields">
@@ -231,8 +231,8 @@ $has_avatar    = $profile->has_custom_avatar( $user_id );
 		<div class="apd-profile-form__section apd-profile-form__section--actions">
 			<button type="submit"
 				class="apd-button apd-button--primary apd-profile-form__submit"
-				data-submitting-text="<?php esc_attr_e( 'Saving…', 'all-purpose-directory' ); ?>">
-				<?php esc_html_e( 'Save Profile', 'all-purpose-directory' ); ?>
+				data-submitting-text="<?php esc_attr_e( 'Saving…', 'damdir-directory' ); ?>">
+				<?php esc_html_e( 'Save Profile', 'damdir-directory' ); ?>
 			</button>
 		</div>
 

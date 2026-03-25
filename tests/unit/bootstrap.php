@@ -34,16 +34,16 @@ if ( ! defined( 'APD_MIN_WP_VERSION' ) ) {
     define( 'APD_MIN_WP_VERSION', '6.0' );
 }
 if ( ! defined( 'APD_PLUGIN_FILE' ) ) {
-    define( 'APD_PLUGIN_FILE', dirname( __DIR__, 2 ) . '/all-purpose-directory.php' );
+    define( 'APD_PLUGIN_FILE', dirname( __DIR__, 2 ) . '/damdir-directory.php' );
 }
 if ( ! defined( 'APD_PLUGIN_DIR' ) ) {
     define( 'APD_PLUGIN_DIR', dirname( __DIR__, 2 ) . '/' );
 }
 if ( ! defined( 'APD_PLUGIN_URL' ) ) {
-    define( 'APD_PLUGIN_URL', 'https://example.com/wp-content/plugins/all-purpose-directory/' );
+    define( 'APD_PLUGIN_URL', 'https://example.com/wp-content/plugins/damdir-directory/' );
 }
 if ( ! defined( 'APD_PLUGIN_BASENAME' ) ) {
-    define( 'APD_PLUGIN_BASENAME', 'all-purpose-directory/all-purpose-directory.php' );
+    define( 'APD_PLUGIN_BASENAME', 'damdir-directory/damdir-directory.php' );
 }
 
 // Load Composer autoloader.

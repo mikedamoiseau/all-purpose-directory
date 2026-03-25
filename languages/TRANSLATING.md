@@ -1,11 +1,11 @@
-# Translating All Purpose Directory
+# Translating DamDir Directory
 
-Thank you for your interest in translating All Purpose Directory! This document explains how to contribute translations to the plugin.
+Thank you for your interest in translating DamDir Directory! This document explains how to contribute translations to the plugin.
 
 ## Overview
 
-- **Text Domain:** `all-purpose-directory`
-- **POT File:** `languages/all-purpose-directory.pot`
+- **Text Domain:** `damdir-directory`
+- **POT File:** `languages/damdir-directory.pot`
 - **Total Strings:** ~938 translatable strings
 
 ## How to Translate
@@ -14,46 +14,46 @@ Thank you for your interest in translating All Purpose Directory! This document 
 
 1. Download and install [Poedit](https://poedit.net/) (free version works fine)
 2. Open Poedit and select **File > New from POT/PO File**
-3. Choose the `languages/all-purpose-directory.pot` file
+3. Choose the `languages/damdir-directory.pot` file
 4. Select your target language when prompted
 5. Translate the strings in the editor
-6. Save the file as `all-purpose-directory-{locale}.po` (e.g., `all-purpose-directory-fr_FR.po`)
+6. Save the file as `damdir-directory-{locale}.po` (e.g., `damdir-directory-fr_FR.po`)
 7. Poedit will automatically generate the `.mo` file
 
 ### Option 2: Using Loco Translate (WordPress Plugin)
 
 1. Install and activate the [Loco Translate](https://wordpress.org/plugins/loco-translate/) plugin
 2. Go to **Loco Translate > Plugins** in your WordPress admin
-3. Click on **All Purpose Directory**
+3. Click on **DamDir Directory**
 4. Click **New language** and select your language
 5. Translate the strings directly in WordPress
 6. Click **Save** when finished
 
 ### Option 3: Using translate.wordpress.org
 
-If All Purpose Directory is hosted on WordPress.org, you can contribute translations through the official [translate.wordpress.org](https://translate.wordpress.org/) platform.
+If DamDir Directory is hosted on WordPress.org, you can contribute translations through the official [translate.wordpress.org](https://translate.wordpress.org/) platform.
 
 ## File Naming Convention
 
 Translation files must follow this naming pattern:
 
 ```
-all-purpose-directory-{locale}.po   # Human-readable translation file
-all-purpose-directory-{locale}.mo   # Compiled binary file (auto-generated)
+damdir-directory-{locale}.po   # Human-readable translation file
+damdir-directory-{locale}.mo   # Compiled binary file (auto-generated)
 ```
 
 ### Common Locale Codes
 
 | Language | Locale Code | Files |
 |----------|-------------|-------|
-| French | fr_FR | `all-purpose-directory-fr_FR.po` |
-| German | de_DE | `all-purpose-directory-de_DE.po` |
-| Spanish | es_ES | `all-purpose-directory-es_ES.po` |
-| Italian | it_IT | `all-purpose-directory-it_IT.po` |
-| Dutch | nl_NL | `all-purpose-directory-nl_NL.po` |
-| Portuguese (Brazil) | pt_BR | `all-purpose-directory-pt_BR.po` |
-| Japanese | ja | `all-purpose-directory-ja.po` |
-| Chinese (Simplified) | zh_CN | `all-purpose-directory-zh_CN.po` |
+| French | fr_FR | `damdir-directory-fr_FR.po` |
+| German | de_DE | `damdir-directory-de_DE.po` |
+| Spanish | es_ES | `damdir-directory-es_ES.po` |
+| Italian | it_IT | `damdir-directory-it_IT.po` |
+| Dutch | nl_NL | `damdir-directory-nl_NL.po` |
+| Portuguese (Brazil) | pt_BR | `damdir-directory-pt_BR.po` |
+| Japanese | ja | `damdir-directory-ja.po` |
+| Chinese (Simplified) | zh_CN | `damdir-directory-zh_CN.po` |
 
 ## Translation Guidelines
 
@@ -96,7 +96,7 @@ When a new version of the plugin is released:
 1. Regenerate the POT file (developers): `npm run i18n:pot`
 2. Open your existing `.po` file in Poedit
 3. Select **Catalog > Update from POT File**
-4. Choose the updated `all-purpose-directory.pot`
+4. Choose the updated `damdir-directory.pot`
 5. Translate new/changed strings
 6. Save to regenerate the `.mo` file
 
@@ -114,7 +114,7 @@ This extracts all translatable strings from:
 - `src/**/*.php`
 - `includes/**/*.php`
 - `templates/**/*.php`
-- `all-purpose-directory.php`
+- `damdir-directory.php`
 
 ### For Translators
 
@@ -146,4 +146,4 @@ Categories of strings:
 
 If you have questions about translating specific strings or need context, please open an issue on the plugin's GitHub repository.
 
-Thank you for helping make All Purpose Directory accessible to more users around the world!
+Thank you for helping make DamDir Directory accessible to more users around the world!

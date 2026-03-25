@@ -71,13 +71,13 @@ class PluginTest extends UnitTestCase {
 	 */
 	public function test_text_domain_is_all_purpose_directory(): void {
 		// Read the main plugin file header.
-		$plugin_file    = dirname( __DIR__, 3 ) . '/all-purpose-directory.php';
+		$plugin_file    = dirname( __DIR__, 3 ) . '/damdir-directory.php';
 		$plugin_content = file_get_contents( $plugin_file );
 
 		$this->assertStringContainsString(
-			'Text Domain:       all-purpose-directory',
+			'Text Domain:       damdir-directory',
 			$plugin_content,
-			'Plugin header should define text domain as all-purpose-directory'
+			'Plugin header should define text domain as damdir-directory'
 		);
 	}
 
@@ -85,7 +85,7 @@ class PluginTest extends UnitTestCase {
 	 * Test domain path is correctly defined in plugin header.
 	 */
 	public function test_domain_path_is_languages(): void {
-		$plugin_file    = dirname( __DIR__, 3 ) . '/all-purpose-directory.php';
+		$plugin_file    = dirname( __DIR__, 3 ) . '/damdir-directory.php';
 		$plugin_content = file_get_contents( $plugin_file );
 
 		$this->assertStringContainsString(

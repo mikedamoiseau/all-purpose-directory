@@ -46,7 +46,7 @@ final class GeneralTabProvider implements TabProviderInterface {
 	 * @return string
 	 */
 	public function get_name(): string {
-		return __( 'General', 'all-purpose-directory' );
+		return __( 'General', 'damdir-directory' );
 	}
 
 	/**
@@ -111,23 +111,23 @@ final class GeneralTabProvider implements TabProviderInterface {
 		$rows = [
 			'categories' => [
 				'icon'  => 'dashicons-category',
-				'label' => __( 'Categories', 'all-purpose-directory' ),
+				'label' => __( 'Categories', 'damdir-directory' ),
 			],
 			'tags'       => [
 				'icon'  => 'dashicons-tag',
-				'label' => __( 'Tags', 'all-purpose-directory' ),
+				'label' => __( 'Tags', 'damdir-directory' ),
 			],
 			'listings'   => [
 				'icon'  => 'dashicons-location',
-				'label' => __( 'Listings', 'all-purpose-directory' ),
+				'label' => __( 'Listings', 'damdir-directory' ),
 			],
 			'reviews'    => [
 				'icon'  => 'dashicons-star-filled',
-				'label' => __( 'Reviews', 'all-purpose-directory' ),
+				'label' => __( 'Reviews', 'damdir-directory' ),
 			],
 			'inquiries'  => [
 				'icon'  => 'dashicons-email',
-				'label' => __( 'Inquiries', 'all-purpose-directory' ),
+				'label' => __( 'Inquiries', 'damdir-directory' ),
 			],
 		];
 
@@ -155,57 +155,57 @@ final class GeneralTabProvider implements TabProviderInterface {
 	public function render_generate_form( array $defaults ): void {
 		?>
 		<p class="apd-tab-intro">
-			<?php esc_html_e( 'Generate general-purpose directory data with business categories like Restaurants, Hotels, and Shopping.', 'all-purpose-directory' ); ?>
+			<?php esc_html_e( 'Generate general-purpose directory data with business categories like Restaurants, Hotels, and Shopping.', 'damdir-directory' ); ?>
 		</p>
 
 		<div class="apd-form-row">
 			<label class="apd-checkbox-label">
 				<input type="checkbox" name="generate_categories" value="1" checked>
-				<?php esc_html_e( 'Categories', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Categories', 'damdir-directory' ); ?>
 			</label>
-			<span class="description"><?php esc_html_e( 'Restaurants, Hotels, Shopping, Services, Entertainment, Healthcare + children', 'all-purpose-directory' ); ?></span>
+			<span class="description"><?php esc_html_e( 'Restaurants, Hotels, Shopping, Services, Entertainment, Healthcare + children', 'damdir-directory' ); ?></span>
 		</div>
 
 		<div class="apd-form-row">
 			<label class="apd-checkbox-label">
 				<input type="checkbox" name="generate_tags" value="1" checked>
-				<?php esc_html_e( 'Tags', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Tags', 'damdir-directory' ); ?>
 			</label>
 			<input type="number" name="tags_count" value="<?php echo esc_attr( (string) ( $defaults['tags'] ?? 10 ) ); ?>" min="1" max="10" class="small-text">
-			<span class="description"><?php esc_html_e( 'tags (max 10)', 'all-purpose-directory' ); ?></span>
+			<span class="description"><?php esc_html_e( 'tags (max 10)', 'damdir-directory' ); ?></span>
 		</div>
 
 		<div class="apd-form-row">
 			<label class="apd-checkbox-label">
 				<input type="checkbox" name="generate_listings" value="1" checked>
-				<?php esc_html_e( 'Listings', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Listings', 'damdir-directory' ); ?>
 			</label>
 			<input type="number" name="listings_count" value="<?php echo esc_attr( (string) ( $defaults['listings'] ?? 25 ) ); ?>" min="1" max="100" class="small-text">
-			<span class="description"><?php esc_html_e( 'listings (max 100)', 'all-purpose-directory' ); ?></span>
+			<span class="description"><?php esc_html_e( 'listings (max 100)', 'damdir-directory' ); ?></span>
 		</div>
 
 		<div class="apd-form-row">
 			<label class="apd-checkbox-label">
 				<input type="checkbox" name="generate_reviews" value="1" checked>
-				<?php esc_html_e( 'Reviews', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Reviews', 'damdir-directory' ); ?>
 			</label>
-			<span class="description"><?php esc_html_e( '2-4 reviews per listing', 'all-purpose-directory' ); ?></span>
+			<span class="description"><?php esc_html_e( '2-4 reviews per listing', 'damdir-directory' ); ?></span>
 		</div>
 
 		<div class="apd-form-row">
 			<label class="apd-checkbox-label">
 				<input type="checkbox" name="generate_inquiries" value="1" checked>
-				<?php esc_html_e( 'Inquiries', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Inquiries', 'damdir-directory' ); ?>
 			</label>
-			<span class="description"><?php esc_html_e( '0-2 inquiries per listing (random)', 'all-purpose-directory' ); ?></span>
+			<span class="description"><?php esc_html_e( '0-2 inquiries per listing (random)', 'damdir-directory' ); ?></span>
 		</div>
 
 		<div class="apd-form-row">
 			<label class="apd-checkbox-label">
 				<input type="checkbox" name="generate_favorites" value="1" checked>
-				<?php esc_html_e( 'Favorites', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Favorites', 'damdir-directory' ); ?>
 			</label>
-			<span class="description"><?php esc_html_e( '1-5 favorites per user', 'all-purpose-directory' ); ?></span>
+			<span class="description"><?php esc_html_e( '1-5 favorites per user', 'damdir-directory' ); ?></span>
 		</div>
 		<?php
 	}
@@ -229,7 +229,7 @@ final class GeneralTabProvider implements TabProviderInterface {
 					<?php
 					printf(
 						/* translators: %s: Number of demo data items */
-						esc_html__( 'This tab has %s demo data items. Deleting will permanently remove all General categories, tags, listings, reviews, inquiries, and favorites.', 'all-purpose-directory' ),
+						esc_html__( 'This tab has %s demo data items. Deleting will permanently remove all General categories, tags, listings, reviews, inquiries, and favorites.', 'damdir-directory' ),
 						'<strong>' . esc_html( number_format_i18n( $total ) ) . '</strong>'
 					);
 					?>
@@ -238,12 +238,12 @@ final class GeneralTabProvider implements TabProviderInterface {
 
 			<button type="button" class="button button-link-delete button-large apd-delete-tab-btn" data-module="<?php echo esc_attr( $this->get_slug() ); ?>">
 				<span class="dashicons dashicons-trash" aria-hidden="true"></span>
-				<?php esc_html_e( 'Delete General Demo Data', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Delete General Demo Data', 'damdir-directory' ); ?>
 			</button>
 		<?php else : ?>
 			<p class="apd-no-data">
 				<span class="dashicons dashicons-yes-alt" aria-hidden="true"></span>
-				<?php esc_html_e( 'No General demo data found.', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'No General demo data found.', 'damdir-directory' ); ?>
 			</p>
 			<?php
 		endif;

@@ -1,4 +1,4 @@
-=== All Purpose Directory ===
+=== DamDir Directory ===
 Contributors: michaeldamoiseau
 Donate link: https://damoiseau.xyz/donate
 Tags: directory, listings, business directory, classifieds, job board
@@ -13,7 +13,7 @@ A flexible WordPress plugin for building directory and listing websites with fro
 
 == Description ==
 
-All Purpose Directory is a powerful and flexible plugin for creating any type of directory or listing website. Whether you need a business directory, job board, real estate listings, or classifieds site, this plugin provides all the features you need out of the box.
+DamDir Directory is a powerful and flexible plugin for creating any type of directory or listing website. Whether you need a business directory, job board, real estate listings, or classifieds site, this plugin provides all the features you need out of the box.
 
 = Core Features =
 
@@ -150,22 +150,22 @@ All Purpose Directory is a powerful and flexible plugin for creating any type of
 
 = Documentation =
 
-For detailed documentation, visit [our documentation site](https://damoiseau.xyz/docs/all-purpose-directory/).
+For detailed documentation, visit [our documentation site](https://damoiseau.xyz/docs/damdir-directory/).
 
 = Support =
 
-For support questions, please use the [WordPress.org support forums](https://wordpress.org/support/plugin/all-purpose-directory/).
+For support questions, please use the [WordPress.org support forums](https://wordpress.org/support/plugin/damdir-directory/).
 
 = Contributing =
 
-Development takes place on [GitHub](https://github.com/mdamoiseau/all-purpose-directory). Pull requests are welcome!
+Development takes place on [GitHub](https://github.com/mdamoiseau/damdir-directory). Pull requests are welcome!
 
 == Installation ==
 
 = Automatic Installation =
 
 1. Go to Plugins > Add New in your WordPress admin
-2. Search for "All Purpose Directory"
+2. Search for "DamDir Directory"
 3. Click "Install Now" and then "Activate"
 
 = Manual Installation =
@@ -194,7 +194,7 @@ Development takes place on [GitHub](https://github.com/mdamoiseau/all-purpose-di
 
 = How do I customize the listing display? =
 
-All templates can be overridden in your theme. Copy templates from `plugins/all-purpose-directory/templates/` to `your-theme/all-purpose-directory/` and modify as needed. Available templates include:
+All templates can be overridden in your theme. Copy templates from `plugins/damdir-directory/templates/` to `your-theme/damdir-directory/` and modify as needed. Available templates include:
 
 * `archive-listing.php` - Listings archive page
 * `single-listing.php` - Single listing page
@@ -241,7 +241,7 @@ Reviews are enabled by default. To disable them, go to Listings > Settings > Lis
 
 = How do I customize email notifications? =
 
-Email templates can be overridden in your theme at `your-theme/all-purpose-directory/emails/`. You can also customize the from name, email, and which notifications are sent in Settings > Email.
+Email templates can be overridden in your theme at `your-theme/damdir-directory/emails/`. You can also customize the from name, email, and which notifications are sent in Settings > Email.
 
 = Can I import existing listings? =
 
@@ -302,7 +302,7 @@ Release date: 2026-03-12
 == Upgrade Notice ==
 
 = 1.0.0 =
-Initial release of All Purpose Directory. Thank you for choosing our plugin!
+Initial release of DamDir Directory. Thank you for choosing our plugin!
 
 == Credits ==
 
@@ -311,7 +311,7 @@ Initial release of All Purpose Directory. Thank you for choosing our plugin!
 
 == Privacy Policy ==
 
-All Purpose Directory stores the following data:
+DamDir Directory stores the following data:
 
 * **Listings**: Stored as WordPress posts with metadata
 * **Reviews**: Stored as WordPress comments with rating metadata

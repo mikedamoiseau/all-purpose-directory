@@ -83,7 +83,7 @@ class InquiriesEndpoint {
 					'permission_callback' => [ $this, 'permission_view_inquiry' ],
 					'args'                => [
 						'id' => [
-							'description' => __( 'Inquiry ID.', 'all-purpose-directory' ),
+							'description' => __( 'Inquiry ID.', 'damdir-directory' ),
 							'type'        => 'integer',
 							'required'    => true,
 							'minimum'     => 1,
@@ -96,13 +96,13 @@ class InquiriesEndpoint {
 					'permission_callback' => [ $this, 'permission_manage_inquiry' ],
 					'args'                => [
 						'id'    => [
-							'description' => __( 'Inquiry ID.', 'all-purpose-directory' ),
+							'description' => __( 'Inquiry ID.', 'damdir-directory' ),
 							'type'        => 'integer',
 							'required'    => true,
 							'minimum'     => 1,
 						],
 						'force' => [
-							'description' => __( 'Whether to permanently delete.', 'all-purpose-directory' ),
+							'description' => __( 'Whether to permanently delete.', 'damdir-directory' ),
 							'type'        => 'boolean',
 							'default'     => false,
 						],
@@ -122,7 +122,7 @@ class InquiriesEndpoint {
 				'permission_callback' => [ $this, 'permission_manage_inquiry' ],
 				'args'                => [
 					'id' => [
-						'description' => __( 'Inquiry ID.', 'all-purpose-directory' ),
+						'description' => __( 'Inquiry ID.', 'damdir-directory' ),
 						'type'        => 'integer',
 						'required'    => true,
 						'minimum'     => 1,
@@ -141,7 +141,7 @@ class InquiriesEndpoint {
 				'permission_callback' => [ $this, 'permission_manage_inquiry' ],
 				'args'                => [
 					'id' => [
-						'description' => __( 'Inquiry ID.', 'all-purpose-directory' ),
+						'description' => __( 'Inquiry ID.', 'damdir-directory' ),
 						'type'        => 'integer',
 						'required'    => true,
 						'minimum'     => 1,
@@ -174,32 +174,32 @@ class InquiriesEndpoint {
 	public function get_collection_params(): array {
 		return [
 			'status'   => [
-				'description' => __( 'Filter by read status.', 'all-purpose-directory' ),
+				'description' => __( 'Filter by read status.', 'damdir-directory' ),
 				'type'        => 'string',
 				'default'     => 'all',
 				'enum'        => [ 'all', 'read', 'unread' ],
 			],
 			'page'     => [
-				'description' => __( 'Current page.', 'all-purpose-directory' ),
+				'description' => __( 'Current page.', 'damdir-directory' ),
 				'type'        => 'integer',
 				'default'     => 1,
 				'minimum'     => 1,
 			],
 			'per_page' => [
-				'description' => __( 'Items per page.', 'all-purpose-directory' ),
+				'description' => __( 'Items per page.', 'damdir-directory' ),
 				'type'        => 'integer',
 				'default'     => 10,
 				'minimum'     => 1,
 				'maximum'     => 100,
 			],
 			'orderby'  => [
-				'description' => __( 'Order by field.', 'all-purpose-directory' ),
+				'description' => __( 'Order by field.', 'damdir-directory' ),
 				'type'        => 'string',
 				'default'     => 'date',
 				'enum'        => [ 'date', 'listing' ],
 			],
 			'order'    => [
-				'description' => __( 'Sort order.', 'all-purpose-directory' ),
+				'description' => __( 'Sort order.', 'damdir-directory' ),
 				'type'        => 'string',
 				'default'     => 'DESC',
 				'enum'        => [ 'ASC', 'DESC' ],
@@ -217,25 +217,25 @@ class InquiriesEndpoint {
 	public function get_listing_inquiries_params(): array {
 		return [
 			'listing_id' => [
-				'description' => __( 'Listing ID.', 'all-purpose-directory' ),
+				'description' => __( 'Listing ID.', 'damdir-directory' ),
 				'type'        => 'integer',
 				'required'    => true,
 				'minimum'     => 1,
 			],
 			'status'     => [
-				'description' => __( 'Filter by read status.', 'all-purpose-directory' ),
+				'description' => __( 'Filter by read status.', 'damdir-directory' ),
 				'type'        => 'string',
 				'default'     => 'all',
 				'enum'        => [ 'all', 'read', 'unread' ],
 			],
 			'page'       => [
-				'description' => __( 'Current page.', 'all-purpose-directory' ),
+				'description' => __( 'Current page.', 'damdir-directory' ),
 				'type'        => 'integer',
 				'default'     => 1,
 				'minimum'     => 1,
 			],
 			'per_page'   => [
-				'description' => __( 'Items per page.', 'all-purpose-directory' ),
+				'description' => __( 'Items per page.', 'damdir-directory' ),
 				'type'        => 'integer',
 				'default'     => 10,
 				'minimum'     => 1,
@@ -258,37 +258,37 @@ class InquiriesEndpoint {
 			'type'       => 'object',
 			'properties' => [
 				'id'         => [
-					'description' => __( 'Unique identifier.', 'all-purpose-directory' ),
+					'description' => __( 'Unique identifier.', 'damdir-directory' ),
 					'type'        => 'integer',
 					'readonly'    => true,
 				],
 				'listing_id' => [
-					'description' => __( 'Listing ID.', 'all-purpose-directory' ),
+					'description' => __( 'Listing ID.', 'damdir-directory' ),
 					'type'        => 'integer',
 				],
 				'listing'    => [
-					'description' => __( 'Listing details.', 'all-purpose-directory' ),
+					'description' => __( 'Listing details.', 'damdir-directory' ),
 					'type'        => 'object',
 					'readonly'    => true,
 				],
 				'sender'     => [
-					'description' => __( 'Sender details.', 'all-purpose-directory' ),
+					'description' => __( 'Sender details.', 'damdir-directory' ),
 					'type'        => 'object',
 				],
 				'subject'    => [
-					'description' => __( 'Inquiry subject.', 'all-purpose-directory' ),
+					'description' => __( 'Inquiry subject.', 'damdir-directory' ),
 					'type'        => 'string',
 				],
 				'message'    => [
-					'description' => __( 'Inquiry message.', 'all-purpose-directory' ),
+					'description' => __( 'Inquiry message.', 'damdir-directory' ),
 					'type'        => 'string',
 				],
 				'is_read'    => [
-					'description' => __( 'Whether inquiry has been read.', 'all-purpose-directory' ),
+					'description' => __( 'Whether inquiry has been read.', 'damdir-directory' ),
 					'type'        => 'boolean',
 				],
 				'date'       => [
-					'description' => __( 'Sent date.', 'all-purpose-directory' ),
+					'description' => __( 'Sent date.', 'damdir-directory' ),
 					'type'        => 'string',
 					'format'      => 'date-time',
 					'readonly'    => true,
@@ -312,7 +312,7 @@ class InquiriesEndpoint {
 		if ( ! $user_id ) {
 			return new WP_Error(
 				'rest_not_logged_in',
-				__( 'You must be logged in to view inquiries.', 'all-purpose-directory' ),
+				__( 'You must be logged in to view inquiries.', 'damdir-directory' ),
 				[ 'status' => 401 ]
 			);
 		}
@@ -329,7 +329,7 @@ class InquiriesEndpoint {
 
 		return new WP_Error(
 			'rest_forbidden',
-			__( 'You do not have permission to view this inquiry.', 'all-purpose-directory' ),
+			__( 'You do not have permission to view this inquiry.', 'damdir-directory' ),
 			[ 'status' => 403 ]
 		);
 	}
@@ -356,7 +356,7 @@ class InquiriesEndpoint {
 		if ( $this->controller->is_cookie_auth( $request ) && ! $this->controller->verify_nonce( $request ) ) {
 			return new WP_Error(
 				'rest_nonce_invalid',
-				__( 'Invalid or missing REST API nonce.', 'all-purpose-directory' ),
+				__( 'Invalid or missing REST API nonce.', 'damdir-directory' ),
 				[ 'status' => 403 ]
 			);
 		}
@@ -379,7 +379,7 @@ class InquiriesEndpoint {
 		if ( ! $user_id ) {
 			return new WP_Error(
 				'rest_not_logged_in',
-				__( 'You must be logged in to view inquiries.', 'all-purpose-directory' ),
+				__( 'You must be logged in to view inquiries.', 'damdir-directory' ),
 				[ 'status' => 401 ]
 			);
 		}
@@ -397,7 +397,7 @@ class InquiriesEndpoint {
 
 		return new WP_Error(
 			'rest_forbidden',
-			__( 'You do not have permission to view these inquiries.', 'all-purpose-directory' ),
+			__( 'You do not have permission to view these inquiries.', 'damdir-directory' ),
 			[ 'status' => 403 ]
 		);
 	}
@@ -462,7 +462,7 @@ class InquiriesEndpoint {
 		if ( ! $post || 'apd_listing' !== $post->post_type ) {
 			return $this->controller->create_error(
 				'rest_listing_not_found',
-				__( 'Listing not found.', 'all-purpose-directory' ),
+				__( 'Listing not found.', 'damdir-directory' ),
 				404
 			);
 		}
@@ -499,7 +499,7 @@ class InquiriesEndpoint {
 		if ( ! $inquiry ) {
 			return $this->controller->create_error(
 				'rest_inquiry_not_found',
-				__( 'Inquiry not found.', 'all-purpose-directory' ),
+				__( 'Inquiry not found.', 'damdir-directory' ),
 				404
 			);
 		}
@@ -525,7 +525,7 @@ class InquiriesEndpoint {
 		if ( ! $result ) {
 			return $this->controller->create_error(
 				'rest_mark_read_failed',
-				__( 'Failed to mark inquiry as read.', 'all-purpose-directory' ),
+				__( 'Failed to mark inquiry as read.', 'damdir-directory' ),
 				500
 			);
 		}
@@ -553,7 +553,7 @@ class InquiriesEndpoint {
 		if ( ! $result ) {
 			return $this->controller->create_error(
 				'rest_mark_unread_failed',
-				__( 'Failed to mark inquiry as unread.', 'all-purpose-directory' ),
+				__( 'Failed to mark inquiry as unread.', 'damdir-directory' ),
 				500
 			);
 		}
@@ -582,7 +582,7 @@ class InquiriesEndpoint {
 		if ( ! $result ) {
 			return $this->controller->create_error(
 				'rest_delete_failed',
-				__( 'Failed to delete inquiry.', 'all-purpose-directory' ),
+				__( 'Failed to delete inquiry.', 'damdir-directory' ),
 				500
 			);
 		}

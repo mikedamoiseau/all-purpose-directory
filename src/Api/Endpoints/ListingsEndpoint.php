@@ -94,7 +94,7 @@ class ListingsEndpoint {
 					'permission_callback' => [ $this->controller, 'permission_public' ],
 					'args'                => [
 						'id' => [
-							'description' => __( 'Unique identifier for the listing.', 'all-purpose-directory' ),
+							'description' => __( 'Unique identifier for the listing.', 'damdir-directory' ),
 							'type'        => 'integer',
 							'required'    => true,
 						],
@@ -112,12 +112,12 @@ class ListingsEndpoint {
 					'permission_callback' => [ $this->controller, 'permission_delete_listing' ],
 					'args'                => [
 						'id'    => [
-							'description' => __( 'Unique identifier for the listing.', 'all-purpose-directory' ),
+							'description' => __( 'Unique identifier for the listing.', 'damdir-directory' ),
 							'type'        => 'integer',
 							'required'    => true,
 						],
 						'force' => [
-							'description' => __( 'Whether to bypass trash and force deletion.', 'all-purpose-directory' ),
+							'description' => __( 'Whether to bypass trash and force deletion.', 'damdir-directory' ),
 							'type'        => 'boolean',
 							'default'     => false,
 						],
@@ -243,7 +243,7 @@ class ListingsEndpoint {
 		if ( ! $listing || $listing->post_type !== 'apd_listing' ) {
 			return $this->controller->create_error(
 				'rest_listing_not_found',
-				__( 'Listing not found.', 'all-purpose-directory' ),
+				__( 'Listing not found.', 'damdir-directory' ),
 				404
 			);
 		}
@@ -252,7 +252,7 @@ class ListingsEndpoint {
 		if ( $listing->post_status !== 'publish' && ! current_user_can( 'edit_post', $listing_id ) ) {
 			return $this->controller->create_error(
 				'rest_listing_not_found',
-				__( 'Listing not found.', 'all-purpose-directory' ),
+				__( 'Listing not found.', 'damdir-directory' ),
 				404
 			);
 		}
@@ -280,7 +280,7 @@ class ListingsEndpoint {
 		if ( empty( $title ) ) {
 			return $this->controller->create_error(
 				'rest_missing_param',
-				__( 'Title is required.', 'all-purpose-directory' ),
+				__( 'Title is required.', 'damdir-directory' ),
 				400
 			);
 		}
@@ -390,7 +390,7 @@ class ListingsEndpoint {
 		if ( ! $listing || $listing->post_type !== 'apd_listing' ) {
 			return $this->controller->create_error(
 				'rest_listing_not_found',
-				__( 'Listing not found.', 'all-purpose-directory' ),
+				__( 'Listing not found.', 'damdir-directory' ),
 				404
 			);
 		}
@@ -519,7 +519,7 @@ class ListingsEndpoint {
 		if ( ! $listing || $listing->post_type !== 'apd_listing' ) {
 			return $this->controller->create_error(
 				'rest_listing_not_found',
-				__( 'Listing not found.', 'all-purpose-directory' ),
+				__( 'Listing not found.', 'damdir-directory' ),
 				404
 			);
 		}
@@ -542,7 +542,7 @@ class ListingsEndpoint {
 		if ( ! $result ) {
 			return $this->controller->create_error(
 				'rest_listing_delete_failed',
-				__( 'Failed to delete listing.', 'all-purpose-directory' ),
+				__( 'Failed to delete listing.', 'damdir-directory' ),
 				500
 			);
 		}
@@ -659,7 +659,7 @@ class ListingsEndpoint {
 		if ( ! $attachment || $attachment->post_type !== 'attachment' ) {
 			return $this->controller->create_error(
 				'rest_invalid_featured_image',
-				__( 'Invalid featured image. The attachment does not exist.', 'all-purpose-directory' ),
+				__( 'Invalid featured image. The attachment does not exist.', 'damdir-directory' ),
 				400
 			);
 		}
@@ -667,7 +667,7 @@ class ListingsEndpoint {
 		if ( ! wp_attachment_is_image( $attachment_id ) ) {
 			return $this->controller->create_error(
 				'rest_invalid_featured_image',
-				__( 'Invalid featured image. The attachment is not an image.', 'all-purpose-directory' ),
+				__( 'Invalid featured image. The attachment is not an image.', 'damdir-directory' ),
 				400
 			);
 		}
@@ -676,7 +676,7 @@ class ListingsEndpoint {
 		if ( ! current_user_can( 'manage_options' ) && (int) $attachment->post_author !== get_current_user_id() ) {
 			return $this->controller->create_error(
 				'rest_forbidden_featured_image',
-				__( 'You do not have permission to use this image.', 'all-purpose-directory' ),
+				__( 'You do not have permission to use this image.', 'damdir-directory' ),
 				403
 			);
 		}
@@ -739,51 +739,51 @@ class ListingsEndpoint {
 	public function get_collection_params(): array {
 		return [
 			'page'     => [
-				'description' => __( 'Current page of the collection.', 'all-purpose-directory' ),
+				'description' => __( 'Current page of the collection.', 'damdir-directory' ),
 				'type'        => 'integer',
 				'default'     => 1,
 				'minimum'     => 1,
 			],
 			'per_page' => [
-				'description' => __( 'Maximum number of items per page.', 'all-purpose-directory' ),
+				'description' => __( 'Maximum number of items per page.', 'damdir-directory' ),
 				'type'        => 'integer',
 				'default'     => 10,
 				'minimum'     => 1,
 				'maximum'     => 100,
 			],
 			'search'   => [
-				'description' => __( 'Search term.', 'all-purpose-directory' ),
+				'description' => __( 'Search term.', 'damdir-directory' ),
 				'type'        => 'string',
 			],
 			'category' => [
-				'description' => __( 'Filter by category ID or slug.', 'all-purpose-directory' ),
+				'description' => __( 'Filter by category ID or slug.', 'damdir-directory' ),
 				'type'        => [ 'integer', 'string' ],
 			],
 			'tag'      => [
-				'description' => __( 'Filter by tag ID or slug.', 'all-purpose-directory' ),
+				'description' => __( 'Filter by tag ID or slug.', 'damdir-directory' ),
 				'type'        => [ 'integer', 'string' ],
 			],
 			'type'     => [
-				'description' => __( 'Filter by listing type slug.', 'all-purpose-directory' ),
+				'description' => __( 'Filter by listing type slug.', 'damdir-directory' ),
 				'type'        => 'string',
 			],
 			'author'   => [
-				'description' => __( 'Filter by author user ID.', 'all-purpose-directory' ),
+				'description' => __( 'Filter by author user ID.', 'damdir-directory' ),
 				'type'        => 'integer',
 			],
 			'status'   => [
-				'description' => __( 'Filter by status (requires manage listings capability).', 'all-purpose-directory' ),
+				'description' => __( 'Filter by status (requires manage listings capability).', 'damdir-directory' ),
 				'type'        => 'string',
 				'enum'        => [ 'publish', 'pending', 'draft', 'expired' ],
 			],
 			'orderby'  => [
-				'description' => __( 'Sort collection by field.', 'all-purpose-directory' ),
+				'description' => __( 'Sort collection by field.', 'damdir-directory' ),
 				'type'        => 'string',
 				'default'     => 'date',
 				'enum'        => [ 'date', 'title', 'modified', 'rand', 'views' ],
 			],
 			'order'    => [
-				'description' => __( 'Sort order.', 'all-purpose-directory' ),
+				'description' => __( 'Sort order.', 'damdir-directory' ),
 				'type'        => 'string',
 				'default'     => 'DESC',
 				'enum'        => [ 'ASC', 'DESC' ],
@@ -801,44 +801,44 @@ class ListingsEndpoint {
 	public function get_create_params(): array {
 		return [
 			'title'          => [
-				'description' => __( 'Listing title.', 'all-purpose-directory' ),
+				'description' => __( 'Listing title.', 'damdir-directory' ),
 				'type'        => 'string',
 				'required'    => true,
 			],
 			'content'        => [
-				'description' => __( 'Listing content/description.', 'all-purpose-directory' ),
+				'description' => __( 'Listing content/description.', 'damdir-directory' ),
 				'type'        => 'string',
 			],
 			'excerpt'        => [
-				'description' => __( 'Listing short description.', 'all-purpose-directory' ),
+				'description' => __( 'Listing short description.', 'damdir-directory' ),
 				'type'        => 'string',
 			],
 			'status'         => [
-				'description' => __( 'Listing status.', 'all-purpose-directory' ),
+				'description' => __( 'Listing status.', 'damdir-directory' ),
 				'type'        => 'string',
 				'default'     => 'pending',
 				'enum'        => [ 'publish', 'pending', 'draft' ],
 			],
 			'categories'     => [
-				'description' => __( 'Category term IDs.', 'all-purpose-directory' ),
+				'description' => __( 'Category term IDs.', 'damdir-directory' ),
 				'type'        => 'array',
 				'items'       => [ 'type' => 'integer' ],
 			],
 			'tags'           => [
-				'description' => __( 'Tag term IDs.', 'all-purpose-directory' ),
+				'description' => __( 'Tag term IDs.', 'damdir-directory' ),
 				'type'        => 'array',
 				'items'       => [ 'type' => 'integer' ],
 			],
 			'type'           => [
-				'description' => __( 'Listing type slug.', 'all-purpose-directory' ),
+				'description' => __( 'Listing type slug.', 'damdir-directory' ),
 				'type'        => 'string',
 			],
 			'meta'           => [
-				'description' => __( 'Custom field values.', 'all-purpose-directory' ),
+				'description' => __( 'Custom field values.', 'damdir-directory' ),
 				'type'        => 'object',
 			],
 			'featured_image' => [
-				'description' => __( 'Featured image attachment ID.', 'all-purpose-directory' ),
+				'description' => __( 'Featured image attachment ID.', 'damdir-directory' ),
 				'type'        => 'integer',
 			],
 		];
@@ -855,7 +855,7 @@ class ListingsEndpoint {
 		return array_merge(
 			[
 				'id' => [
-					'description' => __( 'Unique identifier for the listing.', 'all-purpose-directory' ),
+					'description' => __( 'Unique identifier for the listing.', 'damdir-directory' ),
 					'type'        => 'integer',
 					'required'    => true,
 				],
@@ -878,49 +878,49 @@ class ListingsEndpoint {
 			'type'       => 'object',
 			'properties' => [
 				'id'             => [
-					'description' => __( 'Unique identifier for the listing.', 'all-purpose-directory' ),
+					'description' => __( 'Unique identifier for the listing.', 'damdir-directory' ),
 					'type'        => 'integer',
 					'readonly'    => true,
 				],
 				'title'          => [
-					'description' => __( 'Listing title.', 'all-purpose-directory' ),
+					'description' => __( 'Listing title.', 'damdir-directory' ),
 					'type'        => 'string',
 				],
 				'content'        => [
-					'description' => __( 'Listing content.', 'all-purpose-directory' ),
+					'description' => __( 'Listing content.', 'damdir-directory' ),
 					'type'        => 'string',
 				],
 				'excerpt'        => [
-					'description' => __( 'Listing excerpt.', 'all-purpose-directory' ),
+					'description' => __( 'Listing excerpt.', 'damdir-directory' ),
 					'type'        => 'string',
 				],
 				'status'         => [
-					'description' => __( 'Listing status.', 'all-purpose-directory' ),
+					'description' => __( 'Listing status.', 'damdir-directory' ),
 					'type'        => 'string',
 					'enum'        => [ 'publish', 'pending', 'draft', 'expired' ],
 				],
 				'author'         => [
-					'description' => __( 'Author user ID.', 'all-purpose-directory' ),
+					'description' => __( 'Author user ID.', 'damdir-directory' ),
 					'type'        => 'integer',
 				],
 				'date'           => [
-					'description' => __( 'Published date (RFC3339 format).', 'all-purpose-directory' ),
+					'description' => __( 'Published date (RFC3339 format).', 'damdir-directory' ),
 					'type'        => 'string',
 					'format'      => 'date-time',
 					'readonly'    => true,
 				],
 				'link'           => [
-					'description' => __( 'Listing URL.', 'all-purpose-directory' ),
+					'description' => __( 'Listing URL.', 'damdir-directory' ),
 					'type'        => 'string',
 					'format'      => 'uri',
 					'readonly'    => true,
 				],
 				'featured_image' => [
-					'description' => __( 'Featured image attachment ID.', 'all-purpose-directory' ),
+					'description' => __( 'Featured image attachment ID.', 'damdir-directory' ),
 					'type'        => [ 'integer', 'null' ],
 				],
 				'categories'     => [
-					'description' => __( 'Assigned categories.', 'all-purpose-directory' ),
+					'description' => __( 'Assigned categories.', 'damdir-directory' ),
 					'type'        => 'array',
 					'items'       => [
 						'type'       => 'object',
@@ -933,7 +933,7 @@ class ListingsEndpoint {
 					'readonly'    => true,
 				],
 				'tags'           => [
-					'description' => __( 'Assigned tags.', 'all-purpose-directory' ),
+					'description' => __( 'Assigned tags.', 'damdir-directory' ),
 					'type'        => 'array',
 					'items'       => [
 						'type'       => 'object',
@@ -946,7 +946,7 @@ class ListingsEndpoint {
 					'readonly'    => true,
 				],
 				'meta'           => [
-					'description' => __( 'Custom field values.', 'all-purpose-directory' ),
+					'description' => __( 'Custom field values.', 'damdir-directory' ),
 					'type'        => 'object',
 				],
 			],

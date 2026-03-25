@@ -85,15 +85,15 @@ final class ListingTypeTaxonomy {
 	 */
 	private function get_labels(): array {
 		return [
-			'name'          => _x( 'Listing Types', 'taxonomy general name', 'all-purpose-directory' ),
-			'singular_name' => _x( 'Listing Type', 'taxonomy singular name', 'all-purpose-directory' ),
-			'all_items'     => __( 'All Listing Types', 'all-purpose-directory' ),
-			'edit_item'     => __( 'Edit Listing Type', 'all-purpose-directory' ),
-			'update_item'   => __( 'Update Listing Type', 'all-purpose-directory' ),
-			'add_new_item'  => __( 'Add New Listing Type', 'all-purpose-directory' ),
-			'new_item_name' => __( 'New Listing Type Name', 'all-purpose-directory' ),
-			'search_items'  => __( 'Search Listing Types', 'all-purpose-directory' ),
-			'not_found'     => __( 'No listing types found.', 'all-purpose-directory' ),
+			'name'          => _x( 'Listing Types', 'taxonomy general name', 'damdir-directory' ),
+			'singular_name' => _x( 'Listing Type', 'taxonomy singular name', 'damdir-directory' ),
+			'all_items'     => __( 'All Listing Types', 'damdir-directory' ),
+			'edit_item'     => __( 'Edit Listing Type', 'damdir-directory' ),
+			'update_item'   => __( 'Update Listing Type', 'damdir-directory' ),
+			'add_new_item'  => __( 'Add New Listing Type', 'damdir-directory' ),
+			'new_item_name' => __( 'New Listing Type Name', 'damdir-directory' ),
+			'search_items'  => __( 'Search Listing Types', 'damdir-directory' ),
+			'not_found'     => __( 'No listing types found.', 'damdir-directory' ),
 		];
 	}
 
@@ -107,7 +107,7 @@ final class ListingTypeTaxonomy {
 	private function get_args(): array {
 		return [
 			'labels'             => $this->get_labels(),
-			'description'        => __( 'Internal taxonomy to associate listings with module types.', 'all-purpose-directory' ),
+			'description'        => __( 'Internal taxonomy to associate listings with module types.', 'damdir-directory' ),
 			'hierarchical'       => false,
 			'public'             => false,
 			'publicly_queryable' => false,
@@ -134,7 +134,7 @@ final class ListingTypeTaxonomy {
 	public function ensure_default_term(): void {
 		if ( ! term_exists( self::DEFAULT_TERM, self::TAXONOMY ) ) {
 			wp_insert_term(
-				__( 'General', 'all-purpose-directory' ),
+				__( 'General', 'damdir-directory' ),
 				self::TAXONOMY,
 				[ 'slug' => self::DEFAULT_TERM ]
 			);

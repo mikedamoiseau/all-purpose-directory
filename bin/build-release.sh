@@ -8,14 +8,14 @@ set -euo pipefail
 #   bin/build-release.sh 1.0.0
 #
 # Optional env vars:
-#   APD_PLUGIN_SLUG      Plugin slug/directory (default: all-purpose-directory)
+#   APD_PLUGIN_SLUG      Plugin slug/directory (default: damdir-directory)
 #   APD_OUTPUT_DIR       Output directory for build artifacts (default: <repo>/dist)
 #   APD_VERSION          Version label for zip name (overrides CLI arg)
 #   APD_KEEP_STAGE       Keep staged plugin directory after zip (1=yes, default: 1)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-PLUGIN_SLUG="${APD_PLUGIN_SLUG:-all-purpose-directory}"
+PLUGIN_SLUG="${APD_PLUGIN_SLUG:-damdir-directory}"
 OUTPUT_DIR="${APD_OUTPUT_DIR:-$REPO_ROOT/dist}"
 KEEP_STAGE="${APD_KEEP_STAGE:-1}"
 

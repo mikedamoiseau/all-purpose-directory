@@ -5,16 +5,16 @@ set -euo pipefail
 #
 # Usage:
 #   bin/sync-to-test.sh
-#   bin/sync-to-test.sh /path/to/wp-content/plugins/all-purpose-directory
+#   bin/sync-to-test.sh /path/to/wp-content/plugins/damdir-directory
 #
 # Optional env vars:
-#   APD_PLUGIN_SLUG      Plugin directory name (default: all-purpose-directory)
+#   APD_PLUGIN_SLUG      Plugin directory name (default: damdir-directory)
 #   APD_TEST_ROOT        WordPress test root used for auto-detection
 #                        (default: $HOME/Documents/www/test/wordpress)
 #   APD_TEST_PLUGIN_DIR  Explicit plugin target directory (overrides auto-detection)
 
 SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PLUGIN_SLUG="${APD_PLUGIN_SLUG:-all-purpose-directory}"
+PLUGIN_SLUG="${APD_PLUGIN_SLUG:-damdir-directory}"
 TEST_ROOT="${APD_TEST_ROOT:-$HOME/Documents/www/test/wordpress}"
 
 if [[ ! -f "$SRC_DIR/.distignore" ]]; then

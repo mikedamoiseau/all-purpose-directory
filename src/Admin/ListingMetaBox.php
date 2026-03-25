@@ -85,7 +85,7 @@ final class ListingMetaBox {
 	public function register_meta_box(): void {
 		add_meta_box(
 			self::META_BOX_ID,
-			__( 'Listing Fields', 'all-purpose-directory' ),
+			__( 'Listing Fields', 'damdir-directory' ),
 			[ $this, 'render_meta_box' ],
 			self::POST_TYPE,
 			'normal',
@@ -110,7 +110,7 @@ final class ListingMetaBox {
 		if ( empty( $fields ) ) {
 			printf(
 				'<p class="apd-no-fields">%s</p>',
-				esc_html__( 'No custom fields have been registered for listings.', 'all-purpose-directory' )
+				esc_html__( 'No custom fields have been registered for listings.', 'damdir-directory' )
 			);
 			return;
 		}

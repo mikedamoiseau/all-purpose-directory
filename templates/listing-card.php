@@ -5,7 +5,7 @@
  * This template displays a single listing in grid/card format.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/listing-card.php
+ * yourtheme/damdir-directory/listing-card.php
  *
  * @package APD\Templates
  * @since   1.0.0
@@ -212,7 +212,7 @@ $card_classes = apply_filters( 'apd_listing_card_classes', $card_classes, $listi
 		?>
 
 		<a href="<?php echo esc_url( $card_data['permalink'] ); ?>" class="apd-listing-card__link">
-			<?php esc_html_e( 'View Details', 'all-purpose-directory' ); ?>
+			<?php esc_html_e( 'View Details', 'damdir-directory' ); ?>
 			<span class="screen-reader-text"><?php echo esc_html( $card_data['title'] ); ?></span>
 		</a>
 	</div>

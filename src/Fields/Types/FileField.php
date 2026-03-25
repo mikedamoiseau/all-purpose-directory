@@ -150,8 +150,8 @@ class FileField extends AbstractFieldType {
 		);
 		$html         .= sprintf(
 			'<button type="button" class="apd-file-remove button" aria-label="%s">%s</button>',
-			esc_attr__( 'Remove file', 'all-purpose-directory' ),
-			esc_html__( 'Remove', 'all-purpose-directory' )
+			esc_attr__( 'Remove file', 'damdir-directory' ),
+			esc_html__( 'Remove', 'damdir-directory' )
 		);
 		$html         .= '</div>';
 
@@ -160,9 +160,9 @@ class FileField extends AbstractFieldType {
 		$html        .= sprintf(
 			'<button type="button" class="apd-file-upload button" style="%s" data-title="%s" data-button="%s">%s</button>',
 			esc_attr( $button_style ),
-			esc_attr__( 'Select File', 'all-purpose-directory' ),
-			esc_attr__( 'Use this file', 'all-purpose-directory' ),
-			esc_html__( 'Select File', 'all-purpose-directory' )
+			esc_attr__( 'Select File', 'damdir-directory' ),
+			esc_attr__( 'Use this file', 'damdir-directory' ),
+			esc_html__( 'Select File', 'damdir-directory' )
 		);
 
 		$html .= '</div>';
@@ -202,7 +202,7 @@ class FileField extends AbstractFieldType {
 				'required',
 				sprintf(
 					/* translators: %s: field label */
-					__( '%s is required.', 'all-purpose-directory' ),
+					__( '%s is required.', 'damdir-directory' ),
 					$this->getLabel( $field )
 				)
 			);
@@ -223,7 +223,7 @@ class FileField extends AbstractFieldType {
 				'invalid_attachment',
 				sprintf(
 					/* translators: %s: field label */
-					__( '%s contains an invalid file.', 'all-purpose-directory' ),
+					__( '%s contains an invalid file.', 'damdir-directory' ),
 					$this->getLabel( $field )
 				)
 			);
@@ -241,7 +241,7 @@ class FileField extends AbstractFieldType {
 						'invalid_file_type',
 						sprintf(
 							/* translators: 1: field label, 2: allowed file types */
-							__( '%1$s must be one of the following types: %2$s.', 'all-purpose-directory' ),
+							__( '%1$s must be one of the following types: %2$s.', 'damdir-directory' ),
 							$this->getLabel( $field ),
 							implode( ', ', $allowed_types )
 						)
@@ -285,7 +285,7 @@ class FileField extends AbstractFieldType {
 		}
 
 		$file_path = get_attached_file( $attachment_id );
-		$filename  = $file_path ? basename( $file_path ) : __( 'Download', 'all-purpose-directory' );
+		$filename  = $file_path ? basename( $file_path ) : __( 'Download', 'damdir-directory' );
 
 		return sprintf(
 			'<a href="%s" class="apd-file-link" target="_blank" rel="noopener noreferrer">%s</a>',

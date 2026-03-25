@@ -5,7 +5,7 @@
  * Template for displaying the success message after a listing submission.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/submission/submission-success.php
+ * yourtheme/damdir-directory/submission/submission-success.php
  *
  * @package APD\Templates
  * @since   1.0.0
@@ -37,9 +37,9 @@ $is_published = $status === 'publish';
 	<h2 class="apd-submission-success__title">
 		<?php
 		if ( $is_update ) {
-			esc_html_e( 'Listing Updated Successfully!', 'all-purpose-directory' );
+			esc_html_e( 'Listing Updated Successfully!', 'damdir-directory' );
 		} else {
-			esc_html_e( 'Thank You for Your Submission!', 'all-purpose-directory' );
+			esc_html_e( 'Thank You for Your Submission!', 'damdir-directory' );
 		}
 		?>
 	</h2>
@@ -49,9 +49,9 @@ $is_published = $status === 'publish';
 			<p>
 				<?php
 				if ( $is_update ) {
-					esc_html_e( 'Your listing has been updated and is now live.', 'all-purpose-directory' );
+					esc_html_e( 'Your listing has been updated and is now live.', 'damdir-directory' );
 				} else {
-					esc_html_e( 'Your listing has been published and is now live.', 'all-purpose-directory' );
+					esc_html_e( 'Your listing has been published and is now live.', 'damdir-directory' );
 				}
 				?>
 			</p>
@@ -59,14 +59,14 @@ $is_published = $status === 'publish';
 			<p>
 				<?php
 				if ( $is_update ) {
-					esc_html_e( 'Your listing has been updated and is awaiting review.', 'all-purpose-directory' );
+					esc_html_e( 'Your listing has been updated and is awaiting review.', 'damdir-directory' );
 				} else {
-					esc_html_e( 'Your listing has been submitted and is awaiting review by our team.', 'all-purpose-directory' );
+					esc_html_e( 'Your listing has been submitted and is awaiting review by our team.', 'damdir-directory' );
 				}
 				?>
 			</p>
 			<p>
-				<?php esc_html_e( 'We will review your submission shortly. You will be notified once it has been approved.', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'We will review your submission shortly. You will be notified once it has been approved.', 'damdir-directory' ); ?>
 			</p>
 		<?php endif; ?>
 	</div>
@@ -74,7 +74,7 @@ $is_published = $status === 'publish';
 	<?php if ( ! empty( $title ) ) : ?>
 		<div class="apd-submission-success__details">
 			<p class="apd-submission-success__listing-title">
-				<strong><?php esc_html_e( 'Listing:', 'all-purpose-directory' ); ?></strong>
+				<strong><?php esc_html_e( 'Listing:', 'damdir-directory' ); ?></strong>
 				<?php echo esc_html( $title ); ?>
 			</p>
 		</div>
@@ -83,18 +83,18 @@ $is_published = $status === 'publish';
 	<div class="apd-submission-success__actions">
 		<?php if ( $is_published && ! empty( $listing_url ) ) : ?>
 			<a href="<?php echo esc_url( $listing_url ); ?>" class="apd-button apd-button--primary">
-				<?php esc_html_e( 'View Your Listing', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'View Your Listing', 'damdir-directory' ); ?>
 			</a>
 		<?php endif; ?>
 
 		<?php if ( ! empty( $submit_url ) ) : ?>
 			<a href="<?php echo esc_url( $submit_url ); ?>" class="apd-button apd-button--secondary">
-				<?php esc_html_e( 'Submit Another Listing', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Submit Another Listing', 'damdir-directory' ); ?>
 			</a>
 		<?php endif; ?>
 
 		<a href="<?php echo esc_url( home_url() ); ?>" class="apd-button apd-button--text">
-			<?php esc_html_e( 'Return to Home', 'all-purpose-directory' ); ?>
+			<?php esc_html_e( 'Return to Home', 'damdir-directory' ); ?>
 		</a>
 	</div>
 

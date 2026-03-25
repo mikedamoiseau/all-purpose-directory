@@ -202,7 +202,7 @@ class ReviewManager {
 		if ( ! $listing || $listing->post_type !== 'apd_listing' ) {
 			return new \WP_Error(
 				'invalid_listing',
-				__( 'Invalid listing ID.', 'all-purpose-directory' )
+				__( 'Invalid listing ID.', 'damdir-directory' )
 			);
 		}
 
@@ -220,7 +220,7 @@ class ReviewManager {
 		if ( $user_id > 0 && $this->has_user_reviewed( $listing_id, $user_id ) ) {
 			return new \WP_Error(
 				'already_reviewed',
-				__( 'You have already reviewed this listing.', 'all-purpose-directory' )
+				__( 'You have already reviewed this listing.', 'damdir-directory' )
 			);
 		}
 
@@ -274,7 +274,7 @@ class ReviewManager {
 		if ( ! $comment_id ) {
 			return new \WP_Error(
 				'review_failed',
-				__( 'Failed to create review.', 'all-purpose-directory' )
+				__( 'Failed to create review.', 'damdir-directory' )
 			);
 		}
 
@@ -318,7 +318,7 @@ class ReviewManager {
 		if ( ! $review ) {
 			return new \WP_Error(
 				'invalid_review',
-				__( 'Invalid review ID.', 'all-purpose-directory' )
+				__( 'Invalid review ID.', 'damdir-directory' )
 			);
 		}
 
@@ -330,7 +330,7 @@ class ReviewManager {
 					'invalid_rating',
 					sprintf(
 						/* translators: 1: minimum rating, 2: maximum rating */
-						__( 'Rating must be between %1$d and %2$d.', 'all-purpose-directory' ),
+						__( 'Rating must be between %1$d and %2$d.', 'damdir-directory' ),
 						self::MIN_RATING,
 						self::MAX_RATING
 					)
@@ -348,7 +348,7 @@ class ReviewManager {
 					'content_too_short',
 					sprintf(
 						/* translators: %d: minimum content length */
-						__( 'Review content must be at least %d characters.', 'all-purpose-directory' ),
+						__( 'Review content must be at least %d characters.', 'damdir-directory' ),
 						$min_length
 					)
 				);
@@ -760,13 +760,13 @@ class ReviewManager {
 		if ( ! $is_logged_in && $this->requires_login() ) {
 			$errors->add(
 				'login_required',
-				__( 'You must be logged in to submit a review.', 'all-purpose-directory' )
+				__( 'You must be logged in to submit a review.', 'damdir-directory' )
 			);
 		}
 
 		// Validate rating.
 		if ( ! isset( $data['rating'] ) ) {
-			$errors->add( 'rating_required', __( 'Rating is required.', 'all-purpose-directory' ) );
+			$errors->add( 'rating_required', __( 'Rating is required.', 'damdir-directory' ) );
 		} else {
 			$rating = absint( $data['rating'] );
 			if ( $rating < self::MIN_RATING || $rating > self::MAX_RATING ) {
@@ -774,7 +774,7 @@ class ReviewManager {
 					'invalid_rating',
 					sprintf(
 						/* translators: 1: minimum rating, 2: maximum rating */
-						__( 'Rating must be between %1$d and %2$d.', 'all-purpose-directory' ),
+						__( 'Rating must be between %1$d and %2$d.', 'damdir-directory' ),
 						self::MIN_RATING,
 						self::MAX_RATING
 					)
@@ -784,7 +784,7 @@ class ReviewManager {
 
 		// Validate content.
 		if ( empty( $data['content'] ) ) {
-			$errors->add( 'content_required', __( 'Review content is required.', 'all-purpose-directory' ) );
+			$errors->add( 'content_required', __( 'Review content is required.', 'damdir-directory' ) );
 		} else {
 			$min_length = $this->get_min_content_length();
 			$content    = trim( $data['content'] );
@@ -794,7 +794,7 @@ class ReviewManager {
 					'content_too_short',
 					sprintf(
 						/* translators: %d: minimum content length */
-						__( 'Review content must be at least %d characters.', 'all-purpose-directory' ),
+						__( 'Review content must be at least %d characters.', 'damdir-directory' ),
 						$min_length
 					)
 				);
@@ -804,10 +804,10 @@ class ReviewManager {
 		// Validate guest fields if not logged in and guest reviews allowed.
 		if ( ! $is_logged_in && ! $this->requires_login() ) {
 			if ( empty( $data['author_name'] ) ) {
-				$errors->add( 'author_name_required', __( 'Your name is required.', 'all-purpose-directory' ) );
+				$errors->add( 'author_name_required', __( 'Your name is required.', 'damdir-directory' ) );
 			}
 			if ( empty( $data['author_email'] ) || ! is_email( $data['author_email'] ) ) {
-				$errors->add( 'author_email_required', __( 'A valid email address is required.', 'all-purpose-directory' ) );
+				$errors->add( 'author_email_required', __( 'A valid email address is required.', 'damdir-directory' ) );
 			}
 		}
 

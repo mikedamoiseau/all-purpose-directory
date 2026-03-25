@@ -179,10 +179,10 @@ final class SubmissionFormShortcode extends AbstractShortcode {
 
 		if ( 'logged_in' === $who_can_submit || 'specific_roles' === $who_can_submit ) {
 			if ( ! $is_logged_in ) {
-				return $this->require_login( __( 'Please log in to submit a listing.', 'all-purpose-directory' ) );
+				return $this->require_login( __( 'Please log in to submit a listing.', 'damdir-directory' ) );
 			}
 		} elseif ( 'anyone' === $who_can_submit && ! $guest_allowed && ! $is_logged_in ) {
-			return $this->require_login( __( 'Please log in to submit a listing.', 'all-purpose-directory' ) );
+			return $this->require_login( __( 'Please log in to submit a listing.', 'damdir-directory' ) );
 		}
 
 		// Check specific role restriction (admins always pass).
@@ -192,7 +192,7 @@ final class SubmissionFormShortcode extends AbstractShortcode {
 				$allowed_roles = (array) \apd_get_option( 'submission_roles', [] );
 				if ( empty( array_intersect( (array) $user->roles, $allowed_roles ) ) ) {
 					return '<div class="apd-notice apd-notice--error"><p>' .
-						esc_html__( 'Your user role does not have permission to submit listings.', 'all-purpose-directory' ) .
+						esc_html__( 'Your user role does not have permission to submit listings.', 'damdir-directory' ) .
 						'</p></div>';
 				}
 			}
@@ -318,16 +318,16 @@ final class SubmissionFormShortcode extends AbstractShortcode {
 		$post = get_post( $listing_id );
 		if ( ! $post || $post->post_type !== 'apd_listing' ) {
 			return $this->render_edit_not_allowed(
-				__( 'Listing Not Found', 'all-purpose-directory' ),
-				__( 'The listing you are trying to edit does not exist or has been removed.', 'all-purpose-directory' )
+				__( 'Listing Not Found', 'damdir-directory' ),
+				__( 'The listing you are trying to edit does not exist or has been removed.', 'damdir-directory' )
 			);
 		}
 
 		// Check edit permission using helper function.
 		if ( ! \apd_user_can_edit_listing( $listing_id ) ) {
 			return $this->render_edit_not_allowed(
-				__( 'Permission Denied', 'all-purpose-directory' ),
-				__( 'You do not have permission to edit this listing. You can only edit listings that you have created.', 'all-purpose-directory' )
+				__( 'Permission Denied', 'damdir-directory' ),
+				__( 'You do not have permission to edit this listing. You can only edit listings that you have created.', 'damdir-directory' )
 			);
 		}
 

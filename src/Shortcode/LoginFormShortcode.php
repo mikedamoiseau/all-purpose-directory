@@ -255,7 +255,7 @@ final class LoginFormShortcode extends AbstractShortcode {
 			$links[] = sprintf(
 				'<a href="%s" class="apd-login-link apd-login-link--lost-password">%s</a>',
 				esc_url( wp_lostpassword_url( get_permalink() ) ),
-				esc_html__( 'Lost your password?', 'all-purpose-directory' )
+				esc_html__( 'Lost your password?', 'damdir-directory' )
 			);
 		}
 
@@ -264,7 +264,7 @@ final class LoginFormShortcode extends AbstractShortcode {
 			$links[] = sprintf(
 				'<a href="%s" class="apd-login-link apd-login-link--register">%s</a>',
 				esc_url( wp_registration_url() ),
-				esc_html__( 'Register', 'all-purpose-directory' )
+				esc_html__( 'Register', 'damdir-directory' )
 			);
 		}
 
@@ -292,7 +292,7 @@ final class LoginFormShortcode extends AbstractShortcode {
 		} else {
 			$message = sprintf(
 				/* translators: %s: User display name */
-				__( 'You are logged in as %s.', 'all-purpose-directory' ),
+				__( 'You are logged in as %s.', 'damdir-directory' ),
 				$user->display_name
 			);
 		}
@@ -306,7 +306,7 @@ final class LoginFormShortcode extends AbstractShortcode {
 			</div>',
 			esc_html( $message ),
 			esc_url( $logout_url ),
-			esc_html__( 'Log Out', 'all-purpose-directory' )
+			esc_html__( 'Log Out', 'damdir-directory' )
 		);
 	}
 }

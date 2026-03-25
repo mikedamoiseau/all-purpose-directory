@@ -1,6 +1,6 @@
 <?php
 /**
- * Capability constants for All Purpose Directory.
+ * Capability constants for DamDir Directory.
  *
  * @package APD\Core
  */

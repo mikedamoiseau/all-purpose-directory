@@ -148,7 +148,7 @@ final class ReviewModeration {
 	 */
 	public function register_admin_page(): void {
 		$pending_count = $this->get_pending_count();
-		$menu_title    = __( 'Reviews', 'all-purpose-directory' );
+		$menu_title    = __( 'Reviews', 'damdir-directory' );
 
 		if ( $pending_count > 0 ) {
 			$menu_title .= sprintf(
@@ -161,7 +161,7 @@ final class ReviewModeration {
 						'%s review awaiting moderation',
 						'%s reviews awaiting moderation',
 						$pending_count,
-						'all-purpose-directory'
+						'damdir-directory'
 					),
 					number_format_i18n( $pending_count )
 				)
@@ -170,7 +170,7 @@ final class ReviewModeration {
 
 		add_submenu_page(
 			self::PARENT_MENU,
-			__( 'Reviews', 'all-purpose-directory' ),
+			__( 'Reviews', 'damdir-directory' ),
 			$menu_title,
 			self::CAPABILITY,
 			self::PAGE_SLUG,
@@ -246,7 +246,7 @@ final class ReviewModeration {
 	public function render_admin_page(): void {
 		// Check permissions.
 		if ( ! current_user_can( self::CAPABILITY ) ) {
-			wp_die( esc_html__( 'You do not have permission to access this page.', 'all-purpose-directory' ) );
+			wp_die( esc_html__( 'You do not have permission to access this page.', 'damdir-directory' ) );
 		}
 
 		// Get current filters.
@@ -320,7 +320,7 @@ final class ReviewModeration {
 					<span class="dashicons dashicons-star-half" aria-hidden="true"></span>
 				</div>
 				<div class="apd-page-header__content">
-					<h1><?php esc_html_e( 'Reviews', 'all-purpose-directory' ); ?></h1>
+					<h1><?php esc_html_e( 'Reviews', 'damdir-directory' ); ?></h1>
 				</div>
 			</div>
 			<hr class="wp-header-end">
@@ -337,10 +337,10 @@ final class ReviewModeration {
 
 				<p class="search-box">
 					<label class="screen-reader-text" for="review-search-input">
-						<?php esc_html_e( 'Search Reviews', 'all-purpose-directory' ); ?>
+						<?php esc_html_e( 'Search Reviews', 'damdir-directory' ); ?>
 					</label>
 					<input type="search" id="review-search-input" name="s" value="<?php echo esc_attr( $search ); ?>">
-					<input type="submit" id="search-submit" class="button" value="<?php esc_attr_e( 'Search Reviews', 'all-purpose-directory' ); ?>">
+					<input type="submit" id="search-submit" class="button" value="<?php esc_attr_e( 'Search Reviews', 'damdir-directory' ); ?>">
 				</p>
 			</form>
 
@@ -352,7 +352,7 @@ final class ReviewModeration {
 						<?php echo wp_kses( $this->render_status_filter( $current_status ), $this->get_allowed_filter_html() ); ?>
 						<?php echo wp_kses( $this->render_listing_filter( $current_listing ), $this->get_allowed_filter_html() ); ?>
 						<?php echo wp_kses( $this->render_rating_filter( $current_rating ), $this->get_allowed_filter_html() ); ?>
-						<input type="submit" class="button" value="<?php esc_attr_e( 'Filter', 'all-purpose-directory' ); ?>">
+						<input type="submit" class="button" value="<?php esc_attr_e( 'Filter', 'damdir-directory' ); ?>">
 					</div>
 					<br class="clear">
 				</div>
@@ -365,25 +365,25 @@ final class ReviewModeration {
 				<div class="tablenav top">
 					<div class="alignleft actions bulkactions">
 						<label for="bulk-action-selector-top" class="screen-reader-text">
-							<?php esc_html_e( 'Select bulk action', 'all-purpose-directory' ); ?>
+							<?php esc_html_e( 'Select bulk action', 'damdir-directory' ); ?>
 						</label>
 						<select name="bulk_action" id="bulk-action-selector-top">
-							<option value=""><?php esc_html_e( 'Bulk Actions', 'all-purpose-directory' ); ?></option>
+							<option value=""><?php esc_html_e( 'Bulk Actions', 'damdir-directory' ); ?></option>
 							<?php if ( $current_status !== 'approved' ) : ?>
-								<option value="approve"><?php esc_html_e( 'Approve', 'all-purpose-directory' ); ?></option>
+								<option value="approve"><?php esc_html_e( 'Approve', 'damdir-directory' ); ?></option>
 							<?php endif; ?>
 							<?php if ( $current_status !== 'spam' ) : ?>
-								<option value="spam"><?php esc_html_e( 'Mark as Spam', 'all-purpose-directory' ); ?></option>
+								<option value="spam"><?php esc_html_e( 'Mark as Spam', 'damdir-directory' ); ?></option>
 							<?php endif; ?>
 							<?php if ( $current_status !== 'trash' ) : ?>
-								<option value="trash"><?php esc_html_e( 'Move to Trash', 'all-purpose-directory' ); ?></option>
+								<option value="trash"><?php esc_html_e( 'Move to Trash', 'damdir-directory' ); ?></option>
 							<?php endif; ?>
 							<?php if ( $current_status === 'trash' ) : ?>
-								<option value="restore"><?php esc_html_e( 'Restore', 'all-purpose-directory' ); ?></option>
-								<option value="delete"><?php esc_html_e( 'Delete Permanently', 'all-purpose-directory' ); ?></option>
+								<option value="restore"><?php esc_html_e( 'Restore', 'damdir-directory' ); ?></option>
+								<option value="delete"><?php esc_html_e( 'Delete Permanently', 'damdir-directory' ); ?></option>
 							<?php endif; ?>
 						</select>
-						<input type="submit" id="doaction" class="button action" value="<?php esc_attr_e( 'Apply', 'all-purpose-directory' ); ?>">
+						<input type="submit" id="doaction" class="button action" value="<?php esc_attr_e( 'Apply', 'damdir-directory' ); ?>">
 					</div>
 
 					<?php echo wp_kses_post( $this->render_pagination( $paged, $total_pages, $total, 'top' ) ); ?>
@@ -396,22 +396,22 @@ final class ReviewModeration {
 							<td id="cb" class="manage-column column-cb check-column">
 								<input id="cb-select-all-1" type="checkbox">
 								<label for="cb-select-all-1">
-									<span class="screen-reader-text"><?php esc_html_e( 'Select All', 'all-purpose-directory' ); ?></span>
+									<span class="screen-reader-text"><?php esc_html_e( 'Select All', 'damdir-directory' ); ?></span>
 								</label>
 							</td>
-							<th scope="col" class="manage-column column-listing"><?php esc_html_e( 'Listing', 'all-purpose-directory' ); ?></th>
-							<th scope="col" class="manage-column column-author"><?php esc_html_e( 'Author', 'all-purpose-directory' ); ?></th>
-							<th scope="col" class="manage-column column-rating"><?php esc_html_e( 'Rating', 'all-purpose-directory' ); ?></th>
-							<th scope="col" class="manage-column column-review"><?php esc_html_e( 'Review', 'all-purpose-directory' ); ?></th>
-							<th scope="col" class="manage-column column-status"><?php esc_html_e( 'Status', 'all-purpose-directory' ); ?></th>
-							<th scope="col" class="manage-column column-date"><?php esc_html_e( 'Date', 'all-purpose-directory' ); ?></th>
+							<th scope="col" class="manage-column column-listing"><?php esc_html_e( 'Listing', 'damdir-directory' ); ?></th>
+							<th scope="col" class="manage-column column-author"><?php esc_html_e( 'Author', 'damdir-directory' ); ?></th>
+							<th scope="col" class="manage-column column-rating"><?php esc_html_e( 'Rating', 'damdir-directory' ); ?></th>
+							<th scope="col" class="manage-column column-review"><?php esc_html_e( 'Review', 'damdir-directory' ); ?></th>
+							<th scope="col" class="manage-column column-status"><?php esc_html_e( 'Status', 'damdir-directory' ); ?></th>
+							<th scope="col" class="manage-column column-date"><?php esc_html_e( 'Date', 'damdir-directory' ); ?></th>
 						</tr>
 					</thead>
 					<tbody id="the-list">
 						<?php if ( empty( $reviews ) ) : ?>
 							<tr class="no-items">
 								<td class="colspanchange" colspan="7">
-									<?php esc_html_e( 'No reviews found.', 'all-purpose-directory' ); ?>
+									<?php esc_html_e( 'No reviews found.', 'damdir-directory' ); ?>
 								</td>
 							</tr>
 						<?php else : ?>
@@ -428,15 +428,15 @@ final class ReviewModeration {
 							<td class="manage-column column-cb check-column">
 								<input id="cb-select-all-2" type="checkbox">
 								<label for="cb-select-all-2">
-									<span class="screen-reader-text"><?php esc_html_e( 'Select All', 'all-purpose-directory' ); ?></span>
+									<span class="screen-reader-text"><?php esc_html_e( 'Select All', 'damdir-directory' ); ?></span>
 								</label>
 							</td>
-							<th scope="col" class="manage-column column-listing"><?php esc_html_e( 'Listing', 'all-purpose-directory' ); ?></th>
-							<th scope="col" class="manage-column column-author"><?php esc_html_e( 'Author', 'all-purpose-directory' ); ?></th>
-							<th scope="col" class="manage-column column-rating"><?php esc_html_e( 'Rating', 'all-purpose-directory' ); ?></th>
-							<th scope="col" class="manage-column column-review"><?php esc_html_e( 'Review', 'all-purpose-directory' ); ?></th>
-							<th scope="col" class="manage-column column-status"><?php esc_html_e( 'Status', 'all-purpose-directory' ); ?></th>
-							<th scope="col" class="manage-column column-date"><?php esc_html_e( 'Date', 'all-purpose-directory' ); ?></th>
+							<th scope="col" class="manage-column column-listing"><?php esc_html_e( 'Listing', 'damdir-directory' ); ?></th>
+							<th scope="col" class="manage-column column-author"><?php esc_html_e( 'Author', 'damdir-directory' ); ?></th>
+							<th scope="col" class="manage-column column-rating"><?php esc_html_e( 'Rating', 'damdir-directory' ); ?></th>
+							<th scope="col" class="manage-column column-review"><?php esc_html_e( 'Review', 'damdir-directory' ); ?></th>
+							<th scope="col" class="manage-column column-status"><?php esc_html_e( 'Status', 'damdir-directory' ); ?></th>
+							<th scope="col" class="manage-column column-date"><?php esc_html_e( 'Date', 'damdir-directory' ); ?></th>
 						</tr>
 					</tfoot>
 				</table>
@@ -444,25 +444,25 @@ final class ReviewModeration {
 				<div class="tablenav bottom">
 					<div class="alignleft actions bulkactions">
 						<label for="bulk-action-selector-bottom" class="screen-reader-text">
-							<?php esc_html_e( 'Select bulk action', 'all-purpose-directory' ); ?>
+							<?php esc_html_e( 'Select bulk action', 'damdir-directory' ); ?>
 						</label>
 						<select name="bulk_action2" id="bulk-action-selector-bottom">
-							<option value=""><?php esc_html_e( 'Bulk Actions', 'all-purpose-directory' ); ?></option>
+							<option value=""><?php esc_html_e( 'Bulk Actions', 'damdir-directory' ); ?></option>
 							<?php if ( $current_status !== 'approved' ) : ?>
-								<option value="approve"><?php esc_html_e( 'Approve', 'all-purpose-directory' ); ?></option>
+								<option value="approve"><?php esc_html_e( 'Approve', 'damdir-directory' ); ?></option>
 							<?php endif; ?>
 							<?php if ( $current_status !== 'spam' ) : ?>
-								<option value="spam"><?php esc_html_e( 'Mark as Spam', 'all-purpose-directory' ); ?></option>
+								<option value="spam"><?php esc_html_e( 'Mark as Spam', 'damdir-directory' ); ?></option>
 							<?php endif; ?>
 							<?php if ( $current_status !== 'trash' ) : ?>
-								<option value="trash"><?php esc_html_e( 'Move to Trash', 'all-purpose-directory' ); ?></option>
+								<option value="trash"><?php esc_html_e( 'Move to Trash', 'damdir-directory' ); ?></option>
 							<?php endif; ?>
 							<?php if ( $current_status === 'trash' ) : ?>
-								<option value="restore"><?php esc_html_e( 'Restore', 'all-purpose-directory' ); ?></option>
-								<option value="delete"><?php esc_html_e( 'Delete Permanently', 'all-purpose-directory' ); ?></option>
+								<option value="restore"><?php esc_html_e( 'Restore', 'damdir-directory' ); ?></option>
+								<option value="delete"><?php esc_html_e( 'Delete Permanently', 'damdir-directory' ); ?></option>
 							<?php endif; ?>
 						</select>
-						<input type="submit" id="doaction2" class="button action" value="<?php esc_attr_e( 'Apply', 'all-purpose-directory' ); ?>">
+						<input type="submit" id="doaction2" class="button action" value="<?php esc_attr_e( 'Apply', 'damdir-directory' ); ?>">
 					</div>
 
 					<?php echo wp_kses_post( $this->render_pagination( $paged, $total_pages, $total, 'bottom' ) ); ?>
@@ -486,11 +486,11 @@ final class ReviewModeration {
 	 */
 	private function render_status_tabs( array $counts, string $current_status, string $base_url ): string {
 		$statuses = [
-			'all'      => __( 'All', 'all-purpose-directory' ),
-			'pending'  => __( 'Pending', 'all-purpose-directory' ),
-			'approved' => __( 'Approved', 'all-purpose-directory' ),
-			'spam'     => __( 'Spam', 'all-purpose-directory' ),
-			'trash'    => __( 'Trash', 'all-purpose-directory' ),
+			'all'      => __( 'All', 'damdir-directory' ),
+			'pending'  => __( 'Pending', 'damdir-directory' ),
+			'approved' => __( 'Approved', 'damdir-directory' ),
+			'spam'     => __( 'Spam', 'damdir-directory' ),
+			'trash'    => __( 'Trash', 'damdir-directory' ),
 		];
 
 		$output = '';
@@ -530,7 +530,7 @@ final class ReviewModeration {
 	 */
 	private function render_review_row( array $review, string $current_status ): string {
 		$listing       = get_post( $review['listing_id'] );
-		$listing_title = $listing ? $listing->post_title : __( '(Deleted)', 'all-purpose-directory' );
+		$listing_title = $listing ? $listing->post_title : __( '(Deleted)', 'damdir-directory' );
 		$listing_url   = $listing ? get_edit_post_link( $listing->ID ) : '';
 
 		$row_class = 'review-' . $review['id'];
@@ -544,23 +544,23 @@ final class ReviewModeration {
 			<th scope="row" class="check-column">
 				<input type="checkbox" name="review_ids[]" value="<?php echo esc_attr( $review['id'] ); ?>">
 			</th>
-			<td class="column-listing" data-colname="<?php esc_attr_e( 'Listing', 'all-purpose-directory' ); ?>">
+			<td class="column-listing" data-colname="<?php esc_attr_e( 'Listing', 'damdir-directory' ); ?>">
 				<?php if ( $listing_url ) : ?>
 					<a href="<?php echo esc_url( $listing_url ); ?>"><?php echo esc_html( $listing_title ); ?></a>
 				<?php else : ?>
 					<?php echo esc_html( $listing_title ); ?>
 				<?php endif; ?>
 			</td>
-			<td class="column-author" data-colname="<?php esc_attr_e( 'Author', 'all-purpose-directory' ); ?>">
+			<td class="column-author" data-colname="<?php esc_attr_e( 'Author', 'damdir-directory' ); ?>">
 				<strong><?php echo esc_html( $review['author_name'] ); ?></strong>
 				<?php if ( ! empty( $review['author_email'] ) ) : ?>
 					<br><a href="mailto:<?php echo esc_attr( $review['author_email'] ); ?>"><?php echo esc_html( $review['author_email'] ); ?></a>
 				<?php endif; ?>
 			</td>
-			<td class="column-rating" data-colname="<?php esc_attr_e( 'Rating', 'all-purpose-directory' ); ?>">
+			<td class="column-rating" data-colname="<?php esc_attr_e( 'Rating', 'damdir-directory' ); ?>">
 				<?php echo wp_kses_post( $this->render_stars( $review['rating'] ) ); ?>
 			</td>
-			<td class="column-review" data-colname="<?php esc_attr_e( 'Review', 'all-purpose-directory' ); ?>">
+			<td class="column-review" data-colname="<?php esc_attr_e( 'Review', 'damdir-directory' ); ?>">
 				<?php if ( ! empty( $review['title'] ) ) : ?>
 					<strong><?php echo esc_html( $review['title'] ); ?></strong><br>
 				<?php endif; ?>
@@ -569,10 +569,10 @@ final class ReviewModeration {
 					<?php echo wp_kses_post( $this->render_row_actions( $review, $current_status ) ); ?>
 				</div>
 			</td>
-			<td class="column-status" data-colname="<?php esc_attr_e( 'Status', 'all-purpose-directory' ); ?>">
+			<td class="column-status" data-colname="<?php esc_attr_e( 'Status', 'damdir-directory' ); ?>">
 				<?php echo wp_kses_post( $this->render_status_badge( $review['status'] ) ); ?>
 			</td>
-			<td class="column-date" data-colname="<?php esc_attr_e( 'Date', 'all-purpose-directory' ); ?>">
+			<td class="column-date" data-colname="<?php esc_attr_e( 'Date', 'damdir-directory' ); ?>">
 				<?php echo esc_html( $review['date_formatted'] ); ?>
 			</td>
 		</tr>
@@ -591,7 +591,7 @@ final class ReviewModeration {
 	private function render_stars( int $rating ): string {
 		$output = '<span class="apd-stars" aria-label="' . sprintf(
 			/* translators: %d: Rating number */
-			esc_attr__( '%d out of 5 stars', 'all-purpose-directory' ),
+			esc_attr__( '%d out of 5 stars', 'damdir-directory' ),
 			$rating
 		) . '">';
 
@@ -615,10 +615,10 @@ final class ReviewModeration {
 	 */
 	private function render_status_badge( string $status ): string {
 		$labels = [
-			'approved' => __( 'Approved', 'all-purpose-directory' ),
-			'pending'  => __( 'Pending', 'all-purpose-directory' ),
-			'spam'     => __( 'Spam', 'all-purpose-directory' ),
-			'trash'    => __( 'Trash', 'all-purpose-directory' ),
+			'approved' => __( 'Approved', 'damdir-directory' ),
+			'pending'  => __( 'Pending', 'damdir-directory' ),
+			'spam'     => __( 'Spam', 'damdir-directory' ),
+			'trash'    => __( 'Trash', 'damdir-directory' ),
 		];
 
 		$label = $labels[ $status ] ?? ucfirst( $status );
@@ -660,8 +660,8 @@ final class ReviewModeration {
 				'<a href="%s" class="apd-action-approve" aria-label="%s">%s</a>',
 				esc_url( $approve_url ),
 				/* translators: %s: Review ID */
-				esc_attr( sprintf( __( 'Approve review %s', 'all-purpose-directory' ), $review['id'] ) ),
-				esc_html__( 'Approve', 'all-purpose-directory' )
+				esc_attr( sprintf( __( 'Approve review %s', 'damdir-directory' ), $review['id'] ) ),
+				esc_html__( 'Approve', 'damdir-directory' )
 			);
 		}
 
@@ -682,8 +682,8 @@ final class ReviewModeration {
 				'<a href="%s" class="apd-action-unapprove" aria-label="%s">%s</a>',
 				esc_url( $unapprove_url ),
 				/* translators: %s: Review ID */
-				esc_attr( sprintf( __( 'Unapprove review %s', 'all-purpose-directory' ), $review['id'] ) ),
-				esc_html__( 'Unapprove', 'all-purpose-directory' )
+				esc_attr( sprintf( __( 'Unapprove review %s', 'damdir-directory' ), $review['id'] ) ),
+				esc_html__( 'Unapprove', 'damdir-directory' )
 			);
 		}
 
@@ -704,8 +704,8 @@ final class ReviewModeration {
 				'<a href="%s" class="apd-action-spam" aria-label="%s">%s</a>',
 				esc_url( $spam_url ),
 				/* translators: %s: Review ID */
-				esc_attr( sprintf( __( 'Mark review %s as spam', 'all-purpose-directory' ), $review['id'] ) ),
-				esc_html__( 'Spam', 'all-purpose-directory' )
+				esc_attr( sprintf( __( 'Mark review %s as spam', 'damdir-directory' ), $review['id'] ) ),
+				esc_html__( 'Spam', 'damdir-directory' )
 			);
 		}
 
@@ -726,8 +726,8 @@ final class ReviewModeration {
 				'<a href="%s" class="apd-action-trash" aria-label="%s">%s</a>',
 				esc_url( $trash_url ),
 				/* translators: %s: Review ID */
-				esc_attr( sprintf( __( 'Move review %s to trash', 'all-purpose-directory' ), $review['id'] ) ),
-				esc_html__( 'Trash', 'all-purpose-directory' )
+				esc_attr( sprintf( __( 'Move review %s to trash', 'damdir-directory' ), $review['id'] ) ),
+				esc_html__( 'Trash', 'damdir-directory' )
 			);
 		}
 
@@ -748,8 +748,8 @@ final class ReviewModeration {
 				'<a href="%s" class="apd-action-restore" aria-label="%s">%s</a>',
 				esc_url( $restore_url ),
 				/* translators: %s: Review ID */
-				esc_attr( sprintf( __( 'Restore review %s', 'all-purpose-directory' ), $review['id'] ) ),
-				esc_html__( 'Restore', 'all-purpose-directory' )
+				esc_attr( sprintf( __( 'Restore review %s', 'damdir-directory' ), $review['id'] ) ),
+				esc_html__( 'Restore', 'damdir-directory' )
 			);
 
 			// Permanent delete.
@@ -768,8 +768,8 @@ final class ReviewModeration {
 				'<a href="%s" class="apd-action-delete submitdelete" aria-label="%s">%s</a>',
 				esc_url( $delete_url ),
 				/* translators: %s: Review ID */
-				esc_attr( sprintf( __( 'Delete review %s permanently', 'all-purpose-directory' ), $review['id'] ) ),
-				esc_html__( 'Delete Permanently', 'all-purpose-directory' )
+				esc_attr( sprintf( __( 'Delete review %s permanently', 'damdir-directory' ), $review['id'] ) ),
+				esc_html__( 'Delete Permanently', 'damdir-directory' )
 			);
 		}
 
@@ -781,8 +781,8 @@ final class ReviewModeration {
 				$actions['view'] = sprintf(
 					'<a href="%s" target="_blank" rel="noopener noreferrer" aria-label="%s">%s</a>',
 					esc_url( $view_url ),
-					esc_attr__( 'View listing in new tab', 'all-purpose-directory' ),
-					esc_html__( 'View Listing', 'all-purpose-directory' )
+					esc_attr__( 'View listing in new tab', 'damdir-directory' ),
+					esc_html__( 'View Listing', 'damdir-directory' )
 				);
 			}
 		}
@@ -800,15 +800,15 @@ final class ReviewModeration {
 	 */
 	private function render_status_filter( string $current_status ): string {
 		$statuses = [
-			'all'      => __( 'All Statuses', 'all-purpose-directory' ),
-			'pending'  => __( 'Pending', 'all-purpose-directory' ),
-			'approved' => __( 'Approved', 'all-purpose-directory' ),
-			'spam'     => __( 'Spam', 'all-purpose-directory' ),
-			'trash'    => __( 'Trash', 'all-purpose-directory' ),
+			'all'      => __( 'All Statuses', 'damdir-directory' ),
+			'pending'  => __( 'Pending', 'damdir-directory' ),
+			'approved' => __( 'Approved', 'damdir-directory' ),
+			'spam'     => __( 'Spam', 'damdir-directory' ),
+			'trash'    => __( 'Trash', 'damdir-directory' ),
 		];
 
 		$output  = '<label for="filter-by-status" class="screen-reader-text">' .
-			esc_html__( 'Filter by status', 'all-purpose-directory' ) . '</label>';
+			esc_html__( 'Filter by status', 'damdir-directory' ) . '</label>';
 		$output .= '<select name="status" id="filter-by-status">';
 
 		foreach ( $statuses as $value => $label ) {
@@ -850,9 +850,9 @@ final class ReviewModeration {
 		}
 
 		$output  = '<label for="filter-by-listing" class="screen-reader-text">' .
-			esc_html__( 'Filter by listing', 'all-purpose-directory' ) . '</label>';
+			esc_html__( 'Filter by listing', 'damdir-directory' ) . '</label>';
 		$output .= '<select name="listing_id" id="filter-by-listing">';
-		$output .= '<option value="">' . esc_html__( 'All Listings', 'all-purpose-directory' ) . '</option>';
+		$output .= '<option value="">' . esc_html__( 'All Listings', 'damdir-directory' ) . '</option>';
 
 		foreach ( $listings as $listing ) {
 			$output .= sprintf(
@@ -878,14 +878,14 @@ final class ReviewModeration {
 	 */
 	private function render_rating_filter( int $current_rating ): string {
 		$output  = '<label for="filter-by-rating" class="screen-reader-text">' .
-			esc_html__( 'Filter by rating', 'all-purpose-directory' ) . '</label>';
+			esc_html__( 'Filter by rating', 'damdir-directory' ) . '</label>';
 		$output .= '<select name="rating" id="filter-by-rating">';
-		$output .= '<option value="">' . esc_html__( 'All Ratings', 'all-purpose-directory' ) . '</option>';
+		$output .= '<option value="">' . esc_html__( 'All Ratings', 'damdir-directory' ) . '</option>';
 
 		for ( $i = 5; $i >= 1; $i-- ) {
 			$label = sprintf(
 				/* translators: %d: Star rating number */
-				_n( '%d Star', '%d Stars', $i, 'all-purpose-directory' ),
+				_n( '%d Star', '%d Stars', $i, 'damdir-directory' ),
 				$i
 			);
 			$output .= sprintf(
@@ -917,7 +917,7 @@ final class ReviewModeration {
 			return '<div class="tablenav-pages one-page"><span class="displaying-num">' .
 				sprintf(
 					/* translators: %s: Number of items */
-					_n( '%s item', '%s items', $total_items, 'all-purpose-directory' ),
+					_n( '%s item', '%s items', $total_items, 'damdir-directory' ),
 					number_format_i18n( $total_items )
 				) . '</span></div>';
 		}
@@ -925,7 +925,7 @@ final class ReviewModeration {
 		$output  = '<div class="tablenav-pages">';
 		$output .= '<span class="displaying-num">' . sprintf(
 			/* translators: %s: Number of items */
-			_n( '%s item', '%s items', $total_items, 'all-purpose-directory' ),
+			_n( '%s item', '%s items', $total_items, 'damdir-directory' ),
 			number_format_i18n( $total_items )
 		) . '</span>';
 
@@ -936,13 +936,13 @@ final class ReviewModeration {
 			$output .= sprintf(
 				'<a class="first-page button" href="%s"><span class="screen-reader-text">%s</span><span aria-hidden="true">%s</span></a>',
 				esc_url( remove_query_arg( 'paged' ) ),
-				esc_html__( 'First page', 'all-purpose-directory' ),
+				esc_html__( 'First page', 'damdir-directory' ),
 				'&laquo;'
 			);
 			$output .= sprintf(
 				'<a class="prev-page button" href="%s"><span class="screen-reader-text">%s</span><span aria-hidden="true">%s</span></a>',
 				esc_url( add_query_arg( 'paged', $current_page - 1 ) ),
-				esc_html__( 'Previous page', 'all-purpose-directory' ),
+				esc_html__( 'Previous page', 'damdir-directory' ),
 				'&lsaquo;'
 			);
 		} else {
@@ -952,11 +952,11 @@ final class ReviewModeration {
 
 		$output .= '<span class="paging-input">';
 		$output .= '<label for="current-page-selector-' . $position . '" class="screen-reader-text">' .
-			esc_html__( 'Current Page', 'all-purpose-directory' ) . '</label>';
+			esc_html__( 'Current Page', 'damdir-directory' ) . '</label>';
 		$output .= '<span class="tablenav-paging-text">' .
 			sprintf(
 				/* translators: 1: Current page, 2: Total pages */
-				__( '%1$s of %2$s', 'all-purpose-directory' ),
+				__( '%1$s of %2$s', 'damdir-directory' ),
 				'<span class="current-page">' . number_format_i18n( $current_page ) . '</span>',
 				'<span class="total-pages">' . number_format_i18n( $total_pages ) . '</span>'
 			) . '</span>';
@@ -967,13 +967,13 @@ final class ReviewModeration {
 			$output .= sprintf(
 				'<a class="next-page button" href="%s"><span class="screen-reader-text">%s</span><span aria-hidden="true">%s</span></a>',
 				esc_url( add_query_arg( 'paged', $current_page + 1 ) ),
-				esc_html__( 'Next page', 'all-purpose-directory' ),
+				esc_html__( 'Next page', 'damdir-directory' ),
 				'&rsaquo;'
 			);
 			$output .= sprintf(
 				'<a class="last-page button" href="%s"><span class="screen-reader-text">%s</span><span aria-hidden="true">%s</span></a>',
 				esc_url( add_query_arg( 'paged', $total_pages ) ),
-				esc_html__( 'Last page', 'all-purpose-directory' ),
+				esc_html__( 'Last page', 'damdir-directory' ),
 				'&raquo;'
 			);
 		} else {
@@ -1002,32 +1002,32 @@ final class ReviewModeration {
 		$messages = [
 			'approved'   => sprintf(
 				/* translators: %d: Number of reviews */
-				_n( '%d review approved.', '%d reviews approved.', $count, 'all-purpose-directory' ),
+				_n( '%d review approved.', '%d reviews approved.', $count, 'damdir-directory' ),
 				$count
 			),
 			'unapproved' => sprintf(
 				/* translators: %d: Number of reviews */
-				_n( '%d review unapproved.', '%d reviews unapproved.', $count, 'all-purpose-directory' ),
+				_n( '%d review unapproved.', '%d reviews unapproved.', $count, 'damdir-directory' ),
 				$count
 			),
 			'spammed'    => sprintf(
 				/* translators: %d: Number of reviews */
-				_n( '%d review marked as spam.', '%d reviews marked as spam.', $count, 'all-purpose-directory' ),
+				_n( '%d review marked as spam.', '%d reviews marked as spam.', $count, 'damdir-directory' ),
 				$count
 			),
 			'trashed'    => sprintf(
 				/* translators: %d: Number of reviews */
-				_n( '%d review moved to trash.', '%d reviews moved to trash.', $count, 'all-purpose-directory' ),
+				_n( '%d review moved to trash.', '%d reviews moved to trash.', $count, 'damdir-directory' ),
 				$count
 			),
 			'restored'   => sprintf(
 				/* translators: %d: Number of reviews */
-				_n( '%d review restored.', '%d reviews restored.', $count, 'all-purpose-directory' ),
+				_n( '%d review restored.', '%d reviews restored.', $count, 'damdir-directory' ),
 				$count
 			),
 			'deleted'    => sprintf(
 				/* translators: %d: Number of reviews */
-				_n( '%d review permanently deleted.', '%d reviews permanently deleted.', $count, 'all-purpose-directory' ),
+				_n( '%d review permanently deleted.', '%d reviews permanently deleted.', $count, 'damdir-directory' ),
 				$count
 			),
 		];
@@ -1083,12 +1083,12 @@ final class ReviewModeration {
 
 		// Verify nonce.
 		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ?? '' ) ), 'apd_review_action_' . $review_id ) ) {
-			wp_die( esc_html__( 'Security check failed.', 'all-purpose-directory' ) );
+			wp_die( esc_html__( 'Security check failed.', 'damdir-directory' ) );
 		}
 
 		// Check permissions.
 		if ( ! current_user_can( self::CAPABILITY ) ) {
-			wp_die( esc_html__( 'You do not have permission to perform this action.', 'all-purpose-directory' ) );
+			wp_die( esc_html__( 'You do not have permission to perform this action.', 'damdir-directory' ) );
 		}
 
 		$success = $this->process_action( $action, $review_id );
@@ -1119,12 +1119,12 @@ final class ReviewModeration {
 	private function handle_bulk_action(): void {
 		// Verify nonce.
 		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST[ self::NONCE_NAME ] ?? '' ) ), self::NONCE_ACTION ) ) {
-			wp_die( esc_html__( 'Security check failed.', 'all-purpose-directory' ) );
+			wp_die( esc_html__( 'Security check failed.', 'damdir-directory' ) );
 		}
 
 		// Check permissions.
 		if ( ! current_user_can( self::CAPABILITY ) ) {
-			wp_die( esc_html__( 'You do not have permission to perform this action.', 'all-purpose-directory' ) );
+			wp_die( esc_html__( 'You do not have permission to perform this action.', 'damdir-directory' ) );
 		}
 
 		// Get action from either selector.

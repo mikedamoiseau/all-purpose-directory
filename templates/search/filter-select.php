@@ -5,7 +5,7 @@
  * Template for rendering dropdown/select filter controls.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/search/filter-select.php
+ * yourtheme/damdir-directory/search/filter-select.php
  *
  * @package APD\Templates
  * @since   1.0.0

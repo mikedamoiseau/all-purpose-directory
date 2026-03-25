@@ -5,7 +5,7 @@
  * Main template for the Favorites dashboard tab.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/dashboard/favorites.php
+ * yourtheme/damdir-directory/dashboard/favorites.php
  *
  * @package APD\Templates
  * @since   1.0.0
@@ -42,23 +42,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<div class="apd-favorites__header">
 		<div class="apd-favorites__title-row">
 			<h2 class="apd-favorites__title">
-				<?php esc_html_e( 'Your Favorites', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Your Favorites', 'damdir-directory' ); ?>
 				<?php if ( $total > 0 ) : ?>
 					<span class="apd-favorites__count">(<?php echo esc_html( number_format_i18n( $total ) ); ?>)</span>
 				<?php endif; ?>
 			</h2>
 
 			<?php if ( $total > 0 && $config['show_view_toggle'] ) : ?>
-				<div class="apd-favorites__view-toggle" role="group" aria-label="<?php esc_attr_e( 'View mode', 'all-purpose-directory' ); ?>">
+				<div class="apd-favorites__view-toggle" role="group" aria-label="<?php esc_attr_e( 'View mode', 'damdir-directory' ); ?>">
 					<a href="<?php echo esc_url( $favorites_page->get_view_mode_url( 'grid' ) ); ?>"
 						class="apd-view-toggle__button <?php echo $view_mode === 'grid' ? 'apd-view-toggle__button--active' : ''; ?>"
-						aria-label="<?php esc_attr_e( 'Grid view', 'all-purpose-directory' ); ?>"
+						aria-label="<?php esc_attr_e( 'Grid view', 'damdir-directory' ); ?>"
 						<?php echo $view_mode === 'grid' ? 'aria-current="true"' : ''; ?>>
 						<span class="dashicons dashicons-grid-view" aria-hidden="true"></span>
 					</a>
 					<a href="<?php echo esc_url( $favorites_page->get_view_mode_url( 'list' ) ); ?>"
 						class="apd-view-toggle__button <?php echo $view_mode === 'list' ? 'apd-view-toggle__button--active' : ''; ?>"
-						aria-label="<?php esc_attr_e( 'List view', 'all-purpose-directory' ); ?>"
+						aria-label="<?php esc_attr_e( 'List view', 'damdir-directory' ); ?>"
 						<?php echo $view_mode === 'list' ? 'aria-current="true"' : ''; ?>>
 						<span class="dashicons dashicons-list-view" aria-hidden="true"></span>
 					</a>
@@ -91,7 +91,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 
 		<?php if ( $max_pages > 1 ) : ?>
-			<nav class="apd-favorites__pagination" aria-label="<?php esc_attr_e( 'Favorites pagination', 'all-purpose-directory' ); ?>">
+			<nav class="apd-favorites__pagination" aria-label="<?php esc_attr_e( 'Favorites pagination', 'damdir-directory' ); ?>">
 				<?php
 				$pagination = paginate_links(
 					[
@@ -101,11 +101,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 						'total'     => $max_pages,
 						'prev_text' => sprintf(
 							'<span class="screen-reader-text">%s</span><span aria-hidden="true">&laquo;</span>',
-							esc_html__( 'Previous page', 'all-purpose-directory' )
+							esc_html__( 'Previous page', 'damdir-directory' )
 						),
 						'next_text' => sprintf(
 							'<span class="screen-reader-text">%s</span><span aria-hidden="true">&raquo;</span>',
-							esc_html__( 'Next page', 'all-purpose-directory' )
+							esc_html__( 'Next page', 'damdir-directory' )
 						),
 					]
 				);

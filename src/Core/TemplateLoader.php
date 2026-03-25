@@ -262,13 +262,13 @@ final class TemplateLoader {
 
 				if ( empty( $title ) ) {
 					$post_type = get_post_type_object( 'apd_listing' );
-					$title     = $post_type->labels->name ?? __( 'Listings', 'all-purpose-directory' );
+					$title     = $post_type->labels->name ?? __( 'Listings', 'damdir-directory' );
 				}
 			}
 		} elseif ( is_tax( 'apd_category' ) || is_tax( 'apd_tag' ) ) {
 			$title = single_term_title( '', false );
 		} else {
-			$title = __( 'Listings', 'all-purpose-directory' );
+			$title = __( 'Listings', 'damdir-directory' );
 		}
 
 		/**
@@ -320,7 +320,7 @@ final class TemplateLoader {
 		$grid_url     = $this->get_view_url( 'grid' );
 		$list_url     = $this->get_view_url( 'list' );
 
-		$output = '<div class="apd-view-switcher" role="group" aria-label="' . esc_attr__( 'View mode', 'all-purpose-directory' ) . '">';
+		$output = '<div class="apd-view-switcher" role="group" aria-label="' . esc_attr__( 'View mode', 'damdir-directory' ) . '">';
 
 		// Grid button.
 		$grid_class = 'apd-view-switcher__btn apd-view-switcher__btn--grid';
@@ -332,7 +332,7 @@ final class TemplateLoader {
 			esc_url( $grid_url ),
 			esc_attr( $grid_class ),
 			$current_view === 'grid' ? 'aria-current="true"' : '',
-			esc_attr__( 'Grid view', 'all-purpose-directory' )
+			esc_attr__( 'Grid view', 'damdir-directory' )
 		);
 
 		// List button.
@@ -345,7 +345,7 @@ final class TemplateLoader {
 			esc_url( $list_url ),
 			esc_attr( $list_class ),
 			$current_view === 'list' ? 'aria-current="true"' : '',
-			esc_attr__( 'List view', 'all-purpose-directory' )
+			esc_attr__( 'List view', 'damdir-directory' )
 		);
 
 		$output .= '</div>';
@@ -379,15 +379,15 @@ final class TemplateLoader {
 		$end   = min( $paged * $per_page, $total );
 
 		if ( $total === 0 ) {
-			$text = __( 'No listings found', 'all-purpose-directory' );
+			$text = __( 'No listings found', 'damdir-directory' );
 		} elseif ( $total === 1 ) {
-			$text = __( 'Showing 1 listing', 'all-purpose-directory' );
+			$text = __( 'Showing 1 listing', 'damdir-directory' );
 		} elseif ( $end === $total ) {
 			/* translators: %d: total number of listings */
-			$text = sprintf( __( 'Showing all %d listings', 'all-purpose-directory' ), $total );
+			$text = sprintf( __( 'Showing all %d listings', 'damdir-directory' ), $total );
 		} else {
 			/* translators: 1: start, 2: end, 3: total */
-			$text = sprintf( __( 'Showing %1$d-%2$d of %3$d listings', 'all-purpose-directory' ), $start, $end, $total );
+			$text = sprintf( __( 'Showing %1$d-%2$d of %3$d listings', 'damdir-directory' ), $start, $end, $total );
 		}
 
 		return sprintf(
@@ -427,16 +427,16 @@ final class TemplateLoader {
 			'prev_next'          => true,
 			'prev_text'          => sprintf(
 				'<span class="screen-reader-text">%s</span><span aria-hidden="true">&laquo;</span>',
-				__( 'Previous page', 'all-purpose-directory' )
+				__( 'Previous page', 'damdir-directory' )
 			),
 			'next_text'          => sprintf(
 				'<span class="screen-reader-text">%s</span><span aria-hidden="true">&raquo;</span>',
-				__( 'Next page', 'all-purpose-directory' )
+				__( 'Next page', 'damdir-directory' )
 			),
 			'type'               => 'plain',
 			'add_args'           => false,
 			'add_fragment'       => '',
-			'before_page_number' => '<span class="screen-reader-text">' . __( 'Page', 'all-purpose-directory' ) . ' </span>',
+			'before_page_number' => '<span class="screen-reader-text">' . __( 'Page', 'damdir-directory' ) . ' </span>',
 		];
 
 		// In AJAX context, paginate_links() uses the current request URI as the base,
@@ -462,7 +462,7 @@ final class TemplateLoader {
 			return '';
 		}
 
-		$output  = '<nav class="apd-pagination" role="navigation" aria-label="' . esc_attr__( 'Listings pagination', 'all-purpose-directory' ) . '">';
+		$output  = '<nav class="apd-pagination" role="navigation" aria-label="' . esc_attr__( 'Listings pagination', 'damdir-directory' ) . '">';
 		$output .= '<div class="apd-pagination__links">' . $links . '</div>';
 		$output .= '</nav>';
 
@@ -715,7 +715,7 @@ final class TemplateLoader {
 		if ( ! empty( $custom_fields_html ) ) {
 			$extra .= '<div class="apd-single-listing__fields">';
 			$extra .= '<h2 class="apd-single-listing__section-title">'
-				. esc_html__( 'Details', 'all-purpose-directory' ) . '</h2>';
+				. esc_html__( 'Details', 'damdir-directory' ) . '</h2>';
 			$extra .= $custom_fields_html;
 			$extra .= '</div>';
 		}
@@ -736,7 +736,7 @@ final class TemplateLoader {
 			$extra .= '<div class="apd-single-listing__tags">';
 			$extra .= '<h3 class="apd-single-listing__tags-title">';
 			$extra .= '<span class="dashicons dashicons-tag" aria-hidden="true"></span> ';
-			$extra .= esc_html__( 'Tags', 'all-purpose-directory' );
+			$extra .= esc_html__( 'Tags', 'damdir-directory' );
 			$extra .= '</h3>';
 			$extra .= '<div class="apd-single-listing__tags-list">';
 
@@ -770,7 +770,7 @@ final class TemplateLoader {
 		if ( ! empty( $related_listings ) ) {
 			$related_html  = '<section class="apd-related-listings">';
 			$related_html .= '<h2 class="apd-related-listings__title">'
-				. esc_html__( 'Related Listings', 'all-purpose-directory' ) . '</h2>';
+				. esc_html__( 'Related Listings', 'damdir-directory' ) . '</h2>';
 
 			/** This action is documented in templates/single-listing.php */
 			ob_start();

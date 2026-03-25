@@ -59,7 +59,7 @@ final class PostType {
 		register_post_status(
 			self::STATUS_EXPIRED,
 			[
-				'label'                     => _x( 'Expired', 'post status', 'all-purpose-directory' ),
+				'label'                     => _x( 'Expired', 'post status', 'damdir-directory' ),
 				'public'                    => false,
 				'internal'                  => false,
 				'protected'                 => true,
@@ -70,7 +70,7 @@ final class PostType {
 				'label_count'               => _n_noop(
 					'Expired <span class="count">(%s)</span>',
 					'Expired <span class="count">(%s)</span>',
-					'all-purpose-directory'
+					'damdir-directory'
 				),
 			]
 		);
@@ -78,7 +78,7 @@ final class PostType {
 		register_post_status(
 			self::STATUS_REJECTED,
 			[
-				'label'                     => _x( 'Rejected', 'post status', 'all-purpose-directory' ),
+				'label'                     => _x( 'Rejected', 'post status', 'damdir-directory' ),
 				'public'                    => false,
 				'internal'                  => false,
 				'protected'                 => true,
@@ -89,7 +89,7 @@ final class PostType {
 				'label_count'               => _n_noop(
 					'Rejected <span class="count">(%s)</span>',
 					'Rejected <span class="count">(%s)</span>',
-					'all-purpose-directory'
+					'damdir-directory'
 				),
 			]
 		);
@@ -102,30 +102,30 @@ final class PostType {
 	 */
 	private function get_labels(): array {
 		return [
-			'name'                  => _x( 'Listings', 'post type general name', 'all-purpose-directory' ),
-			'singular_name'         => _x( 'Listing', 'post type singular name', 'all-purpose-directory' ),
-			'menu_name'             => _x( 'Listings', 'admin menu', 'all-purpose-directory' ),
-			'name_admin_bar'        => _x( 'Listing', 'add new on admin bar', 'all-purpose-directory' ),
-			'add_new'               => _x( 'Add New', 'listing', 'all-purpose-directory' ),
-			'add_new_item'          => __( 'Add New Listing', 'all-purpose-directory' ),
-			'new_item'              => __( 'New Listing', 'all-purpose-directory' ),
-			'edit_item'             => __( 'Edit Listing', 'all-purpose-directory' ),
-			'view_item'             => __( 'View Listing', 'all-purpose-directory' ),
-			'all_items'             => __( 'All Listings', 'all-purpose-directory' ),
-			'search_items'          => __( 'Search Listings', 'all-purpose-directory' ),
-			'parent_item_colon'     => __( 'Parent Listings:', 'all-purpose-directory' ),
-			'not_found'             => __( 'No listings found.', 'all-purpose-directory' ),
-			'not_found_in_trash'    => __( 'No listings found in Trash.', 'all-purpose-directory' ),
-			'featured_image'        => _x( 'Listing Image', 'Overrides the "Featured Image" phrase', 'all-purpose-directory' ),
-			'set_featured_image'    => _x( 'Set listing image', 'Overrides the "Set featured image" phrase', 'all-purpose-directory' ),
-			'remove_featured_image' => _x( 'Remove listing image', 'Overrides the "Remove featured image" phrase', 'all-purpose-directory' ),
-			'use_featured_image'    => _x( 'Use as listing image', 'Overrides the "Use as featured image" phrase', 'all-purpose-directory' ),
-			'archives'              => _x( 'Listing archives', 'The post type archive label', 'all-purpose-directory' ),
-			'insert_into_item'      => _x( 'Insert into listing', 'Overrides the "Insert into post" phrase', 'all-purpose-directory' ),
-			'uploaded_to_this_item' => _x( 'Uploaded to this listing', 'Overrides the "Uploaded to this post" phrase', 'all-purpose-directory' ),
-			'filter_items_list'     => _x( 'Filter listings list', 'Screen reader text', 'all-purpose-directory' ),
-			'items_list_navigation' => _x( 'Listings list navigation', 'Screen reader text', 'all-purpose-directory' ),
-			'items_list'            => _x( 'Listings list', 'Screen reader text', 'all-purpose-directory' ),
+			'name'                  => _x( 'Listings', 'post type general name', 'damdir-directory' ),
+			'singular_name'         => _x( 'Listing', 'post type singular name', 'damdir-directory' ),
+			'menu_name'             => _x( 'Listings', 'admin menu', 'damdir-directory' ),
+			'name_admin_bar'        => _x( 'Listing', 'add new on admin bar', 'damdir-directory' ),
+			'add_new'               => _x( 'Add New', 'listing', 'damdir-directory' ),
+			'add_new_item'          => __( 'Add New Listing', 'damdir-directory' ),
+			'new_item'              => __( 'New Listing', 'damdir-directory' ),
+			'edit_item'             => __( 'Edit Listing', 'damdir-directory' ),
+			'view_item'             => __( 'View Listing', 'damdir-directory' ),
+			'all_items'             => __( 'All Listings', 'damdir-directory' ),
+			'search_items'          => __( 'Search Listings', 'damdir-directory' ),
+			'parent_item_colon'     => __( 'Parent Listings:', 'damdir-directory' ),
+			'not_found'             => __( 'No listings found.', 'damdir-directory' ),
+			'not_found_in_trash'    => __( 'No listings found in Trash.', 'damdir-directory' ),
+			'featured_image'        => _x( 'Listing Image', 'Overrides the "Featured Image" phrase', 'damdir-directory' ),
+			'set_featured_image'    => _x( 'Set listing image', 'Overrides the "Set featured image" phrase', 'damdir-directory' ),
+			'remove_featured_image' => _x( 'Remove listing image', 'Overrides the "Remove featured image" phrase', 'damdir-directory' ),
+			'use_featured_image'    => _x( 'Use as listing image', 'Overrides the "Use as featured image" phrase', 'damdir-directory' ),
+			'archives'              => _x( 'Listing archives', 'The post type archive label', 'damdir-directory' ),
+			'insert_into_item'      => _x( 'Insert into listing', 'Overrides the "Insert into post" phrase', 'damdir-directory' ),
+			'uploaded_to_this_item' => _x( 'Uploaded to this listing', 'Overrides the "Uploaded to this post" phrase', 'damdir-directory' ),
+			'filter_items_list'     => _x( 'Filter listings list', 'Screen reader text', 'damdir-directory' ),
+			'items_list_navigation' => _x( 'Listings list navigation', 'Screen reader text', 'damdir-directory' ),
+			'items_list'            => _x( 'Listings list', 'Screen reader text', 'damdir-directory' ),
 		];
 	}
 
@@ -137,7 +137,7 @@ final class PostType {
 	private function get_args(): array {
 		return [
 			'labels'             => $this->get_labels(),
-			'description'        => __( 'Directory listings', 'all-purpose-directory' ),
+			'description'        => __( 'Directory listings', 'damdir-directory' ),
 			'public'             => true,
 			'publicly_queryable' => true,
 			'show_ui'            => true,

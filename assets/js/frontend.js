@@ -1,5 +1,5 @@
 /**
- * All Purpose Directory - Frontend Scripts
+ * DamDir Directory - Frontend Scripts
  *
  * Handles AJAX filtering, form submissions, URL state management,
  * and loading states for listing search and filter functionality.

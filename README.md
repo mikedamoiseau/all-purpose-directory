@@ -1,4 +1,4 @@
-# All Purpose Directory
+# DamDir Directory
 
 A flexible WordPress plugin for building directory and listing websites with frontend submission, reviews, favorites, and advanced search.
 
@@ -12,7 +12,7 @@ A flexible WordPress plugin for building directory and listing websites with fro
 
 ## Description
 
-All Purpose Directory is a powerful and flexible plugin for creating any type of directory or listing website. Whether you need a business directory, job board, real estate listings, or classifieds site, this plugin provides all the features you need out of the box.
+DamDir Directory is a powerful and flexible plugin for creating any type of directory or listing website. Whether you need a business directory, job board, real estate listings, or classifieds site, this plugin provides all the features you need out of the box.
 
 ### Core Features
 
@@ -152,7 +152,7 @@ All Purpose Directory is a powerful and flexible plugin for creating any type of
 ### Automatic Installation
 
 1. Go to **Plugins > Add New** in your WordPress admin
-2. Search for "All Purpose Directory"
+2. Search for "DamDir Directory"
 3. Click "Install Now" and then "Activate"
 
 ### Manual Installation
@@ -213,7 +213,7 @@ Local sync/deploy helper scripts are documented in `bin/README.md`.
 
 ### How do I customize the listing display?
 
-All templates can be overridden in your theme. Copy templates from `plugins/all-purpose-directory/templates/` to `your-theme/all-purpose-directory/` and modify as needed. Available templates include:
+All templates can be overridden in your theme. Copy templates from `plugins/damdir-directory/templates/` to `your-theme/damdir-directory/` and modify as needed. Available templates include:
 
 - `archive-listing.php` - Listings archive page
 - `single-listing.php` - Single listing page
@@ -262,7 +262,7 @@ Reviews are enabled by default. To disable them, go to **Listings > Settings > L
 
 ### How do I customize email notifications?
 
-Email templates can be overridden in your theme at `your-theme/all-purpose-directory/emails/`. You can also customize the from name, email, and which notifications are sent in **Settings > Email**.
+Email templates can be overridden in your theme at `your-theme/damdir-directory/emails/`. You can also customize the from name, email, and which notifications are sent in **Settings > Email**.
 
 ### Can I import existing listings?
 
@@ -316,7 +316,7 @@ Initial release with full feature set:
 
 ## Privacy Policy
 
-All Purpose Directory stores the following data:
+DamDir Directory stores the following data:
 
 - **Listings**: Stored as WordPress posts with metadata
 - **Reviews**: Stored as WordPress comments with rating metadata

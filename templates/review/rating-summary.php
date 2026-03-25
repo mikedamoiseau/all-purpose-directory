@@ -6,7 +6,7 @@
  * and rating distribution bars.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/review/rating-summary.php
+ * yourtheme/damdir-directory/review/rating-summary.php
  *
  * @package APD\Templates
  * @since   1.0.0
@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $calculator = \APD\Review\RatingCalculator::get_instance();
 ?>
 
-<div class="apd-rating-summary" aria-label="<?php esc_attr_e( 'Rating summary', 'all-purpose-directory' ); ?>">
+<div class="apd-rating-summary" aria-label="<?php esc_attr_e( 'Rating summary', 'damdir-directory' ); ?>">
 
 	<div class="apd-rating-summary__overview">
 
@@ -52,7 +52,7 @@ $calculator = \APD\Review\RatingCalculator::get_instance();
 				<?php
 				printf(
 					/* translators: %d: number of reviews */
-					esc_html( _n( '%d review', '%d reviews', $count, 'all-purpose-directory' ) ),
+					esc_html( _n( '%d review', '%d reviews', $count, 'damdir-directory' ) ),
 					esc_html( number_format_i18n( $count ) )
 				);
 				?>
@@ -61,7 +61,7 @@ $calculator = \APD\Review\RatingCalculator::get_instance();
 
 	</div>
 
-	<div class="apd-rating-summary__distribution" role="list" aria-label="<?php esc_attr_e( 'Rating breakdown', 'all-purpose-directory' ); ?>">
+	<div class="apd-rating-summary__distribution" role="list" aria-label="<?php esc_attr_e( 'Rating breakdown', 'damdir-directory' ); ?>">
 		<?php for ( $stars = $star_count; $stars >= 1; $stars-- ) : ?>
 			<?php
 			$data       = $distribution[ $stars ] ?? [
@@ -70,9 +70,9 @@ $calculator = \APD\Review\RatingCalculator::get_instance();
 			];
 			$star_label = $stars === 1
 				/* translators: %d: number of stars (singular) */
-				? sprintf( __( '%d star', 'all-purpose-directory' ), $stars )
+				? sprintf( __( '%d star', 'damdir-directory' ), $stars )
 				/* translators: %d: number of stars (plural) */
-				: sprintf( __( '%d stars', 'all-purpose-directory' ), $stars );
+				: sprintf( __( '%d stars', 'damdir-directory' ), $stars );
 			?>
 			<div class="apd-rating-summary__bar-row" role="listitem">
 				<span class="apd-rating-summary__bar-label" aria-hidden="true">

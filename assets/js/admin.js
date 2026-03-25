@@ -1,5 +1,5 @@
 /**
- * All Purpose Directory - Admin Scripts
+ * DamDir Directory - Admin Scripts
  *
  * Handles listing type switching in the post editor. When a listing type
  * radio button is changed, fields are dynamically shown/hidden based on

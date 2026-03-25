@@ -80,7 +80,7 @@ The Review Moderation admin page (`src/Admin/ReviewModeration.php`) provides an 
 
 ## Menu Location
 
-All Purpose Directory > Reviews (with pending count badge)
+DamDir Directory > Reviews (with pending count badge)
 
 ## Features
 

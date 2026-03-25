@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**All Purpose Directory** is a WordPress plugin for building directory/listing websites. The plugin uses a modular architecture where the core provides generic directory functionality, with optional modules for specific use cases (business directories, job boards, real estate, classifieds).
+**DamDir Directory** is a WordPress plugin for building directory/listing websites. The plugin uses a modular architecture where the core provides generic directory functionality, with optional modules for specific use cases (business directories, job boards, real estate, classifieds).
 
-- **Plugin Slug:** `all-purpose-directory`
+- **Plugin Slug:** `damdir-directory`
 - **Prefix:** `apd_` / `APD`
 - **Requirements:** PHP 8.0+, WordPress 6.0+
 
@@ -39,12 +39,12 @@ wp apd demo status            # Show current demo data counts
 wp apd demo status --format=json  # Output as JSON
 
 # Internationalization
-npm run i18n:pot              # Generate POT file (languages/all-purpose-directory.pot)
+npm run i18n:pot              # Generate POT file (languages/damdir-directory.pot)
 
 # Sync plugin to test environment (excludes dev files for clean plugin check)
 # Set paths for your machine before running:
-#   APD_SOURCE_DIR=/path/to/all-purpose-directory
-#   APD_TEST_PLUGIN_DIR=/path/to/wp-content/plugins/all-purpose-directory
+#   APD_SOURCE_DIR=/path/to/damdir-directory
+#   APD_TEST_PLUGIN_DIR=/path/to/wp-content/plugins/damdir-directory
 rsync -av --delete \
   --exclude='vendor' \
   --exclude='node_modules' \
@@ -72,7 +72,7 @@ rsync -av --delete \
   "$APD_TEST_PLUGIN_DIR"/
 
 # Plugin Check (run after writing or modifying code)
-docker exec wp-all-purpose-directory-web-1 wp plugin check all-purpose-directory \
+docker exec wp-damdir-directory-web-1 wp plugin check damdir-directory \
   --exclude-directories=tests,bin,research,dist,.stage,.git,.github \
   --exclude-files=.gitignore,.distignore,phpunit.xml.dist,phpunit-unit.xml,phpcs.xml.dist,CLAUDE.md,PLAN.md,TASKS.md,CHANGELOG.md,.gitkeep,.phpunit.result.cache,.DS_Store \
   --allow-root
@@ -96,8 +96,8 @@ wp dist-archive .
 
 ### Plugin Structure
 ```
-all-purpose-directory/
-├── all-purpose-directory.php    # Main plugin file, singleton bootstrap
+damdir-directory/
+├── damdir-directory.php    # Main plugin file, singleton bootstrap
 ├── src/
 │   ├── Core/                    # Plugin, Activator, Deactivator, Assets, Template
 │   ├── Admin/                   # ListingMetaBox, ListingTypeMetaBox, ReviewModeration
@@ -613,7 +613,7 @@ All UI follows WCAG 2.1 Level AA guidelines. See `.claude-bw/docs/claude-accessi
 - Keyboard accessibility for tooltips, collapsible sections
 - ARIA attributes for forms, icons, dynamic content
 - Color contrast requirements
-- Translation functions (text domain: `all-purpose-directory`)
+- Translation functions (text domain: `damdir-directory`)
 
 ## Key Files
 

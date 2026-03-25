@@ -39,7 +39,7 @@ final class ReviewModerationTest extends UnitTestCase {
 
 		// Define APD constants if not defined.
 		if ( ! defined( 'APD_PLUGIN_URL' ) ) {
-			define( 'APD_PLUGIN_URL', 'https://example.com/wp-content/plugins/all-purpose-directory/' );
+			define( 'APD_PLUGIN_URL', 'https://example.com/wp-content/plugins/damdir-directory/' );
 		}
 		if ( ! defined( 'APD_VERSION' ) ) {
 			define( 'APD_VERSION', '1.0.0' );

@@ -144,7 +144,7 @@ class TimeField extends AbstractFieldType {
 				'invalid_time',
 				sprintf(
 					/* translators: %s: field label */
-					__( '%s must be a valid time in HH:MM format.', 'all-purpose-directory' ),
+					__( '%s must be a valid time in HH:MM format.', 'damdir-directory' ),
 					$this->getLabel( $field )
 				)
 			);
@@ -162,7 +162,7 @@ class TimeField extends AbstractFieldType {
 					'time_too_early',
 					sprintf(
 						/* translators: 1: field label, 2: minimum time */
-						__( '%1$s must be at or after %2$s.', 'all-purpose-directory' ),
+						__( '%1$s must be at or after %2$s.', 'damdir-directory' ),
 						$this->getLabel( $field ),
 						$min_time
 					)
@@ -178,7 +178,7 @@ class TimeField extends AbstractFieldType {
 					'time_too_late',
 					sprintf(
 						/* translators: 1: field label, 2: maximum time */
-						__( '%1$s must be at or before %2$s.', 'all-purpose-directory' ),
+						__( '%1$s must be at or before %2$s.', 'damdir-directory' ),
 						$this->getLabel( $field ),
 						$max_time
 					)

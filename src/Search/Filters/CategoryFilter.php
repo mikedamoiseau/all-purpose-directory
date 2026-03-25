@@ -51,11 +51,11 @@ class CategoryFilter extends AbstractFilter {
 	public function __construct( array $config = [] ) {
 		$defaults = [
 			'name'         => 'category',
-			'label'        => __( 'Category', 'all-purpose-directory' ),
+			'label'        => __( 'Category', 'damdir-directory' ),
 			'source'       => 'taxonomy',
 			'source_key'   => 'apd_category',
 			'multiple'     => false,
-			'empty_option' => __( 'All Categories', 'all-purpose-directory' ),
+			'empty_option' => __( 'All Categories', 'damdir-directory' ),
 			'hierarchical' => true,
 			'hide_empty'   => true,
 		];

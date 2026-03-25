@@ -1,4 +1,4 @@
-# Consolidated Cross-Functional Review — All Purpose Directory
+# Consolidated Cross-Functional Review — DamDir Directory
 
 **Date:** 2026-03-04
 **Reviewers:** Senior Backend Engineer, Senior Frontend Engineer, Project/Product Manager, Devil's Advocate

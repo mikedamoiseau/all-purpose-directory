@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Manage demo data for the All Purpose Directory plugin.
+ * Manage demo data for the DamDir Directory plugin.
  *
  * ## EXAMPLES
  *

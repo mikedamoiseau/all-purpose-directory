@@ -8,14 +8,14 @@ set -euo pipefail
 #   bin/sync-to-wordpress-deploy.sh /custom/wp-deploy/root
 #
 # Optional env vars:
-#   APD_PLUGIN_SLUG    Plugin directory name (default: all-purpose-directory)
+#   APD_PLUGIN_SLUG    Plugin directory name (default: damdir-directory)
 #   APD_DEPLOY_ROOT    Deploy root (default: $HOME/Documents/www/test/wordpress-deploy)
 #   APD_DEPLOY_DEST    Explicit destination plugin directory
 #
 # If APD_DEPLOY_DEST is set, it takes precedence over APD_DEPLOY_ROOT.
 
 SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PLUGIN_SLUG="${APD_PLUGIN_SLUG:-all-purpose-directory}"
+PLUGIN_SLUG="${APD_PLUGIN_SLUG:-damdir-directory}"
 DEPLOY_ROOT="${1:-${APD_DEPLOY_ROOT:-$HOME/Documents/www/test/wordpress-deploy}}"
 
 if [[ -n "${APD_DEPLOY_DEST:-}" ]]; then

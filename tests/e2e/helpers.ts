@@ -7,7 +7,7 @@ const execAsync = promisify(exec);
 /** Project root directory (two levels up from tests/e2e/). */
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
 
-const DOCKER_CONTAINER = 'wp-all-purpose-directory-web-1';
+const DOCKER_CONTAINER = 'wp-damdir-directory-web-1';
 
 /**
  * Run a WP-CLI command inside the Docker container.

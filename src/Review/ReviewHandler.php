@@ -141,8 +141,8 @@ class ReviewHandler {
 		// Verify nonce.
 		if ( ! $this->verify_nonce() ) {
 			wp_die(
-				esc_html__( 'Security check failed. Please try again.', 'all-purpose-directory' ),
-				esc_html__( 'Error', 'all-purpose-directory' ),
+				esc_html__( 'Security check failed. Please try again.', 'damdir-directory' ),
+				esc_html__( 'Error', 'damdir-directory' ),
 				[ 'response' => 403 ]
 			);
 		}
@@ -202,7 +202,7 @@ class ReviewHandler {
 		if ( ! check_ajax_referer( ReviewForm::NONCE_ACTION, 'nonce', false ) ) {
 			wp_send_json_error(
 				[
-					'message' => __( 'Security check failed. Please refresh the page and try again.', 'all-purpose-directory' ),
+					'message' => __( 'Security check failed. Please refresh the page and try again.', 'damdir-directory' ),
 				],
 				403
 			);
@@ -226,7 +226,7 @@ class ReviewHandler {
 		if ( $manager->requires_login() ) {
 			wp_send_json_error(
 				[
-					'message'        => __( 'You must be logged in to submit a review.', 'all-purpose-directory' ),
+					'message'        => __( 'You must be logged in to submit a review.', 'damdir-directory' ),
 					'login_required' => true,
 				],
 				401
@@ -237,7 +237,7 @@ class ReviewHandler {
 		if ( ! check_ajax_referer( ReviewForm::NONCE_ACTION, 'nonce', false ) ) {
 			wp_send_json_error(
 				[
-					'message' => __( 'Security check failed. Please refresh the page and try again.', 'all-purpose-directory' ),
+					'message' => __( 'Security check failed. Please refresh the page and try again.', 'damdir-directory' ),
 				],
 				403
 			);
@@ -291,11 +291,11 @@ class ReviewHandler {
 		$is_pending = $review && $review['status'] === 'pending';
 
 		$message = $is_update
-			? __( 'Your review has been updated.', 'all-purpose-directory' )
-			: __( 'Thank you for your review!', 'all-purpose-directory' );
+			? __( 'Your review has been updated.', 'damdir-directory' )
+			: __( 'Thank you for your review!', 'damdir-directory' );
 
 		if ( $is_pending && ! $is_update ) {
-			$message = __( 'Thank you! Your review has been submitted and is pending approval.', 'all-purpose-directory' );
+			$message = __( 'Thank you! Your review has been submitted and is pending approval.', 'damdir-directory' );
 		}
 
 		/**
@@ -349,7 +349,7 @@ class ReviewHandler {
 			if ( ! $this->can_edit_review( $review_id ) ) {
 				return new WP_Error(
 					'permission_denied',
-					__( 'You do not have permission to edit this review.', 'all-purpose-directory' )
+					__( 'You do not have permission to edit this review.', 'damdir-directory' )
 				);
 			}
 
@@ -429,11 +429,11 @@ class ReviewHandler {
 
 		// Validate listing ID.
 		if ( empty( $data['listing_id'] ) ) {
-			$this->errors->add( 'listing_id', __( 'Invalid listing.', 'all-purpose-directory' ) );
+			$this->errors->add( 'listing_id', __( 'Invalid listing.', 'damdir-directory' ) );
 		} else {
 			$listing = get_post( $data['listing_id'] );
 			if ( ! $listing || ! is_object( $listing ) || ( $listing->post_type ?? '' ) !== 'apd_listing' ) {
-				$this->errors->add( 'listing_id', __( 'Invalid listing.', 'all-purpose-directory' ) );
+				$this->errors->add( 'listing_id', __( 'Invalid listing.', 'damdir-directory' ) );
 			}
 		}
 
@@ -443,7 +443,7 @@ class ReviewHandler {
 				'rating',
 				sprintf(
 					/* translators: 1: minimum rating, 2: maximum rating */
-					__( 'Rating must be between %1$d and %2$d.', 'all-purpose-directory' ),
+					__( 'Rating must be between %1$d and %2$d.', 'damdir-directory' ),
 					ReviewManager::MIN_RATING,
 					ReviewManager::MAX_RATING
 				)
@@ -455,13 +455,13 @@ class ReviewHandler {
 		$content    = trim( $data['content'] ?? '' );
 
 		if ( empty( $content ) ) {
-			$this->errors->add( 'content', __( 'Review content is required.', 'all-purpose-directory' ) );
+			$this->errors->add( 'content', __( 'Review content is required.', 'damdir-directory' ) );
 		} elseif ( \apd_strlen( $content ) < $min_length ) {
 			$this->errors->add(
 				'content',
 				sprintf(
 					/* translators: %d: minimum content length */
-					__( 'Review must be at least %d characters.', 'all-purpose-directory' ),
+					__( 'Review must be at least %d characters.', 'damdir-directory' ),
 					$min_length
 				)
 			);
@@ -470,11 +470,11 @@ class ReviewHandler {
 		// Validate guest fields if not logged in and guest reviews allowed.
 		if ( ! is_user_logged_in() && ! $manager->requires_login() ) {
 			if ( empty( $data['author_name'] ) ) {
-				$this->errors->add( 'author_name', __( 'Your name is required.', 'all-purpose-directory' ) );
+				$this->errors->add( 'author_name', __( 'Your name is required.', 'damdir-directory' ) );
 			}
 
 			if ( empty( $data['author_email'] ) || ! is_email( $data['author_email'] ) ) {
-				$this->errors->add( 'author_email', __( 'A valid email address is required.', 'all-purpose-directory' ) );
+				$this->errors->add( 'author_email', __( 'A valid email address is required.', 'damdir-directory' ) );
 			}
 		}
 

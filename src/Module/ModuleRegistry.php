@@ -150,7 +150,7 @@ final class ModuleRegistry {
 		if ( empty( $slug ) ) {
 			_doing_it_wrong(
 				__METHOD__,
-				esc_html__( 'Module slug cannot be empty.', 'all-purpose-directory' ),
+				esc_html__( 'Module slug cannot be empty.', 'damdir-directory' ),
 				'1.0.0'
 			);
 			return false;
@@ -165,7 +165,7 @@ final class ModuleRegistry {
 				__METHOD__,
 				sprintf(
 					/* translators: %s: module slug */
-					esc_html__( 'Module "%s" is already registered.', 'all-purpose-directory' ),
+					esc_html__( 'Module "%s" is already registered.', 'damdir-directory' ),
 					esc_html( $slug )
 				),
 				'1.0.0'
@@ -179,7 +179,7 @@ final class ModuleRegistry {
 				__METHOD__,
 				sprintf(
 					/* translators: %s: module slug */
-					esc_html__( 'Module "%s" is missing required "name" field.', 'all-purpose-directory' ),
+					esc_html__( 'Module "%s" is missing required "name" field.', 'damdir-directory' ),
 					esc_html( $slug )
 				),
 				'1.0.0'
@@ -421,7 +421,7 @@ final class ModuleRegistry {
 				if ( version_compare( APD_VERSION, $required_version, '<' ) ) {
 					$unmet[ $dependency ] = sprintf(
 						/* translators: 1: Required version, 2: Current version */
-						__( 'Requires All Purpose Directory %1$s or higher (current: %2$s)', 'all-purpose-directory' ),
+						__( 'Requires DamDir Directory %1$s or higher (current: %2$s)', 'damdir-directory' ),
 						$required_version,
 						APD_VERSION
 					);
@@ -433,7 +433,7 @@ final class ModuleRegistry {
 			if ( ! $this->has( $dependency ) ) {
 				$unmet[ $dependency ] = sprintf(
 					/* translators: %s: Module slug */
-					__( 'Requires module "%s" which is not installed', 'all-purpose-directory' ),
+					__( 'Requires module "%s" which is not installed', 'damdir-directory' ),
 					$dependency
 				);
 				continue;
@@ -444,7 +444,7 @@ final class ModuleRegistry {
 			if ( $module && version_compare( $module['version'], $required_version, '<' ) ) {
 				$unmet[ $dependency ] = sprintf(
 					/* translators: 1: Module name, 2: Required version, 3: Current version */
-					__( 'Requires %1$s %2$s or higher (current: %3$s)', 'all-purpose-directory' ),
+					__( 'Requires %1$s %2$s or higher (current: %3$s)', 'damdir-directory' ),
 					$module['name'],
 					$required_version,
 					$module['version']

@@ -130,7 +130,7 @@ final class FavoritesShortcode extends AbstractShortcode {
 	protected function output( array $atts, ?string $content ): string {
 		// Require login.
 		if ( ! is_user_logged_in() ) {
-			return $this->require_login( __( 'Please log in to view your favorites.', 'all-purpose-directory' ) );
+			return $this->require_login( __( 'Please log in to view your favorites.', 'damdir-directory' ) );
 		}
 
 		/**
@@ -174,7 +174,7 @@ final class FavoritesShortcode extends AbstractShortcode {
 			return $this->error(
 				sprintf(
 				/* translators: %s: View type */
-					__( 'Invalid view type: %s', 'all-purpose-directory' ),
+					__( 'Invalid view type: %s', 'damdir-directory' ),
 					$atts['view']
 				)
 			);
@@ -354,8 +354,8 @@ final class FavoritesShortcode extends AbstractShortcode {
 			'total'     => $query->max_num_pages,
 			'current'   => $this->get_paged(),
 			'mid_size'  => 2,
-			'prev_text' => '&laquo; ' . __( 'Previous', 'all-purpose-directory' ),
-			'next_text' => __( 'Next', 'all-purpose-directory' ) . ' &raquo;',
+			'prev_text' => '&laquo; ' . __( 'Previous', 'damdir-directory' ),
+			'next_text' => __( 'Next', 'damdir-directory' ) . ' &raquo;',
 		];
 
 		/**
@@ -374,7 +374,7 @@ final class FavoritesShortcode extends AbstractShortcode {
 		if ( $links ) {
 			printf(
 				'<nav class="apd-pagination" aria-label="%s">%s</nav>',
-				esc_attr__( 'Favorites pagination', 'all-purpose-directory' ),
+				esc_attr__( 'Favorites pagination', 'damdir-directory' ),
 				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				$links
 			);
@@ -407,7 +407,7 @@ final class FavoritesShortcode extends AbstractShortcode {
 			 */
 			$message = apply_filters(
 				'apd_favorites_shortcode_no_results_message',
-				__( 'You have no favorite listings yet.', 'all-purpose-directory' ),
+				__( 'You have no favorite listings yet.', 'damdir-directory' ),
 				$atts
 			);
 		}

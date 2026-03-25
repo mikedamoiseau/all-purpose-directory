@@ -121,13 +121,13 @@ final class CategoriesBlock extends AbstractBlock {
 	 * @since 1.0.0
 	 */
 	public function __construct() {
-		$this->title       = __( 'Listing Categories', 'all-purpose-directory' );
-		$this->description = __( 'Display listing categories in a grid or list.', 'all-purpose-directory' );
+		$this->title       = __( 'Listing Categories', 'damdir-directory' );
+		$this->description = __( 'Display listing categories in a grid or list.', 'damdir-directory' );
 		$this->keywords    = [
-			__( 'categories', 'all-purpose-directory' ),
-			__( 'taxonomy', 'all-purpose-directory' ),
-			__( 'directory', 'all-purpose-directory' ),
-			__( 'grid', 'all-purpose-directory' ),
+			__( 'categories', 'damdir-directory' ),
+			__( 'taxonomy', 'damdir-directory' ),
+			__( 'directory', 'damdir-directory' ),
+			__( 'grid', 'damdir-directory' ),
 		];
 	}
 
@@ -307,7 +307,7 @@ final class CategoriesBlock extends AbstractBlock {
 						<?php
 						printf(
 							/* translators: %d: Number of listings */
-							esc_html( _n( '%d listing', '%d listings', $category->count, 'all-purpose-directory' ) ),
+							esc_html( _n( '%d listing', '%d listings', $category->count, 'damdir-directory' ) ),
 							absint( $category->count )
 						);
 						?>
@@ -377,7 +377,7 @@ final class CategoriesBlock extends AbstractBlock {
 		 */
 		$message = apply_filters(
 			'apd_categories_block_no_results_message',
-			__( 'No categories found.', 'all-purpose-directory' ),
+			__( 'No categories found.', 'damdir-directory' ),
 			$attributes
 		);
 

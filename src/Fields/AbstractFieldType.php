@@ -117,7 +117,7 @@ abstract class AbstractFieldType implements FieldTypeInterface {
 				'required',
 				sprintf(
 					/* translators: %s: field label */
-					__( '%s is required.', 'all-purpose-directory' ),
+					__( '%s is required.', 'damdir-directory' ),
 					$this->getLabel( $field )
 				)
 			);
@@ -249,7 +249,7 @@ abstract class AbstractFieldType implements FieldTypeInterface {
 	 * @return string The field label.
 	 */
 	protected function getLabel( array $field ): string {
-		return $field['label'] ?? $field['name'] ?? __( 'This field', 'all-purpose-directory' );
+		return $field['label'] ?? $field['name'] ?? __( 'This field', 'damdir-directory' );
 	}
 
 	/**
@@ -377,7 +377,7 @@ abstract class AbstractFieldType implements FieldTypeInterface {
 					'min_length',
 					sprintf(
 						/* translators: 1: field label, 2: minimum length */
-						__( '%1$s must be at least %2$d characters.', 'all-purpose-directory' ),
+						__( '%1$s must be at least %2$d characters.', 'damdir-directory' ),
 						$this->getLabel( $field ),
 						$validation['min_length']
 					)
@@ -392,7 +392,7 @@ abstract class AbstractFieldType implements FieldTypeInterface {
 					'max_length',
 					sprintf(
 						/* translators: 1: field label, 2: maximum length */
-						__( '%1$s must not exceed %2$d characters.', 'all-purpose-directory' ),
+						__( '%1$s must not exceed %2$d characters.', 'damdir-directory' ),
 						$this->getLabel( $field ),
 						$validation['max_length']
 					)
@@ -406,7 +406,7 @@ abstract class AbstractFieldType implements FieldTypeInterface {
 				$message = $validation['pattern_message']
 					?? sprintf(
 						/* translators: %s: field label */
-						__( '%s format is invalid.', 'all-purpose-directory' ),
+						__( '%s format is invalid.', 'damdir-directory' ),
 						$this->getLabel( $field )
 					);
 				$errors->add( 'pattern', $message );
@@ -425,7 +425,7 @@ abstract class AbstractFieldType implements FieldTypeInterface {
 					'callback',
 					sprintf(
 						/* translators: %s: field label */
-						__( '%s is invalid.', 'all-purpose-directory' ),
+						__( '%s is invalid.', 'damdir-directory' ),
 						$this->getLabel( $field )
 					)
 				);

@@ -44,7 +44,7 @@ class I18nTest extends TestCase {
         parent::setUp();
         Monkey\setUp();
 
-        $this->pot_file = dirname( __DIR__, 3 ) . '/languages/all-purpose-directory.pot';
+        $this->pot_file = dirname( __DIR__, 3 ) . '/languages/damdir-directory.pot';
 
         if ( file_exists( $this->pot_file ) ) {
             $this->pot_contents = file_get_contents( $this->pot_file );
@@ -67,7 +67,7 @@ class I18nTest extends TestCase {
     public function test_pot_file_exists(): void {
         $this->assertFileExists(
             $this->pot_file,
-            'POT file should exist at languages/all-purpose-directory.pot'
+            'POT file should exist at languages/damdir-directory.pot'
         );
     }
 
@@ -76,7 +76,7 @@ class I18nTest extends TestCase {
      */
     public function test_pot_file_has_project_id_version(): void {
         $this->assertStringContainsString(
-            'Project-Id-Version: All Purpose Directory',
+            'Project-Id-Version: DamDir Directory',
             $this->pot_contents,
             'POT file should have correct Project-Id-Version header'
         );
@@ -340,9 +340,9 @@ class I18nTest extends TestCase {
         $doc_content = file_get_contents( $doc_file );
 
         $expected_sections = [
-            '# Translating All Purpose Directory',
+            '# Translating DamDir Directory',
             'Text Domain',
-            'all-purpose-directory',
+            'damdir-directory',
             'Poedit',
             'Loco Translate',
             'File Naming Convention',
@@ -384,7 +384,7 @@ class I18nTest extends TestCase {
         $language_dir = dirname( __DIR__, 3 ) . '/languages';
 
         $this->assertDirectoryExists( $language_dir );
-        $this->assertFileExists( $language_dir . '/all-purpose-directory.pot' );
+        $this->assertFileExists( $language_dir . '/damdir-directory.pot' );
         $this->assertFileExists( $language_dir . '/TRANSLATING.md' );
     }
 }

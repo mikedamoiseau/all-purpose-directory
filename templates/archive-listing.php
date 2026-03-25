@@ -5,7 +5,7 @@
  * This template displays the listing archive/search results page.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/archive-listing.php
+ * yourtheme/damdir-directory/archive-listing.php
  *
  * @package APD\Templates
  * @since   1.0.0

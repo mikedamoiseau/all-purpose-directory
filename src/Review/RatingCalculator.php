@@ -422,7 +422,7 @@ class RatingCalculator {
 		// Build ARIA label.
 		$aria_label = sprintf(
 			/* translators: 1: rating value, 2: maximum rating (star count) */
-			__( '%1$s out of %2$s stars', 'all-purpose-directory' ),
+			__( '%1$s out of %2$s stars', 'damdir-directory' ),
 			number_format( $rating, $precision ),
 			$star_count
 		);
@@ -430,7 +430,7 @@ class RatingCalculator {
 		if ( $args['show_count'] && $args['count'] > 0 ) {
 			$aria_label .= sprintf(
 				/* translators: %d: number of reviews */
-				_n( ', based on %d review', ', based on %d reviews', $args['count'], 'all-purpose-directory' ),
+				_n( ', based on %d review', ', based on %d reviews', $args['count'], 'damdir-directory' ),
 				$args['count']
 			);
 		}
@@ -475,7 +475,7 @@ class RatingCalculator {
 		if ( $args['show_count'] ) {
 			$count_text = sprintf(
 				/* translators: %d: number of reviews */
-				_n( '(%d review)', '(%d reviews)', $args['count'], 'all-purpose-directory' ),
+				_n( '(%d review)', '(%d reviews)', $args['count'], 'damdir-directory' ),
 				$args['count']
 			);
 			$html .= sprintf(

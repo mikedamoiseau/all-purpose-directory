@@ -5,7 +5,7 @@
  * Template for rendering the listing search form with filters.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/search/search-form.php
+ * yourtheme/damdir-directory/search/search-form.php
  *
  * @package APD\Templates
  * @since   1.0.0
@@ -29,7 +29,7 @@ $action = $args['action'] ?: get_post_type_archive_link( 'apd_listing' );
 	method="<?php echo esc_attr( $args['method'] ); ?>"
 	data-ajax="<?php echo $args['ajax'] ? 'true' : 'false'; ?>"
 	role="search"
-	aria-label="<?php esc_attr_e( 'Search listings', 'all-purpose-directory' ); ?>">
+	aria-label="<?php esc_attr_e( 'Search listings', 'damdir-directory' ); ?>">
 
 	<?php
 	/**
@@ -71,12 +71,12 @@ $action = $args['action'] ?: get_post_type_archive_link( 'apd_listing' );
 				<?php
 				$submit_label = ! empty( $args['submit_text'] )
 					? sanitize_text_field( $args['submit_text'] )
-					: __( 'Search', 'all-purpose-directory' );
+					: __( 'Search', 'damdir-directory' );
 				echo esc_html( $submit_label );
 				?>
 			</button>
 			<a href="<?php echo esc_url( $action ); ?>" class="apd-search-form__clear">
-				<?php esc_html_e( 'Clear Filters', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Clear Filters', 'damdir-directory' ); ?>
 			</a>
 		</div>
 	<?php endif; ?>

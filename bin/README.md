@@ -13,12 +13,12 @@ Sync the plugin from this repo into a local WordPress test install.
 bin/sync-to-test.sh
 
 # Explicit plugin destination
-bin/sync-to-test.sh /path/to/wp-content/plugins/all-purpose-directory
+bin/sync-to-test.sh /path/to/wp-content/plugins/damdir-directory
 ```
 
 ### Environment variables
 
-- `APD_PLUGIN_SLUG` (default: `all-purpose-directory`)
+- `APD_PLUGIN_SLUG` (default: `damdir-directory`)
 - `APD_TEST_ROOT` (default: `$HOME/Documents/www/test/wordpress`)
 - `APD_TEST_PLUGIN_DIR` (explicit destination; overrides auto-detection)
 
@@ -47,7 +47,7 @@ bin/sync-to-wordpress-deploy.sh /path/to/wordpress-deploy
 
 ### Environment variables
 
-- `APD_PLUGIN_SLUG` (default: `all-purpose-directory`)
+- `APD_PLUGIN_SLUG` (default: `damdir-directory`)
 - `APD_DEPLOY_ROOT` (default: `$HOME/Documents/www/test/wordpress-deploy`)
 - `APD_DEPLOY_DEST` (explicit destination plugin dir; overrides root)
 
@@ -75,7 +75,7 @@ bin/build-release.sh 1.0.1
 
 ### Environment variables
 
-- `APD_PLUGIN_SLUG` (default: `all-purpose-directory`)
+- `APD_PLUGIN_SLUG` (default: `damdir-directory`)
 - `APD_OUTPUT_DIR` (default: `<repo>/dist`)
 - `APD_VERSION` (overrides CLI version)
 - `APD_KEEP_STAGE` (`1` keep staged dir, `0` remove it after zip)

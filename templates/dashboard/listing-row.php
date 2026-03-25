@@ -5,7 +5,7 @@
  * Single listing row for the My Listings table.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/dashboard/listing-row.php
+ * yourtheme/damdir-directory/dashboard/listing-row.php
  *
  * @package APD\Templates
  * @since   1.0.0
@@ -75,7 +75,7 @@ $edit_url   = $my_listings->get_edit_url( $listing_id );
 					echo esc_html( implode( ', ', $cat_names ) );
 					if ( count( $categories ) > 2 ) {
 						/* translators: %d: number of additional categories */
-						printf( esc_html__( ' +%d more', 'all-purpose-directory' ), count( $categories ) - 2 );
+						printf( esc_html__( ' +%d more', 'damdir-directory' ), count( $categories ) - 2 );
 					}
 					?>
 				</div>
@@ -109,7 +109,7 @@ $edit_url   = $my_listings->get_edit_url( $listing_id );
 				<?php echo esc_html( number_format_i18n( $views ) ); ?>
 			</span>
 			<span class="apd-listing-row__views-label screen-reader-text">
-				<?php esc_html_e( 'views', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'views', 'damdir-directory' ); ?>
 			</span>
 		</td>
 	<?php endif; ?>
@@ -121,7 +121,7 @@ $edit_url   = $my_listings->get_edit_url( $listing_id );
 				<?php echo esc_html( number_format_i18n( $inquiry_count ) ); ?>
 			</span>
 			<span class="apd-listing-row__inquiries-label screen-reader-text">
-				<?php esc_html_e( 'inquiries', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'inquiries', 'damdir-directory' ); ?>
 			</span>
 		</td>
 	<?php endif; ?>

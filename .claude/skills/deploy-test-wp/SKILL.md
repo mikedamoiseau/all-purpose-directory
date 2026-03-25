@@ -10,8 +10,8 @@ Deploy the APD plugin ecosystem to the local Docker WordPress test environment.
 
 ## Environment
 
-- **Docker compose dir:** `/Users/mike/Documents/www/test/wp-all-purpose-directory/`
-- **Container:** `wp-all-purpose-directory-web-1`
+- **Docker compose dir:** `/Users/mike/Documents/www/test/wp-damdir-directory/`
+- **Container:** `wp-damdir-directory-web-1`
 - **Site URL:** http://localhost:8085
 - **Admin:** `admin_buzzwoo` / `admin`
 - **Plugin path in container:** `/var/www/html/wp-content/plugins/`
@@ -20,7 +20,7 @@ Deploy the APD plugin ecosystem to the local Docker WordPress test environment.
 
 | Plugin | Source | Target (in container) |
 |--------|--------|-----------------------|
-| all-purpose-directory (core) | `/Users/mike/Documents/www/private/all-purpose-directory/` | `plugins/all-purpose-directory/` |
+| damdir-directory (core) | `/Users/mike/Documents/www/private/damdir-directory/` | `plugins/damdir-directory/` |
 | apd-url-directory (module) | `/Users/mike/Documents/www/private/apd-url-directory/` | `plugins/apd-url-directory/` |
 
 Add new module plugins to this table as they are created.
@@ -30,12 +30,12 @@ Add new module plugins to this table as they are created.
 ### 1. Verify Docker is running
 
 ```bash
-docker ps --filter "name=wp-all-purpose-directory" --format "{{.Names}}\t{{.Status}}"
+docker ps --filter "name=wp-damdir-directory" --format "{{.Names}}\t{{.Status}}"
 ```
 
 If not running, start with:
 ```bash
-cd /Users/mike/Documents/www/test/wp-all-purpose-directory/ && docker-compose up -d
+cd /Users/mike/Documents/www/test/wp-damdir-directory/ && docker-compose up -d
 ```
 
 ### 2. Sync core plugin
@@ -67,8 +67,8 @@ rsync -av --delete \
   --exclude='bin' \
   --exclude='research' \
   --exclude='*.png' \
-  /Users/mike/Documents/www/private/all-purpose-directory/ \
-  /Users/mike/Documents/www/test/wp-all-purpose-directory/html/wp-content/plugins/all-purpose-directory/
+  /Users/mike/Documents/www/private/damdir-directory/ \
+  /Users/mike/Documents/www/test/wp-damdir-directory/html/wp-content/plugins/damdir-directory/
 ```
 
 ### 3. Sync module plugins
@@ -98,7 +98,7 @@ rsync -av --delete \
   --exclude='bin' \
   --exclude='research' \
   /Users/mike/Documents/www/private/apd-url-directory/ \
-  /Users/mike/Documents/www/test/wp-all-purpose-directory/html/wp-content/plugins/apd-url-directory/
+  /Users/mike/Documents/www/test/wp-damdir-directory/html/wp-content/plugins/apd-url-directory/
 ```
 
 ### 4. Install composer dependencies (CRITICAL)
@@ -106,30 +106,30 @@ rsync -av --delete \
 The core plugin uses Composer's **optimized classmap** autoloader. New PHP classes added to `src/` are NOT discovered dynamically - you MUST re-run composer after syncing new files.
 
 ```bash
-docker exec wp-all-purpose-directory-web-1 bash -c \
-  "cd /var/www/html/wp-content/plugins/all-purpose-directory && composer install --no-dev --no-interaction"
+docker exec wp-damdir-directory-web-1 bash -c \
+  "cd /var/www/html/wp-content/plugins/damdir-directory && composer install --no-dev --no-interaction"
 
-docker exec wp-all-purpose-directory-web-1 bash -c \
+docker exec wp-damdir-directory-web-1 bash -c \
   "cd /var/www/html/wp-content/plugins/apd-url-directory && composer install --no-dev --no-interaction"
 ```
 
 ### 5. Verify plugins are active
 
 ```bash
-docker exec wp-all-purpose-directory-web-1 wp plugin list --allow-root --format=table 2>&1 | grep -E "apd|all-purpose"
+docker exec wp-damdir-directory-web-1 wp plugin list --allow-root --format=table 2>&1 | grep -E "apd|all-purpose"
 ```
 
 If a plugin is inactive, activate it:
 ```bash
-docker exec wp-all-purpose-directory-web-1 wp plugin activate all-purpose-directory --allow-root
-docker exec wp-all-purpose-directory-web-1 wp plugin activate apd-url-directory --allow-root
+docker exec wp-damdir-directory-web-1 wp plugin activate damdir-directory --allow-root
+docker exec wp-damdir-directory-web-1 wp plugin activate apd-url-directory --allow-root
 ```
 
 ### 6. Verify (optional)
 
 Quick smoke test with WP-CLI:
 ```bash
-docker exec wp-all-purpose-directory-web-1 wp apd demo status --allow-root
+docker exec wp-damdir-directory-web-1 wp apd demo status --allow-root
 ```
 
 ## Common Issues

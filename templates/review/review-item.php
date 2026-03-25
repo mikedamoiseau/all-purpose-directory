@@ -5,7 +5,7 @@
  * Template for rendering a single review in the reviews list.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/review/review-item.php
+ * yourtheme/damdir-directory/review/review-item.php
  *
  * @package APD\Templates
  * @since   1.0.0
@@ -35,9 +35,9 @@ $calculator = \APD\Review\RatingCalculator::get_instance();
 // Get the star count for ARIA label.
 $star_label = $review['rating'] === 1
 	/* translators: %d: number of stars (singular) */
-	? sprintf( __( '%d star', 'all-purpose-directory' ), $review['rating'] )
+	? sprintf( __( '%d star', 'damdir-directory' ), $review['rating'] )
 	/* translators: %d: number of stars (plural) */
-	: sprintf( __( '%d stars', 'all-purpose-directory' ), $review['rating'] );
+	: sprintf( __( '%d stars', 'damdir-directory' ), $review['rating'] );
 ?>
 
 <article class="apd-review-item" id="review-<?php echo esc_attr( $review['id'] ); ?>" role="listitem">

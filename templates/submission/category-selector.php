@@ -6,7 +6,7 @@
  * Uses a hierarchical checkbox list for selecting categories.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/submission/category-selector.php
+ * yourtheme/damdir-directory/submission/category-selector.php
  *
  * @package APD\Templates
  * @since   1.0.0
@@ -30,10 +30,10 @@ $has_errors = ! empty( $errors );
 	data-field-type="checkbox_group">
 	<fieldset class="apd-field__fieldset">
 		<legend class="apd-field__legend">
-			<?php esc_html_e( 'Category', 'all-purpose-directory' ); ?>
+			<?php esc_html_e( 'Category', 'damdir-directory' ); ?>
 		</legend>
 		<p id="apd-field-listing-categories-desc" class="apd-field__description">
-			<?php esc_html_e( 'Select one or more categories that best describe your listing.', 'all-purpose-directory' ); ?>
+			<?php esc_html_e( 'Select one or more categories that best describe your listing.', 'damdir-directory' ); ?>
 		</p>
 		<div class="apd-field__input">
 			<div class="apd-field__checkbox-options apd-field__checkbox-options--categories" role="group" aria-describedby="apd-field-listing-categories-desc">

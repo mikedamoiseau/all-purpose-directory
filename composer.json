@@ -1,5 +1,5 @@
 {
-    "name": "damoiseau/all-purpose-directory",
+    "name": "damoiseau/damdir-directory",
     "description": "A flexible WordPress plugin for building directory and listing websites",
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",

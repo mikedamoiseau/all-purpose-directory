@@ -121,7 +121,7 @@ final class GridView extends AbstractView {
 	 * @return string Human-readable label.
 	 */
 	public function getLabel(): string {
-		return __( 'Grid', 'all-purpose-directory' );
+		return __( 'Grid', 'damdir-directory' );
 	}
 
 	/**

@@ -101,7 +101,7 @@ class FavoritesEndpoint {
 				'permission_callback' => [ $this->controller, 'permission_authenticated_with_nonce' ],
 				'args'                => [
 					'id' => [
-						'description' => __( 'Listing ID to remove from favorites.', 'all-purpose-directory' ),
+						'description' => __( 'Listing ID to remove from favorites.', 'damdir-directory' ),
 						'type'        => 'integer',
 						'required'    => true,
 						'minimum'     => 1,
@@ -120,7 +120,7 @@ class FavoritesEndpoint {
 				'permission_callback' => [ $this->controller, 'permission_authenticated_with_nonce' ],
 				'args'                => [
 					'id' => [
-						'description' => __( 'Listing ID to toggle favorite.', 'all-purpose-directory' ),
+						'description' => __( 'Listing ID to toggle favorite.', 'damdir-directory' ),
 						'type'        => 'integer',
 						'required'    => true,
 						'minimum'     => 1,
@@ -140,7 +140,7 @@ class FavoritesEndpoint {
 	public function get_add_params(): array {
 		return [
 			'listing_id' => [
-				'description' => __( 'Listing ID to add to favorites.', 'all-purpose-directory' ),
+				'description' => __( 'Listing ID to add to favorites.', 'damdir-directory' ),
 				'type'        => 'integer',
 				'required'    => true,
 				'minimum'     => 1,
@@ -158,13 +158,13 @@ class FavoritesEndpoint {
 	public function get_listings_params(): array {
 		return [
 			'page'     => [
-				'description' => __( 'Current page of the collection.', 'all-purpose-directory' ),
+				'description' => __( 'Current page of the collection.', 'damdir-directory' ),
 				'type'        => 'integer',
 				'default'     => 1,
 				'minimum'     => 1,
 			],
 			'per_page' => [
-				'description' => __( 'Maximum number of items per page.', 'all-purpose-directory' ),
+				'description' => __( 'Maximum number of items per page.', 'damdir-directory' ),
 				'type'        => 'integer',
 				'default'     => 10,
 				'minimum'     => 1,
@@ -187,14 +187,14 @@ class FavoritesEndpoint {
 			'type'       => 'object',
 			'properties' => [
 				'favorites' => [
-					'description' => __( 'Array of favorite listing IDs.', 'all-purpose-directory' ),
+					'description' => __( 'Array of favorite listing IDs.', 'damdir-directory' ),
 					'type'        => 'array',
 					'items'       => [
 						'type' => 'integer',
 					],
 				],
 				'count'     => [
-					'description' => __( 'Total number of favorites.', 'all-purpose-directory' ),
+					'description' => __( 'Total number of favorites.', 'damdir-directory' ),
 					'type'        => 'integer',
 				],
 			],
@@ -215,23 +215,23 @@ class FavoritesEndpoint {
 			'type'       => 'object',
 			'properties' => [
 				'id'      => [
-					'description' => __( 'Unique identifier for the listing.', 'all-purpose-directory' ),
+					'description' => __( 'Unique identifier for the listing.', 'damdir-directory' ),
 					'type'        => 'integer',
 				],
 				'title'   => [
-					'description' => __( 'Listing title.', 'all-purpose-directory' ),
+					'description' => __( 'Listing title.', 'damdir-directory' ),
 					'type'        => 'string',
 				],
 				'slug'    => [
-					'description' => __( 'Listing slug.', 'all-purpose-directory' ),
+					'description' => __( 'Listing slug.', 'damdir-directory' ),
 					'type'        => 'string',
 				],
 				'excerpt' => [
-					'description' => __( 'Listing excerpt.', 'all-purpose-directory' ),
+					'description' => __( 'Listing excerpt.', 'damdir-directory' ),
 					'type'        => 'string',
 				],
 				'link'    => [
-					'description' => __( 'URL to the listing.', 'all-purpose-directory' ),
+					'description' => __( 'URL to the listing.', 'damdir-directory' ),
 					'type'        => 'string',
 					'format'      => 'uri',
 				],
@@ -323,7 +323,7 @@ class FavoritesEndpoint {
 		if ( ! $post || 'apd_listing' !== $post->post_type ) {
 			return $this->controller->create_error(
 				'rest_listing_not_found',
-				__( 'Listing not found.', 'all-purpose-directory' ),
+				__( 'Listing not found.', 'damdir-directory' ),
 				404
 			);
 		}
@@ -333,7 +333,7 @@ class FavoritesEndpoint {
 			return $this->controller->create_response(
 				[
 					'success'     => true,
-					'message'     => __( 'Listing is already in favorites.', 'all-purpose-directory' ),
+					'message'     => __( 'Listing is already in favorites.', 'damdir-directory' ),
 					'listing_id'  => $listing_id,
 					'is_favorite' => true,
 				]
@@ -346,7 +346,7 @@ class FavoritesEndpoint {
 		if ( ! $result ) {
 			return $this->controller->create_error(
 				'rest_favorite_failed',
-				__( 'Failed to add listing to favorites.', 'all-purpose-directory' ),
+				__( 'Failed to add listing to favorites.', 'damdir-directory' ),
 				500
 			);
 		}
@@ -354,7 +354,7 @@ class FavoritesEndpoint {
 		return $this->controller->create_response(
 			[
 				'success'     => true,
-				'message'     => __( 'Listing added to favorites.', 'all-purpose-directory' ),
+				'message'     => __( 'Listing added to favorites.', 'damdir-directory' ),
 				'listing_id'  => $listing_id,
 				'is_favorite' => true,
 			],
@@ -377,7 +377,7 @@ class FavoritesEndpoint {
 		if ( ! apd_is_favorite( $listing_id ) ) {
 			return $this->controller->create_error(
 				'rest_favorite_not_found',
-				__( 'Listing is not in favorites.', 'all-purpose-directory' ),
+				__( 'Listing is not in favorites.', 'damdir-directory' ),
 				404
 			);
 		}
@@ -388,7 +388,7 @@ class FavoritesEndpoint {
 		if ( ! $result ) {
 			return $this->controller->create_error(
 				'rest_favorite_remove_failed',
-				__( 'Failed to remove listing from favorites.', 'all-purpose-directory' ),
+				__( 'Failed to remove listing from favorites.', 'damdir-directory' ),
 				500
 			);
 		}
@@ -396,7 +396,7 @@ class FavoritesEndpoint {
 		return $this->controller->create_response(
 			[
 				'success'     => true,
-				'message'     => __( 'Listing removed from favorites.', 'all-purpose-directory' ),
+				'message'     => __( 'Listing removed from favorites.', 'damdir-directory' ),
 				'listing_id'  => $listing_id,
 				'is_favorite' => false,
 			]
@@ -420,7 +420,7 @@ class FavoritesEndpoint {
 		if ( ! $post || 'apd_listing' !== $post->post_type ) {
 			return $this->controller->create_error(
 				'rest_listing_not_found',
-				__( 'Listing not found.', 'all-purpose-directory' ),
+				__( 'Listing not found.', 'damdir-directory' ),
 				404
 			);
 		}
@@ -431,14 +431,14 @@ class FavoritesEndpoint {
 		if ( $is_favorite === null ) {
 			return $this->controller->create_error(
 				'rest_favorite_toggle_failed',
-				__( 'Failed to toggle favorite status.', 'all-purpose-directory' ),
+				__( 'Failed to toggle favorite status.', 'damdir-directory' ),
 				500
 			);
 		}
 
 		$message = $is_favorite
-			? __( 'Listing added to favorites.', 'all-purpose-directory' )
-			: __( 'Listing removed from favorites.', 'all-purpose-directory' );
+			? __( 'Listing added to favorites.', 'damdir-directory' )
+			: __( 'Listing removed from favorites.', 'damdir-directory' );
 
 		return $this->controller->create_response(
 			[

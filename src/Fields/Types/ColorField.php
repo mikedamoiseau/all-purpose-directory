@@ -129,7 +129,7 @@ class ColorField extends AbstractFieldType {
 				'invalid_color',
 				sprintf(
 					/* translators: %s: field label */
-					__( '%s must be a valid hex color (e.g., #FF5733 or #F53).', 'all-purpose-directory' ),
+					__( '%s must be a valid hex color (e.g., #FF5733 or #F53).', 'damdir-directory' ),
 					$this->getLabel( $field )
 				)
 			);

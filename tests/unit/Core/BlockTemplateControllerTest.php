@@ -115,9 +115,9 @@ final class BlockTemplateControllerTest extends UnitTestCase {
 		$controller = new BlockTemplateController();
 		$controller->register_templates();
 
-		$this->assertArrayHasKey( 'all-purpose-directory//archive-apd_listing', $registered );
-		$this->assertArrayHasKey( 'all-purpose-directory//taxonomy-apd_category', $registered );
-		$this->assertArrayHasKey( 'all-purpose-directory//taxonomy-apd_tag', $registered );
+		$this->assertArrayHasKey( 'damdir-directory//archive-apd_listing', $registered );
+		$this->assertArrayHasKey( 'damdir-directory//taxonomy-apd_category', $registered );
+		$this->assertArrayHasKey( 'damdir-directory//taxonomy-apd_tag', $registered );
 	}
 
 	/**
@@ -134,7 +134,7 @@ final class BlockTemplateControllerTest extends UnitTestCase {
 		$controller = new BlockTemplateController();
 		$controller->register_templates();
 
-		$content = $registered['all-purpose-directory//archive-apd_listing']['content'];
+		$content = $registered['damdir-directory//archive-apd_listing']['content'];
 		$this->assertStringContainsString( '[apd_archive_content]', $content );
 	}
 
@@ -152,7 +152,7 @@ final class BlockTemplateControllerTest extends UnitTestCase {
 		$controller = new BlockTemplateController();
 		$controller->register_templates();
 
-		$content = $registered['all-purpose-directory//taxonomy-apd_category']['content'];
+		$content = $registered['damdir-directory//taxonomy-apd_category']['content'];
 		$this->assertStringContainsString( 'wp:template-part {"slug":"header"', $content );
 		$this->assertStringContainsString( 'wp:template-part {"slug":"footer"', $content );
 	}
@@ -171,9 +171,9 @@ final class BlockTemplateControllerTest extends UnitTestCase {
 		$controller = new BlockTemplateController();
 		$controller->register_templates();
 
-		$this->assertSame( 'Listing Archive', $registered['all-purpose-directory//archive-apd_listing']['title'] );
-		$this->assertSame( 'Listing Category Archive', $registered['all-purpose-directory//taxonomy-apd_category']['title'] );
-		$this->assertSame( 'Listing Tag Archive', $registered['all-purpose-directory//taxonomy-apd_tag']['title'] );
+		$this->assertSame( 'Listing Archive', $registered['damdir-directory//archive-apd_listing']['title'] );
+		$this->assertSame( 'Listing Category Archive', $registered['damdir-directory//taxonomy-apd_category']['title'] );
+		$this->assertSame( 'Listing Tag Archive', $registered['damdir-directory//taxonomy-apd_tag']['title'] );
 	}
 
 	/**
@@ -190,7 +190,7 @@ final class BlockTemplateControllerTest extends UnitTestCase {
 		$controller = new BlockTemplateController();
 		$controller->register_templates();
 
-		$content = $registered['all-purpose-directory//archive-apd_listing']['content'];
+		$content = $registered['damdir-directory//archive-apd_listing']['content'];
 		$this->assertStringContainsString( '<main class="wp-block-group">', $content );
 		$this->assertStringContainsString( '</main>', $content );
 	}

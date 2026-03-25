@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<ruleset name="All Purpose Directory">
-    <description>Coding standards for All Purpose Directory WordPress plugin</description>
+<ruleset name="DamDir Directory">
+    <description>Coding standards for DamDir Directory WordPress plugin</description>
 
     <!-- What to scan -->
     <file>.</file>
@@ -132,7 +132,7 @@
     <rule ref="PHPCompatibilityWP"/>
 
     <!-- Text domain for i18n -->
-    <config name="text_domain" value="all-purpose-directory"/>
+    <config name="text_domain" value="damdir-directory"/>
 
     <!-- Minimum supported WordPress version -->
     <config name="minimum_wp_version" value="6.0"/>
