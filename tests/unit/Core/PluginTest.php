@@ -69,7 +69,7 @@ class PluginTest extends UnitTestCase {
 	/**
 	 * Test text domain constant is correctly defined in plugin header.
 	 */
-	public function test_text_domain_is_all_purpose_directory(): void {
+	public function test_text_domain_is_damdir_directory(): void {
 		// Read the main plugin file header.
 		$plugin_file    = dirname( __DIR__, 3 ) . '/damdir-directory.php';
 		$plugin_content = file_get_contents( $plugin_file );

@@ -143,7 +143,6 @@
             <property name="prefixes" type="array">
                 <element value="apd"/>
                 <element value="APD"/>
-                <element value="all_purpose_directory"/>
             </property>
         </properties>
     </rule>

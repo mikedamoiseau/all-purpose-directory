@@ -317,8 +317,7 @@ class SubmissionHandler {
 			return false;
 		}
 
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce verification.
-		return (bool) wp_verify_nonce( wp_unslash( $_POST[ self::NONCE_NAME ] ), self::NONCE_ACTION );
+		return (bool) wp_verify_nonce( \sanitize_text_field( wp_unslash( $_POST[ self::NONCE_NAME ] ) ), self::NONCE_ACTION );
 	}
 
 	/**
