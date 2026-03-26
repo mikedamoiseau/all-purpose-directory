@@ -318,7 +318,7 @@ final class RestController {
 			return false;
 		}
 
-		return wp_verify_nonce( $nonce, self::NONCE_ACTION ) !== false;
+		return wp_verify_nonce( sanitize_text_field( $nonce ), self::NONCE_ACTION ) !== false;
 	}
 
 	/**

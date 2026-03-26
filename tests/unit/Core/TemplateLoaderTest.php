@@ -29,6 +29,18 @@ final class TemplateLoaderTest extends TestCase {
 
 		// Mock common WordPress functions.
 		Functions\when( 'sanitize_key' )->returnArg();
+		Functions\when( 'sanitize_text_field' )->alias( function( $str ) {
+			return trim( strip_tags( $str ) );
+		});
+		Functions\when( 'wp_unslash' )->alias( function( $value ) {
+			if ( is_string( $value ) ) {
+				return stripslashes( $value );
+			}
+			if ( is_array( $value ) ) {
+				return array_map( 'stripslashes', $value );
+			}
+			return $value;
+		});
 		Functions\when( 'absint' )->alias( function( $value ) {
 			return abs( (int) $value );
 		});

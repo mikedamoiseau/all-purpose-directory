@@ -1264,12 +1264,12 @@ Review the listing: %4$s',
 			return false;
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$value = wp_unslash( $_POST[ $honeypot_field ] );
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$value = sanitize_text_field( wp_unslash( $_POST[ $honeypot_field ] ) );
 
 		// If the field has any value, it's likely spam.
 		// Use hash_equals for constant-time comparison (prevents timing attacks).
-		return ! hash_equals( '', (string) $value );
+		return ! hash_equals( '', $value );
 	}
 
 	/**
@@ -1289,8 +1289,8 @@ Review the listing: %4$s',
 			return false;
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$token = wp_unslash( $_POST['apd_form_token'] );
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$token = sanitize_text_field( wp_unslash( $_POST['apd_form_token'] ) );
 
 		// Decode and verify the signed timestamp.
 		$decoded = base64_decode( (string) $token, true );

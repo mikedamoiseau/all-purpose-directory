@@ -2,7 +2,7 @@
 
 A flexible WordPress plugin for building directory and listing websites with frontend submission, reviews, favorites, and advanced search.
 
-**Contributors:** mdamoiseau
+**Contributors:** michaeldamoiseau
 **Tags:** directory, listings, business directory, classifieds, job board
 **Requires at least:** WordPress 6.0
 **Tested up to:** WordPress 6.9

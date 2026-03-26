@@ -158,7 +158,7 @@ For support questions, please use the [WordPress.org support forums](https://wor
 
 = Contributing =
 
-Development takes place on [GitHub](https://github.com/mdamoiseau/damdir-directory). Pull requests are welcome!
+Development takes place on [GitHub](https://github.com/michaeldamoiseau/damdir-directory). Pull requests are welcome!
 
 == Installation ==
 

@@ -631,10 +631,10 @@ class ContactHandler {
 			return false;
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$value = wp_unslash( $_POST[ $honeypot_field ] );
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$value = sanitize_text_field( wp_unslash( $_POST[ $honeypot_field ] ) );
 
-		return ! hash_equals( '', (string) $value );
+		return ! hash_equals( '', $value );
 	}
 
 	/**
@@ -653,8 +653,8 @@ class ContactHandler {
 			return false;
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$token = wp_unslash( $_POST['apd_contact_token'] );
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$token = sanitize_text_field( wp_unslash( $_POST['apd_contact_token'] ) );
 
 		$decoded = base64_decode( (string) $token, true );
 		if ( $decoded === false || strpos( $decoded, '|' ) === false ) {
