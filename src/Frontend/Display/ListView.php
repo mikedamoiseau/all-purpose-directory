@@ -114,7 +114,7 @@ final class ListView extends AbstractView {
 	 * @return string Human-readable label.
 	 */
 	public function getLabel(): string {
-		return __( 'List', 'all-purpose-directory' );
+		return __( 'List', 'damdir-directory' );
 	}
 
 	/**

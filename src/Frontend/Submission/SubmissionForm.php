@@ -106,14 +106,14 @@ class SubmissionForm {
 
 		// Set default terms text if not provided.
 		if ( empty( $this->config['terms_text'] ) ) {
-			$this->config['terms_text'] = __( 'I agree to the terms and conditions', 'all-purpose-directory' );
+			$this->config['terms_text'] = __( 'I agree to the terms and conditions', 'damdir-directory' );
 		}
 
 		// Set default submit text if not provided.
 		if ( empty( $this->config['submit_text'] ) ) {
 			$this->config['submit_text'] = $this->config['listing_id'] > 0
-				? __( 'Update Listing', 'all-purpose-directory' )
-				: __( 'Submit Listing', 'all-purpose-directory' );
+				? __( 'Update Listing', 'damdir-directory' )
+				: __( 'Submit Listing', 'damdir-directory' );
 		}
 	}
 
@@ -741,7 +741,7 @@ class SubmissionForm {
 					tabindex="-1">
 			</div>',
 			esc_attr( $field_name ),
-			esc_html__( 'Website URL', 'all-purpose-directory' )
+			esc_html__( 'Website URL', 'damdir-directory' )
 		);
 	}
 

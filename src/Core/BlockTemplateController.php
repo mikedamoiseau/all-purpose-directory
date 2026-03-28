@@ -33,7 +33,7 @@ final class BlockTemplateController {
 	 *
 	 * @var string
 	 */
-	private const PLUGIN_SLUG = 'all-purpose-directory';
+	private const PLUGIN_SLUG = 'damdir-directory';
 
 	/**
 	 * Initialize the controller.
@@ -71,8 +71,8 @@ final class BlockTemplateController {
 		register_block_template(
 			self::PLUGIN_SLUG . '//archive-apd_listing',
 			[
-				'title'       => __( 'Listing Archive', 'all-purpose-directory' ),
-				'description' => __( 'Displays the listing archive with search, filters, and card grid.', 'all-purpose-directory' ),
+				'title'       => __( 'Listing Archive', 'damdir-directory' ),
+				'description' => __( 'Displays the listing archive with search, filters, and card grid.', 'damdir-directory' ),
 				'content'     => $template_content,
 			]
 		);
@@ -80,8 +80,8 @@ final class BlockTemplateController {
 		register_block_template(
 			self::PLUGIN_SLUG . '//taxonomy-apd_category',
 			[
-				'title'       => __( 'Listing Category Archive', 'all-purpose-directory' ),
-				'description' => __( 'Displays listings in a category with search, filters, and card grid.', 'all-purpose-directory' ),
+				'title'       => __( 'Listing Category Archive', 'damdir-directory' ),
+				'description' => __( 'Displays listings in a category with search, filters, and card grid.', 'damdir-directory' ),
 				'content'     => $template_content,
 			]
 		);
@@ -89,8 +89,8 @@ final class BlockTemplateController {
 		register_block_template(
 			self::PLUGIN_SLUG . '//taxonomy-apd_tag',
 			[
-				'title'       => __( 'Listing Tag Archive', 'all-purpose-directory' ),
-				'description' => __( 'Displays listings with a tag with search, filters, and card grid.', 'all-purpose-directory' ),
+				'title'       => __( 'Listing Tag Archive', 'damdir-directory' ),
+				'description' => __( 'Displays listings with a tag with search, filters, and card grid.', 'damdir-directory' ),
 				'content'     => $template_content,
 			]
 		);

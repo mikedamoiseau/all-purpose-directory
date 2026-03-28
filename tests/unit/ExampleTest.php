@@ -33,7 +33,7 @@ class ExampleTest extends UnitTestCase
 
         $this->assertEquals($text, esc_html($text));
         $this->assertEquals($text, esc_attr($text));
-        $this->assertEquals($text, __($text, 'all-purpose-directory'));
+        $this->assertEquals($text, __($text, 'damdir-directory'));
     }
 
     /**

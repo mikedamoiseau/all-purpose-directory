@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to All Purpose Directory will be documented in this file.
+All notable changes to DamDir Directory will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -236,7 +236,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 151 unit tests for REST API
 
 #### Internationalization (Phase 15)
-- Text domain: `all-purpose-directory`
+- Text domain: `damdir-directory`
 - 938 translatable strings
 - POT file with translator comments
 - Plural forms support

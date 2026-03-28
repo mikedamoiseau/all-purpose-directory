@@ -38,9 +38,9 @@ class KeywordFilter extends AbstractFilter {
 	public function __construct( array $config = [] ) {
 		$defaults = [
 			'name'        => 'keyword',
-			'label'       => __( 'Search', 'all-purpose-directory' ),
+			'label'       => __( 'Search', 'damdir-directory' ),
 			'source'      => 'custom',
-			'placeholder' => __( 'Search listings...', 'all-purpose-directory' ),
+			'placeholder' => __( 'Search listings...', 'damdir-directory' ),
 			'min_length'  => 2,
 		];
 
@@ -158,7 +158,7 @@ class KeywordFilter extends AbstractFilter {
 	public function getDisplayValue( mixed $value ): string {
 		return sprintf(
 			/* translators: %s: search keyword */
-			__( '"%s"', 'all-purpose-directory' ),
+			__( '"%s"', 'damdir-directory' ),
 			esc_html( (string) $value )
 		);
 	}

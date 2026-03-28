@@ -402,7 +402,7 @@ class ReviewForm {
 			return $this->config['guidelines_text'];
 		}
 
-		$default_text = __( 'Please share your honest experience. Reviews help other users make informed decisions.', 'all-purpose-directory' );
+		$default_text = __( 'Please share your honest experience. Reviews help other users make informed decisions.', 'damdir-directory' );
 
 		/**
 		 * Filter the review guidelines text.
@@ -427,19 +427,19 @@ class ReviewForm {
 		$data['i18n']        = array_merge(
 			$data['i18n'] ?? [],
 			[
-				'reviewSubmitting' => __( 'Submitting review...', 'all-purpose-directory' ),
-				'reviewSubmitted'  => __( 'Thank you for your review!', 'all-purpose-directory' ),
-				'reviewUpdated'    => __( 'Your review has been updated.', 'all-purpose-directory' ),
-				'reviewError'      => __( 'Failed to submit review. Please try again.', 'all-purpose-directory' ),
-				'ratingRequired'   => __( 'Please select a rating.', 'all-purpose-directory' ),
+				'reviewSubmitting' => __( 'Submitting review...', 'damdir-directory' ),
+				'reviewSubmitted'  => __( 'Thank you for your review!', 'damdir-directory' ),
+				'reviewUpdated'    => __( 'Your review has been updated.', 'damdir-directory' ),
+				'reviewError'      => __( 'Failed to submit review. Please try again.', 'damdir-directory' ),
+				'ratingRequired'   => __( 'Please select a rating.', 'damdir-directory' ),
 				/* translators: %d: Minimum number of characters required for review */
-				'reviewTooShort'   => __( 'Your review is too short. Please write at least %d characters.', 'all-purpose-directory' ),
-				'reviewPending'    => __( 'Your review has been submitted and is pending approval.', 'all-purpose-directory' ),
-				'selectRating'     => __( 'Select a rating', 'all-purpose-directory' ),
+				'reviewTooShort'   => __( 'Your review is too short. Please write at least %d characters.', 'damdir-directory' ),
+				'reviewPending'    => __( 'Your review has been submitted and is pending approval.', 'damdir-directory' ),
+				'selectRating'     => __( 'Select a rating', 'damdir-directory' ),
 				/* translators: %d: Star rating number (singular) */
-				'starLabel'        => __( '%d star', 'all-purpose-directory' ),
+				'starLabel'        => __( '%d star', 'damdir-directory' ),
 				/* translators: %d: Star rating number (plural) */
-				'starsLabel'       => __( '%d stars', 'all-purpose-directory' ),
+				'starsLabel'       => __( '%d stars', 'damdir-directory' ),
 			]
 		);
 

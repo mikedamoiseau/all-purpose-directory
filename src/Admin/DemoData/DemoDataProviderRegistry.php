@@ -128,7 +128,7 @@ final class DemoDataProviderRegistry {
 		if ( empty( $slug ) ) {
 			_doing_it_wrong(
 				__METHOD__,
-				esc_html__( 'Demo data provider slug cannot be empty.', 'all-purpose-directory' ),
+				esc_html__( 'Demo data provider slug cannot be empty.', 'damdir-directory' ),
 				'1.0.0'
 			);
 			return false;
@@ -143,7 +143,7 @@ final class DemoDataProviderRegistry {
 				__METHOD__,
 				sprintf(
 					/* translators: %s: provider slug */
-					esc_html__( 'Demo data provider "%s" is already registered.', 'all-purpose-directory' ),
+					esc_html__( 'Demo data provider "%s" is already registered.', 'damdir-directory' ),
 					esc_html( $slug )
 				),
 				'1.0.0'

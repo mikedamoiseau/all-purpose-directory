@@ -5,7 +5,7 @@
  * Displayed when the user has no listings.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/dashboard/my-listings-empty.php
+ * yourtheme/damdir-directory/dashboard/my-listings-empty.php
  *
  * @package APD\Templates
  * @since   1.0.0
@@ -21,28 +21,28 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Get status-specific messaging.
 $messages = [
 	'all'     => [
-		'title'   => __( 'No Listings Yet', 'all-purpose-directory' ),
-		'message' => __( 'You haven\'t created any listings yet. Get started by adding your first listing!', 'all-purpose-directory' ),
+		'title'   => __( 'No Listings Yet', 'damdir-directory' ),
+		'message' => __( 'You haven\'t created any listings yet. Get started by adding your first listing!', 'damdir-directory' ),
 		'icon'    => 'dashicons-plus-alt',
 	],
 	'publish' => [
-		'title'   => __( 'No Published Listings', 'all-purpose-directory' ),
-		'message' => __( 'You don\'t have any published listings. Submit a listing for review to get it published.', 'all-purpose-directory' ),
+		'title'   => __( 'No Published Listings', 'damdir-directory' ),
+		'message' => __( 'You don\'t have any published listings. Submit a listing for review to get it published.', 'damdir-directory' ),
 		'icon'    => 'dashicons-yes-alt',
 	],
 	'pending' => [
-		'title'   => __( 'No Pending Listings', 'all-purpose-directory' ),
-		'message' => __( 'You don\'t have any listings pending review.', 'all-purpose-directory' ),
+		'title'   => __( 'No Pending Listings', 'damdir-directory' ),
+		'message' => __( 'You don\'t have any listings pending review.', 'damdir-directory' ),
 		'icon'    => 'dashicons-clock',
 	],
 	'draft'   => [
-		'title'   => __( 'No Draft Listings', 'all-purpose-directory' ),
-		'message' => __( 'You don\'t have any draft listings saved.', 'all-purpose-directory' ),
+		'title'   => __( 'No Draft Listings', 'damdir-directory' ),
+		'message' => __( 'You don\'t have any draft listings saved.', 'damdir-directory' ),
 		'icon'    => 'dashicons-edit',
 	],
 	'expired' => [
-		'title'   => __( 'No Expired Listings', 'all-purpose-directory' ),
-		'message' => __( 'You don\'t have any expired listings.', 'all-purpose-directory' ),
+		'title'   => __( 'No Expired Listings', 'damdir-directory' ),
+		'message' => __( 'You don\'t have any expired listings.', 'damdir-directory' ),
 		'icon'    => 'dashicons-dismiss',
 	],
 ];
@@ -71,7 +71,7 @@ $show_cta       = ( $status === 'all' || $status === 'publish' || $status === 'd
 		<div class="apd-my-listings-empty__actions">
 			<a href="<?php echo esc_url( $submission_url ); ?>" class="apd-button apd-button--primary">
 				<span class="dashicons dashicons-plus-alt" aria-hidden="true"></span>
-				<?php esc_html_e( 'Create New Listing', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Create New Listing', 'damdir-directory' ); ?>
 			</a>
 		</div>
 	<?php endif; ?>
@@ -79,7 +79,7 @@ $show_cta       = ( $status === 'all' || $status === 'publish' || $status === 'd
 	<?php if ( $status !== 'all' ) : ?>
 		<div class="apd-my-listings-empty__link">
 			<a href="<?php echo esc_url( remove_query_arg( [ 'status', 'paged' ] ) ); ?>">
-				<?php esc_html_e( 'View all listings', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'View all listings', 'damdir-directory' ); ?>
 			</a>
 		</div>
 	<?php endif; ?>

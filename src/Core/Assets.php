@@ -1,6 +1,6 @@
 <?php
 /**
- * Asset management for All Purpose Directory.
+ * Asset management for DamDir Directory.
  *
  * @package APD\Core
  */
@@ -250,19 +250,19 @@ class Assets {
 			'filterNonce' => wp_create_nonce( 'apd_filter_listings' ),
 			'archiveUrl'  => get_post_type_archive_link( 'apd_listing' ) ?: '',
 			'i18n'        => [
-				'loading'             => __( 'Loading...', 'all-purpose-directory' ),
-				'error'               => __( 'An error occurred. Please try again.', 'all-purpose-directory' ),
-				'noResults'           => __( 'No listings found.', 'all-purpose-directory' ),
-				'addToFavorites'      => __( 'Add to favorites', 'all-purpose-directory' ),
-				'removeFromFavorites' => __( 'Remove from favorites', 'all-purpose-directory' ),
-				'favoriteAdded'       => __( 'Added to favorites', 'all-purpose-directory' ),
-				'favoriteRemoved'     => __( 'Removed from favorites', 'all-purpose-directory' ),
-				'favoriteError'       => __( 'Could not update favorites. Please try again.', 'all-purpose-directory' ),
-				'filtering'           => __( 'Filtering listings...', 'all-purpose-directory' ),
-				'submitting'          => __( 'Submitting…', 'all-purpose-directory' ),
+				'loading'             => __( 'Loading...', 'damdir-directory' ),
+				'error'               => __( 'An error occurred. Please try again.', 'damdir-directory' ),
+				'noResults'           => __( 'No listings found.', 'damdir-directory' ),
+				'addToFavorites'      => __( 'Add to favorites', 'damdir-directory' ),
+				'removeFromFavorites' => __( 'Remove from favorites', 'damdir-directory' ),
+				'favoriteAdded'       => __( 'Added to favorites', 'damdir-directory' ),
+				'favoriteRemoved'     => __( 'Removed from favorites', 'damdir-directory' ),
+				'favoriteError'       => __( 'Could not update favorites. Please try again.', 'damdir-directory' ),
+				'filtering'           => __( 'Filtering listings...', 'damdir-directory' ),
+				'submitting'          => __( 'Submitting…', 'damdir-directory' ),
 				/* translators: %d: Number of listings found */
-				'resultsFound'        => __( '%d listings found', 'all-purpose-directory' ),
-				'oneResultFound'      => __( '1 listing found', 'all-purpose-directory' ),
+				'resultsFound'        => __( '%d listings found', 'damdir-directory' ),
+				'oneResultFound'      => __( '1 listing found', 'damdir-directory' ),
 			],
 		];
 
@@ -286,10 +286,10 @@ class Assets {
 			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
 			'nonce'   => wp_create_nonce( 'apd_admin' ),
 			'i18n'    => [
-				'confirmDelete' => __( 'Are you sure you want to delete this item?', 'all-purpose-directory' ),
-				'saving'        => __( 'Saving...', 'all-purpose-directory' ),
-				'saved'         => __( 'Saved!', 'all-purpose-directory' ),
-				'error'         => __( 'An error occurred. Please try again.', 'all-purpose-directory' ),
+				'confirmDelete' => __( 'Are you sure you want to delete this item?', 'damdir-directory' ),
+				'saving'        => __( 'Saving...', 'damdir-directory' ),
+				'saved'         => __( 'Saved!', 'damdir-directory' ),
+				'error'         => __( 'An error occurred. Please try again.', 'damdir-directory' ),
 			],
 		];
 

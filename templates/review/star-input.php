@@ -6,7 +6,7 @@
  * Uses radio buttons for accessibility with visual star display.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/review/star-input.php
+ * yourtheme/damdir-directory/review/star-input.php
  *
  * @package APD\Templates
  * @since   1.0.0
@@ -45,9 +45,9 @@ $star_count      = $star_count ?? 5;
 			<?php
 			$star_label = $i === 1
 				/* translators: %d: number of stars (singular) */
-				? sprintf( __( '%d star', 'all-purpose-directory' ), $i )
+				? sprintf( __( '%d star', 'damdir-directory' ), $i )
 				/* translators: %d: number of stars (plural) */
-				: sprintf( __( '%d stars', 'all-purpose-directory' ), $i );
+				: sprintf( __( '%d stars', 'damdir-directory' ), $i );
 			?>
 			<label class="apd-star-input__radio-label">
 				<input type="radio"
@@ -69,15 +69,15 @@ $star_count      = $star_count ?? 5;
 				echo esc_html(
 					$selected_rating === 1
 					/* translators: %d: number of stars (singular) */
-					? sprintf( __( '%d star selected', 'all-purpose-directory' ), $selected_rating )
+					? sprintf( __( '%d star selected', 'damdir-directory' ), $selected_rating )
 					/* translators: %d: number of stars (plural) */
-					: sprintf( __( '%d stars selected', 'all-purpose-directory' ), $selected_rating )
+					: sprintf( __( '%d stars selected', 'damdir-directory' ), $selected_rating )
 				);
 				?>
 			</span>
 		<?php else : ?>
 			<span class="apd-star-input__prompt-text">
-				<?php esc_html_e( 'Select a rating', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Select a rating', 'damdir-directory' ); ?>
 			</span>
 		<?php endif; ?>
 	</div>

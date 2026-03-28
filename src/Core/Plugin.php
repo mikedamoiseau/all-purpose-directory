@@ -297,8 +297,8 @@ final class Plugin {
 	 * Load plugin text domain for translations.
 	 *
 	 * Loads translations from:
-	 * 1. WP_LANG_DIR/plugins/all-purpose-directory-{locale}.mo (global)
-	 * 2. plugin/languages/all-purpose-directory-{locale}.mo (plugin)
+	 * 1. WP_LANG_DIR/plugins/damdir-directory-{locale}.mo (global)
+	 * 2. plugin/languages/damdir-directory-{locale}.mo (plugin)
 	 *
 	 * @since 1.0.0
 	 *
@@ -312,7 +312,7 @@ final class Plugin {
 		 *
 		 * For self-hosted distributions requiring custom translations, use:
 		 * add_action( 'apd_textdomain_loaded', function() {
-		 *     load_plugin_textdomain( 'all-purpose-directory', false, 'all-purpose-directory/languages' );
+		 *     load_plugin_textdomain( 'damdir-directory', false, 'damdir-directory/languages' );
 		 * } );
 		 *
 		 * @link https://make.wordpress.org/core/2016/07/06/i18n-improvements-in-4-6/

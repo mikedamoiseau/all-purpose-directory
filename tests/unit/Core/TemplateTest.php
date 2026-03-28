@@ -52,8 +52,8 @@ class TemplateTest extends TestCase {
 		$this->theme_dir       = sys_get_temp_dir() . '/apd_theme_' . uniqid();
 		$this->child_theme_dir = sys_get_temp_dir() . '/apd_child_theme_' . uniqid();
 
-		@mkdir( $this->theme_dir . '/all-purpose-directory', 0777, true );
-		@mkdir( $this->child_theme_dir . '/all-purpose-directory', 0777, true );
+		@mkdir( $this->theme_dir . '/damdir-directory', 0777, true );
+		@mkdir( $this->child_theme_dir . '/damdir-directory', 0777, true );
 
 		// Mock WordPress theme functions.
 		Functions\when( 'get_stylesheet_directory' )->justReturn( $this->child_theme_dir );
@@ -142,7 +142,7 @@ class TemplateTest extends TestCase {
 	 */
 	public function test_locate_template_prefers_theme_template(): void {
 		// Create theme template.
-		$theme_template = $this->theme_dir . '/all-purpose-directory/theme-test.php';
+		$theme_template = $this->theme_dir . '/damdir-directory/theme-test.php';
 		file_put_contents( $theme_template, '<?php echo "theme template"; ?>' );
 
 		$result = $this->template->locate_template( 'theme-test.php' );
@@ -155,11 +155,11 @@ class TemplateTest extends TestCase {
 	 */
 	public function test_locate_template_prefers_child_theme_template(): void {
 		// Create parent theme template.
-		$parent_template = $this->theme_dir . '/all-purpose-directory/child-test.php';
+		$parent_template = $this->theme_dir . '/damdir-directory/child-test.php';
 		file_put_contents( $parent_template, '<?php echo "parent theme template"; ?>' );
 
 		// Create child theme template.
-		$child_template = $this->child_theme_dir . '/all-purpose-directory/child-test.php';
+		$child_template = $this->child_theme_dir . '/damdir-directory/child-test.php';
 		file_put_contents( $child_template, '<?php echo "child theme template"; ?>' );
 
 		$result = $this->template->locate_template( 'child-test.php' );
@@ -203,7 +203,7 @@ class TemplateTest extends TestCase {
 	 */
 	public function test_get_template_loads_template_with_args(): void {
 		// Create template that uses args.
-		$template_file = $this->theme_dir . '/all-purpose-directory/args-template.php';
+		$template_file = $this->theme_dir . '/damdir-directory/args-template.php';
 		file_put_contents( $template_file, '<?php echo $title . " - " . $count; ?>' );
 
 		ob_start();
@@ -228,7 +228,7 @@ class TemplateTest extends TestCase {
 	 * Test get_template_html returns template as string.
 	 */
 	public function test_get_template_html_returns_string(): void {
-		$template_file = $this->theme_dir . '/all-purpose-directory/html-template.php';
+		$template_file = $this->theme_dir . '/damdir-directory/html-template.php';
 		file_put_contents( $template_file, '<?php echo "HTML content"; ?>' );
 
 		$result = $this->template->get_template_html( 'html-template.php' );
@@ -241,7 +241,7 @@ class TemplateTest extends TestCase {
 	 */
 	public function test_get_template_part_with_slug_and_name(): void {
 		// Create specialized template.
-		$template_file = $this->theme_dir . '/all-purpose-directory/test-card-grid.php';
+		$template_file = $this->theme_dir . '/damdir-directory/test-card-grid.php';
 		file_put_contents( $template_file, '<?php echo "grid card"; ?>' );
 
 		ob_start();
@@ -256,7 +256,7 @@ class TemplateTest extends TestCase {
 	 */
 	public function test_get_template_part_falls_back_to_generic(): void {
 		// Create only generic template.
-		$template_file = $this->theme_dir . '/all-purpose-directory/generic-card.php';
+		$template_file = $this->theme_dir . '/damdir-directory/generic-card.php';
 		file_put_contents( $template_file, '<?php echo "generic card"; ?>' );
 
 		ob_start();
@@ -270,7 +270,7 @@ class TemplateTest extends TestCase {
 	 * Test get_template_part with slug only.
 	 */
 	public function test_get_template_part_with_slug_only(): void {
-		$template_file = $this->theme_dir . '/all-purpose-directory/slug-only-card.php';
+		$template_file = $this->theme_dir . '/damdir-directory/slug-only-card.php';
 		file_put_contents( $template_file, '<?php echo "card"; ?>' );
 
 		ob_start();
@@ -284,7 +284,7 @@ class TemplateTest extends TestCase {
 	 * Test get_template_part_html returns string.
 	 */
 	public function test_get_template_part_html_returns_string(): void {
-		$template_file = $this->theme_dir . '/all-purpose-directory/html-part.php';
+		$template_file = $this->theme_dir . '/damdir-directory/html-part.php';
 		file_put_contents( $template_file, '<?php echo "HTML card"; ?>' );
 
 		$result = $this->template->get_template_part_html( 'html-part' );
@@ -314,7 +314,7 @@ class TemplateTest extends TestCase {
 	 * Test is_template_overridden returns true when in theme.
 	 */
 	public function test_is_template_overridden_returns_true(): void {
-		$theme_template = $this->theme_dir . '/all-purpose-directory/overridden.php';
+		$theme_template = $this->theme_dir . '/damdir-directory/overridden.php';
 		file_put_contents( $theme_template, '<?php echo "overridden"; ?>' );
 
 		$result = $this->template->is_template_overridden( 'overridden.php' );
@@ -326,7 +326,7 @@ class TemplateTest extends TestCase {
 	 * Test is_template_overridden returns true for child theme.
 	 */
 	public function test_is_template_overridden_returns_true_for_child_theme(): void {
-		$child_template = $this->child_theme_dir . '/all-purpose-directory/child-override.php';
+		$child_template = $this->child_theme_dir . '/damdir-directory/child-override.php';
 		file_put_contents( $child_template, '<?php echo "child override"; ?>' );
 
 		$result = $this->template->is_template_overridden( 'child-override.php' );
@@ -358,7 +358,7 @@ class TemplateTest extends TestCase {
 	public function test_get_theme_template_dir(): void {
 		$result = $this->template->get_theme_template_dir();
 
-		$this->assertSame( 'all-purpose-directory/', $result );
+		$this->assertSame( 'damdir-directory/', $result );
 	}
 
 	/**
@@ -381,7 +381,7 @@ class TemplateTest extends TestCase {
 	 * Test args are available as $args array in template.
 	 */
 	public function test_args_available_as_array(): void {
-		$template_file = $this->theme_dir . '/all-purpose-directory/array-args.php';
+		$template_file = $this->theme_dir . '/damdir-directory/array-args.php';
 		file_put_contents( $template_file, '<?php echo $args["key"]; ?>' );
 
 		ob_start();
@@ -396,8 +396,8 @@ class TemplateTest extends TestCase {
 	 */
 	public function test_subdirectory_templates(): void {
 		// Create a template in a subdirectory.
-		@mkdir( $this->theme_dir . '/all-purpose-directory/subdir', 0777, true );
-		$template_file = $this->theme_dir . '/all-purpose-directory/subdir/test.php';
+		@mkdir( $this->theme_dir . '/damdir-directory/subdir', 0777, true );
+		$template_file = $this->theme_dir . '/damdir-directory/subdir/test.php';
 		file_put_contents( $template_file, '<?php echo "subdirectory template"; ?>' );
 
 		$result = $this->template->get_template_html( 'subdir/test.php' );
@@ -409,7 +409,7 @@ class TemplateTest extends TestCase {
 	 * Test get_template with require_once.
 	 */
 	public function test_get_template_with_require_once(): void {
-		$template_file = $this->theme_dir . '/all-purpose-directory/require-once-template.php';
+		$template_file = $this->theme_dir . '/damdir-directory/require-once-template.php';
 		file_put_contents( $template_file, '<?php echo "loaded"; ?>' );
 
 		ob_start();
@@ -427,7 +427,7 @@ class TemplateTest extends TestCase {
 	 * Test get_template_part with args.
 	 */
 	public function test_get_template_part_with_args(): void {
-		$template_file = $this->theme_dir . '/all-purpose-directory/part-with-args.php';
+		$template_file = $this->theme_dir . '/damdir-directory/part-with-args.php';
 		file_put_contents( $template_file, '<?php echo $listing_id; ?>' );
 
 		ob_start();

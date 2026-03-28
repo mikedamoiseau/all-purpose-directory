@@ -100,7 +100,7 @@ class FieldValidator {
 				'unknown_field',
 				sprintf(
 					/* translators: %s: field name */
-					__( 'Unknown field: %s.', 'all-purpose-directory' ),
+					__( 'Unknown field: %s.', 'damdir-directory' ),
 					$field_name
 				)
 			);
@@ -113,7 +113,7 @@ class FieldValidator {
 				'unknown_field_type',
 				sprintf(
 					/* translators: %s: field type */
-					__( 'Unknown field type: %s.', 'all-purpose-directory' ),
+					__( 'Unknown field type: %s.', 'damdir-directory' ),
 					$field['type']
 				)
 			);
@@ -126,7 +126,7 @@ class FieldValidator {
 				'required',
 				sprintf(
 					/* translators: %s: field label */
-					__( '%s is required.', 'all-purpose-directory' ),
+					__( '%s is required.', 'damdir-directory' ),
 					$field['label'] ?? $field_name
 				)
 			);
@@ -222,7 +222,7 @@ class FieldValidator {
 						$field_name,
 						sprintf(
 							/* translators: %s: field name */
-							__( 'Unknown field: %s.', 'all-purpose-directory' ),
+							__( 'Unknown field: %s.', 'damdir-directory' ),
 							$field_name
 						)
 					);
@@ -457,7 +457,7 @@ class FieldValidator {
 					$field_name,
 					sprintf(
 						/* translators: %s: field label */
-						__( '%s is required.', 'all-purpose-directory' ),
+						__( '%s is required.', 'damdir-directory' ),
 						$field['label'] ?? $field_name
 					)
 				);

@@ -125,7 +125,7 @@ class FavoriteToggle {
 			wp_send_json_error(
 				[
 					'code'    => 'invalid_nonce',
-					'message' => __( 'Invalid security token. Please refresh the page and try again.', 'all-purpose-directory' ),
+					'message' => __( 'Invalid security token. Please refresh the page and try again.', 'damdir-directory' ),
 				],
 				403
 			);
@@ -137,7 +137,7 @@ class FavoriteToggle {
 			wp_send_json_error(
 				[
 					'code'    => 'invalid_listing',
-					'message' => __( 'Invalid listing ID.', 'all-purpose-directory' ),
+					'message' => __( 'Invalid listing ID.', 'damdir-directory' ),
 				],
 				400
 			);
@@ -156,7 +156,7 @@ class FavoriteToggle {
 			wp_send_json_error(
 				[
 					'code'      => 'login_required',
-					'message'   => __( 'Please log in to save favorites.', 'all-purpose-directory' ),
+					'message'   => __( 'Please log in to save favorites.', 'damdir-directory' ),
 					'login_url' => $redirect_url,
 				],
 				401
@@ -170,7 +170,7 @@ class FavoriteToggle {
 			wp_send_json_error(
 				[
 					'code'    => 'toggle_failed',
-					'message' => __( 'Failed to update favorite status.', 'all-purpose-directory' ),
+					'message' => __( 'Failed to update favorite status.', 'damdir-directory' ),
 				],
 				500
 			);
@@ -189,8 +189,8 @@ class FavoriteToggle {
 		);
 
 		$message = $new_state
-			? __( 'Added to favorites.', 'all-purpose-directory' )
-			: __( 'Removed from favorites.', 'all-purpose-directory' );
+			? __( 'Added to favorites.', 'damdir-directory' )
+			: __( 'Removed from favorites.', 'damdir-directory' );
 
 		wp_send_json_success(
 			[
@@ -291,7 +291,7 @@ class FavoriteToggle {
 					<?php
 					printf(
 						/* translators: %s: number of people who favorited */
-						esc_html( _n( '%s person favorited this', '%s people favorited this', $count, 'all-purpose-directory' ) ),
+						esc_html( _n( '%s person favorited this', '%s people favorited this', $count, 'damdir-directory' ) ),
 						esc_html( number_format_i18n( $count ) )
 					);
 					?>
@@ -374,8 +374,8 @@ class FavoriteToggle {
 
 		// Determine ARIA label.
 		$aria_label = $is_favorite
-			? __( 'Remove from favorites', 'all-purpose-directory' )
-			: __( 'Add to favorites', 'all-purpose-directory' );
+			? __( 'Remove from favorites', 'damdir-directory' )
+			: __( 'Add to favorites', 'damdir-directory' );
 
 		// Build button HTML.
 		$html = sprintf(
@@ -453,12 +453,12 @@ class FavoriteToggle {
 			$data['i18n'] = [];
 		}
 
-		$data['i18n']['addedToFavorites']     = __( 'Added to favorites.', 'all-purpose-directory' );
-		$data['i18n']['removedFromFavorites'] = __( 'Removed from favorites.', 'all-purpose-directory' );
-		$data['i18n']['addToFavorites']       = __( 'Add to favorites', 'all-purpose-directory' );
-		$data['i18n']['removeFromFavorites']  = __( 'Remove from favorites', 'all-purpose-directory' );
-		$data['i18n']['loginRequired']        = __( 'Please log in to save favorites.', 'all-purpose-directory' );
-		$data['i18n']['favoriteError']        = __( 'Failed to update favorite. Please try again.', 'all-purpose-directory' );
+		$data['i18n']['addedToFavorites']     = __( 'Added to favorites.', 'damdir-directory' );
+		$data['i18n']['removedFromFavorites'] = __( 'Removed from favorites.', 'damdir-directory' );
+		$data['i18n']['addToFavorites']       = __( 'Add to favorites', 'damdir-directory' );
+		$data['i18n']['removeFromFavorites']  = __( 'Remove from favorites', 'damdir-directory' );
+		$data['i18n']['loginRequired']        = __( 'Please log in to save favorites.', 'damdir-directory' );
+		$data['i18n']['favoriteError']        = __( 'Failed to update favorite. Please try again.', 'damdir-directory' );
 
 		return $data;
 	}

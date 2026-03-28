@@ -154,27 +154,27 @@ final class Settings {
 	public function register_tabs(): void {
 		$this->tabs = [
 			'general'    => [
-				'label'    => __( 'General', 'all-purpose-directory' ),
+				'label'    => __( 'General', 'damdir-directory' ),
 				'callback' => [ $this, 'render_general_tab' ],
 			],
 			'listings'   => [
-				'label'    => __( 'Listings', 'all-purpose-directory' ),
+				'label'    => __( 'Listings', 'damdir-directory' ),
 				'callback' => [ $this, 'render_listings_tab' ],
 			],
 			'submission' => [
-				'label'    => __( 'Submission', 'all-purpose-directory' ),
+				'label'    => __( 'Submission', 'damdir-directory' ),
 				'callback' => [ $this, 'render_submission_tab' ],
 			],
 			'display'    => [
-				'label'    => __( 'Display', 'all-purpose-directory' ),
+				'label'    => __( 'Display', 'damdir-directory' ),
 				'callback' => [ $this, 'render_display_tab' ],
 			],
 			'email'      => [
-				'label'    => __( 'Email', 'all-purpose-directory' ),
+				'label'    => __( 'Email', 'damdir-directory' ),
 				'callback' => [ $this, 'render_email_tab' ],
 			],
 			'advanced'   => [
-				'label'    => __( 'Advanced', 'all-purpose-directory' ),
+				'label'    => __( 'Advanced', 'damdir-directory' ),
 				'callback' => [ $this, 'render_advanced_tab' ],
 			],
 		];
@@ -199,8 +199,8 @@ final class Settings {
 	public function register_admin_page(): void {
 		add_submenu_page(
 			self::PARENT_MENU,
-			__( 'Settings', 'all-purpose-directory' ),
-			__( 'Settings', 'all-purpose-directory' ),
+			__( 'Settings', 'damdir-directory' ),
+			__( 'Settings', 'damdir-directory' ),
 			self::CAPABILITY,
 			self::PAGE_SLUG,
 			[ $this, 'render_page' ]
@@ -258,75 +258,75 @@ final class Settings {
 
 		add_settings_section(
 			$section_id,
-			__( 'General Settings', 'all-purpose-directory' ),
+			__( 'General Settings', 'damdir-directory' ),
 			function () {
-				echo '<p>' . esc_html__( 'Configure general plugin settings.', 'all-purpose-directory' ) . '</p>';
+				echo '<p>' . esc_html__( 'Configure general plugin settings.', 'damdir-directory' ) . '</p>';
 			},
 			$page
 		);
 
 		add_settings_field(
 			'currency_symbol',
-			__( 'Currency Symbol', 'all-purpose-directory' ),
+			__( 'Currency Symbol', 'damdir-directory' ),
 			[ $this, 'render_text_field' ],
 			$page,
 			$section_id,
 			[
 				'field'       => 'currency_symbol',
-				'description' => __( 'Currency symbol to display with prices (e.g., $, €, £).', 'all-purpose-directory' ),
+				'description' => __( 'Currency symbol to display with prices (e.g., $, €, £).', 'damdir-directory' ),
 				'class'       => 'small-text',
 			]
 		);
 
 		add_settings_field(
 			'currency_position',
-			__( 'Currency Position', 'all-purpose-directory' ),
+			__( 'Currency Position', 'damdir-directory' ),
 			[ $this, 'render_select_field' ],
 			$page,
 			$section_id,
 			[
 				'field'       => 'currency_position',
 				'options'     => [
-					'before' => __( 'Before amount ($99)', 'all-purpose-directory' ),
-					'after'  => __( 'After amount (99$)', 'all-purpose-directory' ),
+					'before' => __( 'Before amount ($99)', 'damdir-directory' ),
+					'after'  => __( 'After amount (99$)', 'damdir-directory' ),
 				],
-				'description' => __( 'Where to display the currency symbol.', 'all-purpose-directory' ),
+				'description' => __( 'Where to display the currency symbol.', 'damdir-directory' ),
 			]
 		);
 
 		add_settings_field(
 			'date_format',
-			__( 'Date Format', 'all-purpose-directory' ),
+			__( 'Date Format', 'damdir-directory' ),
 			[ $this, 'render_select_field' ],
 			$page,
 			$section_id,
 			[
 				'field'       => 'date_format',
 				'options'     => [
-					'default' => __( 'WordPress Default', 'all-purpose-directory' ),
+					'default' => __( 'WordPress Default', 'damdir-directory' ),
 					'Y-m-d'   => 'YYYY-MM-DD (2024-01-15)',
 					'm/d/Y'   => 'MM/DD/YYYY (01/15/2024)',
 					'd/m/Y'   => 'DD/MM/YYYY (15/01/2024)',
 					'F j, Y'  => 'Month Day, Year (January 15, 2024)',
 					'j F Y'   => 'Day Month Year (15 January 2024)',
 				],
-				'description' => __( 'Date format for listing dates.', 'all-purpose-directory' ),
+				'description' => __( 'Date format for listing dates.', 'damdir-directory' ),
 			]
 		);
 
 		add_settings_field(
 			'distance_unit',
-			__( 'Distance Unit', 'all-purpose-directory' ),
+			__( 'Distance Unit', 'damdir-directory' ),
 			[ $this, 'render_select_field' ],
 			$page,
 			$section_id,
 			[
 				'field'       => 'distance_unit',
 				'options'     => [
-					'km'    => __( 'Kilometers (km)', 'all-purpose-directory' ),
-					'miles' => __( 'Miles', 'all-purpose-directory' ),
+					'km'    => __( 'Kilometers (km)', 'damdir-directory' ),
+					'miles' => __( 'Miles', 'damdir-directory' ),
 				],
-				'description' => __( 'Unit for distance measurements.', 'all-purpose-directory' ),
+				'description' => __( 'Unit for distance measurements.', 'damdir-directory' ),
 			]
 		);
 
@@ -334,46 +334,46 @@ final class Settings {
 		$pages_section = 'apd_general_pages_section';
 		add_settings_section(
 			$pages_section,
-			__( 'Pages', 'all-purpose-directory' ),
+			__( 'Pages', 'damdir-directory' ),
 			function () {
-				echo '<p>' . esc_html__( 'Pages created during activation. You can reassign them here.', 'all-purpose-directory' ) . '</p>';
+				echo '<p>' . esc_html__( 'Pages created during activation. You can reassign them here.', 'damdir-directory' ) . '</p>';
 			},
 			$page
 		);
 
 		add_settings_field(
 			'directory_page',
-			__( 'Directory Page', 'all-purpose-directory' ),
+			__( 'Directory Page', 'damdir-directory' ),
 			[ $this, 'render_page_select_field' ],
 			$page,
 			$pages_section,
 			[
 				'field'       => 'directory_page',
-				'description' => __( 'Main directory page with search form and listings.', 'all-purpose-directory' ),
+				'description' => __( 'Main directory page with search form and listings.', 'damdir-directory' ),
 			]
 		);
 
 		add_settings_field(
 			'submit_page',
-			__( 'Submit Listing Page', 'all-purpose-directory' ),
+			__( 'Submit Listing Page', 'damdir-directory' ),
 			[ $this, 'render_page_select_field' ],
 			$page,
 			$pages_section,
 			[
 				'field'       => 'submit_page',
-				'description' => __( 'Page with the listing submission form.', 'all-purpose-directory' ),
+				'description' => __( 'Page with the listing submission form.', 'damdir-directory' ),
 			]
 		);
 
 		add_settings_field(
 			'dashboard_page',
-			__( 'Dashboard Page', 'all-purpose-directory' ),
+			__( 'Dashboard Page', 'damdir-directory' ),
 			[ $this, 'render_page_select_field' ],
 			$page,
 			$pages_section,
 			[
 				'field'       => 'dashboard_page',
-				'description' => __( 'User dashboard page.', 'all-purpose-directory' ),
+				'description' => __( 'User dashboard page.', 'damdir-directory' ),
 			]
 		);
 	}
@@ -391,16 +391,16 @@ final class Settings {
 
 		add_settings_section(
 			$section_id,
-			__( 'Listing Settings', 'all-purpose-directory' ),
+			__( 'Listing Settings', 'damdir-directory' ),
 			function () {
-				echo '<p>' . esc_html__( 'Configure listing display and behavior.', 'all-purpose-directory' ) . '</p>';
+				echo '<p>' . esc_html__( 'Configure listing display and behavior.', 'damdir-directory' ) . '</p>';
 			},
 			$page
 		);
 
 		add_settings_field(
 			'listings_per_page',
-			__( 'Listings Per Page', 'all-purpose-directory' ),
+			__( 'Listings Per Page', 'damdir-directory' ),
 			[ $this, 'render_number_field' ],
 			$page,
 			$section_id,
@@ -408,30 +408,30 @@ final class Settings {
 				'field'       => 'listings_per_page',
 				'min'         => 1,
 				'max'         => 100,
-				'description' => __( 'Number of listings to display per page (1-100).', 'all-purpose-directory' ),
+				'description' => __( 'Number of listings to display per page (1-100).', 'damdir-directory' ),
 			]
 		);
 
 		add_settings_field(
 			'default_status',
-			__( 'Default Listing Status', 'all-purpose-directory' ),
+			__( 'Default Listing Status', 'damdir-directory' ),
 			[ $this, 'render_select_field' ],
 			$page,
 			$section_id,
 			[
 				'field'       => 'default_status',
 				'options'     => [
-					'publish' => __( 'Published', 'all-purpose-directory' ),
-					'pending' => __( 'Pending Review', 'all-purpose-directory' ),
-					'draft'   => __( 'Draft', 'all-purpose-directory' ),
+					'publish' => __( 'Published', 'damdir-directory' ),
+					'pending' => __( 'Pending Review', 'damdir-directory' ),
+					'draft'   => __( 'Draft', 'damdir-directory' ),
 				],
-				'description' => __( 'Default status for new listing submissions.', 'all-purpose-directory' ),
+				'description' => __( 'Default status for new listing submissions.', 'damdir-directory' ),
 			]
 		);
 
 		add_settings_field(
 			'expiration_days',
-			__( 'Listing Expiration', 'all-purpose-directory' ),
+			__( 'Listing Expiration', 'damdir-directory' ),
 			[ $this, 'render_number_field' ],
 			$page,
 			$section_id,
@@ -439,7 +439,7 @@ final class Settings {
 				'field'       => 'expiration_days',
 				'min'         => 0,
 				'max'         => 365,
-				'description' => __( 'Days until listings expire (0 = never expire).', 'all-purpose-directory' ),
+				'description' => __( 'Days until listings expire (0 = never expire).', 'damdir-directory' ),
 			]
 		);
 
@@ -447,46 +447,46 @@ final class Settings {
 		$features_section = 'apd_listings_features_section';
 		add_settings_section(
 			$features_section,
-			__( 'Features', 'all-purpose-directory' ),
+			__( 'Features', 'damdir-directory' ),
 			function () {
-				echo '<p>' . esc_html__( 'Enable or disable listing features.', 'all-purpose-directory' ) . '</p>';
+				echo '<p>' . esc_html__( 'Enable or disable listing features.', 'damdir-directory' ) . '</p>';
 			},
 			$page
 		);
 
 		add_settings_field(
 			'enable_reviews',
-			__( 'Enable Reviews', 'all-purpose-directory' ),
+			__( 'Enable Reviews', 'damdir-directory' ),
 			[ $this, 'render_checkbox_field' ],
 			$page,
 			$features_section,
 			[
 				'field' => 'enable_reviews',
-				'label' => __( 'Allow users to leave reviews on listings.', 'all-purpose-directory' ),
+				'label' => __( 'Allow users to leave reviews on listings.', 'damdir-directory' ),
 			]
 		);
 
 		add_settings_field(
 			'enable_favorites',
-			__( 'Enable Favorites', 'all-purpose-directory' ),
+			__( 'Enable Favorites', 'damdir-directory' ),
 			[ $this, 'render_checkbox_field' ],
 			$page,
 			$features_section,
 			[
 				'field' => 'enable_favorites',
-				'label' => __( 'Allow users to save listings to favorites.', 'all-purpose-directory' ),
+				'label' => __( 'Allow users to save listings to favorites.', 'damdir-directory' ),
 			]
 		);
 
 		add_settings_field(
 			'enable_contact_form',
-			__( 'Enable Contact Form', 'all-purpose-directory' ),
+			__( 'Enable Contact Form', 'damdir-directory' ),
 			[ $this, 'render_checkbox_field' ],
 			$page,
 			$features_section,
 			[
 				'field' => 'enable_contact_form',
-				'label' => __( 'Show contact form on listing pages.', 'all-purpose-directory' ),
+				'label' => __( 'Show contact form on listing pages.', 'damdir-directory' ),
 			]
 		);
 	}
@@ -504,93 +504,93 @@ final class Settings {
 
 		add_settings_section(
 			$section_id,
-			__( 'Submission Settings', 'all-purpose-directory' ),
+			__( 'Submission Settings', 'damdir-directory' ),
 			function () {
-				echo '<p>' . esc_html__( 'Configure frontend listing submission settings.', 'all-purpose-directory' ) . '</p>';
+				echo '<p>' . esc_html__( 'Configure frontend listing submission settings.', 'damdir-directory' ) . '</p>';
 			},
 			$page
 		);
 
 		add_settings_field(
 			'who_can_submit',
-			__( 'Who Can Submit', 'all-purpose-directory' ),
+			__( 'Who Can Submit', 'damdir-directory' ),
 			[ $this, 'render_select_field' ],
 			$page,
 			$section_id,
 			[
 				'field'       => 'who_can_submit',
 				'options'     => [
-					'anyone'         => __( 'Anyone (including guests)', 'all-purpose-directory' ),
-					'logged_in'      => __( 'Logged-in Users Only', 'all-purpose-directory' ),
-					'specific_roles' => __( 'Specific User Roles', 'all-purpose-directory' ),
+					'anyone'         => __( 'Anyone (including guests)', 'damdir-directory' ),
+					'logged_in'      => __( 'Logged-in Users Only', 'damdir-directory' ),
+					'specific_roles' => __( 'Specific User Roles', 'damdir-directory' ),
 				],
-				'description' => __( 'Who can submit new listings from the frontend.', 'all-purpose-directory' ),
+				'description' => __( 'Who can submit new listings from the frontend.', 'damdir-directory' ),
 			]
 		);
 
 		add_settings_field(
 			'submission_roles',
-			__( 'Allowed Roles', 'all-purpose-directory' ),
+			__( 'Allowed Roles', 'damdir-directory' ),
 			[ $this, 'render_roles_field' ],
 			$page,
 			$section_id,
 			[
 				'field'       => 'submission_roles',
-				'description' => __( 'Select which user roles can submit listings.', 'all-purpose-directory' ),
+				'description' => __( 'Select which user roles can submit listings.', 'damdir-directory' ),
 			]
 		);
 
 		add_settings_field(
 			'guest_submission',
-			__( 'Guest Submission', 'all-purpose-directory' ),
+			__( 'Guest Submission', 'damdir-directory' ),
 			[ $this, 'render_checkbox_field' ],
 			$page,
 			$section_id,
 			[
 				'field' => 'guest_submission',
-				'label' => __( 'Allow guests to submit listings with email address.', 'all-purpose-directory' ),
+				'label' => __( 'Allow guests to submit listings with email address.', 'damdir-directory' ),
 			]
 		);
 
 		add_settings_field(
 			'terms_page',
-			__( 'Terms & Conditions Page', 'all-purpose-directory' ),
+			__( 'Terms & Conditions Page', 'damdir-directory' ),
 			[ $this, 'render_page_select_field' ],
 			$page,
 			$section_id,
 			[
 				'field'       => 'terms_page',
-				'description' => __( 'Page containing terms and conditions (optional).', 'all-purpose-directory' ),
+				'description' => __( 'Page containing terms and conditions (optional).', 'damdir-directory' ),
 			]
 		);
 
 		add_settings_field(
 			'redirect_after',
-			__( 'After Submission Redirect', 'all-purpose-directory' ),
+			__( 'After Submission Redirect', 'damdir-directory' ),
 			[ $this, 'render_select_field' ],
 			$page,
 			$section_id,
 			[
 				'field'       => 'redirect_after',
 				'options'     => [
-					'listing'   => __( 'View Listing', 'all-purpose-directory' ),
-					'dashboard' => __( 'User Dashboard', 'all-purpose-directory' ),
-					'custom'    => __( 'Custom URL', 'all-purpose-directory' ),
+					'listing'   => __( 'View Listing', 'damdir-directory' ),
+					'dashboard' => __( 'User Dashboard', 'damdir-directory' ),
+					'custom'    => __( 'Custom URL', 'damdir-directory' ),
 				],
-				'description' => __( 'Where to redirect users after successful submission.', 'all-purpose-directory' ),
+				'description' => __( 'Where to redirect users after successful submission.', 'damdir-directory' ),
 			]
 		);
 
 		add_settings_field(
 			'redirect_custom_url',
-			__( 'Custom Redirect URL', 'all-purpose-directory' ),
+			__( 'Custom Redirect URL', 'damdir-directory' ),
 			[ $this, 'render_text_field' ],
 			$page,
 			$section_id,
 			[
 				'field'       => 'redirect_custom_url',
 				'class'       => 'regular-text code',
-				'description' => __( 'URL on this site to redirect to (e.g., /thank-you). If empty, redirects to the submitted listing.', 'all-purpose-directory' ),
+				'description' => __( 'URL on this site to redirect to (e.g., /thank-you). If empty, redirects to the submitted listing.', 'damdir-directory' ),
 			]
 		);
 	}
@@ -608,43 +608,43 @@ final class Settings {
 
 		add_settings_section(
 			$section_id,
-			__( 'Display Settings', 'all-purpose-directory' ),
+			__( 'Display Settings', 'damdir-directory' ),
 			function () {
-				echo '<p>' . esc_html__( 'Configure how listings are displayed.', 'all-purpose-directory' ) . '</p>';
+				echo '<p>' . esc_html__( 'Configure how listings are displayed.', 'damdir-directory' ) . '</p>';
 			},
 			$page
 		);
 
 		add_settings_field(
 			'default_view',
-			__( 'Default View', 'all-purpose-directory' ),
+			__( 'Default View', 'damdir-directory' ),
 			[ $this, 'render_select_field' ],
 			$page,
 			$section_id,
 			[
 				'field'       => 'default_view',
 				'options'     => [
-					'grid' => __( 'Grid View', 'all-purpose-directory' ),
-					'list' => __( 'List View', 'all-purpose-directory' ),
+					'grid' => __( 'Grid View', 'damdir-directory' ),
+					'list' => __( 'List View', 'damdir-directory' ),
 				],
-				'description' => __( 'Default listing view on archive pages.', 'all-purpose-directory' ),
+				'description' => __( 'Default listing view on archive pages.', 'damdir-directory' ),
 			]
 		);
 
 		add_settings_field(
 			'grid_columns',
-			__( 'Grid Columns', 'all-purpose-directory' ),
+			__( 'Grid Columns', 'damdir-directory' ),
 			[ $this, 'render_select_field' ],
 			$page,
 			$section_id,
 			[
 				'field'       => 'grid_columns',
 				'options'     => [
-					'2' => __( '2 Columns', 'all-purpose-directory' ),
-					'3' => __( '3 Columns', 'all-purpose-directory' ),
-					'4' => __( '4 Columns', 'all-purpose-directory' ),
+					'2' => __( '2 Columns', 'damdir-directory' ),
+					'3' => __( '3 Columns', 'damdir-directory' ),
+					'4' => __( '4 Columns', 'damdir-directory' ),
 				],
-				'description' => __( 'Number of columns in grid view.', 'all-purpose-directory' ),
+				'description' => __( 'Number of columns in grid view.', 'damdir-directory' ),
 			]
 		);
 
@@ -652,70 +652,70 @@ final class Settings {
 		$elements_section = 'apd_display_elements_section';
 		add_settings_section(
 			$elements_section,
-			__( 'Card Elements', 'all-purpose-directory' ),
+			__( 'Card Elements', 'damdir-directory' ),
 			function () {
-				echo '<p>' . esc_html__( 'Choose which elements to show on listing cards.', 'all-purpose-directory' ) . '</p>';
+				echo '<p>' . esc_html__( 'Choose which elements to show on listing cards.', 'damdir-directory' ) . '</p>';
 			},
 			$page
 		);
 
 		add_settings_field(
 			'show_thumbnail',
-			__( 'Show Thumbnail', 'all-purpose-directory' ),
+			__( 'Show Thumbnail', 'damdir-directory' ),
 			[ $this, 'render_checkbox_field' ],
 			$page,
 			$elements_section,
 			[
 				'field' => 'show_thumbnail',
-				'label' => __( 'Display featured image on listing cards.', 'all-purpose-directory' ),
+				'label' => __( 'Display featured image on listing cards.', 'damdir-directory' ),
 			]
 		);
 
 		add_settings_field(
 			'show_excerpt',
-			__( 'Show Excerpt', 'all-purpose-directory' ),
+			__( 'Show Excerpt', 'damdir-directory' ),
 			[ $this, 'render_checkbox_field' ],
 			$page,
 			$elements_section,
 			[
 				'field' => 'show_excerpt',
-				'label' => __( 'Display excerpt/short description on cards.', 'all-purpose-directory' ),
+				'label' => __( 'Display excerpt/short description on cards.', 'damdir-directory' ),
 			]
 		);
 
 		add_settings_field(
 			'show_category',
-			__( 'Show Category', 'all-purpose-directory' ),
+			__( 'Show Category', 'damdir-directory' ),
 			[ $this, 'render_checkbox_field' ],
 			$page,
 			$elements_section,
 			[
 				'field' => 'show_category',
-				'label' => __( 'Display category badge on cards.', 'all-purpose-directory' ),
+				'label' => __( 'Display category badge on cards.', 'damdir-directory' ),
 			]
 		);
 
 		add_settings_field(
 			'show_rating',
-			__( 'Show Rating', 'all-purpose-directory' ),
+			__( 'Show Rating', 'damdir-directory' ),
 			[ $this, 'render_checkbox_field' ],
 			$page,
 			$elements_section,
 			[
 				'field' => 'show_rating',
-				'label' => __( 'Display star rating on cards.', 'all-purpose-directory' ),
+				'label' => __( 'Display star rating on cards.', 'damdir-directory' ),
 			]
 		);
 
 		add_settings_field(
 			'show_favorite',
-			__( 'Show Favorite Button', 'all-purpose-directory' ),
+			__( 'Show Favorite Button', 'damdir-directory' ),
 			[ $this, 'render_checkbox_field' ],
 			$page,
 			$elements_section,
 			[
 				'field' => 'show_favorite',
-				'label' => __( 'Display favorite/heart button on cards.', 'all-purpose-directory' ),
+				'label' => __( 'Display favorite/heart button on cards.', 'damdir-directory' ),
 			]
 		);
 
@@ -723,38 +723,38 @@ final class Settings {
 		$layout_section = 'apd_display_layout_section';
 		add_settings_section(
 			$layout_section,
-			__( 'Layout', 'all-purpose-directory' ),
+			__( 'Layout', 'damdir-directory' ),
 			function () {
-				echo '<p>' . esc_html__( 'Configure page layouts.', 'all-purpose-directory' ) . '</p>';
+				echo '<p>' . esc_html__( 'Configure page layouts.', 'damdir-directory' ) . '</p>';
 			},
 			$page
 		);
 
 		add_settings_field(
 			'archive_title',
-			__( 'Archive Page Title', 'all-purpose-directory' ),
+			__( 'Archive Page Title', 'damdir-directory' ),
 			[ $this, 'render_text_field' ],
 			$page,
 			$layout_section,
 			[
 				'field'       => 'archive_title',
-				'description' => __( 'Custom title for the listings archive page (leave empty for default).', 'all-purpose-directory' ),
+				'description' => __( 'Custom title for the listings archive page (leave empty for default).', 'damdir-directory' ),
 			]
 		);
 
 		add_settings_field(
 			'single_layout',
-			__( 'Single Listing Layout', 'all-purpose-directory' ),
+			__( 'Single Listing Layout', 'damdir-directory' ),
 			[ $this, 'render_select_field' ],
 			$page,
 			$layout_section,
 			[
 				'field'       => 'single_layout',
 				'options'     => [
-					'full'    => __( 'Full Width', 'all-purpose-directory' ),
-					'sidebar' => __( 'With Sidebar', 'all-purpose-directory' ),
+					'full'    => __( 'Full Width', 'damdir-directory' ),
+					'sidebar' => __( 'With Sidebar', 'damdir-directory' ),
 				],
-				'description' => __( 'Layout for single listing pages.', 'all-purpose-directory' ),
+				'description' => __( 'Layout for single listing pages.', 'damdir-directory' ),
 			]
 		);
 	}
@@ -772,46 +772,46 @@ final class Settings {
 
 		add_settings_section(
 			$section_id,
-			__( 'Email Settings', 'all-purpose-directory' ),
+			__( 'Email Settings', 'damdir-directory' ),
 			function () {
-				echo '<p>' . esc_html__( 'Configure email sender information.', 'all-purpose-directory' ) . '</p>';
+				echo '<p>' . esc_html__( 'Configure email sender information.', 'damdir-directory' ) . '</p>';
 			},
 			$page
 		);
 
 		add_settings_field(
 			'from_name',
-			__( 'From Name', 'all-purpose-directory' ),
+			__( 'From Name', 'damdir-directory' ),
 			[ $this, 'render_text_field' ],
 			$page,
 			$section_id,
 			[
 				'field'       => 'from_name',
-				'description' => __( 'Name shown as the email sender (leave empty for site name).', 'all-purpose-directory' ),
+				'description' => __( 'Name shown as the email sender (leave empty for site name).', 'damdir-directory' ),
 			]
 		);
 
 		add_settings_field(
 			'from_email',
-			__( 'From Email', 'all-purpose-directory' ),
+			__( 'From Email', 'damdir-directory' ),
 			[ $this, 'render_email_field' ],
 			$page,
 			$section_id,
 			[
 				'field'       => 'from_email',
-				'description' => __( 'Email address shown as sender (leave empty for admin email).', 'all-purpose-directory' ),
+				'description' => __( 'Email address shown as sender (leave empty for admin email).', 'damdir-directory' ),
 			]
 		);
 
 		add_settings_field(
 			'admin_email',
-			__( 'Admin Notification Email', 'all-purpose-directory' ),
+			__( 'Admin Notification Email', 'damdir-directory' ),
 			[ $this, 'render_email_field' ],
 			$page,
 			$section_id,
 			[
 				'field'       => 'admin_email',
-				'description' => __( 'Email for admin notifications (leave empty for default admin email).', 'all-purpose-directory' ),
+				'description' => __( 'Email for admin notifications (leave empty for default admin email).', 'damdir-directory' ),
 			]
 		);
 
@@ -819,82 +819,82 @@ final class Settings {
 		$notifications_section = 'apd_email_notifications_section';
 		add_settings_section(
 			$notifications_section,
-			__( 'Email Notifications', 'all-purpose-directory' ),
+			__( 'Email Notifications', 'damdir-directory' ),
 			function () {
-				echo '<p>' . esc_html__( 'Enable or disable email notifications.', 'all-purpose-directory' ) . '</p>';
+				echo '<p>' . esc_html__( 'Enable or disable email notifications.', 'damdir-directory' ) . '</p>';
 			},
 			$page
 		);
 
 		add_settings_field(
 			'notify_submission',
-			__( 'New Submission', 'all-purpose-directory' ),
+			__( 'New Submission', 'damdir-directory' ),
 			[ $this, 'render_checkbox_field' ],
 			$page,
 			$notifications_section,
 			[
 				'field' => 'notify_submission',
-				'label' => __( 'Notify admin when a new listing is submitted.', 'all-purpose-directory' ),
+				'label' => __( 'Notify admin when a new listing is submitted.', 'damdir-directory' ),
 			]
 		);
 
 		add_settings_field(
 			'notify_approved',
-			__( 'Listing Approved', 'all-purpose-directory' ),
+			__( 'Listing Approved', 'damdir-directory' ),
 			[ $this, 'render_checkbox_field' ],
 			$page,
 			$notifications_section,
 			[
 				'field' => 'notify_approved',
-				'label' => __( 'Notify author when their listing is approved.', 'all-purpose-directory' ),
+				'label' => __( 'Notify author when their listing is approved.', 'damdir-directory' ),
 			]
 		);
 
 		add_settings_field(
 			'notify_rejected',
-			__( 'Listing Rejected', 'all-purpose-directory' ),
+			__( 'Listing Rejected', 'damdir-directory' ),
 			[ $this, 'render_checkbox_field' ],
 			$page,
 			$notifications_section,
 			[
 				'field' => 'notify_rejected',
-				'label' => __( 'Notify author when their listing is rejected.', 'all-purpose-directory' ),
+				'label' => __( 'Notify author when their listing is rejected.', 'damdir-directory' ),
 			]
 		);
 
 		add_settings_field(
 			'notify_expiring',
-			__( 'Listing Expiring', 'all-purpose-directory' ),
+			__( 'Listing Expiring', 'damdir-directory' ),
 			[ $this, 'render_checkbox_field' ],
 			$page,
 			$notifications_section,
 			[
 				'field' => 'notify_expiring',
-				'label' => __( 'Notify author when their listing is about to expire.', 'all-purpose-directory' ),
+				'label' => __( 'Notify author when their listing is about to expire.', 'damdir-directory' ),
 			]
 		);
 
 		add_settings_field(
 			'notify_review',
-			__( 'New Review', 'all-purpose-directory' ),
+			__( 'New Review', 'damdir-directory' ),
 			[ $this, 'render_checkbox_field' ],
 			$page,
 			$notifications_section,
 			[
 				'field' => 'notify_review',
-				'label' => __( 'Notify listing author when they receive a new review.', 'all-purpose-directory' ),
+				'label' => __( 'Notify listing author when they receive a new review.', 'damdir-directory' ),
 			]
 		);
 
 		add_settings_field(
 			'notify_inquiry',
-			__( 'New Inquiry', 'all-purpose-directory' ),
+			__( 'New Inquiry', 'damdir-directory' ),
 			[ $this, 'render_checkbox_field' ],
 			$page,
 			$notifications_section,
 			[
 				'field' => 'notify_inquiry',
-				'label' => __( 'Notify listing author when they receive a contact inquiry.', 'all-purpose-directory' ),
+				'label' => __( 'Notify listing author when they receive a contact inquiry.', 'damdir-directory' ),
 			]
 		);
 	}
@@ -912,49 +912,49 @@ final class Settings {
 
 		add_settings_section(
 			$section_id,
-			__( 'Advanced Settings', 'all-purpose-directory' ),
+			__( 'Advanced Settings', 'damdir-directory' ),
 			function () {
-				echo '<p>' . esc_html__( 'Advanced configuration options.', 'all-purpose-directory' ) . '</p>';
+				echo '<p>' . esc_html__( 'Advanced configuration options.', 'damdir-directory' ) . '</p>';
 			},
 			$page
 		);
 
 		add_settings_field(
 			'delete_data',
-			__( 'Delete Data on Uninstall', 'all-purpose-directory' ),
+			__( 'Delete Data on Uninstall', 'damdir-directory' ),
 			[ $this, 'render_checkbox_field' ],
 			$page,
 			$section_id,
 			[
 				'field'       => 'delete_data',
-				'label'       => __( 'Remove all plugin data when uninstalling.', 'all-purpose-directory' ),
-				'description' => __( 'Warning: This will permanently delete all listings, reviews, and settings.', 'all-purpose-directory' ),
+				'label'       => __( 'Remove all plugin data when uninstalling.', 'damdir-directory' ),
+				'description' => __( 'Warning: This will permanently delete all listings, reviews, and settings.', 'damdir-directory' ),
 			]
 		);
 
 		add_settings_field(
 			'custom_css',
-			__( 'Custom CSS', 'all-purpose-directory' ),
+			__( 'Custom CSS', 'damdir-directory' ),
 			[ $this, 'render_textarea_field' ],
 			$page,
 			$section_id,
 			[
 				'field'       => 'custom_css',
 				'rows'        => 10,
-				'description' => __( 'Add custom CSS styles for the plugin.', 'all-purpose-directory' ),
+				'description' => __( 'Add custom CSS styles for the plugin.', 'damdir-directory' ),
 			]
 		);
 
 		add_settings_field(
 			'debug_mode',
-			__( 'Debug Mode', 'all-purpose-directory' ),
+			__( 'Debug Mode', 'damdir-directory' ),
 			[ $this, 'render_checkbox_field' ],
 			$page,
 			$section_id,
 			[
 				'field'       => 'debug_mode',
-				'label'       => __( 'Enable debug logging for troubleshooting.', 'all-purpose-directory' ),
-				'description' => __( 'Logs will be written to the WordPress debug log.', 'all-purpose-directory' ),
+				'label'       => __( 'Enable debug logging for troubleshooting.', 'damdir-directory' ),
+				'description' => __( 'Logs will be written to the WordPress debug log.', 'damdir-directory' ),
 			]
 		);
 	}
@@ -1121,7 +1121,7 @@ final class Settings {
 				'name'              => self::OPTION_NAME . '[' . $field . ']',
 				'id'                => $field,
 				'selected'          => (int) $value,
-				'show_option_none'  => __( '— Select Page —', 'all-purpose-directory' ),
+				'show_option_none'  => __( '— Select Page —', 'damdir-directory' ),
 				'option_none_value' => 0,
 			]
 		);
@@ -1303,7 +1303,7 @@ final class Settings {
 	public function render_page(): void {
 		// Check user capabilities.
 		if ( ! current_user_can( self::CAPABILITY ) ) {
-			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'all-purpose-directory' ) );
+			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'damdir-directory' ) );
 		}
 
 		$current_tab = $this->get_current_tab();
@@ -1326,9 +1326,9 @@ final class Settings {
 				<div class="apd-page-header__content">
 					<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
 				</div>
-				<a href="https://damoiseau.xyz/docs/all-purpose-directory/user-guide/#settings" class="apd-page-header__docs" target="_blank" rel="noopener noreferrer">
+				<a href="https://damoiseau.xyz/docs/damdir-directory/user-guide/#settings" class="apd-page-header__docs" target="_blank" rel="noopener noreferrer">
 					<span class="dashicons dashicons-external" aria-hidden="true"></span>
-					<?php esc_html_e( 'Documentation', 'all-purpose-directory' ); ?>
+					<?php esc_html_e( 'Documentation', 'damdir-directory' ); ?>
 				</a>
 			</div>
 
@@ -1338,10 +1338,10 @@ final class Settings {
 				<?php
 				// Show settings saved notice.
 				// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				if ( isset( $_GET['settings-updated'] ) && $_GET['settings-updated'] === 'true' ) {
+				if ( isset( $_GET['settings-updated'] ) && sanitize_text_field( wp_unslash( $_GET['settings-updated'] ) ) === 'true' ) {
 					?>
 					<div class="notice notice-success is-dismissible">
-						<p><?php esc_html_e( 'Settings saved.', 'all-purpose-directory' ); ?></p>
+						<p><?php esc_html_e( 'Settings saved.', 'damdir-directory' ); ?></p>
 					</div>
 					<?php
 				}
@@ -1386,7 +1386,7 @@ final class Settings {
 		$base_url = admin_url( self::PARENT_MENU . '&page=' . self::PAGE_SLUG );
 
 		?>
-		<nav class="nav-tab-wrapper apd-settings-tabs" aria-label="<?php esc_attr_e( 'Settings tabs', 'all-purpose-directory' ); ?>">
+		<nav class="nav-tab-wrapper apd-settings-tabs" aria-label="<?php esc_attr_e( 'Settings tabs', 'damdir-directory' ); ?>">
 			<?php foreach ( $this->tabs as $tab_id => $tab ) : ?>
 				<?php
 				$tab_url   = add_query_arg( 'tab', $tab_id, $base_url );

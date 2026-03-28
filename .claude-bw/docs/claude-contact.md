@@ -65,7 +65,7 @@ $config = [
 
 ## Template
 
-`templates/contact/contact-form.php` - Override in theme at `yourtheme/all-purpose-directory/contact/contact-form.php`
+`templates/contact/contact-form.php` - Override in theme at `yourtheme/damdir-directory/contact/contact-form.php`
 
 ---
 

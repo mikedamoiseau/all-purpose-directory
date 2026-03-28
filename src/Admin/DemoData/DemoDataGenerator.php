@@ -735,7 +735,7 @@ final class DemoDataGenerator {
 					'post_type'    => 'apd_inquiry',
 					'post_title'   => sprintf(
 						/* translators: 1: Sender name, 2: Listing title */
-						__( 'Inquiry from %1$s about %2$s', 'all-purpose-directory' ),
+						__( 'Inquiry from %1$s about %2$s', 'damdir-directory' ),
 						$sender_name,
 						get_the_title( $listing_id )
 					),

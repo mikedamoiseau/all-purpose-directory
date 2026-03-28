@@ -50,7 +50,7 @@ abstract class AbstractBlock {
 	 *
 	 * @var string
 	 */
-	protected string $category = 'all-purpose-directory';
+	protected string $category = 'damdir-directory';
 
 	/**
 	 * Block icon.

@@ -224,7 +224,7 @@ final class ListingsShortcode extends AbstractShortcode {
 			return $this->error(
 				sprintf(
 				/* translators: %s: View type */
-					__( 'Invalid view type: %s', 'all-purpose-directory' ),
+					__( 'Invalid view type: %s', 'damdir-directory' ),
 					$atts['view']
 				)
 			);
@@ -393,8 +393,8 @@ final class ListingsShortcode extends AbstractShortcode {
 			'total'     => $query->max_num_pages,
 			'current'   => $this->get_paged(),
 			'mid_size'  => 2,
-			'prev_text' => '&laquo; ' . __( 'Previous', 'all-purpose-directory' ),
-			'next_text' => __( 'Next', 'all-purpose-directory' ) . ' &raquo;',
+			'prev_text' => '&laquo; ' . __( 'Previous', 'damdir-directory' ),
+			'next_text' => __( 'Next', 'damdir-directory' ) . ' &raquo;',
 		];
 
 		/**
@@ -413,7 +413,7 @@ final class ListingsShortcode extends AbstractShortcode {
 		if ( $links ) {
 			printf(
 				'<nav class="apd-pagination" aria-label="%s">%s</nav>',
-				esc_attr__( 'Listings pagination', 'all-purpose-directory' ),
+				esc_attr__( 'Listings pagination', 'damdir-directory' ),
 				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				$links
 			);
@@ -439,7 +439,7 @@ final class ListingsShortcode extends AbstractShortcode {
 		 */
 		$message = apply_filters(
 			'apd_listings_shortcode_no_results_message',
-			__( 'No listings found.', 'all-purpose-directory' ),
+			__( 'No listings found.', 'damdir-directory' ),
 			$atts
 		);
 

@@ -236,7 +236,7 @@ final class FilterRenderer {
 		if ( $args['show_submit'] ) {
 			$submit_label = ! empty( $args['submit_text'] )
 				? sanitize_text_field( $args['submit_text'] )
-				: __( 'Search', 'all-purpose-directory' );
+				: __( 'Search', 'damdir-directory' );
 
 			$output .= '<div class="apd-search-form__actions">';
 			$output .= sprintf(
@@ -246,7 +246,7 @@ final class FilterRenderer {
 			$output .= sprintf(
 				'<a href="%s" class="apd-search-form__clear">%s</a>',
 				esc_url( $action ),
-				esc_html__( 'Clear Filters', 'all-purpose-directory' )
+				esc_html__( 'Clear Filters', 'damdir-directory' )
 			);
 			$output .= '</div>';
 		}
@@ -344,7 +344,7 @@ final class FilterRenderer {
 		$output  = '<div class="apd-search-form__orderby">';
 		$output .= sprintf(
 			'<label for="apd-orderby" class="apd-search-form__label">%s</label>',
-			esc_html__( 'Sort by', 'all-purpose-directory' )
+			esc_html__( 'Sort by', 'damdir-directory' )
 		);
 
 		$output .= '<select id="apd-orderby" name="apd_orderby" class="apd-search-form__select">';
@@ -422,7 +422,7 @@ final class FilterRenderer {
 		$output  = '<div class="apd-active-filters" aria-live="polite">';
 		$output .= sprintf(
 			'<span class="apd-active-filters__label">%s</span>',
-			esc_html__( 'Active filters:', 'all-purpose-directory' )
+			esc_html__( 'Active filters:', 'damdir-directory' )
 		);
 
 		$output .= '<ul class="apd-active-filters__list">';
@@ -447,7 +447,7 @@ final class FilterRenderer {
 				'<a href="%s" class="apd-active-filters__remove" aria-label="%s"><span aria-hidden="true">&times;</span></a>',
 				esc_url( $remove_url ),
 				/* translators: %s: filter label */
-				esc_attr( sprintf( __( 'Remove %s filter', 'all-purpose-directory' ), $filter->getLabel() ) )
+				esc_attr( sprintf( __( 'Remove %s filter', 'damdir-directory' ), $filter->getLabel() ) )
 			);
 			$output .= '</li>';
 		}
@@ -459,7 +459,7 @@ final class FilterRenderer {
 		$output   .= sprintf(
 			'<a href="%s" class="apd-active-filters__clear">%s</a>',
 			esc_url( $clear_url ),
-			esc_html__( 'Clear all', 'all-purpose-directory' )
+			esc_html__( 'Clear all', 'damdir-directory' )
 		);
 
 		$output .= '</div>';
@@ -522,12 +522,12 @@ final class FilterRenderer {
 		$output  = '<div class="apd-no-results">';
 		$output .= sprintf(
 			'<p class="apd-no-results__message">%s</p>',
-			esc_html__( 'No listings found matching your criteria.', 'all-purpose-directory' )
+			esc_html__( 'No listings found matching your criteria.', 'damdir-directory' )
 		);
 		$output .= sprintf(
 			'<a href="%s" class="apd-no-results__clear">%s</a>',
 			esc_url( $this->get_base_url() ),
-			esc_html__( 'Clear all filters', 'all-purpose-directory' )
+			esc_html__( 'Clear all filters', 'damdir-directory' )
 		);
 		$output .= '</div>';
 

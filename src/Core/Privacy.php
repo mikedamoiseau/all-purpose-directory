@@ -47,7 +47,7 @@ class Privacy {
 	 *
 	 * @var string
 	 */
-	private const HANDLER_NAME = 'all-purpose-directory';
+	private const HANDLER_NAME = 'damdir-directory';
 
 	/**
 	 * Profile meta keys exported and erased.
@@ -102,7 +102,7 @@ class Privacy {
 	 */
 	public function register_exporter( array $exporters ): array {
 		$exporters[ self::HANDLER_NAME ] = [
-			'exporter_friendly_name' => __( 'All Purpose Directory', 'all-purpose-directory' ),
+			'exporter_friendly_name' => __( 'DamDir Directory', 'damdir-directory' ),
 			'callback'               => [ $this, 'export_user_data' ],
 		];
 		return $exporters;
@@ -118,7 +118,7 @@ class Privacy {
 	 */
 	public function register_eraser( array $erasers ): array {
 		$erasers[ self::HANDLER_NAME ] = [
-			'eraser_friendly_name' => __( 'All Purpose Directory', 'all-purpose-directory' ),
+			'eraser_friendly_name' => __( 'DamDir Directory', 'damdir-directory' ),
 			'callback'             => [ $this, 'erase_user_data' ],
 		];
 		return $erasers;
@@ -132,23 +132,23 @@ class Privacy {
 	 * @return void
 	 */
 	public function add_policy_content(): void {
-		$content  = '<h2>' . esc_html__( 'Directory Listings', 'all-purpose-directory' ) . '</h2>';
-		$content .= '<p>' . esc_html__( 'When you submit a listing, we store your listing content along with any contact information you provide, including email address, phone number, physical address, and website URL. This information is stored as part of your listing and may be publicly visible.', 'all-purpose-directory' ) . '</p>';
+		$content  = '<h2>' . esc_html__( 'Directory Listings', 'damdir-directory' ) . '</h2>';
+		$content .= '<p>' . esc_html__( 'When you submit a listing, we store your listing content along with any contact information you provide, including email address, phone number, physical address, and website URL. This information is stored as part of your listing and may be publicly visible.', 'damdir-directory' ) . '</p>';
 
-		$content .= '<h2>' . esc_html__( 'Reviews', 'all-purpose-directory' ) . '</h2>';
-		$content .= '<p>' . esc_html__( 'When you submit a review, we store your name, email address, star rating, review title, and review content associated with your account. Approved reviews are displayed publicly on the listing page.', 'all-purpose-directory' ) . '</p>';
+		$content .= '<h2>' . esc_html__( 'Reviews', 'damdir-directory' ) . '</h2>';
+		$content .= '<p>' . esc_html__( 'When you submit a review, we store your name, email address, star rating, review title, and review content associated with your account. Approved reviews are displayed publicly on the listing page.', 'damdir-directory' ) . '</p>';
 
-		$content .= '<h2>' . esc_html__( 'Contact Inquiries', 'all-purpose-directory' ) . '</h2>';
-		$content .= '<p>' . esc_html__( 'When you send a contact inquiry through a listing, we store your name, email address, phone number, and message. This data is retained so that listing owners can manage and respond to inquiries.', 'all-purpose-directory' ) . '</p>';
+		$content .= '<h2>' . esc_html__( 'Contact Inquiries', 'damdir-directory' ) . '</h2>';
+		$content .= '<p>' . esc_html__( 'When you send a contact inquiry through a listing, we store your name, email address, phone number, and message. This data is retained so that listing owners can manage and respond to inquiries.', 'damdir-directory' ) . '</p>';
 
-		$content .= '<h2>' . esc_html__( 'Favorites', 'all-purpose-directory' ) . '</h2>';
-		$content .= '<p>' . esc_html__( 'When you mark listings as favorites while logged in, we store a list of those listing IDs in your user account. If guest favorites are enabled, we store this list in a browser cookie named "apd_guest_favorites" for up to 30 days.', 'all-purpose-directory' ) . '</p>';
+		$content .= '<h2>' . esc_html__( 'Favorites', 'damdir-directory' ) . '</h2>';
+		$content .= '<p>' . esc_html__( 'When you mark listings as favorites while logged in, we store a list of those listing IDs in your user account. If guest favorites are enabled, we store this list in a browser cookie named "apd_guest_favorites" for up to 30 days.', 'damdir-directory' ) . '</p>';
 
-		$content .= '<h2>' . esc_html__( 'Profile Data', 'all-purpose-directory' ) . '</h2>';
-		$content .= '<p>' . esc_html__( 'When you update your directory profile, we may store additional information including your phone number, a profile avatar image, and links to your social media profiles (Facebook, Twitter, LinkedIn, Instagram).', 'all-purpose-directory' ) . '</p>';
+		$content .= '<h2>' . esc_html__( 'Profile Data', 'damdir-directory' ) . '</h2>';
+		$content .= '<p>' . esc_html__( 'When you update your directory profile, we may store additional information including your phone number, a profile avatar image, and links to your social media profiles (Facebook, Twitter, LinkedIn, Instagram).', 'damdir-directory' ) . '</p>';
 
 		wp_add_privacy_policy_content(
-			__( 'All Purpose Directory', 'all-purpose-directory' ),
+			__( 'DamDir Directory', 'damdir-directory' ),
 			wp_kses_post( $content )
 		);
 	}
@@ -301,7 +301,7 @@ class Privacy {
 		$phone = get_user_meta( $user->ID, '_apd_phone', true );
 		if ( '' !== $phone && false !== $phone ) {
 			$profile_data[] = [
-				'name'  => __( 'Phone', 'all-purpose-directory' ),
+				'name'  => __( 'Phone', 'damdir-directory' ),
 				'value' => $phone,
 			];
 		}
@@ -310,7 +310,7 @@ class Privacy {
 		if ( $avatar_id > 0 ) {
 			$avatar_url     = wp_get_attachment_url( $avatar_id );
 			$profile_data[] = [
-				'name'  => __( 'Avatar', 'all-purpose-directory' ),
+				'name'  => __( 'Avatar', 'damdir-directory' ),
 				'value' => $avatar_url ? $avatar_url : (string) $avatar_id,
 			];
 		}
@@ -322,7 +322,7 @@ class Privacy {
 				$profile_data[] = [
 					'name'  => sprintf(
 						/* translators: %s: social platform name (e.g. Facebook, Twitter) */
-						__( 'Social link (%s)', 'all-purpose-directory' ),
+						__( 'Social link (%s)', 'damdir-directory' ),
 						ucfirst( $platform )
 					),
 					'value' => $value,
@@ -341,7 +341,7 @@ class Privacy {
 				array_map( 'absint', $favorites )
 			);
 			$profile_data[] = [
-				'name'  => __( 'Favorite listings', 'all-purpose-directory' ),
+				'name'  => __( 'Favorite listings', 'damdir-directory' ),
 				'value' => implode( ', ', $titles ),
 			];
 		}
@@ -350,7 +350,7 @@ class Privacy {
 		if ( ! empty( $profile_data ) ) {
 			$data[] = [
 				'group_id'    => 'apd-profile',
-				'group_label' => __( 'Directory Profile', 'all-purpose-directory' ),
+				'group_label' => __( 'Directory Profile', 'damdir-directory' ),
 				'item_id'     => "apd-profile-{$user->ID}",
 				'data'        => $profile_data,
 			];
@@ -386,19 +386,19 @@ class Privacy {
 		foreach ( $posts as $post ) {
 			$item_data = [
 				[
-					'name'  => __( 'Title', 'all-purpose-directory' ),
+					'name'  => __( 'Title', 'damdir-directory' ),
 					'value' => $post->post_title,
 				],
 				[
-					'name'  => __( 'Status', 'all-purpose-directory' ),
+					'name'  => __( 'Status', 'damdir-directory' ),
 					'value' => $post->post_status,
 				],
 				[
-					'name'  => __( 'Date', 'all-purpose-directory' ),
+					'name'  => __( 'Date', 'damdir-directory' ),
 					'value' => $post->post_date,
 				],
 				[
-					'name'  => __( 'Content', 'all-purpose-directory' ),
+					'name'  => __( 'Content', 'damdir-directory' ),
 					'value' => $post->post_content,
 				],
 			];
@@ -416,7 +416,7 @@ class Privacy {
 
 			$data[] = [
 				'group_id'    => 'apd-listings',
-				'group_label' => __( 'Directory Listings', 'all-purpose-directory' ),
+				'group_label' => __( 'Directory Listings', 'damdir-directory' ),
 				'item_id'     => "apd-listing-{$post->ID}",
 				'data'        => $item_data,
 			];
@@ -490,35 +490,35 @@ class Privacy {
 
 			$data[] = [
 				'group_id'    => 'apd-reviews',
-				'group_label' => __( 'Directory Reviews', 'all-purpose-directory' ),
+				'group_label' => __( 'Directory Reviews', 'damdir-directory' ),
 				'item_id'     => "apd-review-{$comment->comment_ID}",
 				'data'        => [
 					[
-						'name'  => __( 'Listing', 'all-purpose-directory' ),
+						'name'  => __( 'Listing', 'damdir-directory' ),
 						'value' => $listing_title,
 					],
 					[
-						'name'  => __( 'Rating', 'all-purpose-directory' ),
+						'name'  => __( 'Rating', 'damdir-directory' ),
 						'value' => (string) $rating,
 					],
 					[
-						'name'  => __( 'Title', 'all-purpose-directory' ),
+						'name'  => __( 'Title', 'damdir-directory' ),
 						'value' => (string) $title,
 					],
 					[
-						'name'  => __( 'Review', 'all-purpose-directory' ),
+						'name'  => __( 'Review', 'damdir-directory' ),
 						'value' => $comment->comment_content,
 					],
 					[
-						'name'  => __( 'Date', 'all-purpose-directory' ),
+						'name'  => __( 'Date', 'damdir-directory' ),
 						'value' => $comment->comment_date,
 					],
 					[
-						'name'  => __( 'Author', 'all-purpose-directory' ),
+						'name'  => __( 'Author', 'damdir-directory' ),
 						'value' => $comment->comment_author,
 					],
 					[
-						'name'  => __( 'Email', 'all-purpose-directory' ),
+						'name'  => __( 'Email', 'damdir-directory' ),
 						'value' => $comment->comment_author_email,
 					],
 				],
@@ -564,35 +564,35 @@ class Privacy {
 
 			$data[] = [
 				'group_id'    => 'apd-inquiries-sent',
-				'group_label' => __( 'Directory Inquiries Sent', 'all-purpose-directory' ),
+				'group_label' => __( 'Directory Inquiries Sent', 'damdir-directory' ),
 				'item_id'     => "apd-inquiry-sent-{$post->ID}",
 				'data'        => [
 					[
-						'name'  => __( 'Listing', 'all-purpose-directory' ),
+						'name'  => __( 'Listing', 'damdir-directory' ),
 						'value' => $listing_title,
 					],
 					[
-						'name'  => __( 'Sender Name', 'all-purpose-directory' ),
+						'name'  => __( 'Sender Name', 'damdir-directory' ),
 						'value' => (string) get_post_meta( $post->ID, InquiryTracker::META_SENDER_NAME, true ),
 					],
 					[
-						'name'  => __( 'Sender Email', 'all-purpose-directory' ),
+						'name'  => __( 'Sender Email', 'damdir-directory' ),
 						'value' => (string) get_post_meta( $post->ID, InquiryTracker::META_SENDER_EMAIL, true ),
 					],
 					[
-						'name'  => __( 'Sender Phone', 'all-purpose-directory' ),
+						'name'  => __( 'Sender Phone', 'damdir-directory' ),
 						'value' => (string) get_post_meta( $post->ID, InquiryTracker::META_SENDER_PHONE, true ),
 					],
 					[
-						'name'  => __( 'Subject', 'all-purpose-directory' ),
+						'name'  => __( 'Subject', 'damdir-directory' ),
 						'value' => (string) get_post_meta( $post->ID, InquiryTracker::META_SUBJECT, true ),
 					],
 					[
-						'name'  => __( 'Message', 'all-purpose-directory' ),
+						'name'  => __( 'Message', 'damdir-directory' ),
 						'value' => $post->post_content,
 					],
 					[
-						'name'  => __( 'Date', 'all-purpose-directory' ),
+						'name'  => __( 'Date', 'damdir-directory' ),
 						'value' => $post->post_date,
 					],
 				],
@@ -633,15 +633,15 @@ class Privacy {
 			// Only export listing and date — sender PII belongs to a third party.
 			$data[] = [
 				'group_id'    => 'apd-inquiries-received',
-				'group_label' => __( 'Directory Inquiries Received', 'all-purpose-directory' ),
+				'group_label' => __( 'Directory Inquiries Received', 'damdir-directory' ),
 				'item_id'     => "apd-inquiry-received-{$post->ID}",
 				'data'        => [
 					[
-						'name'  => __( 'Listing', 'all-purpose-directory' ),
+						'name'  => __( 'Listing', 'damdir-directory' ),
 						'value' => $listing_title,
 					],
 					[
-						'name'  => __( 'Date', 'all-purpose-directory' ),
+						'name'  => __( 'Date', 'damdir-directory' ),
 						'value' => $post->post_date,
 					],
 				],
@@ -750,7 +750,7 @@ class Privacy {
 
 		$messages = [];
 		if ( $items_retained ) {
-			$messages[] = __( 'Directory listing content was retained with personal contact fields removed and author anonymized.', 'all-purpose-directory' );
+			$messages[] = __( 'Directory listing content was retained with personal contact fields removed and author anonymized.', 'damdir-directory' );
 		}
 
 		return [
@@ -877,7 +877,7 @@ class Privacy {
 			wp_update_post(
 				[
 					'ID'         => $post_id,
-					'post_title' => __( '[Anonymized]', 'all-purpose-directory' ),
+					'post_title' => __( '[Anonymized]', 'damdir-directory' ),
 				]
 			);
 
@@ -887,7 +887,7 @@ class Privacy {
 
 		$messages = [];
 		if ( $items_retained ) {
-			$messages[] = __( 'Inquiry records were retained with sender information removed.', 'all-purpose-directory' );
+			$messages[] = __( 'Inquiry records were retained with sender information removed.', 'damdir-directory' );
 		}
 
 		return [

@@ -44,8 +44,8 @@ class RangeFilter extends AbstractFilter {
 			'min'             => null,
 			'max'             => null,
 			'step'            => 1,
-			'min_placeholder' => __( 'Min', 'all-purpose-directory' ),
-			'max_placeholder' => __( 'Max', 'all-purpose-directory' ),
+			'min_placeholder' => __( 'Min', 'damdir-directory' ),
+			'max_placeholder' => __( 'Max', 'damdir-directory' ),
 			'prefix'          => '',
 			'suffix'          => '',
 		];
@@ -327,13 +327,13 @@ class RangeFilter extends AbstractFilter {
 		} elseif ( $min !== '' ) {
 			return sprintf(
 				/* translators: %s: minimum value */
-				__( '%s or more', 'all-purpose-directory' ),
+				__( '%s or more', 'damdir-directory' ),
 				$prefix . $min . $suffix
 			);
 		} elseif ( $max !== '' ) {
 			return sprintf(
 				/* translators: %s: maximum value */
-				__( 'Up to %s', 'all-purpose-directory' ),
+				__( 'Up to %s', 'damdir-directory' ),
 				$prefix . $max . $suffix
 			);
 		}

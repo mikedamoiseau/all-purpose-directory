@@ -385,7 +385,7 @@ class PhpVersionTest extends TestCase {
      * Test that main plugin file parses correctly.
      */
     public function test_main_plugin_file_parses(): void {
-        $file = dirname( $this->src_dir ) . '/all-purpose-directory.php';
+        $file = dirname( $this->src_dir ) . '/damdir-directory.php';
 
         $output = [];
         $return_code = 0;
@@ -394,7 +394,7 @@ class PhpVersionTest extends TestCase {
         $this->assertEquals(
             0,
             $return_code,
-            'all-purpose-directory.php has syntax errors: ' . implode( ' ', $output )
+            'damdir-directory.php has syntax errors: ' . implode( ' ', $output )
         );
     }
 

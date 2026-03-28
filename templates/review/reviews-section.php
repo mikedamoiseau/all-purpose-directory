@@ -6,7 +6,7 @@
  * Includes rating summary, review form, reviews list, and pagination.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/review/reviews-section.php
+ * yourtheme/damdir-directory/review/reviews-section.php
  *
  * @package APD\Templates
  * @since   1.0.0
@@ -58,11 +58,11 @@ $display = \APD\Review\ReviewDisplay::get_instance();
 			if ( $review_count > 0 ) {
 				printf(
 					/* translators: %d: number of reviews */
-					esc_html( _n( 'Reviews (%d)', 'Reviews (%d)', $review_count, 'all-purpose-directory' ) ),
+					esc_html( _n( 'Reviews (%d)', 'Reviews (%d)', $review_count, 'damdir-directory' ) ),
 					esc_html( number_format_i18n( $review_count ) )
 				);
 			} else {
-				esc_html_e( 'Reviews', 'all-purpose-directory' );
+				esc_html_e( 'Reviews', 'damdir-directory' );
 			}
 			?>
 		</h2>
@@ -131,7 +131,7 @@ $display = \APD\Review\ReviewDisplay::get_instance();
 
 		<?php if ( $has_reviews ) : ?>
 
-			<div class="apd-reviews-list" role="list" aria-label="<?php esc_attr_e( 'Reviews', 'all-purpose-directory' ); ?>">
+			<div class="apd-reviews-list" role="list" aria-label="<?php esc_attr_e( 'Reviews', 'damdir-directory' ); ?>">
 				<?php foreach ( $reviews as $review ) : ?>
 					<?php
 					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Output is escaped in render_single_review method.

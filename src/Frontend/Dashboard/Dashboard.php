@@ -179,28 +179,28 @@ class Dashboard {
 
 		$tabs = [
 			'my-listings' => [
-				'label'    => __( 'My Listings', 'all-purpose-directory' ),
+				'label'    => __( 'My Listings', 'damdir-directory' ),
 				'icon'     => 'dashicons-list-view',
 				'count'    => $stats['total'],
 				'callback' => [ $this, 'render_my_listings_tab' ],
 				'priority' => 10,
 			],
 			'add-new'     => [
-				'label'    => __( 'Add New', 'all-purpose-directory' ),
+				'label'    => __( 'Add New', 'damdir-directory' ),
 				'icon'     => 'dashicons-plus-alt',
 				'count'    => null,
 				'callback' => [ $this, 'render_add_new_tab' ],
 				'priority' => 20,
 			],
 			'favorites'   => [
-				'label'    => __( 'Favorites', 'all-purpose-directory' ),
+				'label'    => __( 'Favorites', 'damdir-directory' ),
 				'icon'     => 'dashicons-heart',
 				'count'    => $favorites_count,
 				'callback' => [ $this, 'render_favorites_tab' ],
 				'priority' => 30,
 			],
 			'profile'     => [
-				'label'    => __( 'Profile', 'all-purpose-directory' ),
+				'label'    => __( 'Profile', 'damdir-directory' ),
 				'icon'     => 'dashicons-admin-users',
 				'count'    => null,
 				'callback' => [ $this, 'render_profile_tab' ],
@@ -445,7 +445,7 @@ class Dashboard {
 	 */
 	public function render_login_required(): string {
 		$args = [
-			'message'   => __( 'Please log in to access your dashboard.', 'all-purpose-directory' ),
+			'message'   => __( 'Please log in to access your dashboard.', 'damdir-directory' ),
 			'login_url' => wp_login_url( $this->get_dashboard_url() ),
 		];
 
@@ -536,7 +536,7 @@ class Dashboard {
 			</div>',
 			sprintf(
 				/* translators: %s: Tab name */
-				esc_html__( '%s content is coming soon.', 'all-purpose-directory' ),
+				esc_html__( '%s content is coming soon.', 'damdir-directory' ),
 				esc_html( $label )
 			)
 		);
@@ -576,9 +576,9 @@ class Dashboard {
 					<p>%s</p>
 					<a href="%s" class="apd-button apd-button--primary">%s</a>
 				</div>',
-				esc_html__( 'Create a new listing to share with the community.', 'all-purpose-directory' ),
+				esc_html__( 'Create a new listing to share with the community.', 'damdir-directory' ),
 				esc_url( $submission_url ),
-				esc_html__( 'Add New Listing', 'all-purpose-directory' )
+				esc_html__( 'Add New Listing', 'damdir-directory' )
 			);
 		} else {
 			echo $this->render_placeholder( $tab ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped

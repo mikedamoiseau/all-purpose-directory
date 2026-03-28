@@ -155,10 +155,10 @@ class GalleryField extends AbstractFieldType {
 		$button_disabled = $max_images > 0 && count( $attachment_ids ) >= $max_images;
 		$html           .= sprintf(
 			'<button type="button" class="apd-gallery-add button" data-title="%s" data-button="%s"%s>%s</button>',
-			esc_attr__( 'Add Images', 'all-purpose-directory' ),
-			esc_attr__( 'Add to gallery', 'all-purpose-directory' ),
+			esc_attr__( 'Add Images', 'damdir-directory' ),
+			esc_attr__( 'Add to gallery', 'damdir-directory' ),
 			$button_disabled ? ' disabled' : '',
-			esc_html__( 'Add Images', 'all-purpose-directory' )
+			esc_html__( 'Add Images', 'damdir-directory' )
 		);
 
 		// Image count display.
@@ -167,7 +167,7 @@ class GalleryField extends AbstractFieldType {
 				'<span class="apd-gallery-count">%s</span>',
 				sprintf(
 					/* translators: 1: current count, 2: max images */
-					esc_html__( '%1$d of %2$d images', 'all-purpose-directory' ),
+					esc_html__( '%1$d of %2$d images', 'damdir-directory' ),
 					count( $attachment_ids ),
 					$max_images
 				)
@@ -211,7 +211,7 @@ class GalleryField extends AbstractFieldType {
 		);
 		$html .= sprintf(
 			'<button type="button" class="apd-gallery-remove" aria-label="%s">&times;</button>',
-			esc_attr__( 'Remove image', 'all-purpose-directory' )
+			esc_attr__( 'Remove image', 'damdir-directory' )
 		);
 		$html .= '</div>';
 
@@ -249,7 +249,7 @@ class GalleryField extends AbstractFieldType {
 				'required',
 				sprintf(
 					/* translators: %s: field label */
-					__( '%s is required.', 'all-purpose-directory' ),
+					__( '%s is required.', 'damdir-directory' ),
 					$this->getLabel( $field )
 				)
 			);
@@ -268,7 +268,7 @@ class GalleryField extends AbstractFieldType {
 				'max_images_exceeded',
 				sprintf(
 					/* translators: 1: field label, 2: max images */
-					__( '%1$s cannot contain more than %2$d images.', 'all-purpose-directory' ),
+					__( '%1$s cannot contain more than %2$d images.', 'damdir-directory' ),
 					$this->getLabel( $field ),
 					$max_images
 				)
@@ -285,7 +285,7 @@ class GalleryField extends AbstractFieldType {
 					'invalid_attachment',
 					sprintf(
 						/* translators: %s: field label */
-						__( '%s contains an invalid image.', 'all-purpose-directory' ),
+						__( '%s contains an invalid image.', 'damdir-directory' ),
 						$this->getLabel( $field )
 					)
 				);
@@ -298,7 +298,7 @@ class GalleryField extends AbstractFieldType {
 					'not_an_image',
 					sprintf(
 						/* translators: %s: field label */
-						__( '%s must contain only image files.', 'all-purpose-directory' ),
+						__( '%s must contain only image files.', 'damdir-directory' ),
 						$this->getLabel( $field )
 					)
 				);
@@ -315,7 +315,7 @@ class GalleryField extends AbstractFieldType {
 							'invalid_image_type',
 							sprintf(
 								/* translators: 1: field label, 2: allowed image types */
-								__( '%1$s images must be one of the following types: %2$s.', 'all-purpose-directory' ),
+								__( '%1$s images must be one of the following types: %2$s.', 'damdir-directory' ),
 								$this->getLabel( $field ),
 								implode( ', ', $allowed_types )
 							)

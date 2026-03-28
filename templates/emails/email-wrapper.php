@@ -3,7 +3,7 @@
  * Email wrapper template.
  *
  * This template wraps all email content in a consistent HTML structure.
- * Override this template in your theme: all-purpose-directory/emails/email-wrapper.php
+ * Override this template in your theme: damdir-directory/emails/email-wrapper.php
  *
  * @package All_Purpose_Directory
  * @since   1.0.0
@@ -256,7 +256,7 @@ $button_color = apply_filters( 'apd_email_button_color', '#0073aa' );
 					<tr>
 						<td class="email-footer">
 							<p>&copy; <?php echo esc_html( $year ); ?> <a href="<?php echo esc_url( $site_url ); ?>"><?php echo esc_html( $site_name ); ?></a></p>
-							<p class="text-muted"><?php esc_html_e( 'This is an automated message. Please do not reply directly to this email.', 'all-purpose-directory' ); ?></p>
+							<p class="text-muted"><?php esc_html_e( 'This is an automated message. Please do not reply directly to this email.', 'damdir-directory' ); ?></p>
 						</td>
 					</tr>
 				</table>

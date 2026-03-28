@@ -64,4 +64,4 @@ All user-facing strings must use WordPress translation functions:
 - `esc_html__()` for escaped output
 - `esc_attr__()` for attributes
 - `_n()` for plurals
-- Text domain: `all-purpose-directory`
+- Text domain: `damdir-directory`

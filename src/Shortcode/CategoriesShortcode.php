@@ -335,7 +335,7 @@ final class CategoriesShortcode extends AbstractShortcode {
 						<?php
 						printf(
 							/* translators: %d: Number of listings */
-							esc_html( _n( '%d listing', '%d listings', $category->count, 'all-purpose-directory' ) ),
+							esc_html( _n( '%d listing', '%d listings', $category->count, 'damdir-directory' ) ),
 							absint( $category->count )
 						);
 						?>
@@ -439,7 +439,7 @@ final class CategoriesShortcode extends AbstractShortcode {
 		 */
 		$message = apply_filters(
 			'apd_categories_shortcode_no_results_message',
-			__( 'No categories found.', 'all-purpose-directory' ),
+			__( 'No categories found.', 'damdir-directory' ),
 			$atts
 		);
 

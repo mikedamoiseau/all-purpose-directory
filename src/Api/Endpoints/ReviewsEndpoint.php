@@ -93,7 +93,7 @@ class ReviewsEndpoint {
 					'permission_callback' => [ $this->controller, 'permission_public' ],
 					'args'                => [
 						'id' => [
-							'description' => __( 'Review ID.', 'all-purpose-directory' ),
+							'description' => __( 'Review ID.', 'damdir-directory' ),
 							'type'        => 'integer',
 							'required'    => true,
 							'minimum'     => 1,
@@ -112,13 +112,13 @@ class ReviewsEndpoint {
 					'permission_callback' => [ $this, 'permission_delete_review' ],
 					'args'                => [
 						'id'    => [
-							'description' => __( 'Review ID.', 'all-purpose-directory' ),
+							'description' => __( 'Review ID.', 'damdir-directory' ),
 							'type'        => 'integer',
 							'required'    => true,
 							'minimum'     => 1,
 						],
 						'force' => [
-							'description' => __( 'Whether to permanently delete.', 'all-purpose-directory' ),
+							'description' => __( 'Whether to permanently delete.', 'damdir-directory' ),
 							'type'        => 'boolean',
 							'default'     => false,
 						],
@@ -152,42 +152,42 @@ class ReviewsEndpoint {
 	public function get_collection_params(): array {
 		return [
 			'listing_id' => [
-				'description' => __( 'Filter by listing ID.', 'all-purpose-directory' ),
+				'description' => __( 'Filter by listing ID.', 'damdir-directory' ),
 				'type'        => 'integer',
 				'minimum'     => 1,
 			],
 			'author'     => [
-				'description' => __( 'Filter by author user ID.', 'all-purpose-directory' ),
+				'description' => __( 'Filter by author user ID.', 'damdir-directory' ),
 				'type'        => 'integer',
 				'minimum'     => 1,
 			],
 			'status'     => [
-				'description' => __( 'Filter by review status.', 'all-purpose-directory' ),
+				'description' => __( 'Filter by review status.', 'damdir-directory' ),
 				'type'        => 'string',
 				'default'     => 'approved',
 				'enum'        => [ 'approved', 'pending', 'all' ],
 			],
 			'page'       => [
-				'description' => __( 'Current page.', 'all-purpose-directory' ),
+				'description' => __( 'Current page.', 'damdir-directory' ),
 				'type'        => 'integer',
 				'default'     => 1,
 				'minimum'     => 1,
 			],
 			'per_page'   => [
-				'description' => __( 'Items per page.', 'all-purpose-directory' ),
+				'description' => __( 'Items per page.', 'damdir-directory' ),
 				'type'        => 'integer',
 				'default'     => 10,
 				'minimum'     => 1,
 				'maximum'     => 100,
 			],
 			'orderby'    => [
-				'description' => __( 'Order by field.', 'all-purpose-directory' ),
+				'description' => __( 'Order by field.', 'damdir-directory' ),
 				'type'        => 'string',
 				'default'     => 'date',
 				'enum'        => [ 'date', 'rating' ],
 			],
 			'order'      => [
-				'description' => __( 'Sort order.', 'all-purpose-directory' ),
+				'description' => __( 'Sort order.', 'damdir-directory' ),
 				'type'        => 'string',
 				'default'     => 'DESC',
 				'enum'        => [ 'ASC', 'DESC' ],
@@ -205,25 +205,25 @@ class ReviewsEndpoint {
 	public function get_listing_reviews_params(): array {
 		return [
 			'listing_id' => [
-				'description' => __( 'Listing ID.', 'all-purpose-directory' ),
+				'description' => __( 'Listing ID.', 'damdir-directory' ),
 				'type'        => 'integer',
 				'required'    => true,
 				'minimum'     => 1,
 			],
 			'status'     => [
-				'description' => __( 'Filter by review status.', 'all-purpose-directory' ),
+				'description' => __( 'Filter by review status.', 'damdir-directory' ),
 				'type'        => 'string',
 				'default'     => 'approved',
 				'enum'        => [ 'approved', 'pending', 'all' ],
 			],
 			'page'       => [
-				'description' => __( 'Current page.', 'all-purpose-directory' ),
+				'description' => __( 'Current page.', 'damdir-directory' ),
 				'type'        => 'integer',
 				'default'     => 1,
 				'minimum'     => 1,
 			],
 			'per_page'   => [
-				'description' => __( 'Items per page.', 'all-purpose-directory' ),
+				'description' => __( 'Items per page.', 'damdir-directory' ),
 				'type'        => 'integer',
 				'default'     => 10,
 				'minimum'     => 1,
@@ -242,25 +242,25 @@ class ReviewsEndpoint {
 	public function get_create_params(): array {
 		return [
 			'listing_id' => [
-				'description' => __( 'Listing ID to review.', 'all-purpose-directory' ),
+				'description' => __( 'Listing ID to review.', 'damdir-directory' ),
 				'type'        => 'integer',
 				'required'    => true,
 				'minimum'     => 1,
 			],
 			'rating'     => [
-				'description' => __( 'Rating from 1 to 5.', 'all-purpose-directory' ),
+				'description' => __( 'Rating from 1 to 5.', 'damdir-directory' ),
 				'type'        => 'integer',
 				'required'    => true,
 				'minimum'     => 1,
 				'maximum'     => 5,
 			],
 			'title'      => [
-				'description' => __( 'Review title.', 'all-purpose-directory' ),
+				'description' => __( 'Review title.', 'damdir-directory' ),
 				'type'        => 'string',
 				'maxLength'   => 200,
 			],
 			'content'    => [
-				'description' => __( 'Review content.', 'all-purpose-directory' ),
+				'description' => __( 'Review content.', 'damdir-directory' ),
 				'type'        => 'string',
 				'required'    => true,
 				'minLength'   => 10,
@@ -278,24 +278,24 @@ class ReviewsEndpoint {
 	public function get_update_params(): array {
 		return [
 			'id'      => [
-				'description' => __( 'Review ID.', 'all-purpose-directory' ),
+				'description' => __( 'Review ID.', 'damdir-directory' ),
 				'type'        => 'integer',
 				'required'    => true,
 				'minimum'     => 1,
 			],
 			'rating'  => [
-				'description' => __( 'Rating from 1 to 5.', 'all-purpose-directory' ),
+				'description' => __( 'Rating from 1 to 5.', 'damdir-directory' ),
 				'type'        => 'integer',
 				'minimum'     => 1,
 				'maximum'     => 5,
 			],
 			'title'   => [
-				'description' => __( 'Review title.', 'all-purpose-directory' ),
+				'description' => __( 'Review title.', 'damdir-directory' ),
 				'type'        => 'string',
 				'maxLength'   => 200,
 			],
 			'content' => [
-				'description' => __( 'Review content.', 'all-purpose-directory' ),
+				'description' => __( 'Review content.', 'damdir-directory' ),
 				'type'        => 'string',
 				'minLength'   => 10,
 			],
@@ -316,45 +316,45 @@ class ReviewsEndpoint {
 			'type'       => 'object',
 			'properties' => [
 				'id'         => [
-					'description' => __( 'Unique identifier.', 'all-purpose-directory' ),
+					'description' => __( 'Unique identifier.', 'damdir-directory' ),
 					'type'        => 'integer',
 					'readonly'    => true,
 				],
 				'listing_id' => [
-					'description' => __( 'Listing ID.', 'all-purpose-directory' ),
+					'description' => __( 'Listing ID.', 'damdir-directory' ),
 					'type'        => 'integer',
 				],
 				'author_id'  => [
-					'description' => __( 'Author user ID.', 'all-purpose-directory' ),
+					'description' => __( 'Author user ID.', 'damdir-directory' ),
 					'type'        => 'integer',
 					'readonly'    => true,
 				],
 				'author'     => [
-					'description' => __( 'Author details.', 'all-purpose-directory' ),
+					'description' => __( 'Author details.', 'damdir-directory' ),
 					'type'        => 'object',
 					'readonly'    => true,
 				],
 				'rating'     => [
-					'description' => __( 'Rating from 1 to 5.', 'all-purpose-directory' ),
+					'description' => __( 'Rating from 1 to 5.', 'damdir-directory' ),
 					'type'        => 'integer',
 					'minimum'     => 1,
 					'maximum'     => 5,
 				],
 				'title'      => [
-					'description' => __( 'Review title.', 'all-purpose-directory' ),
+					'description' => __( 'Review title.', 'damdir-directory' ),
 					'type'        => 'string',
 				],
 				'content'    => [
-					'description' => __( 'Review content.', 'all-purpose-directory' ),
+					'description' => __( 'Review content.', 'damdir-directory' ),
 					'type'        => 'string',
 				],
 				'status'     => [
-					'description' => __( 'Review status.', 'all-purpose-directory' ),
+					'description' => __( 'Review status.', 'damdir-directory' ),
 					'type'        => 'string',
 					'readonly'    => true,
 				],
 				'date'       => [
-					'description' => __( 'Created date.', 'all-purpose-directory' ),
+					'description' => __( 'Created date.', 'damdir-directory' ),
 					'type'        => 'string',
 					'format'      => 'date-time',
 					'readonly'    => true,
@@ -383,7 +383,7 @@ class ReviewsEndpoint {
 		if ( ! $review ) {
 			return new WP_Error(
 				'rest_review_not_found',
-				__( 'Review not found.', 'all-purpose-directory' ),
+				__( 'Review not found.', 'damdir-directory' ),
 				[ 'status' => 404 ]
 			);
 		}
@@ -402,7 +402,7 @@ class ReviewsEndpoint {
 
 		return new WP_Error(
 			'rest_forbidden',
-			__( 'You do not have permission to edit this review.', 'all-purpose-directory' ),
+			__( 'You do not have permission to edit this review.', 'damdir-directory' ),
 			[ 'status' => 403 ]
 		);
 	}
@@ -427,7 +427,7 @@ class ReviewsEndpoint {
 		if ( ! $review ) {
 			return new WP_Error(
 				'rest_review_not_found',
-				__( 'Review not found.', 'all-purpose-directory' ),
+				__( 'Review not found.', 'damdir-directory' ),
 				[ 'status' => 404 ]
 			);
 		}
@@ -446,7 +446,7 @@ class ReviewsEndpoint {
 
 		return new WP_Error(
 			'rest_forbidden',
-			__( 'You do not have permission to delete this review.', 'all-purpose-directory' ),
+			__( 'You do not have permission to delete this review.', 'damdir-directory' ),
 			[ 'status' => 403 ]
 		);
 	}
@@ -514,7 +514,7 @@ class ReviewsEndpoint {
 		if ( ! $post || 'apd_listing' !== $post->post_type ) {
 			return $this->controller->create_error(
 				'rest_listing_not_found',
-				__( 'Listing not found.', 'all-purpose-directory' ),
+				__( 'Listing not found.', 'damdir-directory' ),
 				404
 			);
 		}
@@ -562,7 +562,7 @@ class ReviewsEndpoint {
 		if ( ! $review ) {
 			return $this->controller->create_error(
 				'rest_review_not_found',
-				__( 'Review not found.', 'all-purpose-directory' ),
+				__( 'Review not found.', 'damdir-directory' ),
 				404
 			);
 		}
@@ -571,7 +571,7 @@ class ReviewsEndpoint {
 		if ( ! $this->can_view_review( $review ) ) {
 			return $this->controller->create_error(
 				'rest_review_not_found',
-				__( 'Review not found.', 'all-purpose-directory' ),
+				__( 'Review not found.', 'damdir-directory' ),
 				404
 			);
 		}
@@ -600,7 +600,7 @@ class ReviewsEndpoint {
 		if ( ! $post || 'apd_listing' !== $post->post_type ) {
 			return $this->controller->create_error(
 				'rest_listing_not_found',
-				__( 'Listing not found.', 'all-purpose-directory' ),
+				__( 'Listing not found.', 'damdir-directory' ),
 				404
 			);
 		}
@@ -610,7 +610,7 @@ class ReviewsEndpoint {
 		if ( apd_has_user_reviewed( $listing_id, $user_id ) ) {
 			return $this->controller->create_error(
 				'rest_review_exists',
-				__( 'You have already reviewed this listing.', 'all-purpose-directory' ),
+				__( 'You have already reviewed this listing.', 'damdir-directory' ),
 				400
 			);
 		}
@@ -671,7 +671,7 @@ class ReviewsEndpoint {
 		if ( empty( $update_data ) ) {
 			return $this->controller->create_error(
 				'rest_no_update_data',
-				__( 'No data provided to update.', 'all-purpose-directory' ),
+				__( 'No data provided to update.', 'damdir-directory' ),
 				400
 			);
 		}
@@ -710,7 +710,7 @@ class ReviewsEndpoint {
 		if ( ! $result ) {
 			return $this->controller->create_error(
 				'rest_delete_failed',
-				__( 'Failed to delete review.', 'all-purpose-directory' ),
+				__( 'Failed to delete review.', 'damdir-directory' ),
 				500
 			);
 		}

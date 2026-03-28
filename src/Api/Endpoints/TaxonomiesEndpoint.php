@@ -85,7 +85,7 @@ class TaxonomiesEndpoint {
 					'permission_callback' => [ $this->controller, 'permission_public' ],
 					'args'                => [
 						'id' => [
-							'description' => __( 'Unique identifier for the category.', 'all-purpose-directory' ),
+							'description' => __( 'Unique identifier for the category.', 'damdir-directory' ),
 							'type'        => 'integer',
 							'required'    => true,
 						],
@@ -121,7 +121,7 @@ class TaxonomiesEndpoint {
 					'permission_callback' => [ $this->controller, 'permission_public' ],
 					'args'                => [
 						'id' => [
-							'description' => __( 'Unique identifier for the tag.', 'all-purpose-directory' ),
+							'description' => __( 'Unique identifier for the tag.', 'damdir-directory' ),
 							'type'        => 'integer',
 							'required'    => true,
 						],
@@ -290,7 +290,7 @@ class TaxonomiesEndpoint {
 				"rest_{$type}_not_found",
 				sprintf(
 					/* translators: %s: term type (category or tag) */
-					__( '%s not found.', 'all-purpose-directory' ),
+					__( '%s not found.', 'damdir-directory' ),
 					ucfirst( $type )
 				),
 				404
@@ -354,49 +354,49 @@ class TaxonomiesEndpoint {
 	public function get_taxonomy_params(): array {
 		return [
 			'page'       => [
-				'description' => __( 'Current page of the collection.', 'all-purpose-directory' ),
+				'description' => __( 'Current page of the collection.', 'damdir-directory' ),
 				'type'        => 'integer',
 				'default'     => 1,
 				'minimum'     => 1,
 			],
 			'per_page'   => [
-				'description' => __( 'Maximum number of items per page.', 'all-purpose-directory' ),
+				'description' => __( 'Maximum number of items per page.', 'damdir-directory' ),
 				'type'        => 'integer',
 				'default'     => 100,
 				'minimum'     => 1,
 				'maximum'     => 100,
 			],
 			'search'     => [
-				'description' => __( 'Search term.', 'all-purpose-directory' ),
+				'description' => __( 'Search term.', 'damdir-directory' ),
 				'type'        => 'string',
 			],
 			'parent'     => [
-				'description' => __( 'Filter by parent term ID (0 for top-level).', 'all-purpose-directory' ),
+				'description' => __( 'Filter by parent term ID (0 for top-level).', 'damdir-directory' ),
 				'type'        => 'integer',
 			],
 			'hide_empty' => [
-				'description' => __( 'Hide terms with no posts.', 'all-purpose-directory' ),
+				'description' => __( 'Hide terms with no posts.', 'damdir-directory' ),
 				'type'        => 'boolean',
 				'default'     => true,
 			],
 			'include'    => [
-				'description' => __( 'Limit to specific term IDs.', 'all-purpose-directory' ),
+				'description' => __( 'Limit to specific term IDs.', 'damdir-directory' ),
 				'type'        => 'array',
 				'items'       => [ 'type' => 'integer' ],
 			],
 			'exclude'    => [ // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude -- REST schema parameter name, not a query arg.
-				'description' => __( 'Exclude specific term IDs.', 'all-purpose-directory' ),
+				'description' => __( 'Exclude specific term IDs.', 'damdir-directory' ),
 				'type'        => 'array',
 				'items'       => [ 'type' => 'integer' ],
 			],
 			'orderby'    => [
-				'description' => __( 'Sort collection by field.', 'all-purpose-directory' ),
+				'description' => __( 'Sort collection by field.', 'damdir-directory' ),
 				'type'        => 'string',
 				'default'     => 'name',
 				'enum'        => [ 'name', 'slug', 'count', 'id', 'term_group' ],
 			],
 			'order'      => [
-				'description' => __( 'Sort order.', 'all-purpose-directory' ),
+				'description' => __( 'Sort order.', 'damdir-directory' ),
 				'type'        => 'string',
 				'default'     => 'ASC',
 				'enum'        => [ 'ASC', 'DESC' ],
@@ -418,43 +418,43 @@ class TaxonomiesEndpoint {
 			'type'       => 'object',
 			'properties' => [
 				'id'          => [
-					'description' => __( 'Unique identifier for the category.', 'all-purpose-directory' ),
+					'description' => __( 'Unique identifier for the category.', 'damdir-directory' ),
 					'type'        => 'integer',
 					'readonly'    => true,
 				],
 				'name'        => [
-					'description' => __( 'Category name.', 'all-purpose-directory' ),
+					'description' => __( 'Category name.', 'damdir-directory' ),
 					'type'        => 'string',
 				],
 				'slug'        => [
-					'description' => __( 'Category slug.', 'all-purpose-directory' ),
+					'description' => __( 'Category slug.', 'damdir-directory' ),
 					'type'        => 'string',
 				],
 				'description' => [
-					'description' => __( 'Category description.', 'all-purpose-directory' ),
+					'description' => __( 'Category description.', 'damdir-directory' ),
 					'type'        => 'string',
 				],
 				'parent'      => [
-					'description' => __( 'Parent category ID.', 'all-purpose-directory' ),
+					'description' => __( 'Parent category ID.', 'damdir-directory' ),
 					'type'        => 'integer',
 				],
 				'count'       => [
-					'description' => __( 'Number of posts in this category.', 'all-purpose-directory' ),
+					'description' => __( 'Number of posts in this category.', 'damdir-directory' ),
 					'type'        => 'integer',
 					'readonly'    => true,
 				],
 				'link'        => [
-					'description' => __( 'Category URL.', 'all-purpose-directory' ),
+					'description' => __( 'Category URL.', 'damdir-directory' ),
 					'type'        => 'string',
 					'format'      => 'uri',
 					'readonly'    => true,
 				],
 				'icon'        => [
-					'description' => __( 'Category icon class.', 'all-purpose-directory' ),
+					'description' => __( 'Category icon class.', 'damdir-directory' ),
 					'type'        => 'string',
 				],
 				'color'       => [
-					'description' => __( 'Category color (hex).', 'all-purpose-directory' ),
+					'description' => __( 'Category color (hex).', 'damdir-directory' ),
 					'type'        => 'string',
 				],
 			],
@@ -475,29 +475,29 @@ class TaxonomiesEndpoint {
 			'type'       => 'object',
 			'properties' => [
 				'id'          => [
-					'description' => __( 'Unique identifier for the tag.', 'all-purpose-directory' ),
+					'description' => __( 'Unique identifier for the tag.', 'damdir-directory' ),
 					'type'        => 'integer',
 					'readonly'    => true,
 				],
 				'name'        => [
-					'description' => __( 'Tag name.', 'all-purpose-directory' ),
+					'description' => __( 'Tag name.', 'damdir-directory' ),
 					'type'        => 'string',
 				],
 				'slug'        => [
-					'description' => __( 'Tag slug.', 'all-purpose-directory' ),
+					'description' => __( 'Tag slug.', 'damdir-directory' ),
 					'type'        => 'string',
 				],
 				'description' => [
-					'description' => __( 'Tag description.', 'all-purpose-directory' ),
+					'description' => __( 'Tag description.', 'damdir-directory' ),
 					'type'        => 'string',
 				],
 				'count'       => [
-					'description' => __( 'Number of posts with this tag.', 'all-purpose-directory' ),
+					'description' => __( 'Number of posts with this tag.', 'damdir-directory' ),
 					'type'        => 'integer',
 					'readonly'    => true,
 				],
 				'link'        => [
-					'description' => __( 'Tag URL.', 'all-purpose-directory' ),
+					'description' => __( 'Tag URL.', 'damdir-directory' ),
 					'type'        => 'string',
 					'format'      => 'uri',
 					'readonly'    => true,

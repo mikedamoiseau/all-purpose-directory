@@ -36,44 +36,44 @@ final class TagData {
 	public static function get_tags(): array {
 		return [
 			'pet-friendly'          => [
-				'name'        => __( 'Pet Friendly', 'all-purpose-directory' ),
-				'description' => __( 'Welcomes pets', 'all-purpose-directory' ),
+				'name'        => __( 'Pet Friendly', 'damdir-directory' ),
+				'description' => __( 'Welcomes pets', 'damdir-directory' ),
 			],
 			'wheelchair-accessible' => [
-				'name'        => __( 'Wheelchair Accessible', 'all-purpose-directory' ),
-				'description' => __( 'Fully accessible', 'all-purpose-directory' ),
+				'name'        => __( 'Wheelchair Accessible', 'damdir-directory' ),
+				'description' => __( 'Fully accessible', 'damdir-directory' ),
 			],
 			'free-wifi'             => [
-				'name'        => __( 'Free WiFi', 'all-purpose-directory' ),
-				'description' => __( 'Complimentary WiFi', 'all-purpose-directory' ),
+				'name'        => __( 'Free WiFi', 'damdir-directory' ),
+				'description' => __( 'Complimentary WiFi', 'damdir-directory' ),
 			],
 			'parking-available'     => [
-				'name'        => __( 'Parking Available', 'all-purpose-directory' ),
-				'description' => __( 'On-site parking', 'all-purpose-directory' ),
+				'name'        => __( 'Parking Available', 'damdir-directory' ),
+				'description' => __( 'On-site parking', 'damdir-directory' ),
 			],
 			'open-late'             => [
-				'name'        => __( 'Open Late', 'all-purpose-directory' ),
-				'description' => __( 'Late night hours', 'all-purpose-directory' ),
+				'name'        => __( 'Open Late', 'damdir-directory' ),
+				'description' => __( 'Late night hours', 'damdir-directory' ),
 			],
 			'family-friendly'       => [
-				'name'        => __( 'Family Friendly', 'all-purpose-directory' ),
-				'description' => __( 'Great for families', 'all-purpose-directory' ),
+				'name'        => __( 'Family Friendly', 'damdir-directory' ),
+				'description' => __( 'Great for families', 'damdir-directory' ),
 			],
 			'outdoor-seating'       => [
-				'name'        => __( 'Outdoor Seating', 'all-purpose-directory' ),
-				'description' => __( 'Patio or outdoor area', 'all-purpose-directory' ),
+				'name'        => __( 'Outdoor Seating', 'damdir-directory' ),
+				'description' => __( 'Patio or outdoor area', 'damdir-directory' ),
 			],
 			'delivery-available'    => [
-				'name'        => __( 'Delivery Available', 'all-purpose-directory' ),
-				'description' => __( 'Offers delivery service', 'all-purpose-directory' ),
+				'name'        => __( 'Delivery Available', 'damdir-directory' ),
+				'description' => __( 'Offers delivery service', 'damdir-directory' ),
 			],
 			'accepts-credit-cards'  => [
-				'name'        => __( 'Accepts Credit Cards', 'all-purpose-directory' ),
-				'description' => __( 'Credit card payments accepted', 'all-purpose-directory' ),
+				'name'        => __( 'Accepts Credit Cards', 'damdir-directory' ),
+				'description' => __( 'Credit card payments accepted', 'damdir-directory' ),
 			],
 			'reservations'          => [
-				'name'        => __( 'Reservations', 'all-purpose-directory' ),
-				'description' => __( 'Takes reservations', 'all-purpose-directory' ),
+				'name'        => __( 'Reservations', 'damdir-directory' ),
+				'description' => __( 'Takes reservations', 'damdir-directory' ),
 			],
 		];
 	}

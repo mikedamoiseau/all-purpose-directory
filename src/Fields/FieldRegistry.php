@@ -198,7 +198,7 @@ final class FieldRegistry {
 		if ( empty( $name ) ) {
 			_doing_it_wrong(
 				__METHOD__,
-				esc_html__( 'Field name cannot be empty.', 'all-purpose-directory' ),
+				esc_html__( 'Field name cannot be empty.', 'damdir-directory' ),
 				'1.0.0'
 			);
 			return false;
@@ -213,7 +213,7 @@ final class FieldRegistry {
 				__METHOD__,
 				sprintf(
 					/* translators: %s: field name */
-					esc_html__( 'Field "%s" is already registered.', 'all-purpose-directory' ),
+					esc_html__( 'Field "%s" is already registered.', 'damdir-directory' ),
 					esc_html( $name )
 				),
 				'1.0.0'
@@ -518,50 +518,50 @@ final class FieldRegistry {
 		$fields = [
 			'phone'       => [
 				'type'     => 'phone',
-				'label'    => __( 'Phone', 'all-purpose-directory' ),
+				'label'    => __( 'Phone', 'damdir-directory' ),
 				'priority' => 10,
 			],
 			'email'       => [
 				'type'     => 'email',
-				'label'    => __( 'Email', 'all-purpose-directory' ),
+				'label'    => __( 'Email', 'damdir-directory' ),
 				'priority' => 20,
 			],
 			'website'     => [
 				'type'     => 'url',
-				'label'    => __( 'Website', 'all-purpose-directory' ),
+				'label'    => __( 'Website', 'damdir-directory' ),
 				'priority' => 30,
 			],
 			'address'     => [
 				'type'     => 'text',
-				'label'    => __( 'Address', 'all-purpose-directory' ),
+				'label'    => __( 'Address', 'damdir-directory' ),
 				'priority' => 40,
 			],
 			'city'        => [
 				'type'     => 'text',
-				'label'    => __( 'City', 'all-purpose-directory' ),
+				'label'    => __( 'City', 'damdir-directory' ),
 				'priority' => 50,
 			],
 			'state'       => [
 				'type'     => 'text',
-				'label'    => __( 'State', 'all-purpose-directory' ),
+				'label'    => __( 'State', 'damdir-directory' ),
 				'priority' => 60,
 			],
 			'zip'         => [
 				'type'     => 'text',
-				'label'    => __( 'Zip Code', 'all-purpose-directory' ),
+				'label'    => __( 'Zip Code', 'damdir-directory' ),
 				'priority' => 70,
 			],
 			'hours'       => [
 				'type'     => 'textarea',
-				'label'    => __( 'Business Hours', 'all-purpose-directory' ),
+				'label'    => __( 'Business Hours', 'damdir-directory' ),
 				'priority' => 80,
 			],
 			'price_range' => [
 				'type'     => 'select',
-				'label'    => __( 'Price Range', 'all-purpose-directory' ),
+				'label'    => __( 'Price Range', 'damdir-directory' ),
 				'priority' => 90,
 				'options'  => [
-					''     => __( 'Not specified', 'all-purpose-directory' ),
+					''     => __( 'Not specified', 'damdir-directory' ),
 					'$'    => '$',
 					'$$'   => '$$',
 					'$$$'  => '$$$',

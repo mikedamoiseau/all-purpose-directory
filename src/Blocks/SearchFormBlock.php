@@ -109,13 +109,13 @@ final class SearchFormBlock extends AbstractBlock {
 	 * @since 1.0.0
 	 */
 	public function __construct() {
-		$this->title       = __( 'Listing Search Form', 'all-purpose-directory' );
-		$this->description = __( 'Display a search form for filtering listings.', 'all-purpose-directory' );
+		$this->title       = __( 'Listing Search Form', 'damdir-directory' );
+		$this->description = __( 'Display a search form for filtering listings.', 'damdir-directory' );
 		$this->keywords    = [
-			__( 'search', 'all-purpose-directory' ),
-			__( 'filter', 'all-purpose-directory' ),
-			__( 'form', 'all-purpose-directory' ),
-			__( 'listings', 'all-purpose-directory' ),
+			__( 'search', 'damdir-directory' ),
+			__( 'filter', 'damdir-directory' ),
+			__( 'form', 'damdir-directory' ),
+			__( 'listings', 'damdir-directory' ),
 		];
 	}
 

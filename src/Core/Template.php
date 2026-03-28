@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Provides a template system similar to WooCommerce's template loading.
  * Templates can be overridden in themes by placing them in an
- * `all-purpose-directory/` folder within the theme directory.
+ * `damdir-directory/` folder within the theme directory.
  *
  * @since 1.0.0
  */
@@ -40,7 +40,7 @@ final class Template {
 	 *
 	 * @var string
 	 */
-	private const THEME_TEMPLATE_DIR = 'all-purpose-directory/';
+	private const THEME_TEMPLATE_DIR = 'damdir-directory/';
 
 	/**
 	 * Singleton instance.
@@ -98,7 +98,7 @@ final class Template {
 	 * Locate a template file.
 	 *
 	 * Searches for templates in the following order:
-	 * 1. Theme: `{theme}/all-purpose-directory/{template_name}`
+	 * 1. Theme: `{theme}/damdir-directory/{template_name}`
 	 * 2. Plugin: `{plugin}/templates/{template_name}`
 	 *
 	 * @since 1.0.0

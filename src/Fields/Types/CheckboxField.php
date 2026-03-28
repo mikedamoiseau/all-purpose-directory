@@ -140,7 +140,7 @@ class CheckboxField extends AbstractFieldType {
 				'required',
 				sprintf(
 					/* translators: %s: field label */
-					__( '%s must be checked.', 'all-purpose-directory' ),
+					__( '%s must be checked.', 'damdir-directory' ),
 					$this->getLabel( $field )
 				)
 			);
@@ -174,8 +174,8 @@ class CheckboxField extends AbstractFieldType {
 	public function formatValue( mixed $value, array $field ): string {
 		$is_checked = $this->toBoolean( $value );
 
-		$yes_label = $field['yes_label'] ?? __( 'Yes', 'all-purpose-directory' );
-		$no_label  = $field['no_label'] ?? __( 'No', 'all-purpose-directory' );
+		$yes_label = $field['yes_label'] ?? __( 'Yes', 'damdir-directory' );
+		$no_label  = $field['no_label'] ?? __( 'No', 'damdir-directory' );
 
 		return esc_html( $is_checked ? $yes_label : $no_label );
 	}

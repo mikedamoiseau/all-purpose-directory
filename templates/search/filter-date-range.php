@@ -5,7 +5,7 @@
  * Template for rendering date range filter controls with start/end date inputs.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/search/filter-date-range.php
+ * yourtheme/damdir-directory/search/filter-date-range.php
  *
  * @package APD\Templates
  * @since   1.0.0
@@ -52,7 +52,7 @@ if ( $is_active ) {
 	<div class="apd-filter__date-range-inputs" role="group" aria-labelledby="<?php echo esc_attr( $filter_id ); ?>-label">
 		<div class="apd-filter__date-field">
 			<label for="<?php echo esc_attr( $filter_id ); ?>-start" class="apd-filter__date-label">
-				<?php echo esc_html( $config['start_label'] ?? __( 'From', 'all-purpose-directory' ) ); ?>
+				<?php echo esc_html( $config['start_label'] ?? __( 'From', 'damdir-directory' ) ); ?>
 			</label>
 			<input
 				type="date"
@@ -71,7 +71,7 @@ if ( $is_active ) {
 
 		<div class="apd-filter__date-field">
 			<label for="<?php echo esc_attr( $filter_id ); ?>-end" class="apd-filter__date-label">
-				<?php echo esc_html( $config['end_label'] ?? __( 'To', 'all-purpose-directory' ) ); ?>
+				<?php echo esc_html( $config['end_label'] ?? __( 'To', 'damdir-directory' ) ); ?>
 			</label>
 			<input
 				type="date"

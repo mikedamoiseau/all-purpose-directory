@@ -5,7 +5,7 @@
  * Statistics overview section for the user dashboard.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/dashboard/stats.php
+ * yourtheme/damdir-directory/dashboard/stats.php
  *
  * @package APD\Templates
  * @since   1.0.0
@@ -32,29 +32,29 @@ $stat_items = apply_filters(
 	'apd_dashboard_stat_items',
 	[
 		'total'     => [
-			'label' => __( 'Total Listings', 'all-purpose-directory' ),
+			'label' => __( 'Total Listings', 'damdir-directory' ),
 			'icon'  => 'dashicons-list-view',
 			'value' => $stats['total'],
 		],
 		'published' => [
-			'label' => __( 'Published', 'all-purpose-directory' ),
+			'label' => __( 'Published', 'damdir-directory' ),
 			'icon'  => 'dashicons-yes-alt',
 			'value' => $stats['published'],
 			'class' => 'apd-stat-card--success',
 		],
 		'pending'   => [
-			'label' => __( 'Pending Review', 'all-purpose-directory' ),
+			'label' => __( 'Pending Review', 'damdir-directory' ),
 			'icon'  => 'dashicons-clock',
 			'value' => $stats['pending'],
 			'class' => 'apd-stat-card--warning',
 		],
 		'draft'     => [
-			'label' => __( 'Drafts', 'all-purpose-directory' ),
+			'label' => __( 'Drafts', 'damdir-directory' ),
 			'icon'  => 'dashicons-edit',
 			'value' => $stats['draft'],
 		],
 		'views'     => [
-			'label' => __( 'Total Views', 'all-purpose-directory' ),
+			'label' => __( 'Total Views', 'damdir-directory' ),
 			'icon'  => 'dashicons-visibility',
 			'value' => $stats['views'],
 			'class' => 'apd-stat-card--info',

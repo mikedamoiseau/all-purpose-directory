@@ -163,7 +163,7 @@ class DecimalField extends AbstractFieldType {
 				'not_numeric',
 				sprintf(
 					/* translators: %s: field label */
-					__( '%s must be a number.', 'all-purpose-directory' ),
+					__( '%s must be a number.', 'damdir-directory' ),
 					$this->getLabel( $field )
 				)
 			);
@@ -178,7 +178,7 @@ class DecimalField extends AbstractFieldType {
 				'min_value',
 				sprintf(
 					/* translators: 1: field label, 2: minimum value */
-					__( '%1$s must be at least %2$s.', 'all-purpose-directory' ),
+					__( '%1$s must be at least %2$s.', 'damdir-directory' ),
 					$this->getLabel( $field ),
 					$this->formatNumber( (float) $field['min'], $field )
 				)
@@ -191,7 +191,7 @@ class DecimalField extends AbstractFieldType {
 				'max_value',
 				sprintf(
 					/* translators: 1: field label, 2: maximum value */
-					__( '%1$s must be no more than %2$s.', 'all-purpose-directory' ),
+					__( '%1$s must be no more than %2$s.', 'damdir-directory' ),
 					$this->getLabel( $field ),
 					$this->formatNumber( (float) $field['max'], $field )
 				)

@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 import { ADMIN_STATE, USER_STATE } from './helpers';
 
 /**
- * Playwright configuration for All Purpose Directory E2E tests.
+ * Playwright configuration for DamDir Directory E2E tests.
  *
  * @see https://playwright.dev/docs/test-configuration
  */

@@ -3,7 +3,7 @@
  * New Review Email Template.
  *
  * Sent to the listing owner when their listing receives a new review.
- * Override this template in your theme: all-purpose-directory/emails/new-review.php
+ * Override this template in your theme: damdir-directory/emails/new-review.php
  *
  * @package All_Purpose_Directory
  * @since   1.0.0
@@ -42,35 +42,35 @@ function apd_email_star_rating( int $rating ): string {
 }
 ?>
 
-<h2><?php esc_html_e( 'New Review on Your Listing', 'all-purpose-directory' ); ?></h2>
+<h2><?php esc_html_e( 'New Review on Your Listing', 'damdir-directory' ); ?></h2>
 
 <p>
 	<?php
 	printf(
 		/* translators: %s: author name */
-		esc_html__( 'Hi %s,', 'all-purpose-directory' ),
+		esc_html__( 'Hi %s,', 'damdir-directory' ),
 		esc_html( $author_name )
 	);
 	?>
 </p>
 
-<p><?php esc_html_e( 'Your listing has received a new review! Here are the details:', 'all-purpose-directory' ); ?></p>
+<p><?php esc_html_e( 'Your listing has received a new review! Here are the details:', 'damdir-directory' ); ?></p>
 
 <table class="info-table">
 	<tr>
-		<td><?php esc_html_e( 'Listing', 'all-purpose-directory' ); ?></td>
+		<td><?php esc_html_e( 'Listing', 'damdir-directory' ); ?></td>
 		<td><a href="<?php echo esc_url( $listing_url ); ?>"><?php echo esc_html( $listing_title ); ?></a></td>
 	</tr>
 	<tr>
-		<td><?php esc_html_e( 'Reviewer', 'all-purpose-directory' ); ?></td>
+		<td><?php esc_html_e( 'Reviewer', 'damdir-directory' ); ?></td>
 		<td><?php echo esc_html( $review_author ); ?></td>
 	</tr>
 	<tr>
-		<td><?php esc_html_e( 'Rating', 'all-purpose-directory' ); ?></td>
+		<td><?php esc_html_e( 'Rating', 'damdir-directory' ); ?></td>
 		<td><?php echo apd_email_star_rating( (int) $review_rating ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> (<?php echo esc_html( $review_rating ); ?>/5)</td>
 	</tr>
 	<tr>
-		<td><?php esc_html_e( 'Date', 'all-purpose-directory' ); ?></td>
+		<td><?php esc_html_e( 'Date', 'damdir-directory' ); ?></td>
 		<td><?php echo esc_html( $review_date ); ?></td>
 	</tr>
 </table>
@@ -84,7 +84,7 @@ function apd_email_star_rating( int $rating ): string {
 </div>
 
 <div class="text-center mt-20">
-	<a href="<?php echo esc_url( $listing_url . '#reviews' ); ?>" class="button"><?php esc_html_e( 'View Review', 'all-purpose-directory' ); ?></a>
+	<a href="<?php echo esc_url( $listing_url . '#reviews' ); ?>" class="button"><?php esc_html_e( 'View Review', 'damdir-directory' ); ?></a>
 </div>
 
-<p class="text-muted mt-20"><?php esc_html_e( 'Reviews help build trust with potential customers. Thank your reviewer or respond to their feedback to show you value their opinion!', 'all-purpose-directory' ); ?></p>
+<p class="text-muted mt-20"><?php esc_html_e( 'Reviews help build trust with potential customers. Thank your reviewer or respond to their feedback to show you value their opinion!', 'damdir-directory' ); ?></p>

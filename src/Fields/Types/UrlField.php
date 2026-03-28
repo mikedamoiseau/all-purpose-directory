@@ -119,7 +119,7 @@ class UrlField extends AbstractFieldType {
 				'invalid_url',
 				sprintf(
 					/* translators: %s: field label */
-					__( '%s must be a valid URL.', 'all-purpose-directory' ),
+					__( '%s must be a valid URL.', 'damdir-directory' ),
 					$this->getLabel( $field )
 				)
 			);

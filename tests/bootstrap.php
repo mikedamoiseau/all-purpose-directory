@@ -38,7 +38,7 @@ function _manually_load_plugin(): void {
     require dirname(__DIR__) . '/vendor/autoload.php';
 
     // Load the main plugin file.
-    $plugin_file = dirname(__DIR__) . '/all-purpose-directory.php';
+    $plugin_file = dirname(__DIR__) . '/damdir-directory.php';
 
     if (file_exists($plugin_file)) {
         require $plugin_file;

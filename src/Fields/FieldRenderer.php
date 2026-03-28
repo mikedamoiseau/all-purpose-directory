@@ -512,7 +512,7 @@ class FieldRenderer {
 		if ( ! empty( $field['required'] ) ) {
 			$required_indicator = sprintf(
 				' <span class="apd-field__required-indicator" aria-hidden="true">%s</span>',
-				esc_html__( '*', 'all-purpose-directory' )
+				esc_html__( '*', 'damdir-directory' )
 			);
 		}
 

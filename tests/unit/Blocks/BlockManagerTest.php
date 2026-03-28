@@ -230,8 +230,8 @@ class BlockManagerTest extends TestCase {
 	public function test_register_block_category_adds_plugin_category(): void {
 		Functions\expect( '__' )
 			->once()
-			->with( 'All Purpose Directory', 'all-purpose-directory' )
-			->andReturn( 'All Purpose Directory' );
+			->with( 'DamDir Directory', 'damdir-directory' )
+			->andReturn( 'DamDir Directory' );
 
 		$manager    = BlockManager::get_instance();
 		$categories = [
@@ -244,8 +244,8 @@ class BlockManagerTest extends TestCase {
 		$result = $manager->register_block_category( $categories );
 
 		$this->assertCount( 2, $result );
-		$this->assertSame( 'all-purpose-directory', $result[0]['slug'] );
-		$this->assertSame( 'All Purpose Directory', $result[0]['title'] );
+		$this->assertSame( 'damdir-directory', $result[0]['slug'] );
+		$this->assertSame( 'DamDir Directory', $result[0]['title'] );
 		$this->assertSame( 'text', $result[1]['slug'] );
 	}
 }

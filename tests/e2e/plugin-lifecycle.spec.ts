@@ -19,13 +19,13 @@ test.describe('Plugin Lifecycle', () => {
 
   // Ensure plugin is active before tests start (may be left deactivated from previous run).
   test.beforeAll(async () => {
-    await wpCli('plugin activate all-purpose-directory').catch(() => {});
+    await wpCli('plugin activate damdir-directory').catch(() => {});
     await wpCli('rewrite flush');
   });
 
   // Safety net: always reactivate after this suite.
   test.afterAll(async () => {
-    await wpCli('plugin activate all-purpose-directory').catch(() => {});
+    await wpCli('plugin activate damdir-directory').catch(() => {});
     await wpCli('rewrite flush');
   });
 
@@ -85,7 +85,7 @@ test.describe('Plugin Lifecycle', () => {
     expect(countBefore).toBeGreaterThan(0);
 
     // Deactivate plugin.
-    await wpCli('plugin deactivate all-purpose-directory');
+    await wpCli('plugin deactivate damdir-directory');
 
     // Count listings after deactivation (posts still exist in DB).
     // Plugin is inactive so post type helpers are unavailable; use $wpdb directly.
@@ -96,7 +96,7 @@ test.describe('Plugin Lifecycle', () => {
     expect(parseInt(countAfter.trim(), 10)).toBe(countBefore);
 
     // Reactivate plugin.
-    await wpCli('plugin activate all-purpose-directory');
+    await wpCli('plugin activate damdir-directory');
     await wpCli('rewrite flush');
   });
 
@@ -107,7 +107,7 @@ test.describe('Plugin Lifecycle', () => {
     );
 
     // Deactivate.
-    await wpCli('plugin deactivate all-purpose-directory');
+    await wpCli('plugin deactivate damdir-directory');
 
     // Check option still exists.
     const optionAfterDeactivate = await wpCli(
@@ -116,7 +116,7 @@ test.describe('Plugin Lifecycle', () => {
     expect(optionAfterDeactivate).toBe('€');
 
     // Reactivate.
-    await wpCli('plugin activate all-purpose-directory');
+    await wpCli('plugin activate damdir-directory');
     await wpCli('rewrite flush');
 
     // Verify setting persisted.

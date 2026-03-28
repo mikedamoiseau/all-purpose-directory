@@ -144,7 +144,7 @@ class DateTimeField extends AbstractFieldType {
 				'invalid_datetime',
 				sprintf(
 					/* translators: %s: field label */
-					__( '%s must be a valid date and time.', 'all-purpose-directory' ),
+					__( '%s must be a valid date and time.', 'damdir-directory' ),
 					$this->getLabel( $field )
 				)
 			);
@@ -161,7 +161,7 @@ class DateTimeField extends AbstractFieldType {
 					'datetime_too_early',
 					sprintf(
 						/* translators: 1: field label, 2: minimum datetime */
-						__( '%1$s must be on or after %2$s.', 'all-purpose-directory' ),
+						__( '%1$s must be on or after %2$s.', 'damdir-directory' ),
 						$this->getLabel( $field ),
 						str_replace( 'T', ' ', $field['min'] )
 					)
@@ -177,7 +177,7 @@ class DateTimeField extends AbstractFieldType {
 					'datetime_too_late',
 					sprintf(
 						/* translators: 1: field label, 2: maximum datetime */
-						__( '%1$s must be on or before %2$s.', 'all-purpose-directory' ),
+						__( '%1$s must be on or before %2$s.', 'damdir-directory' ),
 						$this->getLabel( $field ),
 						str_replace( 'T', ' ', $field['max'] )
 					)

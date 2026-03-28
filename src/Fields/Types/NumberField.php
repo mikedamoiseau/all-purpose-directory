@@ -140,7 +140,7 @@ class NumberField extends AbstractFieldType {
 				'not_numeric',
 				sprintf(
 					/* translators: %s: field label */
-					__( '%s must be a number.', 'all-purpose-directory' ),
+					__( '%s must be a number.', 'damdir-directory' ),
 					$this->getLabel( $field )
 				)
 			);
@@ -155,7 +155,7 @@ class NumberField extends AbstractFieldType {
 				'min_value',
 				sprintf(
 					/* translators: 1: field label, 2: minimum value */
-					__( '%1$s must be at least %2$d.', 'all-purpose-directory' ),
+					__( '%1$s must be at least %2$d.', 'damdir-directory' ),
 					$this->getLabel( $field ),
 					(int) $field['min']
 				)
@@ -168,7 +168,7 @@ class NumberField extends AbstractFieldType {
 				'max_value',
 				sprintf(
 					/* translators: 1: field label, 2: maximum value */
-					__( '%1$s must be no more than %2$d.', 'all-purpose-directory' ),
+					__( '%1$s must be no more than %2$d.', 'damdir-directory' ),
 					$this->getLabel( $field ),
 					(int) $field['max']
 				)

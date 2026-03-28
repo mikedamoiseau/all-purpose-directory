@@ -66,8 +66,8 @@ class SwitchField extends AbstractFieldType {
 		$field_name = $this->getFieldName( $field );
 		$checked    = $this->toBoolean( $value ) ? ' checked="checked"' : '';
 
-		$on_label  = $field['on_label'] ?? __( 'On', 'all-purpose-directory' );
-		$off_label = $field['off_label'] ?? __( 'Off', 'all-purpose-directory' );
+		$on_label  = $field['on_label'] ?? __( 'On', 'damdir-directory' );
+		$off_label = $field['off_label'] ?? __( 'Off', 'damdir-directory' );
 
 		// Build switch attributes.
 		$attributes = [
@@ -155,7 +155,7 @@ class SwitchField extends AbstractFieldType {
 				'required',
 				sprintf(
 					/* translators: %s: field label */
-					__( '%s must be enabled.', 'all-purpose-directory' ),
+					__( '%s must be enabled.', 'damdir-directory' ),
 					$this->getLabel( $field )
 				)
 			);
@@ -189,8 +189,8 @@ class SwitchField extends AbstractFieldType {
 	public function formatValue( mixed $value, array $field ): string {
 		$is_on = $this->toBoolean( $value );
 
-		$on_label  = $field['on_label'] ?? __( 'On', 'all-purpose-directory' );
-		$off_label = $field['off_label'] ?? __( 'Off', 'all-purpose-directory' );
+		$on_label  = $field['on_label'] ?? __( 'On', 'damdir-directory' );
+		$off_label = $field['off_label'] ?? __( 'Off', 'damdir-directory' );
 
 		return esc_html( $is_on ? $on_label : $off_label );
 	}

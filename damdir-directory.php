@@ -1,7 +1,7 @@
 <?php
 /**
- * Plugin Name:       All Purpose Directory
- * Plugin URI:        https://damoiseau.xyz/all-purpose-directory/
+ * Plugin Name:       DamDir Directory
+ * Plugin URI:        https://damoiseau.xyz/damdir-directory/
  * Description:       A flexible WordPress plugin for building directory and listing websites.
  * Version:           1.0.0
  * Requires at least: 6.0
@@ -10,7 +10,7 @@
  * Author URI:        https://damoiseau.xyz
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       all-purpose-directory
+ * Text Domain:       damdir-directory
  * Domain Path:       /languages
  *
  * @package APD
@@ -96,7 +96,7 @@ add_action( 'plugins_loaded', 'apd_init' );
 function apd_php_version_notice(): void {
 	$message = sprintf(
 		/* translators: 1: Required PHP version, 2: Current PHP version */
-		__( 'All Purpose Directory requires PHP %1$s or higher. You are running PHP %2$s.', 'all-purpose-directory' ),
+		__( 'DamDir Directory requires PHP %1$s or higher. You are running PHP %2$s.', 'damdir-directory' ),
 		APD_MIN_PHP_VERSION,
 		PHP_VERSION
 	);
@@ -112,7 +112,7 @@ function apd_php_version_notice(): void {
 function apd_wp_version_notice(): void {
 	$message = sprintf(
 		/* translators: 1: Required WordPress version, 2: Current WordPress version */
-		__( 'All Purpose Directory requires WordPress %1$s or higher. You are running WordPress %2$s.', 'all-purpose-directory' ),
+		__( 'DamDir Directory requires WordPress %1$s or higher. You are running WordPress %2$s.', 'damdir-directory' ),
 		APD_MIN_WP_VERSION,
 		get_bloginfo( 'version' )
 	);

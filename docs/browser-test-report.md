@@ -1,4 +1,4 @@
-# Browser Test Report: All Purpose Directory Plugin
+# Browser Test Report: DamDir Directory Plugin
 
 **Date:** 2026-03-04
 **Environment:** WordPress 6.9.1 at `http://localhost/` (Docker)
