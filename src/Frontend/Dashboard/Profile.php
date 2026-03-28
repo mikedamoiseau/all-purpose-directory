@@ -298,7 +298,8 @@ class Profile {
 	public function handle_save(): void {
 		// Check for form submission.
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified below.
-		if ( ! isset( $_POST['apd_profile_action'] ) || $_POST['apd_profile_action'] !== 'save' ) {
+		$profile_action = isset( $_POST['apd_profile_action'] ) ? sanitize_text_field( wp_unslash( $_POST['apd_profile_action'] ) ) : '';
+		if ( $profile_action !== 'save' ) {
 			return;
 		}
 
@@ -343,7 +344,7 @@ class Profile {
 
 		// Check for avatar removal.
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Already verified above.
-		if ( isset( $_POST['apd_remove_avatar'] ) && $_POST['apd_remove_avatar'] === '1' ) {
+		if ( isset( $_POST['apd_remove_avatar'] ) && sanitize_text_field( wp_unslash( $_POST['apd_remove_avatar'] ) ) === '1' ) {
 			$data['avatar_id'] = 0;
 		}
 

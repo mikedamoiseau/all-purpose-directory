@@ -375,7 +375,7 @@ final class SubmissionFormShortcode extends AbstractShortcode {
 
 		// Check if this was an update.
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Just checking update flag.
-		$is_update = isset( $_GET['is_update'] ) && $_GET['is_update'] === '1';
+		$is_update = isset( $_GET['is_update'] ) && sanitize_text_field( wp_unslash( $_GET['is_update'] ) ) === '1';
 
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in template.
 		return \apd_render_submission_success( 0, $submit_url, $is_update );

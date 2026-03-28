@@ -1338,7 +1338,7 @@ final class Settings {
 				<?php
 				// Show settings saved notice.
 				// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				if ( isset( $_GET['settings-updated'] ) && $_GET['settings-updated'] === 'true' ) {
+				if ( isset( $_GET['settings-updated'] ) && sanitize_text_field( wp_unslash( $_GET['settings-updated'] ) ) === 'true' ) {
 					?>
 					<div class="notice notice-success is-dismissible">
 						<p><?php esc_html_e( 'Settings saved.', 'damdir-directory' ); ?></p>

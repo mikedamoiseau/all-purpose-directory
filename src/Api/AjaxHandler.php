@@ -219,7 +219,7 @@ class AjaxHandler {
 		}
 
 		// Get action type (trash or delete).
-		$delete_type = isset( $_POST['delete_type'] ) && $_POST['delete_type'] === 'permanent' ? 'permanent' : 'trash';
+		$delete_type = isset( $_POST['delete_type'] ) && sanitize_key( wp_unslash( $_POST['delete_type'] ) ) === 'permanent' ? 'permanent' : 'trash';
 
 		$my_listings = MyListings::get_instance();
 

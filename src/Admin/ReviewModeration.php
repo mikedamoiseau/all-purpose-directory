@@ -1050,7 +1050,7 @@ final class ReviewModeration {
 	public function handle_actions(): void {
 		// Check we're on the right page.
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Just checking page.
-		if ( ! isset( $_GET['page'] ) || $_GET['page'] !== self::PAGE_SLUG ) {
+		if ( ! isset( $_GET['page'] ) || sanitize_text_field( wp_unslash( $_GET['page'] ) ) !== self::PAGE_SLUG ) {
 			return;
 		}
 

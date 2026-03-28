@@ -196,7 +196,8 @@ class SubmissionHandler {
 
 		// Must have our action.
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in process().
-		if ( ! isset( $_POST['apd_action'] ) || $_POST['apd_action'] !== 'submit_listing' ) {
+		$action = isset( $_POST['apd_action'] ) ? sanitize_text_field( wp_unslash( $_POST['apd_action'] ) ) : '';
+		if ( $action !== 'submit_listing' ) {
 			return false;
 		}
 

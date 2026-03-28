@@ -510,7 +510,8 @@ class ReviewHandler {
 
 		// Must have our action.
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in handle_submit().
-		if ( ! isset( $_POST['apd_action'] ) || $_POST['apd_action'] !== 'submit_review' ) {
+		$action = isset( $_POST['apd_action'] ) ? sanitize_text_field( wp_unslash( $_POST['apd_action'] ) ) : '';
+		if ( $action !== 'submit_review' ) {
 			return false;
 		}
 
