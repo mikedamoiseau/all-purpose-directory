@@ -318,7 +318,7 @@ class SubmissionHandler {
 			return false;
 		}
 
-		return (bool) wp_verify_nonce( \sanitize_text_field( wp_unslash( $_POST[ self::NONCE_NAME ] ) ), self::NONCE_ACTION );
+		return (bool) wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST[ self::NONCE_NAME ] ) ), self::NONCE_ACTION );
 	}
 
 	/**

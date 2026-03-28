@@ -530,7 +530,7 @@ class ReviewHandler {
 			return false;
 		}
 
-		return (bool) wp_verify_nonce( \sanitize_text_field( wp_unslash( $_POST[ ReviewForm::NONCE_NAME ] ) ), ReviewForm::NONCE_ACTION );
+		return (bool) wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST[ ReviewForm::NONCE_NAME ] ) ), ReviewForm::NONCE_ACTION );
 	}
 
 	/**

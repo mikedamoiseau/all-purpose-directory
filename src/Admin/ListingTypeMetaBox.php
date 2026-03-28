@@ -164,7 +164,7 @@ final class ListingTypeMetaBox {
 			return;
 		}
 
-		if ( ! wp_verify_nonce( \sanitize_text_field( wp_unslash( $_POST[ self::NONCE_NAME ] ) ), self::NONCE_ACTION ) ) {
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST[ self::NONCE_NAME ] ) ), self::NONCE_ACTION ) ) {
 			return;
 		}
 
