@@ -5,7 +5,7 @@
  * Tab navigation for the user dashboard.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/dashboard/navigation.php
+ * yourtheme/damdir-directory/dashboard/navigation.php
  *
  * @package APD\Templates
  * @since   1.0.0
@@ -43,7 +43,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</span>
 				<?php if ( $has_count && $tab['count'] > 0 ) : ?>
 					<?php /* translators: %d: Number of items in this tab */ ?>
-					<span class="apd-dashboard-nav__count" aria-label="<?php echo esc_attr( sprintf( __( '%d items', 'all-purpose-directory' ), $tab['count'] ) ); ?>">
+					<span class="apd-dashboard-nav__count" aria-label="<?php echo esc_attr( sprintf( __( '%d items', 'damdir-directory' ), $tab['count'] ) ); ?>">
 						<?php echo absint( $tab['count'] ); ?>
 					</span>
 				<?php endif; ?>

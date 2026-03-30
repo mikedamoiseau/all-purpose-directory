@@ -121,7 +121,7 @@ final class FilterRegistry {
 		if ( empty( $name ) ) {
 			_doing_it_wrong(
 				__METHOD__,
-				esc_html__( 'Filter name cannot be empty.', 'all-purpose-directory' ),
+				esc_html__( 'Filter name cannot be empty.', 'damdir-directory' ),
 				'1.0.0'
 			);
 			return false;
@@ -132,7 +132,7 @@ final class FilterRegistry {
 				__METHOD__,
 				sprintf(
 					/* translators: %s: filter name */
-					esc_html__( 'Filter "%s" is already registered.', 'all-purpose-directory' ),
+					esc_html__( 'Filter "%s" is already registered.', 'damdir-directory' ),
 					esc_html( $name )
 				),
 				'1.0.0'

@@ -5,7 +5,7 @@
  * Main template for the My Listings dashboard tab.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/dashboard/my-listings.php
+ * yourtheme/damdir-directory/dashboard/my-listings.php
  *
  * @package APD\Templates
  * @since   1.0.0
@@ -55,14 +55,14 @@ $message = $my_listings->get_message();
 	<div class="apd-my-listings__header">
 		<div class="apd-my-listings__title-row">
 			<h2 class="apd-my-listings__title">
-				<?php esc_html_e( 'My Listings', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'My Listings', 'damdir-directory' ); ?>
 				<span class="apd-my-listings__count">(<?php echo esc_html( number_format_i18n( $total ) ); ?>)</span>
 			</h2>
 		</div>
 
 		<div class="apd-my-listings__filters">
 			<!-- Status Filter Tabs -->
-			<nav class="apd-my-listings__status-tabs" aria-label="<?php esc_attr_e( 'Filter by status', 'all-purpose-directory' ); ?>">
+			<nav class="apd-my-listings__status-tabs" aria-label="<?php esc_attr_e( 'Filter by status', 'damdir-directory' ); ?>">
 				<ul class="apd-status-tabs">
 					<?php foreach ( $statuses as $status_key => $status_data ) : ?>
 						<?php
@@ -89,7 +89,7 @@ $message = $my_listings->get_message();
 			<!-- Sort Options -->
 			<div class="apd-my-listings__sort">
 				<label for="apd-sort-select" class="apd-my-listings__sort-label">
-					<?php esc_html_e( 'Sort by:', 'all-purpose-directory' ); ?>
+					<?php esc_html_e( 'Sort by:', 'damdir-directory' ); ?>
 				</label>
 				<select id="apd-sort-select" class="apd-my-listings__sort-select">
 					<?php
@@ -116,21 +116,21 @@ $message = $my_listings->get_message();
 					<tr>
 						<?php if ( $config['show_thumbnail'] ) : ?>
 							<th class="apd-my-listings__col-image" scope="col">
-								<span class="screen-reader-text"><?php esc_html_e( 'Image', 'all-purpose-directory' ); ?></span>
+								<span class="screen-reader-text"><?php esc_html_e( 'Image', 'damdir-directory' ); ?></span>
 							</th>
 						<?php endif; ?>
-						<th class="apd-my-listings__col-title" scope="col"><?php esc_html_e( 'Listing', 'all-purpose-directory' ); ?></th>
-						<th class="apd-my-listings__col-status" scope="col"><?php esc_html_e( 'Status', 'all-purpose-directory' ); ?></th>
+						<th class="apd-my-listings__col-title" scope="col"><?php esc_html_e( 'Listing', 'damdir-directory' ); ?></th>
+						<th class="apd-my-listings__col-status" scope="col"><?php esc_html_e( 'Status', 'damdir-directory' ); ?></th>
 						<?php if ( $config['show_views'] ) : ?>
-							<th class="apd-my-listings__col-views" scope="col"><?php esc_html_e( 'Views', 'all-purpose-directory' ); ?></th>
+							<th class="apd-my-listings__col-views" scope="col"><?php esc_html_e( 'Views', 'damdir-directory' ); ?></th>
 						<?php endif; ?>
 						<?php if ( $config['show_inquiries'] ) : ?>
-							<th class="apd-my-listings__col-inquiries" scope="col"><?php esc_html_e( 'Inquiries', 'all-purpose-directory' ); ?></th>
+							<th class="apd-my-listings__col-inquiries" scope="col"><?php esc_html_e( 'Inquiries', 'damdir-directory' ); ?></th>
 						<?php endif; ?>
 						<?php if ( $config['show_date'] ) : ?>
-							<th class="apd-my-listings__col-date" scope="col"><?php esc_html_e( 'Date', 'all-purpose-directory' ); ?></th>
+							<th class="apd-my-listings__col-date" scope="col"><?php esc_html_e( 'Date', 'damdir-directory' ); ?></th>
 						<?php endif; ?>
-						<th class="apd-my-listings__col-actions" scope="col"><?php esc_html_e( 'Actions', 'all-purpose-directory' ); ?></th>
+						<th class="apd-my-listings__col-actions" scope="col"><?php esc_html_e( 'Actions', 'damdir-directory' ); ?></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -153,7 +153,7 @@ $message = $my_listings->get_message();
 		</div>
 
 		<?php if ( $max_pages > 1 ) : ?>
-			<nav class="apd-my-listings__pagination" aria-label="<?php esc_attr_e( 'Listings pagination', 'all-purpose-directory' ); ?>">
+			<nav class="apd-my-listings__pagination" aria-label="<?php esc_attr_e( 'Listings pagination', 'damdir-directory' ); ?>">
 				<?php
 				$pagination = paginate_links(
 					[
@@ -163,11 +163,11 @@ $message = $my_listings->get_message();
 						'total'     => $max_pages,
 						'prev_text' => sprintf(
 							'<span class="screen-reader-text">%s</span><span aria-hidden="true">&laquo;</span>',
-							esc_html__( 'Previous page', 'all-purpose-directory' )
+							esc_html__( 'Previous page', 'damdir-directory' )
 						),
 						'next_text' => sprintf(
 							'<span class="screen-reader-text">%s</span><span aria-hidden="true">&raquo;</span>',
-							esc_html__( 'Next page', 'all-purpose-directory' )
+							esc_html__( 'Next page', 'damdir-directory' )
 						),
 					]
 				);

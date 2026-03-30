@@ -305,7 +305,7 @@ class ReviewDisplay {
 
 		ob_start();
 
-		echo '<div class="apd-reviews-list" aria-label="' . esc_attr__( 'Reviews list', 'all-purpose-directory' ) . '">';
+		echo '<div class="apd-reviews-list" aria-label="' . esc_attr__( 'Reviews list', 'damdir-directory' ) . '">';
 
 		foreach ( $reviews['reviews'] as $review ) {
 			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Output is escaped in render method.

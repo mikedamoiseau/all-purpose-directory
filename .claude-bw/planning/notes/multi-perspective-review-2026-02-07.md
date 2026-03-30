@@ -1,4 +1,4 @@
-# All Purpose Directory — Multi-Perspective Review
+# DamDir Directory — Multi-Perspective Review
 
 **Date:** 2026-02-07
 **Reviewers:** Frontend Senior, Backend Senior, Devil's Advocate, End User, Product Manager
@@ -180,7 +180,7 @@ Every reviewer acknowledged these strengths:
 
 ### Executive Summary
 
-The All Purpose Directory plugin demonstrates strong frontend fundamentals. The codebase follows BEM naming conventions consistently, uses semantic HTML with proper ARIA attributes, and provides a well-organized CSS architecture using custom properties for theming. The vanilla JavaScript approach (no jQuery on frontend) is a smart choice for performance. Template overridability via theme directory and extensive hook coverage enable deep customization.
+The DamDir Directory plugin demonstrates strong frontend fundamentals. The codebase follows BEM naming conventions consistently, uses semantic HTML with proper ARIA attributes, and provides a well-organized CSS architecture using custom properties for theming. The vanilla JavaScript approach (no jQuery on frontend) is a smart choice for performance. Template overridability via theme directory and extensive hook coverage enable deep customization.
 
 However, there are several issues that need attention, ranging from a JavaScript bug that causes double initialization to ARIA role misuse and some accessibility gaps. The plugin is well-positioned for WordPress.org submission with these fixes.
 
@@ -304,7 +304,7 @@ The honeypot field uses `style="position: absolute; left: -9999px;"` inline. Sop
 The contact form doesn't have `novalidate` but also has no custom JS validation attached to it. The submission form does have `novalidate` with proper JS validation. These should be consistent -- either use native browser validation on both, or add custom JS validation and `novalidate` on both.
 
 **[SUGGESTION] Template documentation consistency**
-All templates have the `@var` PHPDoc annotations at the top documenting available variables, which is excellent. The theme override instructions (`yourtheme/all-purpose-directory/...`) are consistently included. This is a strong pattern.
+All templates have the `@var` PHPDoc annotations at the top documenting available variables, which is excellent. The theme override instructions (`yourtheme/damdir-directory/...`) are consistently included. This is a strong pattern.
 
 ---
 
@@ -452,7 +452,7 @@ The field groups support `collapsible` and `collapsed` states with proper `aria-
 
 ### Executive Summary
 
-The All Purpose Directory plugin demonstrates solid WordPress engineering with proper use of hooks, capability checks, and sanitization. The codebase follows WordPress conventions well and makes good use of PHP 8.0+ features. I identified **1 Major issue**, **several Minor issues**, and **several Suggestions** across 8 focus areas.
+The DamDir Directory plugin demonstrates solid WordPress engineering with proper use of hooks, capability checks, and sanitization. The codebase follows WordPress conventions well and makes good use of PHP 8.0+ features. I identified **1 Major issue**, **several Minor issues**, and **several Suggestions** across 8 focus areas.
 
 **Overall Rating: GOOD** -- Production-ready with a few targeted improvements recommended.
 
@@ -460,7 +460,7 @@ The All Purpose Directory plugin demonstrates solid WordPress engineering with p
 
 ### 1. Bootstrap & Initialization
 
-**Files:** `all-purpose-directory.php`, `src/Core/Plugin.php`, `src/Core/Activator.php`
+**Files:** `damdir-directory.php`, `src/Core/Plugin.php`, `src/Core/Activator.php`
 
 **Rating: GOOD**
 
@@ -475,7 +475,7 @@ The initialization follows the standard WordPress pattern: `plugins_loaded` -> `
 
 This ordering is correct -- post types register before anything that depends on them, and modules initialize early enough to hook into field/filter registration.
 
-**Minor:** The activation hook in `all-purpose-directory.php:129-131` redundantly requires the autoloader (it's already loaded at line 50-52). This is harmless but unnecessary since the activation hook fires in the same request where the file is already loaded.
+**Minor:** The activation hook in `damdir-directory.php:129-131` redundantly requires the autoloader (it's already loaded at line 50-52). This is harmless but unnecessary since the activation hook fires in the same request where the file is already loaded.
 
 ---
 
@@ -829,7 +829,7 @@ Zero threat for the next 2 years:
 
 **Product Readiness Score: 7.5/10**
 
-All Purpose Directory is technically well-executed with solid code quality (2,660 tests, PHP 8.0+, PSR-4, WCAG compliance). However, it enters a mature, crowded market where GeoDirectory, Directorist, and HivePress have multi-year head starts with 100K+ active installs each. The plugin is technically ready for WordPress.org but needs visual polish, a first module, and clear "10x better at one thing" positioning.
+DamDir Directory is technically well-executed with solid code quality (2,660 tests, PHP 8.0+, PSR-4, WCAG compliance). However, it enters a mature, crowded market where GeoDirectory, Directorist, and HivePress have multi-year head starts with 100K+ active installs each. The plugin is technically ready for WordPress.org but needs visual polish, a first module, and clear "10x better at one thing" positioning.
 
 ---
 

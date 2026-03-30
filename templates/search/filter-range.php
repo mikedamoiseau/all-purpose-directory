@@ -5,7 +5,7 @@
  * Template for rendering numeric range filter controls with min/max inputs.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/search/filter-range.php
+ * yourtheme/damdir-directory/search/filter-range.php
  *
  * @package APD\Templates
  * @since   1.0.0
@@ -59,9 +59,9 @@ if ( $is_active ) {
 			id="<?php echo esc_attr( $filter_id ); ?>-min"
 			name="<?php echo esc_attr( $filter->getUrlParamMin() ); ?>"
 			value="<?php echo esc_attr( $min_value ); ?>"
-			placeholder="<?php echo esc_attr( $config['min_placeholder'] ?? __( 'Min', 'all-purpose-directory' ) ); ?>"
+			placeholder="<?php echo esc_attr( $config['min_placeholder'] ?? __( 'Min', 'damdir-directory' ) ); ?>"
 			class="apd-filter__input apd-filter__input--min"
-			aria-label="<?php esc_attr_e( 'Minimum value', 'all-purpose-directory' ); ?>"
+			aria-label="<?php esc_attr_e( 'Minimum value', 'damdir-directory' ); ?>"
 			<?php if ( isset( $config['min'] ) && $config['min'] !== null ) : ?>
 				min="<?php echo esc_attr( $config['min'] ); ?>"
 			<?php endif; ?>
@@ -80,9 +80,9 @@ if ( $is_active ) {
 			id="<?php echo esc_attr( $filter_id ); ?>-max"
 			name="<?php echo esc_attr( $filter->getUrlParamMax() ); ?>"
 			value="<?php echo esc_attr( $max_value ); ?>"
-			placeholder="<?php echo esc_attr( $config['max_placeholder'] ?? __( 'Max', 'all-purpose-directory' ) ); ?>"
+			placeholder="<?php echo esc_attr( $config['max_placeholder'] ?? __( 'Max', 'damdir-directory' ) ); ?>"
 			class="apd-filter__input apd-filter__input--max"
-			aria-label="<?php esc_attr_e( 'Maximum value', 'all-purpose-directory' ); ?>"
+			aria-label="<?php esc_attr_e( 'Maximum value', 'damdir-directory' ); ?>"
 			<?php if ( isset( $config['min'] ) && $config['min'] !== null ) : ?>
 				min="<?php echo esc_attr( $config['min'] ); ?>"
 			<?php endif; ?>

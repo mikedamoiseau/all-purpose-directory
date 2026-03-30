@@ -1,13 +1,13 @@
-# WordPress.org Deployment Guide (All Purpose Directory)
+# WordPress.org Deployment Guide (DamDir Directory)
 
-This guide is the operational runbook to publish **All Purpose Directory** to WordPress.org with minimal risk.
+This guide is the operational runbook to publish **DamDir Directory** to WordPress.org with minimal risk.
 
 ---
 
 ## 0) Current status snapshot (as of latest check)
 
 - `README.txt` stable tag: **1.0.0** ✅
-- Plugin header version (`all-purpose-directory.php`): **1.0.0** ✅
+- Plugin header version (`damdir-directory.php`): **1.0.0** ✅
 - `CHANGELOG.md`: `## [1.0.0] - Unreleased` ⚠️
 - Git tags: **none yet** (expected before release) ⚠️
 - Working tree: local-only changes present (`bin/sync-to-test.sh`, `docs/WPORG-PREFLIGHT.md`) — acceptable if excluded from release package
@@ -44,13 +44,13 @@ git pull --ff-only
 
 2. Confirm release metadata:
 - `README.txt`: `Stable tag: 1.0.0`
-- `all-purpose-directory.php`: `Version: 1.0.0`
+- `damdir-directory.php`: `Version: 1.0.0`
 - `CHANGELOG.md`: mark 1.0.0 as released (replace `Unreleased` with date)
 
 3. Commit release metadata updates:
 
 ```bash
-git add README.txt all-purpose-directory.php CHANGELOG.md
+git add README.txt damdir-directory.php CHANGELOG.md
 git commit -m "chore(release): finalize 1.0.0 metadata"
 git push origin main
 ```
@@ -81,7 +81,7 @@ Use repo root and respect `.distignore`:
 
 ```bash
 # Example using git archive (or your existing packaging script)
-git archive --format=zip --output all-purpose-directory-1.0.0.zip HEAD
+git archive --format=zip --output damdir-directory-1.0.0.zip HEAD
 ```
 
 Then verify package manually:

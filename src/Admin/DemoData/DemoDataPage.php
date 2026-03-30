@@ -221,8 +221,8 @@ final class DemoDataPage {
 	public function register_admin_page(): void {
 		add_submenu_page(
 			self::PARENT_MENU,
-			__( 'Demo Data', 'all-purpose-directory' ),
-			__( 'Demo Data', 'all-purpose-directory' ),
+			__( 'Demo Data', 'damdir-directory' ),
+			__( 'Demo Data', 'damdir-directory' ),
 			self::CAPABILITY,
 			self::PAGE_SLUG,
 			[ $this, 'render_page' ]
@@ -282,14 +282,14 @@ final class DemoDataPage {
 				'deleteNonce'   => wp_create_nonce( self::NONCE_DELETE ),
 				'tabs'          => $tab_slugs,
 				'strings'       => [
-					'generating'       => __( 'Generating demo data...', 'all-purpose-directory' ),
-					'deleting'         => __( 'Deleting demo data...', 'all-purpose-directory' ),
-					'confirmDelete'    => __( 'Are you sure you want to delete this demo data? This cannot be undone.', 'all-purpose-directory' ),
-					'confirmDeleteAll' => __( 'Are you sure you want to delete ALL demo data including users? This cannot be undone.', 'all-purpose-directory' ),
-					'success'          => __( 'Operation completed successfully!', 'all-purpose-directory' ),
-					'error'            => __( 'An error occurred. Please try again.', 'all-purpose-directory' ),
-					'generatingUsers'  => __( 'Creating users...', 'all-purpose-directory' ),
-					'deletingUsers'    => __( 'Deleting users...', 'all-purpose-directory' ),
+					'generating'       => __( 'Generating demo data...', 'damdir-directory' ),
+					'deleting'         => __( 'Deleting demo data...', 'damdir-directory' ),
+					'confirmDelete'    => __( 'Are you sure you want to delete this demo data? This cannot be undone.', 'damdir-directory' ),
+					'confirmDeleteAll' => __( 'Are you sure you want to delete ALL demo data including users? This cannot be undone.', 'damdir-directory' ),
+					'success'          => __( 'Operation completed successfully!', 'damdir-directory' ),
+					'error'            => __( 'An error occurred. Please try again.', 'damdir-directory' ),
+					'generatingUsers'  => __( 'Creating users...', 'damdir-directory' ),
+					'deletingUsers'    => __( 'Deleting users...', 'damdir-directory' ),
 				],
 			]
 		);
@@ -305,7 +305,7 @@ final class DemoDataPage {
 	public function render_page(): void {
 		// Check user capabilities.
 		if ( ! current_user_can( self::CAPABILITY ) ) {
-			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'all-purpose-directory' ) );
+			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'damdir-directory' ) );
 		}
 
 		$tracker  = DemoDataTracker::get_instance();
@@ -348,8 +348,8 @@ final class DemoDataPage {
 				<span class="dashicons dashicons-database" aria-hidden="true"></span>
 			</div>
 			<div class="apd-page-header__content">
-				<h1><?php esc_html_e( 'Demo Data Generator', 'all-purpose-directory' ); ?></h1>
-				<p><?php esc_html_e( 'Generate sample data to test your directory. All demo data can be deleted later without affecting your real content.', 'all-purpose-directory' ); ?></p>
+				<h1><?php esc_html_e( 'Demo Data Generator', 'damdir-directory' ); ?></h1>
+				<p><?php esc_html_e( 'Generate sample data to test your directory. All demo data can be deleted later without affecting your real content.', 'damdir-directory' ); ?></p>
 			</div>
 		</div>
 		<?php
@@ -371,9 +371,9 @@ final class DemoDataPage {
 
 		?>
 		<div class="apd-demo-section apd-demo-users">
-			<h2><?php esc_html_e( 'Demo Users', 'all-purpose-directory' ); ?></h2>
+			<h2><?php esc_html_e( 'Demo Users', 'damdir-directory' ); ?></h2>
 			<p class="apd-section-description">
-				<?php esc_html_e( 'Demo users are shared across all tabs. They are used as listing authors, reviewers, and for favorites.', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Demo users are shared across all tabs. They are used as listing authors, reviewers, and for favorites.', 'damdir-directory' ); ?>
 			</p>
 
 			<div class="apd-users-status">
@@ -382,7 +382,7 @@ final class DemoDataPage {
 						<tr>
 							<td>
 								<span class="dashicons dashicons-admin-users" aria-hidden="true"></span>
-								<?php esc_html_e( 'Users', 'all-purpose-directory' ); ?>
+								<?php esc_html_e( 'Users', 'damdir-directory' ); ?>
 							</td>
 							<td class="apd-stat-count" data-type="users">
 								<?php echo esc_html( number_format_i18n( $user_count ) ); ?>
@@ -395,13 +395,13 @@ final class DemoDataPage {
 			<div class="apd-users-actions">
 				<form id="apd-generate-users-form" class="apd-demo-form apd-inline-form">
 					<fieldset>
-						<legend class="screen-reader-text"><?php esc_html_e( 'Generate demo users', 'all-purpose-directory' ); ?></legend>
-						<label for="apd-users-count" class="screen-reader-text"><?php esc_html_e( 'Number of users', 'all-purpose-directory' ); ?></label>
+						<legend class="screen-reader-text"><?php esc_html_e( 'Generate demo users', 'damdir-directory' ); ?></legend>
+						<label for="apd-users-count" class="screen-reader-text"><?php esc_html_e( 'Number of users', 'damdir-directory' ); ?></label>
 						<input type="number" id="apd-users-count" name="users_count" value="<?php echo esc_attr( (string) ( $defaults['users'] ?? 5 ) ); ?>" min="1" max="20" class="small-text">
-						<span class="description"><?php esc_html_e( 'users (max 20)', 'all-purpose-directory' ); ?></span>
+						<span class="description"><?php esc_html_e( 'users (max 20)', 'damdir-directory' ); ?></span>
 						<button type="submit" class="button button-secondary" id="apd-generate-users-btn">
 							<span class="dashicons dashicons-plus-alt2" aria-hidden="true"></span>
-							<?php esc_html_e( 'Generate Users', 'all-purpose-directory' ); ?>
+							<?php esc_html_e( 'Generate Users', 'damdir-directory' ); ?>
 						</button>
 					</fieldset>
 				</form>
@@ -412,11 +412,11 @@ final class DemoDataPage {
 						id="apd-delete-users-btn"
 						<?php disabled( $has_module_data ); ?>>
 						<span class="dashicons dashicons-trash" aria-hidden="true"></span>
-						<?php esc_html_e( 'Delete Users', 'all-purpose-directory' ); ?>
+						<?php esc_html_e( 'Delete Users', 'damdir-directory' ); ?>
 					</button>
 					<?php if ( $has_module_data ) : ?>
 						<span class="description apd-delete-users-hint">
-							<?php esc_html_e( 'Delete all tab data first before deleting users.', 'all-purpose-directory' ); ?>
+							<?php esc_html_e( 'Delete all tab data first before deleting users.', 'damdir-directory' ); ?>
 						</span>
 					<?php endif; ?>
 				<?php endif; ?>
@@ -485,7 +485,7 @@ final class DemoDataPage {
 				<?php
 				printf(
 					/* translators: %s: Tab name */
-					esc_html__( 'Current %s Demo Data', 'all-purpose-directory' ),
+					esc_html__( 'Current %s Demo Data', 'damdir-directory' ),
 					esc_html( $tab->get_name() )
 				);
 				?>
@@ -494,7 +494,7 @@ final class DemoDataPage {
 			<div class="apd-stats-grid">
 				<?php $tab->render_status_section( $tracker ); ?>
 				<div class="apd-stat-item apd-stat-footer">
-					<span class="apd-stat-label"><?php esc_html_e( 'Total Items', 'all-purpose-directory' ); ?></span>
+					<span class="apd-stat-label"><?php esc_html_e( 'Total Items', 'damdir-directory' ); ?></span>
 					<span class="apd-stat-total" data-module="<?php echo esc_attr( $slug ); ?>">
 						<?php echo esc_html( number_format_i18n( $total ) ); ?>
 					</span>
@@ -508,7 +508,7 @@ final class DemoDataPage {
 				<?php
 				printf(
 					/* translators: %s: Tab name */
-					esc_html__( 'Generate %s Demo Data', 'all-purpose-directory' ),
+					esc_html__( 'Generate %s Demo Data', 'damdir-directory' ),
 					esc_html( $tab->get_name() )
 				);
 				?>
@@ -520,7 +520,7 @@ final class DemoDataPage {
 						<?php
 						printf(
 							/* translators: %s: Tab name */
-							esc_html__( 'Select %s data to generate', 'all-purpose-directory' ),
+							esc_html__( 'Select %s data to generate', 'damdir-directory' ),
 							esc_html( $tab->get_name() )
 						);
 						?>
@@ -534,7 +534,7 @@ final class DemoDataPage {
 						<?php
 						printf(
 							/* translators: %s: Tab name */
-							esc_html__( 'Generate %s Data', 'all-purpose-directory' ),
+							esc_html__( 'Generate %s Data', 'damdir-directory' ),
 							esc_html( $tab->get_name() )
 						);
 						?>
@@ -560,7 +560,7 @@ final class DemoDataPage {
 				<?php
 				printf(
 					/* translators: %s: Tab name */
-					esc_html__( 'Delete %s Demo Data', 'all-purpose-directory' ),
+					esc_html__( 'Delete %s Demo Data', 'damdir-directory' ),
 					esc_html( $tab->get_name() )
 				);
 				?>
@@ -581,12 +581,12 @@ final class DemoDataPage {
 	public function ajax_generate(): void {
 		// Verify nonce.
 		if ( ! check_ajax_referer( self::NONCE_GENERATE, 'nonce', false ) ) {
-			wp_send_json_error( [ 'message' => __( 'Invalid security token.', 'all-purpose-directory' ) ], 403 );
+			wp_send_json_error( [ 'message' => __( 'Invalid security token.', 'damdir-directory' ) ], 403 );
 		}
 
 		// Check capability.
 		if ( ! current_user_can( self::CAPABILITY ) ) {
-			wp_send_json_error( [ 'message' => __( 'Permission denied.', 'all-purpose-directory' ) ], 403 );
+			wp_send_json_error( [ 'message' => __( 'Permission denied.', 'damdir-directory' ) ], 403 );
 		}
 
 		// Get the target module/tab.
@@ -594,7 +594,7 @@ final class DemoDataPage {
 		$tab    = $this->get_tab( $module );
 
 		if ( ! $tab ) {
-			wp_send_json_error( [ 'message' => __( 'Invalid tab.', 'all-purpose-directory' ) ], 400 );
+			wp_send_json_error( [ 'message' => __( 'Invalid tab.', 'damdir-directory' ) ], 400 );
 			return;
 		}
 
@@ -635,7 +635,7 @@ final class DemoDataPage {
 
 		wp_send_json_success(
 			[
-				'message'         => __( 'Demo data generated successfully!', 'all-purpose-directory' ),
+				'message'         => __( 'Demo data generated successfully!', 'damdir-directory' ),
 				'created'         => $result['created'],
 				'counts'          => $result['counts'],
 				'module'          => $module,
@@ -654,19 +654,19 @@ final class DemoDataPage {
 	public function ajax_delete(): void {
 		// Verify nonce.
 		if ( ! check_ajax_referer( self::NONCE_DELETE, 'nonce', false ) ) {
-			wp_send_json_error( [ 'message' => __( 'Invalid security token.', 'all-purpose-directory' ) ], 403 );
+			wp_send_json_error( [ 'message' => __( 'Invalid security token.', 'damdir-directory' ) ], 403 );
 		}
 
 		// Check capability.
 		if ( ! current_user_can( self::CAPABILITY ) ) {
-			wp_send_json_error( [ 'message' => __( 'Permission denied.', 'all-purpose-directory' ) ], 403 );
+			wp_send_json_error( [ 'message' => __( 'Permission denied.', 'damdir-directory' ) ], 403 );
 		}
 
 		$module = isset( $_POST['module'] ) ? sanitize_key( $_POST['module'] ) : '';
 		$tab    = $this->get_tab( $module );
 
 		if ( ! $tab ) {
-			wp_send_json_error( [ 'message' => __( 'Invalid tab.', 'all-purpose-directory' ) ], 400 );
+			wp_send_json_error( [ 'message' => __( 'Invalid tab.', 'damdir-directory' ) ], 400 );
 			return;
 		}
 
@@ -698,7 +698,7 @@ final class DemoDataPage {
 
 		wp_send_json_success(
 			[
-				'message'         => __( 'Demo data has been deleted.', 'all-purpose-directory' ),
+				'message'         => __( 'Demo data has been deleted.', 'damdir-directory' ),
 				'deleted'         => $deleted,
 				'counts'          => $counts,
 				'module'          => $module,
@@ -717,11 +717,11 @@ final class DemoDataPage {
 	 */
 	public function ajax_generate_users(): void {
 		if ( ! check_ajax_referer( self::NONCE_GENERATE, 'nonce', false ) ) {
-			wp_send_json_error( [ 'message' => __( 'Invalid security token.', 'all-purpose-directory' ) ], 403 );
+			wp_send_json_error( [ 'message' => __( 'Invalid security token.', 'damdir-directory' ) ], 403 );
 		}
 
 		if ( ! current_user_can( self::CAPABILITY ) ) {
-			wp_send_json_error( [ 'message' => __( 'Permission denied.', 'all-purpose-directory' ) ], 403 );
+			wp_send_json_error( [ 'message' => __( 'Permission denied.', 'damdir-directory' ) ], 403 );
 		}
 
 		$count     = min( absint( $_POST['users_count'] ?? 5 ), 20 );
@@ -732,7 +732,7 @@ final class DemoDataPage {
 			[
 				'message' => sprintf(
 					/* translators: %d: Number of users created */
-					__( '%d demo users created.', 'all-purpose-directory' ),
+					__( '%d demo users created.', 'damdir-directory' ),
 					count( $user_ids )
 				),
 				'created' => count( $user_ids ),
@@ -750,11 +750,11 @@ final class DemoDataPage {
 	 */
 	public function ajax_delete_users(): void {
 		if ( ! check_ajax_referer( self::NONCE_DELETE, 'nonce', false ) ) {
-			wp_send_json_error( [ 'message' => __( 'Invalid security token.', 'all-purpose-directory' ) ], 403 );
+			wp_send_json_error( [ 'message' => __( 'Invalid security token.', 'damdir-directory' ) ], 403 );
 		}
 
 		if ( ! current_user_can( self::CAPABILITY ) ) {
-			wp_send_json_error( [ 'message' => __( 'Permission denied.', 'all-purpose-directory' ) ], 403 );
+			wp_send_json_error( [ 'message' => __( 'Permission denied.', 'damdir-directory' ) ], 403 );
 		}
 
 		$tracker = DemoDataTracker::get_instance();
@@ -763,7 +763,7 @@ final class DemoDataPage {
 		if ( $tracker->has_module_demo_data() ) {
 			wp_send_json_error(
 				[
-					'message' => __( 'Cannot delete demo users while demo data exists in other tabs. Delete all tab data first.', 'all-purpose-directory' ),
+					'message' => __( 'Cannot delete demo users while demo data exists in other tabs. Delete all tab data first.', 'damdir-directory' ),
 				],
 				400
 			);
@@ -775,7 +775,7 @@ final class DemoDataPage {
 			[
 				'message' => sprintf(
 					/* translators: %d: Number of users deleted */
-					__( '%d demo users deleted.', 'all-purpose-directory' ),
+					__( '%d demo users deleted.', 'damdir-directory' ),
 					$deleted
 				),
 				'deleted' => $deleted,

@@ -136,7 +136,7 @@ class DateRangeField extends AbstractFieldType {
 		$html .= sprintf(
 			'<label for="%s">%s</label>',
 			esc_attr( $field_id . '-start' ),
-			esc_html__( 'Start Date', 'all-purpose-directory' )
+			esc_html__( 'Start Date', 'damdir-directory' )
 		);
 		$html .= sprintf( '<input %s>', $this->buildAttributes( $start_attrs ) );
 		$html .= '</div>';
@@ -145,7 +145,7 @@ class DateRangeField extends AbstractFieldType {
 		$html .= sprintf(
 			'<label for="%s">%s</label>',
 			esc_attr( $field_id . '-end' ),
-			esc_html__( 'End Date', 'all-purpose-directory' )
+			esc_html__( 'End Date', 'damdir-directory' )
 		);
 		$html .= sprintf( '<input %s>', $this->buildAttributes( $end_attrs ) );
 		$html .= '</div>';
@@ -207,7 +207,7 @@ class DateRangeField extends AbstractFieldType {
 					'required',
 					sprintf(
 						/* translators: %s: field label */
-						__( '%s requires both start and end dates.', 'all-purpose-directory' ),
+						__( '%s requires both start and end dates.', 'damdir-directory' ),
 						$this->getLabel( $field )
 					)
 				);
@@ -226,7 +226,7 @@ class DateRangeField extends AbstractFieldType {
 				'invalid_start_date',
 				sprintf(
 					/* translators: %s: field label */
-					__( '%s start date must be in YYYY-MM-DD format.', 'all-purpose-directory' ),
+					__( '%s start date must be in YYYY-MM-DD format.', 'damdir-directory' ),
 					$this->getLabel( $field )
 				)
 			);
@@ -237,7 +237,7 @@ class DateRangeField extends AbstractFieldType {
 				'invalid_end_date',
 				sprintf(
 					/* translators: %s: field label */
-					__( '%s end date must be in YYYY-MM-DD format.', 'all-purpose-directory' ),
+					__( '%s end date must be in YYYY-MM-DD format.', 'damdir-directory' ),
 					$this->getLabel( $field )
 				)
 			);
@@ -255,7 +255,7 @@ class DateRangeField extends AbstractFieldType {
 					'end_before_start',
 					sprintf(
 						/* translators: %s: field label */
-						__( '%s end date cannot be before the start date.', 'all-purpose-directory' ),
+						__( '%s end date cannot be before the start date.', 'damdir-directory' ),
 						$this->getLabel( $field )
 					)
 				);
@@ -271,7 +271,7 @@ class DateRangeField extends AbstractFieldType {
 					'start_too_early',
 					sprintf(
 						/* translators: 1: field label, 2: minimum date */
-						__( '%1$s start date must be on or after %2$s.', 'all-purpose-directory' ),
+						__( '%1$s start date must be on or after %2$s.', 'damdir-directory' ),
 						$this->getLabel( $field ),
 						$field['min']
 					)
@@ -283,7 +283,7 @@ class DateRangeField extends AbstractFieldType {
 					'end_too_early',
 					sprintf(
 						/* translators: 1: field label, 2: minimum date */
-						__( '%1$s end date must be on or after %2$s.', 'all-purpose-directory' ),
+						__( '%1$s end date must be on or after %2$s.', 'damdir-directory' ),
 						$this->getLabel( $field ),
 						$field['min']
 					)
@@ -300,7 +300,7 @@ class DateRangeField extends AbstractFieldType {
 					'start_too_late',
 					sprintf(
 						/* translators: 1: field label, 2: maximum date */
-						__( '%1$s start date must be on or before %2$s.', 'all-purpose-directory' ),
+						__( '%1$s start date must be on or before %2$s.', 'damdir-directory' ),
 						$this->getLabel( $field ),
 						$field['max']
 					)
@@ -312,7 +312,7 @@ class DateRangeField extends AbstractFieldType {
 					'end_too_late',
 					sprintf(
 						/* translators: 1: field label, 2: maximum date */
-						__( '%1$s end date must be on or before %2$s.', 'all-purpose-directory' ),
+						__( '%1$s end date must be on or before %2$s.', 'damdir-directory' ),
 						$this->getLabel( $field ),
 						$field['max']
 					)

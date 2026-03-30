@@ -64,7 +64,7 @@ final class AdminColumns {
 		}
 
 		// Featured image thumbnail.
-		$new_columns['thumbnail'] = __( 'Image', 'all-purpose-directory' );
+		$new_columns['thumbnail'] = __( 'Image', 'damdir-directory' );
 
 		// Title.
 		if ( isset( $columns['title'] ) ) {
@@ -72,18 +72,18 @@ final class AdminColumns {
 		}
 
 		// Category.
-		$new_columns['apd_category'] = __( 'Category', 'all-purpose-directory' );
+		$new_columns['apd_category'] = __( 'Category', 'damdir-directory' );
 
 		// Listing type (only when 2+ types exist).
 		if ( $this->has_multiple_listing_types() ) {
-			$new_columns['listing_type'] = __( 'Type', 'all-purpose-directory' );
+			$new_columns['listing_type'] = __( 'Type', 'damdir-directory' );
 		}
 
 		// Status badge.
-		$new_columns['listing_status'] = __( 'Status', 'all-purpose-directory' );
+		$new_columns['listing_status'] = __( 'Status', 'damdir-directory' );
 
 		// Views count.
-		$new_columns['views_count'] = __( 'Views', 'all-purpose-directory' );
+		$new_columns['views_count'] = __( 'Views', 'damdir-directory' );
 
 		// Author (if exists).
 		if ( isset( $columns['author'] ) ) {
@@ -151,7 +151,7 @@ final class AdminColumns {
 			echo wp_kses_post( $thumbnail );
 		} else {
 			echo '<span class="apd-no-image" aria-hidden="true">—</span>';
-			echo '<span class="screen-reader-text">' . esc_html__( 'No image', 'all-purpose-directory' ) . '</span>';
+			echo '<span class="screen-reader-text">' . esc_html__( 'No image', 'damdir-directory' ) . '</span>';
 		}
 	}
 
@@ -166,7 +166,7 @@ final class AdminColumns {
 
 		if ( is_wp_error( $terms ) || empty( $terms ) ) {
 			echo '<span class="apd-no-category" aria-hidden="true">—</span>';
-			echo '<span class="screen-reader-text">' . esc_html__( 'No category', 'all-purpose-directory' ) . '</span>';
+			echo '<span class="screen-reader-text">' . esc_html__( 'No category', 'damdir-directory' ) . '</span>';
 			return;
 		}
 
@@ -213,7 +213,7 @@ final class AdminColumns {
 
 		if ( $term === null ) {
 			echo '<span aria-hidden="true">—</span>';
-			echo '<span class="screen-reader-text">' . esc_html__( 'No type', 'all-purpose-directory' ) . '</span>';
+			echo '<span class="screen-reader-text">' . esc_html__( 'No type', 'damdir-directory' ) . '</span>';
 			return;
 		}
 
@@ -260,11 +260,11 @@ final class AdminColumns {
 		$status = $post->post_status;
 
 		$status_labels = [
-			'publish'  => __( 'Published', 'all-purpose-directory' ),
-			'pending'  => __( 'Pending', 'all-purpose-directory' ),
-			'draft'    => __( 'Draft', 'all-purpose-directory' ),
-			'expired'  => __( 'Expired', 'all-purpose-directory' ),
-			'rejected' => __( 'Rejected', 'all-purpose-directory' ),
+			'publish'  => __( 'Published', 'damdir-directory' ),
+			'pending'  => __( 'Pending', 'damdir-directory' ),
+			'draft'    => __( 'Draft', 'damdir-directory' ),
+			'expired'  => __( 'Expired', 'damdir-directory' ),
+			'rejected' => __( 'Rejected', 'damdir-directory' ),
 		];
 
 		$label = $status_labels[ $status ] ?? ucfirst( $status );
@@ -368,7 +368,7 @@ final class AdminColumns {
 
 		wp_dropdown_categories(
 			[
-				'show_option_all' => __( 'All Categories', 'all-purpose-directory' ),
+				'show_option_all' => __( 'All Categories', 'damdir-directory' ),
 				'taxonomy'        => $taxonomy,
 				'name'            => $taxonomy,
 				'orderby'         => 'name',
@@ -405,7 +405,7 @@ final class AdminColumns {
 		$selected = isset( $_GET[ $taxonomy ] ) ? sanitize_text_field( wp_unslash( $_GET[ $taxonomy ] ) ) : '';
 
 		echo '<select name="' . esc_attr( $taxonomy ) . '" id="filter-by-listing-type">';
-		echo '<option value="">' . esc_html__( 'All Listing Types', 'all-purpose-directory' ) . '</option>';
+		echo '<option value="">' . esc_html__( 'All Listing Types', 'damdir-directory' ) . '</option>';
 
 		foreach ( $terms as $term ) {
 			$count = $this->get_listing_type_admin_count( $term->slug );
@@ -502,16 +502,16 @@ final class AdminColumns {
 		$selected = isset( $_GET['listing_status'] ) ? sanitize_text_field( wp_unslash( $_GET['listing_status'] ) ) : '';
 
 		$statuses = [
-			''         => __( 'All Statuses', 'all-purpose-directory' ),
-			'publish'  => __( 'Published', 'all-purpose-directory' ),
-			'pending'  => __( 'Pending', 'all-purpose-directory' ),
-			'draft'    => __( 'Draft', 'all-purpose-directory' ),
-			'expired'  => __( 'Expired', 'all-purpose-directory' ),
-			'rejected' => __( 'Rejected', 'all-purpose-directory' ),
+			''         => __( 'All Statuses', 'damdir-directory' ),
+			'publish'  => __( 'Published', 'damdir-directory' ),
+			'pending'  => __( 'Pending', 'damdir-directory' ),
+			'draft'    => __( 'Draft', 'damdir-directory' ),
+			'expired'  => __( 'Expired', 'damdir-directory' ),
+			'rejected' => __( 'Rejected', 'damdir-directory' ),
 		];
 
 		echo '<select name="listing_status" id="filter-by-listing-status">';
-		echo '<option value="">' . esc_html__( 'All Statuses', 'all-purpose-directory' ) . '</option>';
+		echo '<option value="">' . esc_html__( 'All Statuses', 'damdir-directory' ) . '</option>';
 
 		foreach ( $statuses as $value => $label ) {
 			if ( '' === $value ) {

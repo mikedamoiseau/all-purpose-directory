@@ -193,7 +193,7 @@ class CurrencyField extends AbstractFieldType {
 				'not_numeric',
 				sprintf(
 					/* translators: %s: field label */
-					__( '%s must be a valid amount.', 'all-purpose-directory' ),
+					__( '%s must be a valid amount.', 'damdir-directory' ),
 					$this->getLabel( $field )
 				)
 			);
@@ -208,7 +208,7 @@ class CurrencyField extends AbstractFieldType {
 				'negative_value',
 				sprintf(
 					/* translators: %s: field label */
-					__( '%s cannot be negative.', 'all-purpose-directory' ),
+					__( '%s cannot be negative.', 'damdir-directory' ),
 					$this->getLabel( $field )
 				)
 			);
@@ -220,7 +220,7 @@ class CurrencyField extends AbstractFieldType {
 				'min_value',
 				sprintf(
 					/* translators: 1: field label, 2: minimum value with currency */
-					__( '%1$s must be at least %2$s.', 'all-purpose-directory' ),
+					__( '%1$s must be at least %2$s.', 'damdir-directory' ),
 					$this->getLabel( $field ),
 					$this->formatWithCurrency( (float) $field['min'], $field )
 				)
@@ -233,7 +233,7 @@ class CurrencyField extends AbstractFieldType {
 				'max_value',
 				sprintf(
 					/* translators: 1: field label, 2: maximum value with currency */
-					__( '%1$s must be no more than %2$s.', 'all-purpose-directory' ),
+					__( '%1$s must be no more than %2$s.', 'damdir-directory' ),
 					$this->getLabel( $field ),
 					$this->formatWithCurrency( (float) $field['max'], $field )
 				)

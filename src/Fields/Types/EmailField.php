@@ -119,7 +119,7 @@ class EmailField extends AbstractFieldType {
 				'invalid_email',
 				sprintf(
 					/* translators: %s: field label */
-					__( '%s must be a valid email address.', 'all-purpose-directory' ),
+					__( '%s must be a valid email address.', 'damdir-directory' ),
 					$this->getLabel( $field )
 				)
 			);

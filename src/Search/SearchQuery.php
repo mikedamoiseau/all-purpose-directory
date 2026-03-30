@@ -515,10 +515,10 @@ final class SearchQuery {
 	 */
 	public function get_orderby_options(): array {
 		$options = [
-			'date'   => __( 'Newest First', 'all-purpose-directory' ),
-			'title'  => __( 'Title A-Z', 'all-purpose-directory' ),
-			'views'  => __( 'Most Viewed', 'all-purpose-directory' ),
-			'random' => __( 'Random', 'all-purpose-directory' ),
+			'date'   => __( 'Newest First', 'damdir-directory' ),
+			'title'  => __( 'Title A-Z', 'damdir-directory' ),
+			'views'  => __( 'Most Viewed', 'damdir-directory' ),
+			'random' => __( 'Random', 'damdir-directory' ),
 		];
 
 		/**

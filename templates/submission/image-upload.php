@@ -5,7 +5,7 @@
  * Template for rendering the featured image upload in the submission form.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/submission/image-upload.php
+ * yourtheme/damdir-directory/submission/image-upload.php
  *
  * @package APD\Templates
  * @since   1.0.0
@@ -34,10 +34,10 @@ if ( $has_image ) {
 	data-field-name="featured_image"
 	data-field-type="image">
 	<label class="apd-field__label" id="apd-field-featured-image-label">
-		<?php esc_html_e( 'Featured Image', 'all-purpose-directory' ); ?>
+		<?php esc_html_e( 'Featured Image', 'damdir-directory' ); ?>
 	</label>
 	<p id="apd-field-featured-image-desc" class="apd-field__description">
-		<?php esc_html_e( 'Upload an image to represent your listing. Recommended size: 1200x800 pixels.', 'all-purpose-directory' ); ?>
+		<?php esc_html_e( 'Upload an image to represent your listing. Recommended size: 1200x800 pixels.', 'damdir-directory' ); ?>
 	</p>
 
 	<div class="apd-field__input">
@@ -45,7 +45,7 @@ if ( $has_image ) {
 			<div class="apd-image-upload__preview <?php echo $has_image ? 'apd-image-upload__preview--visible' : ''; ?>">
 				<?php if ( $has_image && $image_url ) : ?>
 					<img src="<?php echo esc_url( $image_url ); ?>"
-						alt="<?php echo esc_attr( $image_alt ?: __( 'Featured image preview', 'all-purpose-directory' ) ); ?>"
+						alt="<?php echo esc_attr( $image_alt ?: __( 'Featured image preview', 'damdir-directory' ) ); ?>"
 						class="apd-image-upload__image">
 				<?php endif; ?>
 			</div>
@@ -73,15 +73,15 @@ if ( $has_image ) {
 						</svg>
 					</span>
 					<span class="apd-image-upload__button-text">
-						<?php echo $has_image ? esc_html__( 'Change Image', 'all-purpose-directory' ) : esc_html__( 'Select Image', 'all-purpose-directory' ); ?>
+						<?php echo $has_image ? esc_html__( 'Change Image', 'damdir-directory' ) : esc_html__( 'Select Image', 'damdir-directory' ); ?>
 					</span>
 				</label>
 
 				<?php if ( $has_image ) : ?>
 					<button type="button"
 						class="apd-image-upload__remove apd-button apd-button--text"
-						aria-label="<?php esc_attr_e( 'Remove featured image', 'all-purpose-directory' ); ?>">
-						<?php esc_html_e( 'Remove', 'all-purpose-directory' ); ?>
+						aria-label="<?php esc_attr_e( 'Remove featured image', 'damdir-directory' ); ?>">
+						<?php esc_html_e( 'Remove', 'damdir-directory' ); ?>
 					</button>
 				<?php endif; ?>
 			</div>
@@ -90,7 +90,7 @@ if ( $has_image ) {
 				<?php
 				printf(
 					/* translators: %s: maximum file size */
-					esc_html__( 'Accepted formats: JPG, PNG, GIF, WebP. Maximum size: %s.', 'all-purpose-directory' ),
+					esc_html__( 'Accepted formats: JPG, PNG, GIF, WebP. Maximum size: %s.', 'damdir-directory' ),
 					esc_html( size_format( wp_max_upload_size() ) )
 				);
 				?>

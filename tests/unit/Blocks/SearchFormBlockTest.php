@@ -187,7 +187,7 @@ class SearchFormBlockTest extends TestCase {
 		$property = $reflection->getProperty( 'category' );
 
 
-		$this->assertSame( 'all-purpose-directory', $property->getValue( $block ) );
+		$this->assertSame( 'damdir-directory', $property->getValue( $block ) );
 	}
 
 	/**

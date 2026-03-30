@@ -43,10 +43,10 @@ class DateRangeFilter extends AbstractFilter {
 			'source_key'        => '',
 			'min'               => '',
 			'max'               => '',
-			'start_label'       => __( 'From', 'all-purpose-directory' ),
-			'end_label'         => __( 'To', 'all-purpose-directory' ),
-			'start_placeholder' => __( 'Start date', 'all-purpose-directory' ),
-			'end_placeholder'   => __( 'End date', 'all-purpose-directory' ),
+			'start_label'       => __( 'From', 'damdir-directory' ),
+			'end_label'         => __( 'To', 'damdir-directory' ),
+			'start_placeholder' => __( 'Start date', 'damdir-directory' ),
+			'end_placeholder'   => __( 'End date', 'damdir-directory' ),
 		];
 
 		parent::__construct( wp_parse_args( $config, $defaults ) );
@@ -319,13 +319,13 @@ class DateRangeFilter extends AbstractFilter {
 		} elseif ( $start !== '' ) {
 			return sprintf(
 				/* translators: %s: start date */
-				__( 'From %s', 'all-purpose-directory' ),
+				__( 'From %s', 'damdir-directory' ),
 				date_i18n( $date_format, strtotime( $start ) )
 			);
 		} elseif ( $end !== '' ) {
 			return sprintf(
 				/* translators: %s: end date */
-				__( 'Until %s', 'all-purpose-directory' ),
+				__( 'Until %s', 'damdir-directory' ),
 				date_i18n( $date_format, strtotime( $end ) )
 			);
 		}

@@ -700,7 +700,7 @@ class EmailManager {
 		}
 
 		$to      = $this->get_admin_email();
-		$subject = __( '[{site_name}] New listing submitted: {listing_title}', 'all-purpose-directory' );
+		$subject = __( '[{site_name}] New listing submitted: {listing_title}', 'damdir-directory' );
 		$message = $this->get_template_html( 'listing-submitted', $context );
 
 		return $this->send( $to, $subject, $message, [], $context );
@@ -720,7 +720,7 @@ class EmailManager {
 		}
 
 		$to      = $context['author_email'];
-		$subject = __( '[{site_name}] Your listing has been approved: {listing_title}', 'all-purpose-directory' );
+		$subject = __( '[{site_name}] Your listing has been approved: {listing_title}', 'damdir-directory' );
 		$message = $this->get_template_html( 'listing-approved', $context );
 
 		return $this->send( $to, $subject, $message, [], $context );
@@ -743,7 +743,7 @@ class EmailManager {
 		$context['rejection_reason'] = $reason;
 
 		$to      = $context['author_email'];
-		$subject = __( '[{site_name}] Your listing was not approved: {listing_title}', 'all-purpose-directory' );
+		$subject = __( '[{site_name}] Your listing was not approved: {listing_title}', 'damdir-directory' );
 		$message = $this->get_template_html( 'listing-rejected', $context );
 
 		return $this->send( $to, $subject, $message, [], $context );
@@ -766,7 +766,7 @@ class EmailManager {
 		$context['days_left'] = $days_left;
 
 		$to      = $context['author_email'];
-		$subject = __( '[{site_name}] Your listing expires soon: {listing_title}', 'all-purpose-directory' );
+		$subject = __( '[{site_name}] Your listing expires soon: {listing_title}', 'damdir-directory' );
 		$message = $this->get_template_html( 'listing-expiring', $context );
 
 		return $this->send( $to, $subject, $message, [], $context );
@@ -786,7 +786,7 @@ class EmailManager {
 		}
 
 		$to      = $context['author_email'];
-		$subject = __( '[{site_name}] Your listing has expired: {listing_title}', 'all-purpose-directory' );
+		$subject = __( '[{site_name}] Your listing has expired: {listing_title}', 'damdir-directory' );
 		$message = $this->get_template_html( 'listing-expired', $context );
 
 		return $this->send( $to, $subject, $message, [], $context );
@@ -816,7 +816,7 @@ class EmailManager {
 		}
 
 		$to      = $context['author_email'];
-		$subject = __( '[{site_name}] New review on your listing: {listing_title}', 'all-purpose-directory' );
+		$subject = __( '[{site_name}] New review on your listing: {listing_title}', 'damdir-directory' );
 		$message = $this->get_template_html( 'new-review', $context );
 
 		return $this->send( $to, $subject, $message, [], $context );
@@ -845,7 +845,7 @@ class EmailManager {
 		}
 
 		$to      = $context['author_email'];
-		$subject = __( '[{site_name}] New inquiry about your listing: {listing_title}', 'all-purpose-directory' );
+		$subject = __( '[{site_name}] New inquiry about your listing: {listing_title}', 'damdir-directory' );
 		$message = $this->get_template_html( 'new-inquiry', $context );
 
 		return $this->send( $to, $subject, $message, [], $context );
@@ -941,7 +941,7 @@ body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "S
 			$content,
 			gmdate( 'Y' ),
 			esc_url( $site_url ),
-			esc_html__( 'This is an automated message. Please do not reply directly to this email.', 'all-purpose-directory' )
+			esc_html__( 'This is an automated message. Please do not reply directly to this email.', 'damdir-directory' )
 		);
 	}
 
@@ -957,31 +957,31 @@ body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "S
 		$messages = [
 			'listing-submitted' => __(
 				"A new listing has been submitted on {site_name}.\n\nTitle: {listing_title}\nAuthor: {author_name}\nStatus: {listing_status}\n\nView listing: {listing_url}\nEdit listing: {listing_edit_url}\n\nManage listings: {admin_url}",
-				'all-purpose-directory'
+				'damdir-directory'
 			),
 			'listing-approved'  => __(
 				"Great news! Your listing has been approved on {site_name}.\n\nTitle: {listing_title}\n\nYour listing is now live and can be viewed at:\n{listing_url}\n\nThank you for your submission!",
-				'all-purpose-directory'
+				'damdir-directory'
 			),
 			'listing-rejected'  => __(
 				"We're sorry, but your listing was not approved on {site_name}.\n\nTitle: {listing_title}\n\nIf you have any questions, please contact us.\n\nThank you for your understanding.",
-				'all-purpose-directory'
+				'damdir-directory'
 			),
 			'listing-expiring'  => __(
 				"Your listing on {site_name} will expire soon.\n\nTitle: {listing_title}\nDays remaining: {days_left}\n\nTo keep your listing active, please renew it.\n\nView listing: {listing_url}",
-				'all-purpose-directory'
+				'damdir-directory'
 			),
 			'listing-expired'   => __(
 				"Your listing on {site_name} has expired.\n\nTitle: {listing_title}\n\nYour listing is no longer visible to the public.\nTo reactivate your listing, please contact us or submit a new listing.",
-				'all-purpose-directory'
+				'damdir-directory'
 			),
 			'new-review'        => __(
 				"Your listing has received a new review on {site_name}.\n\nListing: {listing_title}\nReviewer: {review_author}\nRating: {review_rating}/5\n\nReview:\n{review_content}\n\nView listing: {listing_url}",
-				'all-purpose-directory'
+				'damdir-directory'
 			),
 			'new-inquiry'       => __(
 				"You have received a new inquiry about your listing on {site_name}.\n\nListing: {listing_title}\n\nFrom: {inquiry_name}\nEmail: {inquiry_email}\nPhone: {inquiry_phone}\n\nMessage:\n{inquiry_message}\n\nView listing: {listing_url}",
-				'all-purpose-directory'
+				'damdir-directory'
 			),
 		];
 		// phpcs:enable Generic.Strings.UnnecessaryStringConcat.Found

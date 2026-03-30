@@ -5,7 +5,7 @@
  * Template for rendering the empty state when a listing has no reviews.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/review/reviews-empty.php
+ * yourtheme/damdir-directory/review/reviews-empty.php
  *
  * @package APD\Templates
  * @since   1.0.0
@@ -24,6 +24,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<span class="dashicons dashicons-star-empty"></span>
 	</div>
 	<p class="apd-reviews-empty__message">
-		<?php esc_html_e( 'No reviews yet. Be the first to share your experience!', 'all-purpose-directory' ); ?>
+		<?php esc_html_e( 'No reviews yet. Be the first to share your experience!', 'damdir-directory' ); ?>
 	</p>
 </div>

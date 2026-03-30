@@ -5,7 +5,7 @@
  * Template for the avatar upload section in the Profile tab.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/dashboard/profile-avatar.php
+ * yourtheme/damdir-directory/dashboard/profile-avatar.php
  *
  * @package APD\Templates
  * @since   1.0.0
@@ -32,7 +32,7 @@ $avatar_size = $config['avatar_size'] ?? 150;
 	<div class="apd-profile-avatar__preview">
 		<img
 			src="<?php echo esc_url( $avatar_url ); ?>"
-			alt="<?php esc_attr_e( 'Profile photo', 'all-purpose-directory' ); ?>"
+			alt="<?php esc_attr_e( 'Profile photo', 'damdir-directory' ); ?>"
 			class="apd-profile-avatar__image"
 			width="<?php echo esc_attr( $avatar_size ); ?>"
 			height="<?php echo esc_attr( $avatar_size ); ?>"
@@ -43,7 +43,7 @@ $avatar_size = $config['avatar_size'] ?? 150;
 		<div class="apd-profile-avatar__upload">
 			<label for="apd-avatar-input" class="apd-button apd-button--secondary apd-profile-avatar__upload-btn">
 				<span class="dashicons dashicons-upload" aria-hidden="true"></span>
-				<?php esc_html_e( 'Upload New Photo', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Upload New Photo', 'damdir-directory' ); ?>
 			</label>
 			<input
 				type="file"
@@ -63,7 +63,7 @@ $avatar_size = $config['avatar_size'] ?? 150;
 					class="apd-profile-avatar__remove-checkbox"
 					id="apd-remove-avatar">
 				<span class="apd-profile-avatar__remove-label">
-					<?php esc_html_e( 'Remove custom photo', 'all-purpose-directory' ); ?>
+					<?php esc_html_e( 'Remove custom photo', 'damdir-directory' ); ?>
 				</span>
 			</label>
 		<?php endif; ?>
@@ -73,12 +73,12 @@ $avatar_size = $config['avatar_size'] ?? 150;
 		<?php
 		printf(
 			/* translators: %s: Maximum file size */
-			esc_html__( 'Accepted formats: JPEG, PNG, GIF, or WebP. Maximum size: %s.', 'all-purpose-directory' ),
+			esc_html__( 'Accepted formats: JPEG, PNG, GIF, or WebP. Maximum size: %s.', 'damdir-directory' ),
 			esc_html( size_format( Profile::MAX_AVATAR_SIZE ) )
 		);
 		?>
 		<?php if ( ! $has_avatar ) : ?>
-			<?php esc_html_e( 'Currently using Gravatar.', 'all-purpose-directory' ); ?>
+			<?php esc_html_e( 'Currently using Gravatar.', 'damdir-directory' ); ?>
 		<?php endif; ?>
 	</p>
 

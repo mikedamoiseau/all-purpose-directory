@@ -1,6 +1,6 @@
-# All Purpose Directory - Developer Documentation
+# DamDir Directory - Developer Documentation
 
-This guide covers extending and customizing All Purpose Directory for developers.
+This guide covers extending and customizing DamDir Directory for developers.
 
 ## Table of Contents
 
@@ -24,7 +24,7 @@ This guide covers extending and customizing All Purpose Directory for developers
 ### Plugin Structure
 
 ```
-all-purpose-directory/
+damdir-directory/
 ├── src/
 │   ├── Core/           # Plugin bootstrap, assets, templates
 │   ├── Admin/          # Admin pages, meta boxes, settings
@@ -62,11 +62,234 @@ all-purpose-directory/
 - **Meta Keys**: `_apd_{field_name}`
 - **Options**: `apd_options`
 - **Nonces**: `apd_{action}_nonce`
-- **Text Domain**: `all-purpose-directory`
+- **Text Domain**: `damdir-directory`
 
 ---
 
 ## Action Hooks
+
+### Hook Inventory
+
+| Hook | Notes |
+| --- | --- |
+| `apd_activated` | Defined in source |
+| `apd_after_admin_fields` | Defined in source |
+| `apd_after_ajax_filter` | Defined in source |
+| `apd_after_archive` | Defined in source |
+| `apd_after_archive_loop` | Defined in source |
+| `apd_after_archive_search_form` | Defined in source |
+| `apd_after_block_{$this->name}` | Defined in source |
+| `apd_after_categories_shortcode` | Defined in source |
+| `apd_after_change_listing_status` | Defined in source |
+| `apd_after_dashboard` | Defined in source |
+| `apd_after_delete_demo_data` | Defined in source |
+| `apd_after_delete_listing` | Defined in source |
+| `apd_after_edit_not_allowed` | Defined in source |
+| `apd_after_favorites_shortcode` | Defined in source |
+| `apd_after_filters` | Defined in source |
+| `apd_after_frontend_fields` | Defined in source |
+| `apd_after_generate_demo_data` | Defined in source |
+| `apd_after_get_template` | Defined in source |
+| `apd_after_listing_save` | Defined in source |
+| `apd_after_listings_shortcode` | Defined in source |
+| `apd_after_login_form_shortcode` | Defined in source |
+| `apd_after_register_form_shortcode` | Defined in source |
+| `apd_after_related_listings` | Defined in source |
+| `apd_after_review_form` | Defined in source |
+| `apd_after_reviews_section` | Defined in source |
+| `apd_after_save_profile` | Defined in source |
+| `apd_after_search_form` | Defined in source |
+| `apd_after_search_form_shortcode` | Defined in source |
+| `apd_after_send_email` | Defined in source |
+| `apd_after_settings_page` | Defined in source |
+| `apd_after_settings_tab` | Defined in source |
+| `apd_after_shortcode_{$this->tag}` | Defined in source |
+| `apd_after_single_listing` | Defined in source |
+| `apd_after_submission` | Defined in source |
+| `apd_after_submission_form` | Defined in source |
+| `apd_after_submission_form_shortcode` | Defined in source |
+| `apd_after_submission_success` | Defined in source |
+| `apd_after_trash_listing` | Defined in source |
+| `apd_after_validate_fields` | Defined in source |
+| `apd_all_ratings_recalculated` | Defined in source |
+| `apd_archive_wrapper_end` | Defined in source |
+| `apd_archive_wrapper_start` | Defined in source |
+| `apd_avatar_uploaded` | Defined in source |
+| `apd_before_ajax_filter` | Defined in source |
+| `apd_before_archive` | Defined in source |
+| `apd_before_archive_loop` | Defined in source |
+| `apd_before_archive_search_form` | Defined in source |
+| `apd_before_block_{$this->name}` | Defined in source |
+| `apd_before_categories_shortcode` | Defined in source |
+| `apd_before_change_listing_status` | Defined in source |
+| `apd_before_dashboard` | Defined in source |
+| `apd_before_delete_demo_data` | Defined in source |
+| `apd_before_delete_listing` | Defined in source |
+| `apd_before_favorites_shortcode` | Defined in source |
+| `apd_before_filters` | Defined in source |
+| `apd_before_generate_demo_data` | Defined in source |
+| `apd_before_get_template` | Defined in source |
+| `apd_before_inquiry_delete` | Defined in source |
+| `apd_before_listing_save` | Defined in source |
+| `apd_before_listing_update` | Defined in source |
+| `apd_before_listings_shortcode` | Defined in source |
+| `apd_before_login_form_shortcode` | Defined in source |
+| `apd_before_register_form_shortcode` | Defined in source |
+| `apd_before_related_listings` | Defined in source |
+| `apd_before_review_create` | Defined in source |
+| `apd_before_review_delete` | Defined in source |
+| `apd_before_review_form` | Defined in source |
+| `apd_before_review_process` | Defined in source |
+| `apd_before_review_update` | Defined in source |
+| `apd_before_reviews_section` | Defined in source |
+| `apd_before_save_profile` | Defined in source |
+| `apd_before_search_form` | Defined in source |
+| `apd_before_search_form_shortcode` | Defined in source |
+| `apd_before_send_contact` | Defined in source |
+| `apd_before_send_email` | Defined in source |
+| `apd_before_settings_page` | Defined in source |
+| `apd_before_settings_tab` | Defined in source |
+| `apd_before_shortcode_{$this->tag}` | Defined in source |
+| `apd_before_single_listing` | Defined in source |
+| `apd_before_submission` | Defined in source |
+| `apd_before_submission_form` | Defined in source |
+| `apd_before_submission_form_shortcode` | Defined in source |
+| `apd_before_trash_listing` | Defined in source |
+| `apd_block_registered` | Defined in source |
+| `apd_block_unregistered` | Defined in source |
+| `apd_blocks_init` | Defined in source |
+| `apd_cache_cleared` | Defined in source |
+| `apd_category_cache_invalidated` | Defined in source |
+| `apd_contact_form_after_fields` | Defined in source |
+| `apd_contact_form_init` | Defined in source |
+| `apd_contact_handler_init` | Defined in source |
+| `apd_contact_sent` | Defined in source |
+| `apd_contact_spam_attempt_detected` | Defined in source |
+| `apd_dashboard_after_content` | Defined in source |
+| `apd_dashboard_before_content` | Defined in source |
+| `apd_dashboard_end` | Defined in source |
+| `apd_dashboard_start` | Defined in source |
+| `apd_dashboard_{$tab}_content` | Defined in source |
+| `apd_deactivated` | Defined in source |
+| `apd_demo_data_init` | Defined in source |
+| `apd_demo_provider_registered` | Defined in source |
+| `apd_demo_provider_unregistered` | Defined in source |
+| `apd_demo_providers_init` | Defined in source |
+| `apd_email_manager_init` | Defined in source |
+| `apd_favorite_added` | Defined in source |
+| `apd_favorite_removed` | Defined in source |
+| `apd_favorites_cleared` | Defined in source |
+| `apd_favorites_end` | Defined in source |
+| `apd_favorites_init` | Defined in source |
+| `apd_favorites_start` | Defined in source |
+| `apd_field_registered` | Defined in source |
+| `apd_field_type_registered` | Defined in source |
+| `apd_field_unregistered` | Defined in source |
+| `apd_filter_registered` | Defined in source |
+| `apd_filter_unregistered` | Defined in source |
+| `apd_init` | Defined in source |
+| `apd_inquiry_logged` | Defined in source |
+| `apd_inquiry_marked_read` | Defined in source |
+| `apd_inquiry_marked_unread` | Defined in source |
+| `apd_inquiry_tracker_init` | Defined in source |
+| `apd_listing_cache_invalidated` | Defined in source |
+| `apd_listing_card_body` | Defined in source |
+| `apd_listing_card_end` | Defined in source |
+| `apd_listing_card_footer` | Defined in source |
+| `apd_listing_card_image` | Defined in source |
+| `apd_listing_card_start` | Defined in source |
+| `apd_listing_fields_saved` | Defined in source |
+| `apd_listing_processed` | Defined in source |
+| `apd_listing_saved` | Defined in source |
+| `apd_listing_status_changed` | Defined in source |
+| `apd_listing_taxonomies_assigned` | Defined in source |
+| `apd_listing_type_registered` | Defined in source |
+| `apd_listing_viewed` | Defined in source |
+| `apd_loaded` | Defined in source |
+| `apd_module_registered` | Defined in source |
+| `apd_module_unregistered` | Defined in source |
+| `apd_modules_admin_init` | Defined in source |
+| `apd_modules_init` | Defined in source |
+| `apd_modules_loaded` | Defined in source |
+| `apd_my_listings_end` | Defined in source |
+| `apd_my_listings_start` | Defined in source |
+| `apd_profile_end` | Defined in source |
+| `apd_profile_saved` | Defined in source |
+| `apd_profile_start` | Defined in source |
+| `apd_rating_calculated` | Defined in source |
+| `apd_rating_calculator_init` | Defined in source |
+| `apd_rating_invalidated` | Defined in source |
+| `apd_register_filters` | Defined in source |
+| `apd_register_form_fields` | Defined in source |
+| `apd_register_rest_routes` | Defined in source |
+| `apd_register_settings` | Defined in source |
+| `apd_render_review_form` | Defined in source |
+| `apd_rest_after_create_listing` | Defined in source |
+| `apd_rest_after_delete_listing` | Defined in source |
+| `apd_rest_after_update_listing` | Defined in source |
+| `apd_rest_api_init` | Defined in source |
+| `apd_rest_before_create_listing` | Defined in source |
+| `apd_rest_before_delete_listing` | Defined in source |
+| `apd_rest_before_update_listing` | Defined in source |
+| `apd_rest_endpoint_registered` | Defined in source |
+| `apd_rest_endpoint_unregistered` | Defined in source |
+| `apd_rest_routes_registered` | Defined in source |
+| `apd_review_approved` | Defined in source |
+| `apd_review_created` | Defined in source |
+| `apd_review_deleted` | Defined in source |
+| `apd_review_display_init` | Defined in source |
+| `apd_review_form_before_submit` | Defined in source |
+| `apd_review_form_created` | Defined in source |
+| `apd_review_form_end` | Defined in source |
+| `apd_review_form_init` | Defined in source |
+| `apd_review_form_start` | Defined in source |
+| `apd_review_form_updated` | Defined in source |
+| `apd_review_handler_init` | Defined in source |
+| `apd_review_item_footer` | Defined in source |
+| `apd_review_rejected` | Defined in source |
+| `apd_review_updated` | Defined in source |
+| `apd_reviews_init` | Defined in source |
+| `apd_reviews_section_after_form` | Defined in source |
+| `apd_reviews_section_after_header` | Defined in source |
+| `apd_reviews_section_before_form` | Defined in source |
+| `apd_reviews_section_end` | Defined in source |
+| `apd_reviews_section_start` | Defined in source |
+| `apd_search_query_modified` | Defined in source |
+| `apd_settings_init` | Defined in source |
+| `apd_shortcode_registered` | Defined in source |
+| `apd_shortcode_unregistered` | Defined in source |
+| `apd_shortcodes_init` | Defined in source |
+| `apd_single_listing_after_content` | Defined in source |
+| `apd_single_listing_after_fields` | Defined in source |
+| `apd_single_listing_author` | Defined in source |
+| `apd_single_listing_before_content` | Defined in source |
+| `apd_single_listing_contact_form` | Defined in source |
+| `apd_single_listing_end` | Defined in source |
+| `apd_single_listing_header` | Defined in source |
+| `apd_single_listing_image` | Defined in source |
+| `apd_single_listing_meta` | Defined in source |
+| `apd_single_listing_reviews` | Defined in source |
+| `apd_single_listing_sidebar_end` | Defined in source |
+| `apd_single_listing_sidebar_start` | Defined in source |
+| `apd_single_listing_start` | Defined in source |
+| `apd_single_wrapper_end` | Defined in source |
+| `apd_single_wrapper_start` | Defined in source |
+| `apd_spam_attempt_detected` | Defined in source |
+| `apd_submission_form_after_basic_fields` | Defined in source |
+| `apd_submission_form_after_custom_fields` | Defined in source |
+| `apd_submission_form_after_image` | Defined in source |
+| `apd_submission_form_after_taxonomies` | Defined in source |
+| `apd_submission_form_before_submit` | Defined in source |
+| `apd_submission_form_end` | Defined in source |
+| `apd_submission_form_start` | Defined in source |
+| `apd_textdomain_loaded` | Defined in source |
+| `apd_user_registered` | Defined in source |
+| `apd_validate_review` | Defined in source |
+| `apd_validate_submission` | Defined in source |
+| `apd_view_registered` | Defined in source |
+| `apd_view_unregistered` | Defined in source |
+| `apd_views_init` | Defined in source |
+
 
 ### Core Lifecycle
 
@@ -862,8 +1085,8 @@ do_action( 'apd_block_registered', $block, $name );
  *
  * @param array $attributes Block attributes.
  */
-do_action( "apd_before_block_{$name}", $attributes );
-do_action( "apd_after_block_{$name}", $attributes );
+// Dynamic hook: apd_before_block_{$name}
+// Dynamic hook: apd_after_block_{$name}
 ```
 
 ### Shortcodes
@@ -890,8 +1113,8 @@ do_action( 'apd_shortcode_registered', $shortcode, $tag );
  * @param array       $atts    Shortcode attributes.
  * @param string|null $content Shortcode content.
  */
-do_action( "apd_before_shortcode_{$tag}", $atts, $content );
-do_action( "apd_after_shortcode_{$tag}", $output, $atts, $content );
+// Dynamic hook: apd_before_shortcode_{$tag}
+// Dynamic hook: apd_after_shortcode_{$tag}
 
 /**
  * User registration hook.
@@ -1053,6 +1276,219 @@ do_action( 'apd_after_ajax_filter' );
 
 ## Filter Hooks
 
+### Hook Inventory
+
+| Hook | Notes |
+| --- | --- |
+| `apd_admin_script_data` | Defined in source |
+| `apd_ajax_filter_response` | Defined in source |
+| `apd_archive_content` | Defined in source |
+| `apd_archive_description` | Defined in source |
+| `apd_archive_title` | Defined in source |
+| `apd_author_can_review_own_listing` | Defined in source |
+| `apd_before_validate_field` | Defined in source |
+| `apd_block_args` | Defined in source |
+| `apd_block_{$this->name}_args` | Defined in source |
+| `apd_block_{$this->name}_output` | Defined in source |
+| `apd_blocks_editor_data` | Defined in source |
+| `apd_bypass_spam_protection` | Defined in source |
+| `apd_cache_expiration` | Defined in source |
+| `apd_can_show_review_form` | Defined in source |
+| `apd_categories_block_no_results_message` | Defined in source |
+| `apd_categories_block_query_args` | Defined in source |
+| `apd_categories_shortcode_classes` | Defined in source |
+| `apd_categories_shortcode_no_results_message` | Defined in source |
+| `apd_categories_shortcode_query_args` | Defined in source |
+| `apd_categories_with_count_args` | Defined in source |
+| `apd_category_listings_query_args` | Defined in source |
+| `apd_contact_admin_email` | Defined in source |
+| `apd_contact_bypass_spam_protection` | Defined in source |
+| `apd_contact_email_headers` | Defined in source |
+| `apd_contact_email_message` | Defined in source |
+| `apd_contact_email_subject` | Defined in source |
+| `apd_contact_email_to` | Defined in source |
+| `apd_contact_form_args` | Defined in source |
+| `apd_contact_form_classes` | Defined in source |
+| `apd_contact_form_html` | Defined in source |
+| `apd_contact_honeypot_field_name` | Defined in source |
+| `apd_contact_min_time` | Defined in source |
+| `apd_contact_rate_limit` | Defined in source |
+| `apd_contact_rate_period` | Defined in source |
+| `apd_contact_send_admin_copy` | Defined in source |
+| `apd_contact_spam_check` | Defined in source |
+| `apd_contact_trusted_proxies` | Defined in source |
+| `apd_contact_validation_errors` | Defined in source |
+| `apd_dashboard_args` | Defined in source |
+| `apd_dashboard_classes` | Defined in source |
+| `apd_dashboard_html` | Defined in source |
+| `apd_dashboard_register_url` | Defined in source |
+| `apd_dashboard_show_register` | Defined in source |
+| `apd_dashboard_stat_items` | Defined in source |
+| `apd_dashboard_stats` | Defined in source |
+| `apd_dashboard_tabs` | Defined in source |
+| `apd_dashboard_url` | Defined in source |
+| `apd_default_listing_status` | Defined in source |
+| `apd_default_listing_type` | Defined in source |
+| `apd_default_pages` | Defined in source |
+| `apd_demo_category_data` | Defined in source |
+| `apd_demo_default_counts` | Defined in source |
+| `apd_demo_listing_data` | Defined in source |
+| `apd_edit_listing_status` | Defined in source |
+| `apd_edit_listing_url` | Defined in source |
+| `apd_edit_not_allowed_args` | Defined in source |
+| `apd_email_admin_email` | Defined in source |
+| `apd_email_button_color` | Defined in source |
+| `apd_email_from_email` | Defined in source |
+| `apd_email_from_name` | Defined in source |
+| `apd_email_header_color` | Defined in source |
+| `apd_email_header_text_color` | Defined in source |
+| `apd_email_headers` | Defined in source |
+| `apd_email_message` | Defined in source |
+| `apd_email_notification_enabled` | Defined in source |
+| `apd_email_plain_text_message` | Defined in source |
+| `apd_email_replace_placeholders` | Defined in source |
+| `apd_email_subject` | Defined in source |
+| `apd_email_to` | Defined in source |
+| `apd_expiration_cron_batch_size` | Defined in source |
+| `apd_expiration_cron_lock_ttl` | Defined in source |
+| `apd_favorite_button_classes` | Defined in source |
+| `apd_favorite_button_html` | Defined in source |
+| `apd_favorite_listings_batch_size` | Defined in source |
+| `apd_favorite_listings_query_args` | Defined in source |
+| `apd_favorites_empty_browse_url` | Defined in source |
+| `apd_favorites_enabled` | Defined in source |
+| `apd_favorites_output` | Defined in source |
+| `apd_favorites_page_args` | Defined in source |
+| `apd_favorites_page_query_args` | Defined in source |
+| `apd_favorites_require_login` | Defined in source |
+| `apd_favorites_shortcode_no_results_message` | Defined in source |
+| `apd_favorites_shortcode_pagination_args` | Defined in source |
+| `apd_favorites_shortcode_query_args` | Defined in source |
+| `apd_field_group_wrapper_class` | Defined in source |
+| `apd_field_wrapper_class` | Defined in source |
+| `apd_filter_options` | Defined in source |
+| `apd_filter_wrapper_class` | Defined in source |
+| `apd_frontend_script_data` | Defined in source |
+| `apd_get_field` | Defined in source |
+| `apd_get_fields` | Defined in source |
+| `apd_get_module` | Defined in source |
+| `apd_get_modules` | Defined in source |
+| `apd_get_template_part` | Defined in source |
+| `apd_grid_responsive_columns` | Defined in source |
+| `apd_guest_favorites_enabled` | Defined in source |
+| `apd_honeypot_field_name` | Defined in source |
+| `apd_inquiry_post_data` | Defined in source |
+| `apd_inquiry_post_type_args` | Defined in source |
+| `apd_is_plugin_admin_screen` | Defined in source |
+| `apd_list_responsive_layout` | Defined in source |
+| `apd_listing_can_receive_contact` | Defined in source |
+| `apd_listing_card_classes` | Defined in source |
+| `apd_listing_card_data` | Defined in source |
+| `apd_listing_field_value` | Defined in source |
+| `apd_listing_fields` | Defined in source |
+| `apd_listing_inquiries_query_args` | Defined in source |
+| `apd_listings_block_no_results_message` | Defined in source |
+| `apd_listings_block_pagination_args` | Defined in source |
+| `apd_listings_block_query_args` | Defined in source |
+| `apd_listings_shortcode_no_results_message` | Defined in source |
+| `apd_listings_shortcode_pagination_args` | Defined in source |
+| `apd_listings_shortcode_query_args` | Defined in source |
+| `apd_locate_template` | Defined in source |
+| `apd_login_form_shortcode_args` | Defined in source |
+| `apd_my_listings_actions` | Defined in source |
+| `apd_my_listings_args` | Defined in source |
+| `apd_my_listings_query_args` | Defined in source |
+| `apd_new_listing_post_data` | Defined in source |
+| `apd_orderby_options` | Defined in source |
+| `apd_pagination_args` | Defined in source |
+| `apd_profile_args` | Defined in source |
+| `apd_profile_user_data` | Defined in source |
+| `apd_rating_precision` | Defined in source |
+| `apd_rating_star_count` | Defined in source |
+| `apd_rating_summary_data` | Defined in source |
+| `apd_register_default_fields` | Defined in source |
+| `apd_register_field_config` | Defined in source |
+| `apd_register_form_errors` | Defined in source |
+| `apd_register_module_config` | Defined in source |
+| `apd_related_listings` | Defined in source |
+| `apd_related_listings_args` | Defined in source |
+| `apd_render_display_fields` | Defined in source |
+| `apd_render_field` | Defined in source |
+| `apd_render_field_display` | Defined in source |
+| `apd_render_field_group` | Defined in source |
+| `apd_render_filter` | Defined in source |
+| `apd_rest_favorite_listing_data` | Defined in source |
+| `apd_rest_inquiry_data` | Defined in source |
+| `apd_rest_listing_data` | Defined in source |
+| `apd_rest_listings_query_args` | Defined in source |
+| `apd_rest_review_data` | Defined in source |
+| `apd_rest_taxonomy_query_args` | Defined in source |
+| `apd_rest_term_data` | Defined in source |
+| `apd_review_data` | Defined in source |
+| `apd_review_default_status` | Defined in source |
+| `apd_review_form_classes` | Defined in source |
+| `apd_review_form_data` | Defined in source |
+| `apd_review_form_data_collected` | Defined in source |
+| `apd_review_guidelines_text` | Defined in source |
+| `apd_review_min_content_length` | Defined in source |
+| `apd_review_success_message` | Defined in source |
+| `apd_reviews_list_data` | Defined in source |
+| `apd_reviews_pagination_data` | Defined in source |
+| `apd_reviews_per_page` | Defined in source |
+| `apd_reviews_require_login` | Defined in source |
+| `apd_reviews_section_data` | Defined in source |
+| `apd_sanitize_settings` | Defined in source |
+| `apd_sanitized_fields` | Defined in source |
+| `apd_search_form_block_args` | Defined in source |
+| `apd_search_form_classes` | Defined in source |
+| `apd_search_form_shortcode_args` | Defined in source |
+| `apd_search_query_args` | Defined in source |
+| `apd_searchable_meta_keys` | Defined in source |
+| `apd_set_listing_field_value` | Defined in source |
+| `apd_settings_defaults` | Defined in source |
+| `apd_settings_tabs` | Defined in source |
+| `apd_shortcode_{$this->tag}_atts` | Defined in source |
+| `apd_shortcode_{$this->tag}_output` | Defined in source |
+| `apd_should_display_field` | Defined in source |
+| `apd_should_load_frontend_assets` | Defined in source |
+| `apd_show_empty_star_rating` | Defined in source |
+| `apd_single_listing_data` | Defined in source |
+| `apd_single_review_data` | Defined in source |
+| `apd_skip_admin_view_count` | Defined in source |
+| `apd_submission_admin_notification` | Defined in source |
+| `apd_submission_default_status` | Defined in source |
+| `apd_submission_error_redirect` | Defined in source |
+| `apd_submission_field_groups` | Defined in source |
+| `apd_submission_fields` | Defined in source |
+| `apd_submission_form_args` | Defined in source |
+| `apd_submission_form_classes` | Defined in source |
+| `apd_submission_form_data` | Defined in source |
+| `apd_submission_form_html` | Defined in source |
+| `apd_submission_form_shortcode_config` | Defined in source |
+| `apd_submission_min_time` | Defined in source |
+| `apd_submission_page_url` | Defined in source |
+| `apd_submission_rate_limit` | Defined in source |
+| `apd_submission_rate_period` | Defined in source |
+| `apd_submission_spam_check` | Defined in source |
+| `apd_submission_success_args` | Defined in source |
+| `apd_submission_success_redirect` | Defined in source |
+| `apd_submission_trusted_proxies` | Defined in source |
+| `apd_track_inquiry` | Defined in source |
+| `apd_user_can_delete_listing` | Defined in source |
+| `apd_user_can_edit_listing` | Defined in source |
+| `apd_user_can_edit_review` | Defined in source |
+| `apd_user_can_submit_listing` | Defined in source |
+| `apd_user_can_view_inquiry` | Defined in source |
+| `apd_user_inquiries_query_args` | Defined in source |
+| `apd_user_social_links` | Defined in source |
+| `apd_validate_field` | Defined in source |
+| `apd_validate_profile` | Defined in source |
+| `apd_view_container_attributes` | Defined in source |
+| `apd_view_container_classes` | Defined in source |
+| `apd_view_listing_args` | Defined in source |
+| `apd_view_listings_query_args` | Defined in source |
+
+
 ### Listing Data
 
 ```php
@@ -1131,7 +1567,7 @@ add_filter( 'apd_listing_card_classes', function( $classes, $listing_id ) {
  * @param array $args WP_Query arguments.
  * @return array Modified arguments.
  */
-add_filter( 'apd_listing_query_args', function( $args ) {
+add_filter( 'apd_search_query_args', function( $args ) {
     $args['meta_query'][] = [
         'key'     => '_featured',
         'value'   => '1',
@@ -1439,14 +1875,8 @@ add_filter( 'apd_should_display_field', function( $display, $field, $context, $l
  * @param array $filters Registered filters.
  * @return array Modified filters.
  */
-add_filter( 'apd_search_filters', function( $filters ) {
-    $filters['custom_filter'] = [
-        'type'  => 'select',
-        'label' => 'Custom Filter',
-        'options' => [ 'a' => 'Option A', 'b' => 'Option B' ],
-    ];
-    return $filters;
-});
+// Example concept: add your own filter configuration during plugin setup
+// using the registry APIs or existing filter hooks documented below.
 
 /**
  * Modify filter options dynamically.
@@ -1530,10 +1960,7 @@ add_filter( 'apd_pagination_args', function( $args, $query ) {
  * @param string $content Shortcode content.
  * @return array Modified attributes.
  */
-add_filter( 'apd_shortcode_{tag}_atts', function( $atts, $tag, $content ) {
-    $atts['columns'] = 4;
-    return $atts;
-}, 10, 3 );
+// Dynamic hook example: apd_shortcode_{$tag}_atts
 
 /**
  * Modify shortcode output.
@@ -1543,9 +1970,7 @@ add_filter( 'apd_shortcode_{tag}_atts', function( $atts, $tag, $content ) {
  * @param string $content Shortcode content.
  * @return string Modified output.
  */
-add_filter( 'apd_shortcode_{tag}_output', function( $output, $atts, $content ) {
-    return '<div class="custom-wrapper">' . $output . '</div>';
-}, 10, 3 );
+// Dynamic hook example: apd_shortcode_{$tag}_output
 ```
 
 ### Blocks
@@ -1558,9 +1983,7 @@ add_filter( 'apd_shortcode_{tag}_output', function( $output, $atts, $content ) {
  * @param AbstractBlock $block Block instance.
  * @return array Modified arguments.
  */
-add_filter( 'apd_block_{name}_args', function( $args, $block ) {
-    return $args;
-}, 10, 2 );
+// Dynamic hook example: apd_block_{$name}_args
 
 /**
  * Modify block output after render.
@@ -1569,9 +1992,7 @@ add_filter( 'apd_block_{name}_args', function( $args, $block ) {
  * @param array  $attributes Block attributes.
  * @return string Modified output.
  */
-add_filter( 'apd_block_{name}_output', function( $output, $attributes ) {
-    return $output;
-}, 10, 2 );
+// Dynamic hook example: apd_block_{$name}_output
 
 /**
  * Modify listings block query arguments.
@@ -2493,37 +2914,8 @@ add_action( 'apd_init', function() {
 ### Registering Filters
 
 ```php
-add_filter( 'apd_search_filters', function( $filters ) {
-    $filters['price_range'] = [
-        'type'           => 'range',
-        'label'          => 'Price Range',
-        'field'          => 'price',
-        'min'            => 0,
-        'max'            => 1000000,
-        'step'           => 1000,
-        'query_callback' => function( $query_args, $value ) {
-            if ( ! empty( $value['min'] ) ) {
-                $query_args['meta_query'][] = [
-                    'key'     => '_apd_price',
-                    'value'   => $value['min'],
-                    'compare' => '>=',
-                    'type'    => 'NUMERIC',
-                ];
-            }
-            if ( ! empty( $value['max'] ) ) {
-                $query_args['meta_query'][] = [
-                    'key'     => '_apd_price',
-                    'value'   => $value['max'],
-                    'compare' => '<=',
-                    'type'    => 'NUMERIC',
-                ];
-            }
-            return $query_args;
-        },
-    ];
-
-    return $filters;
-});
+// Register custom filters through the plugin's filter registry during setup.
+// Example: add a price range filter with a custom query callback.
 ```
 
 ### Filter Types
@@ -2581,9 +2973,9 @@ add_action( 'apd_views_init', function() {
 
 ### Template Hierarchy
 
-1. Child theme: `wp-content/themes/child-theme/all-purpose-directory/`
-2. Parent theme: `wp-content/themes/parent-theme/all-purpose-directory/`
-3. Plugin: `wp-content/plugins/all-purpose-directory/templates/`
+1. Child theme: `wp-content/themes/child-theme/damdir-directory/`
+2. Parent theme: `wp-content/themes/parent-theme/damdir-directory/`
+3. Plugin: `wp-content/plugins/damdir-directory/templates/`
 
 ### Using Templates
 
@@ -2787,7 +3179,7 @@ apd_cache_clear_all();
 
 ## WP-CLI Commands
 
-All Purpose Directory provides WP-CLI commands for managing demo data without the browser.
+DamDir Directory provides WP-CLI commands for managing demo data without the browser.
 
 ### Demo Data
 
@@ -2962,7 +3354,7 @@ grep -RInE "do_action\(\s*['" ]apd_[^'"]+['"]" src templates includes \\
 - `apd_after_archive | templates/archive-listing.php:180`
 - `apd_after_archive_loop | templates/archive-listing.php:146`
 - `apd_after_archive_search_form | templates/archive-listing.php:82`
-- `apd_after_block_{$this->name} | src/Blocks/AbstractBlock.php:233`
+- `apd_after_block_{$name} | src/Blocks/AbstractBlock.php:233`
 - `apd_after_categories_shortcode | src/Shortcode/CategoriesShortcode.php:202`
 - `apd_after_change_listing_status | src/Frontend/Dashboard/MyListings.php:641`
 - `apd_after_dashboard | src/Frontend/Dashboard/Dashboard.php:426`
@@ -2989,7 +3381,7 @@ grep -RInE "do_action\(\s*['" ]apd_[^'"]+['"]" src templates includes \\
 - `apd_after_send_email | src/Email/EmailManager.php:403`
 - `apd_after_settings_page | src/Admin/Settings.php:1357`
 - `apd_after_settings_tab | src/Admin/Settings.php:1433`
-- `apd_after_shortcode_{$this->tag} | src/Shortcode/AbstractShortcode.php:167`
+- `apd_after_shortcode_{$tag} | src/Shortcode/AbstractShortcode.php:167`
 - `apd_after_single_listing | templates/single-listing.php:428`
 - `apd_after_submission | src/Frontend/Submission/SubmissionHandler.php:298`
 - `apd_after_submission_form | src/Frontend/Submission/SubmissionForm.php:594`
@@ -3005,7 +3397,7 @@ grep -RInE "do_action\(\s*['" ]apd_[^'"]+['"]" src templates includes \\
 - `apd_before_archive | templates/archive-listing.php:33`
 - `apd_before_archive_loop | templates/archive-listing.php:111`
 - `apd_before_archive_search_form | templates/archive-listing.php:66`
-- `apd_before_block_{$this->name} | src/Blocks/AbstractBlock.php:211`
+- `apd_before_block_{$name} | src/Blocks/AbstractBlock.php:211`
 - `apd_before_categories_shortcode | src/Shortcode/CategoriesShortcode.php:186`
 - `apd_before_change_listing_status | src/Frontend/Dashboard/MyListings.php:620`
 - `apd_before_dashboard | src/Frontend/Dashboard/Dashboard.php:402`
@@ -3037,7 +3429,7 @@ grep -RInE "do_action\(\s*['" ]apd_[^'"]+['"]" src templates includes \\
 - `apd_before_send_email | src/Email/EmailManager.php:389`
 - `apd_before_settings_page | src/Admin/Settings.php:1305`
 - `apd_before_settings_tab | src/Admin/Settings.php:1414`
-- `apd_before_shortcode_{$this->tag} | src/Shortcode/AbstractShortcode.php:142`
+- `apd_before_shortcode_{$tag} | src/Shortcode/AbstractShortcode.php:142`
 - `apd_before_single_listing | templates/single-listing.php:26`
 - `apd_before_submission | src/Frontend/Submission/SubmissionHandler.php:261`
 - `apd_before_submission_form | src/Frontend/Submission/SubmissionForm.php:570`

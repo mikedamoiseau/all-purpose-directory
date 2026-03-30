@@ -85,7 +85,7 @@ final class ListingMetaBox {
 	public function register_meta_box(): void {
 		add_meta_box(
 			self::META_BOX_ID,
-			__( 'Listing Fields', 'all-purpose-directory' ),
+			__( 'Listing Fields', 'damdir-directory' ),
 			[ $this, 'render_meta_box' ],
 			self::POST_TYPE,
 			'normal',
@@ -110,7 +110,7 @@ final class ListingMetaBox {
 		if ( empty( $fields ) ) {
 			printf(
 				'<p class="apd-no-fields">%s</p>',
-				esc_html__( 'No custom fields have been registered for listings.', 'all-purpose-directory' )
+				esc_html__( 'No custom fields have been registered for listings.', 'damdir-directory' )
 			);
 			return;
 		}
@@ -144,8 +144,7 @@ final class ListingMetaBox {
 			return;
 		}
 
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce verification.
-		if ( ! wp_verify_nonce( wp_unslash( $_POST[ self::NONCE_NAME ] ), self::NONCE_ACTION ) ) {
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST[ self::NONCE_NAME ] ) ), self::NONCE_ACTION ) ) {
 			return;
 		}
 

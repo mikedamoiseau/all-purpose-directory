@@ -1,4 +1,4 @@
-# All Purpose Directory - Manual Testing Checklist
+# DamDir Directory - Manual Testing Checklist
 
 Use this checklist when testing the plugin before a release. Run automated tests first, then perform manual testing on supported PHP and WordPress versions.
 
@@ -37,7 +37,7 @@ npm run test:e2e
 - [ ] `composer phpcs`
 - [ ] `composer test:unit`
 - [ ] `git status` is clean (no debug artifacts)
-- [ ] Version reviewed (`all-purpose-directory.php` + `README.txt` stable tag)
+- [ ] Version reviewed (`damdir-directory.php` + `README.txt` stable tag)
 - [ ] Changelog updated
 
 ---
@@ -647,8 +647,8 @@ npm run test:e2e
 
 ### Translation Ready
 - [ ] All strings use `__()` or `_e()`
-- [ ] Text domain is `all-purpose-directory`
-- [ ] POT file current (`languages/all-purpose-directory.pot`)
+- [ ] Text domain is `damdir-directory`
+- [ ] POT file current (`languages/damdir-directory.pot`)
 - [ ] Placeholders have translator comments
 - [ ] No hardcoded English strings
 

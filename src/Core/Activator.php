@@ -59,7 +59,7 @@ class Activator {
 			wp_die(
 				sprintf(
 					/* translators: %s: Required PHP version */
-					esc_html__( 'All Purpose Directory requires PHP %s or higher.', 'all-purpose-directory' ),
+					esc_html__( 'DamDir Directory requires PHP %s or higher.', 'damdir-directory' ),
 					esc_html( APD_MIN_PHP_VERSION )
 				),
 				'Plugin Activation Error',
@@ -72,7 +72,7 @@ class Activator {
 			wp_die(
 				sprintf(
 					/* translators: %s: Required WordPress version */
-					esc_html__( 'All Purpose Directory requires WordPress %s or higher.', 'all-purpose-directory' ),
+					esc_html__( 'DamDir Directory requires WordPress %s or higher.', 'damdir-directory' ),
 					esc_html( APD_MIN_WP_VERSION )
 				),
 				'Plugin Activation Error',
@@ -150,15 +150,15 @@ class Activator {
 	private static function create_default_pages(): void {
 		$pages = [
 			'directory_page' => [
-				'title'   => __( 'Directory', 'all-purpose-directory' ),
+				'title'   => __( 'Directory', 'damdir-directory' ),
 				'content' => "<!-- wp:shortcode -->\n[apd_search_form]\n<!-- /wp:shortcode -->\n\n<!-- wp:shortcode -->\n[apd_listings]\n<!-- /wp:shortcode -->",
 			],
 			'submit_page'    => [
-				'title'   => __( 'Submit a Listing', 'all-purpose-directory' ),
+				'title'   => __( 'Submit a Listing', 'damdir-directory' ),
 				'content' => "<!-- wp:shortcode -->\n[apd_submission_form]\n<!-- /wp:shortcode -->",
 			],
 			'dashboard_page' => [
-				'title'   => __( 'My Dashboard', 'all-purpose-directory' ),
+				'title'   => __( 'My Dashboard', 'damdir-directory' ),
 				'content' => "<!-- wp:shortcode -->\n[apd_dashboard]\n<!-- /wp:shortcode -->",
 			],
 		];

@@ -5,7 +5,7 @@
  * Template for rendering the listing submission form on the frontend.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/submission/submission-form.php
+ * yourtheme/damdir-directory/submission/submission-form.php
  *
  * @package APD\Templates
  * @since   1.0.0
@@ -45,7 +45,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	method="post"
 	enctype="multipart/form-data"
 	data-validate="true"
-	aria-label="<?php echo $listing_id > 0 ? esc_attr__( 'Edit listing', 'all-purpose-directory' ) : esc_attr__( 'Submit listing', 'all-purpose-directory' ); ?>">
+	aria-label="<?php echo $listing_id > 0 ? esc_attr__( 'Edit listing', 'damdir-directory' ) : esc_attr__( 'Submit listing', 'damdir-directory' ); ?>">
 
 	<?php wp_nonce_field( $nonce_action, $nonce_name ); ?>
 
@@ -87,30 +87,30 @@ if ( ! defined( 'ABSPATH' ) ) {
 	if ( $config['show_title'] || $config['show_content'] ) {
 		$progress_steps[] = [
 			'id'    => 'apd-section-basic',
-			'label' => __( 'Basic Info', 'all-purpose-directory' ),
+			'label' => __( 'Basic Info', 'damdir-directory' ),
 		];
 	}
 	if ( ! empty( $fields ) ) {
 		$progress_steps[] = [
 			'id'    => 'apd-section-details',
-			'label' => __( 'Details', 'all-purpose-directory' ),
+			'label' => __( 'Details', 'damdir-directory' ),
 		];
 	}
 	if ( ( $config['show_categories'] && ! empty( $categories ) ) || ( $config['show_tags'] && ! empty( $tags ) ) ) {
 		$progress_steps[] = [
 			'id'    => 'apd-section-taxonomy',
-			'label' => __( 'Categories', 'all-purpose-directory' ),
+			'label' => __( 'Categories', 'damdir-directory' ),
 		];
 	}
 	if ( $config['show_featured_image'] ) {
 		$progress_steps[] = [
 			'id'    => 'apd-section-image',
-			'label' => __( 'Image', 'all-purpose-directory' ),
+			'label' => __( 'Image', 'damdir-directory' ),
 		];
 	}
 	?>
 	<?php if ( count( $progress_steps ) > 1 ) : ?>
-		<nav class="apd-submission-progress" aria-label="<?php esc_attr_e( 'Form sections', 'all-purpose-directory' ); ?>">
+		<nav class="apd-submission-progress" aria-label="<?php esc_attr_e( 'Form sections', 'damdir-directory' ); ?>">
 			<ol class="apd-submission-progress__steps">
 				<?php foreach ( $progress_steps as $step_index => $step ) : ?>
 					<li class="apd-submission-progress__step">
@@ -127,7 +127,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<?php if ( $form->has_errors() ) : ?>
 		<div class="apd-submission-form__errors" role="alert">
 			<p class="apd-submission-form__errors-title">
-				<?php esc_html_e( 'Please fix the following errors:', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Please fix the following errors:', 'damdir-directory' ); ?>
 			</p>
 			<ul class="apd-submission-form__errors-list">
 				<?php foreach ( $errors as $field_name => $field_errors ) : ?>
@@ -145,7 +145,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				data-field-name="listing_title"
 				data-field-type="text">
 				<label class="apd-field__label" for="apd-field-listing-title">
-					<?php esc_html_e( 'Listing Title', 'all-purpose-directory' ); ?>
+					<?php esc_html_e( 'Listing Title', 'damdir-directory' ); ?>
 					<span class="apd-field__required-indicator" aria-hidden="true">*</span>
 				</label>
 				<div class="apd-field__input">
@@ -157,10 +157,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 						required
 						aria-required="true"
 						aria-describedby="apd-field-listing-title-desc"
-						placeholder="<?php esc_attr_e( 'Enter a descriptive title for your listing', 'all-purpose-directory' ); ?>">
+						placeholder="<?php esc_attr_e( 'Enter a descriptive title for your listing', 'damdir-directory' ); ?>">
 				</div>
 				<p id="apd-field-listing-title-desc" class="apd-field__description">
-					<?php esc_html_e( 'Choose a clear and descriptive title that summarizes your listing.', 'all-purpose-directory' ); ?>
+					<?php esc_html_e( 'Choose a clear and descriptive title that summarizes your listing.', 'damdir-directory' ); ?>
 				</p>
 				<?php if ( isset( $errors['listing_title'] ) ) : ?>
 					<div class="apd-field__errors" role="alert" aria-live="polite">
@@ -179,7 +179,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				data-field-name="listing_content"
 				data-field-type="textarea">
 				<label class="apd-field__label" for="apd-field-listing-content">
-					<?php esc_html_e( 'Description', 'all-purpose-directory' ); ?>
+					<?php esc_html_e( 'Description', 'damdir-directory' ); ?>
 					<span class="apd-field__required-indicator" aria-hidden="true">*</span>
 				</label>
 				<div class="apd-field__input">
@@ -191,10 +191,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 						required
 						aria-required="true"
 						aria-describedby="apd-field-listing-content-desc"
-						placeholder="<?php esc_attr_e( 'Provide a detailed description of your listing', 'all-purpose-directory' ); ?>"><?php echo esc_textarea( $content_value ); ?></textarea>
+						placeholder="<?php esc_attr_e( 'Provide a detailed description of your listing', 'damdir-directory' ); ?>"><?php echo esc_textarea( $content_value ); ?></textarea>
 				</div>
 				<p id="apd-field-listing-content-desc" class="apd-field__description">
-					<?php esc_html_e( 'Provide a comprehensive description to help users understand your listing.', 'all-purpose-directory' ); ?>
+					<?php esc_html_e( 'Provide a comprehensive description to help users understand your listing.', 'damdir-directory' ); ?>
 				</p>
 				<?php if ( isset( $errors['listing_content'] ) ) : ?>
 					<div class="apd-field__errors" role="alert" aria-live="polite">
@@ -213,7 +213,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				data-field-name="listing_excerpt"
 				data-field-type="textarea">
 				<label class="apd-field__label" for="apd-field-listing-excerpt">
-					<?php esc_html_e( 'Short Description', 'all-purpose-directory' ); ?>
+					<?php esc_html_e( 'Short Description', 'damdir-directory' ); ?>
 				</label>
 				<div class="apd-field__input">
 					<textarea
@@ -222,10 +222,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 						class="apd-field__textarea apd-field__textarea--short"
 						rows="3"
 						aria-describedby="apd-field-listing-excerpt-desc"
-						placeholder="<?php esc_attr_e( 'Brief summary for search results', 'all-purpose-directory' ); ?>"><?php echo esc_textarea( $excerpt_value ); ?></textarea>
+						placeholder="<?php esc_attr_e( 'Brief summary for search results', 'damdir-directory' ); ?>"><?php echo esc_textarea( $excerpt_value ); ?></textarea>
 				</div>
 				<p id="apd-field-listing-excerpt-desc" class="apd-field__description">
-					<?php esc_html_e( 'Optional short summary that appears in listing previews.', 'all-purpose-directory' ); ?>
+					<?php esc_html_e( 'Optional short summary that appears in listing previews.', 'damdir-directory' ); ?>
 				</p>
 				<?php if ( isset( $errors['listing_excerpt'] ) ) : ?>
 					<div class="apd-field__errors" role="alert" aria-live="polite">
@@ -253,7 +253,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<?php if ( ! empty( $fields ) ) : ?>
 		<div id="apd-section-details" class="apd-submission-form__section apd-submission-form__section--custom-fields">
 			<h3 class="apd-submission-form__section-title">
-				<?php esc_html_e( 'Additional Details', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Additional Details', 'damdir-directory' ); ?>
 			</h3>
 			<?php
 			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped

@@ -137,23 +137,23 @@ final class ModuleTabProvider implements TabProviderInterface {
 		$core_rows = [
 			'categories' => [
 				'icon'  => 'dashicons-category',
-				'label' => __( 'Categories', 'all-purpose-directory' ),
+				'label' => __( 'Categories', 'damdir-directory' ),
 			],
 			'tags'       => [
 				'icon'  => 'dashicons-tag',
-				'label' => __( 'Tags', 'all-purpose-directory' ),
+				'label' => __( 'Tags', 'damdir-directory' ),
 			],
 			'listings'   => [
 				'icon'  => 'dashicons-location',
-				'label' => __( 'Listings', 'all-purpose-directory' ),
+				'label' => __( 'Listings', 'damdir-directory' ),
 			],
 			'reviews'    => [
 				'icon'  => 'dashicons-star-filled',
-				'label' => __( 'Reviews', 'all-purpose-directory' ),
+				'label' => __( 'Reviews', 'damdir-directory' ),
 			],
 			'inquiries'  => [
 				'icon'  => 'dashicons-email',
-				'label' => __( 'Inquiries', 'all-purpose-directory' ),
+				'label' => __( 'Inquiries', 'damdir-directory' ),
 			],
 		];
 
@@ -201,7 +201,7 @@ final class ModuleTabProvider implements TabProviderInterface {
 			<?php
 			printf(
 				/* translators: %s: Module name */
-				esc_html__( 'Generate %s directory data with module-specific categories and fields.', 'all-purpose-directory' ),
+				esc_html__( 'Generate %s directory data with module-specific categories and fields.', 'damdir-directory' ),
 				esc_html( $this->get_name() )
 			);
 			?>
@@ -210,7 +210,7 @@ final class ModuleTabProvider implements TabProviderInterface {
 		<div class="apd-form-row">
 			<label class="apd-checkbox-label">
 				<input type="checkbox" name="generate_categories" value="1" checked>
-				<?php esc_html_e( 'Categories', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Categories', 'damdir-directory' ); ?>
 			</label>
 			<span class="description">
 				<?php echo esc_html( $this->get_category_description() ); ?>
@@ -220,43 +220,43 @@ final class ModuleTabProvider implements TabProviderInterface {
 		<div class="apd-form-row">
 			<label class="apd-checkbox-label">
 				<input type="checkbox" name="generate_tags" value="1" checked>
-				<?php esc_html_e( 'Tags', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Tags', 'damdir-directory' ); ?>
 			</label>
 			<input type="number" name="tags_count" value="<?php echo esc_attr( (string) ( $defaults['tags'] ?? 10 ) ); ?>" min="1" max="10" class="small-text">
-			<span class="description"><?php esc_html_e( 'tags (max 10)', 'all-purpose-directory' ); ?></span>
+			<span class="description"><?php esc_html_e( 'tags (max 10)', 'damdir-directory' ); ?></span>
 		</div>
 
 		<div class="apd-form-row">
 			<label class="apd-checkbox-label">
 				<input type="checkbox" name="generate_listings" value="1" checked>
-				<?php esc_html_e( 'Listings', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Listings', 'damdir-directory' ); ?>
 			</label>
 			<input type="number" name="listings_count" value="<?php echo esc_attr( (string) ( $defaults['listings'] ?? 25 ) ); ?>" min="1" max="100" class="small-text">
-			<span class="description"><?php esc_html_e( 'listings (max 100)', 'all-purpose-directory' ); ?></span>
+			<span class="description"><?php esc_html_e( 'listings (max 100)', 'damdir-directory' ); ?></span>
 		</div>
 
 		<div class="apd-form-row">
 			<label class="apd-checkbox-label">
 				<input type="checkbox" name="generate_reviews" value="1" checked>
-				<?php esc_html_e( 'Reviews', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Reviews', 'damdir-directory' ); ?>
 			</label>
-			<span class="description"><?php esc_html_e( '2-4 reviews per listing', 'all-purpose-directory' ); ?></span>
+			<span class="description"><?php esc_html_e( '2-4 reviews per listing', 'damdir-directory' ); ?></span>
 		</div>
 
 		<div class="apd-form-row">
 			<label class="apd-checkbox-label">
 				<input type="checkbox" name="generate_inquiries" value="1" checked>
-				<?php esc_html_e( 'Inquiries', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Inquiries', 'damdir-directory' ); ?>
 			</label>
-			<span class="description"><?php esc_html_e( '0-2 inquiries per listing (random)', 'all-purpose-directory' ); ?></span>
+			<span class="description"><?php esc_html_e( '0-2 inquiries per listing (random)', 'damdir-directory' ); ?></span>
 		</div>
 
 		<div class="apd-form-row">
 			<label class="apd-checkbox-label">
 				<input type="checkbox" name="generate_favorites" value="1" checked>
-				<?php esc_html_e( 'Favorites', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Favorites', 'damdir-directory' ); ?>
 			</label>
-			<span class="description"><?php esc_html_e( '1-5 favorites per user', 'all-purpose-directory' ); ?></span>
+			<span class="description"><?php esc_html_e( '1-5 favorites per user', 'damdir-directory' ); ?></span>
 		</div>
 
 		<?php
@@ -272,7 +272,7 @@ final class ModuleTabProvider implements TabProviderInterface {
 				<?php
 				printf(
 					/* translators: %s: Module name */
-					esc_html__( '%s Options', 'all-purpose-directory' ),
+					esc_html__( '%s Options', 'damdir-directory' ),
 					esc_html( $this->get_name() )
 				);
 				?>
@@ -316,7 +316,7 @@ final class ModuleTabProvider implements TabProviderInterface {
 					<?php
 					printf(
 						/* translators: 1: Number of items, 2: Module name */
-						esc_html__( 'This tab has %1$s demo data items. Deleting will permanently remove all %2$s demo data.', 'all-purpose-directory' ),
+						esc_html__( 'This tab has %1$s demo data items. Deleting will permanently remove all %2$s demo data.', 'damdir-directory' ),
 						'<strong>' . esc_html( number_format_i18n( $total ) ) . '</strong>',
 						esc_html( $this->get_name() )
 					);
@@ -329,7 +329,7 @@ final class ModuleTabProvider implements TabProviderInterface {
 				<?php
 				printf(
 					/* translators: %s: Module name */
-					esc_html__( 'Delete %s Demo Data', 'all-purpose-directory' ),
+					esc_html__( 'Delete %s Demo Data', 'damdir-directory' ),
 					esc_html( $this->get_name() )
 				);
 				?>
@@ -340,7 +340,7 @@ final class ModuleTabProvider implements TabProviderInterface {
 				<?php
 				printf(
 					/* translators: %s: Module name */
-					esc_html__( 'No %s demo data found.', 'all-purpose-directory' ),
+					esc_html__( 'No %s demo data found.', 'damdir-directory' ),
 					esc_html( $this->get_name() )
 				);
 				?>
@@ -471,7 +471,7 @@ final class ModuleTabProvider implements TabProviderInterface {
 		if ( empty( $category_data ) ) {
 			return sprintf(
 				/* translators: %s: Module name */
-				__( '%s categories with icons and colors', 'all-purpose-directory' ),
+				__( '%s categories with icons and colors', 'damdir-directory' ),
 				$this->get_name()
 			);
 		}
@@ -493,12 +493,12 @@ final class ModuleTabProvider implements TabProviderInterface {
 		$suffix  = count( $parent_names ) > 3
 			? sprintf(
 				/* translators: %d: number of additional categories */
-				__( ' & %d more', 'all-purpose-directory' ),
+				__( ' & %d more', 'damdir-directory' ),
 				count( $parent_names ) - 3
 			)
 			: '';
 
-		return implode( ', ', $preview ) . $suffix . ' + ' . __( 'children', 'all-purpose-directory' );
+		return implode( ', ', $preview ) . $suffix . ' + ' . __( 'children', 'damdir-directory' );
 	}
 
 	/**
@@ -522,7 +522,7 @@ final class ModuleTabProvider implements TabProviderInterface {
 			<?php
 			printf(
 				/* translators: %s: Module name */
-				esc_html__( '%s Fields', 'all-purpose-directory' ),
+				esc_html__( '%s Fields', 'damdir-directory' ),
 				esc_html( $this->get_name() )
 			);
 			?>

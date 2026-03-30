@@ -194,7 +194,7 @@ final class RegisterFormShortcode extends AbstractShortcode {
 
 			<div class="apd-form-field">
 				<label for="apd-register-username" class="apd-form-label">
-					<?php esc_html_e( 'Username', 'all-purpose-directory' ); ?>
+					<?php esc_html_e( 'Username', 'damdir-directory' ); ?>
 					<span class="apd-required">*</span>
 				</label>
 				<input type="text"
@@ -208,7 +208,7 @@ final class RegisterFormShortcode extends AbstractShortcode {
 
 			<div class="apd-form-field">
 				<label for="apd-register-email" class="apd-form-label">
-					<?php esc_html_e( 'Email Address', 'all-purpose-directory' ); ?>
+					<?php esc_html_e( 'Email Address', 'damdir-directory' ); ?>
 					<span class="apd-required">*</span>
 				</label>
 				<input type="email"
@@ -221,7 +221,7 @@ final class RegisterFormShortcode extends AbstractShortcode {
 			</div>
 
 			<p class="apd-form-note">
-				<?php esc_html_e( 'A password will be sent to your email address.', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'A password will be sent to your email address.', 'damdir-directory' ); ?>
 			</p>
 
 			<?php
@@ -237,7 +237,7 @@ final class RegisterFormShortcode extends AbstractShortcode {
 
 			<div class="apd-form-field apd-form-field--submit">
 				<button type="submit" name="apd_register_submit" class="apd-button apd-button--primary">
-					<?php esc_html_e( 'Register', 'all-purpose-directory' ); ?>
+					<?php esc_html_e( 'Register', 'damdir-directory' ); ?>
 				</button>
 			</div>
 		</form>
@@ -261,7 +261,7 @@ final class RegisterFormShortcode extends AbstractShortcode {
 		// Verify nonce.
 		if ( ! isset( $_POST['apd_register_nonce'] ) ||
 			! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['apd_register_nonce'] ) ), 'apd_register_user' ) ) {
-			return [ __( 'Security check failed. Please try again.', 'all-purpose-directory' ) ];
+			return [ __( 'Security check failed. Please try again.', 'damdir-directory' ) ];
 		}
 
 		$errors = [];
@@ -270,22 +270,22 @@ final class RegisterFormShortcode extends AbstractShortcode {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$username = isset( $_POST['apd_register_username'] ) ? sanitize_user( wp_unslash( $_POST['apd_register_username'] ) ) : '';
 		if ( empty( $username ) ) {
-			$errors[] = __( 'Please enter a username.', 'all-purpose-directory' );
+			$errors[] = __( 'Please enter a username.', 'damdir-directory' );
 		} elseif ( username_exists( $username ) ) {
-			$errors[] = __( 'This username is already registered.', 'all-purpose-directory' );
+			$errors[] = __( 'This username is already registered.', 'damdir-directory' );
 		} elseif ( ! validate_username( $username ) ) {
-			$errors[] = __( 'Invalid username. Please use only letters, numbers, and underscores.', 'all-purpose-directory' );
+			$errors[] = __( 'Invalid username. Please use only letters, numbers, and underscores.', 'damdir-directory' );
 		}
 
 		// Get and validate email.
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$email = isset( $_POST['apd_register_email'] ) ? sanitize_email( wp_unslash( $_POST['apd_register_email'] ) ) : '';
 		if ( empty( $email ) ) {
-			$errors[] = __( 'Please enter an email address.', 'all-purpose-directory' );
+			$errors[] = __( 'Please enter an email address.', 'damdir-directory' );
 		} elseif ( ! is_email( $email ) ) {
-			$errors[] = __( 'Please enter a valid email address.', 'all-purpose-directory' );
+			$errors[] = __( 'Please enter a valid email address.', 'damdir-directory' );
 		} elseif ( email_exists( $email ) ) {
-			$errors[] = __( 'This email address is already registered.', 'all-purpose-directory' );
+			$errors[] = __( 'This email address is already registered.', 'damdir-directory' );
 		}
 
 		/**
@@ -359,11 +359,11 @@ final class RegisterFormShortcode extends AbstractShortcode {
 		?>
 		<div class="apd-form-success" role="status">
 			<p class="apd-form-success__message">
-				<?php esc_html_e( 'Registration successful! Please check your email for your password.', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Registration successful! Please check your email for your password.', 'damdir-directory' ); ?>
 			</p>
 			<p class="apd-form-success__action">
 				<a href="<?php echo esc_url( wp_login_url() ); ?>" class="apd-button">
-					<?php esc_html_e( 'Log In', 'all-purpose-directory' ); ?>
+					<?php esc_html_e( 'Log In', 'damdir-directory' ); ?>
 				</a>
 			</p>
 		</div>
@@ -380,9 +380,9 @@ final class RegisterFormShortcode extends AbstractShortcode {
 	private function render_login_link(): void {
 		?>
 		<p class="apd-register-login-link">
-			<?php esc_html_e( 'Already have an account?', 'all-purpose-directory' ); ?>
+			<?php esc_html_e( 'Already have an account?', 'damdir-directory' ); ?>
 			<a href="<?php echo esc_url( wp_login_url( get_permalink() ) ); ?>">
-				<?php esc_html_e( 'Log In', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Log In', 'damdir-directory' ); ?>
 			</a>
 		</p>
 		<?php
@@ -400,7 +400,7 @@ final class RegisterFormShortcode extends AbstractShortcode {
 			'<div class="apd-register-form-shortcode apd-notice apd-notice--info">
 				<p>%s</p>
 			</div>',
-			esc_html__( 'User registration is currently disabled.', 'all-purpose-directory' )
+			esc_html__( 'User registration is currently disabled.', 'damdir-directory' )
 		);
 	}
 
@@ -420,7 +420,7 @@ final class RegisterFormShortcode extends AbstractShortcode {
 		} else {
 			$message = sprintf(
 				/* translators: %s: User display name */
-				__( 'You are already logged in as %s.', 'all-purpose-directory' ),
+				__( 'You are already logged in as %s.', 'damdir-directory' ),
 				$user->display_name
 			);
 		}
@@ -434,7 +434,7 @@ final class RegisterFormShortcode extends AbstractShortcode {
 			</div>',
 			esc_html( $message ),
 			esc_url( $logout_url ),
-			esc_html__( 'Log Out', 'all-purpose-directory' )
+			esc_html__( 'Log Out', 'damdir-directory' )
 		);
 	}
 }

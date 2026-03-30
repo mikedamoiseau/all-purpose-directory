@@ -111,14 +111,14 @@ class InquiryTracker {
 	 */
 	public function register_post_type(): void {
 		$labels = [
-			'name'               => _x( 'Inquiries', 'post type general name', 'all-purpose-directory' ),
-			'singular_name'      => _x( 'Inquiry', 'post type singular name', 'all-purpose-directory' ),
-			'menu_name'          => _x( 'Inquiries', 'admin menu', 'all-purpose-directory' ),
-			'all_items'          => __( 'All Inquiries', 'all-purpose-directory' ),
-			'view_item'          => __( 'View Inquiry', 'all-purpose-directory' ),
-			'search_items'       => __( 'Search Inquiries', 'all-purpose-directory' ),
-			'not_found'          => __( 'No inquiries found.', 'all-purpose-directory' ),
-			'not_found_in_trash' => __( 'No inquiries found in Trash.', 'all-purpose-directory' ),
+			'name'               => _x( 'Inquiries', 'post type general name', 'damdir-directory' ),
+			'singular_name'      => _x( 'Inquiry', 'post type singular name', 'damdir-directory' ),
+			'menu_name'          => _x( 'Inquiries', 'admin menu', 'damdir-directory' ),
+			'all_items'          => __( 'All Inquiries', 'damdir-directory' ),
+			'view_item'          => __( 'View Inquiry', 'damdir-directory' ),
+			'search_items'       => __( 'Search Inquiries', 'damdir-directory' ),
+			'not_found'          => __( 'No inquiries found.', 'damdir-directory' ),
+			'not_found_in_trash' => __( 'No inquiries found in Trash.', 'damdir-directory' ),
 		];
 
 		$args = [
@@ -226,7 +226,7 @@ class InquiryTracker {
 			'post_status'  => 'publish',
 			'post_title'   => sprintf(
 				/* translators: 1: sender name, 2: listing title */
-				__( 'Inquiry from %1$s about %2$s', 'all-purpose-directory' ),
+				__( 'Inquiry from %1$s about %2$s', 'damdir-directory' ),
 				$sender_name,
 				$listing->post_title
 			),

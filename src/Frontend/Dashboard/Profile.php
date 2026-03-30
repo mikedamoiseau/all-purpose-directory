@@ -298,13 +298,14 @@ class Profile {
 	public function handle_save(): void {
 		// Check for form submission.
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified below.
-		if ( ! isset( $_POST['apd_profile_action'] ) || $_POST['apd_profile_action'] !== 'save' ) {
+		$profile_action = isset( $_POST['apd_profile_action'] ) ? sanitize_text_field( wp_unslash( $_POST['apd_profile_action'] ) ) : '';
+		if ( $profile_action !== 'save' ) {
 			return;
 		}
 
 		// Verify nonce.
 		if ( ! isset( $_POST[ self::NONCE_NAME ] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST[ self::NONCE_NAME ] ) ), self::NONCE_ACTION ) ) {
-			$this->set_message( 'error', __( 'Security verification failed. Please try again.', 'all-purpose-directory' ) );
+			$this->set_message( 'error', __( 'Security verification failed. Please try again.', 'damdir-directory' ) );
 			return;
 		}
 
@@ -343,7 +344,7 @@ class Profile {
 
 		// Check for avatar removal.
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Already verified above.
-		if ( isset( $_POST['apd_remove_avatar'] ) && $_POST['apd_remove_avatar'] === '1' ) {
+		if ( isset( $_POST['apd_remove_avatar'] ) && sanitize_text_field( wp_unslash( $_POST['apd_remove_avatar'] ) ) === '1' ) {
 			$data['avatar_id'] = 0;
 		}
 
@@ -365,7 +366,7 @@ class Profile {
 		 */
 		do_action( 'apd_profile_saved', $user_id, $data );
 
-		$this->set_message( 'success', __( 'Profile updated successfully.', 'all-purpose-directory' ) );
+		$this->set_message( 'success', __( 'Profile updated successfully.', 'damdir-directory' ) );
 
 		// Redirect to remove POST data.
 		$redirect_url = remove_query_arg( 'apd_profile_updated' );
@@ -414,25 +415,25 @@ class Profile {
 
 		// Display name is required.
 		if ( empty( $data['display_name'] ) ) {
-			$errors->add( 'display_name', __( 'Display name is required.', 'all-purpose-directory' ) );
+			$errors->add( 'display_name', __( 'Display name is required.', 'damdir-directory' ) );
 		}
 
 		// Email validation.
 		if ( empty( $data['user_email'] ) ) {
-			$errors->add( 'user_email', __( 'Email is required.', 'all-purpose-directory' ) );
+			$errors->add( 'user_email', __( 'Email is required.', 'damdir-directory' ) );
 		} elseif ( ! is_email( $data['user_email'] ) ) {
-			$errors->add( 'user_email', __( 'Please enter a valid email address.', 'all-purpose-directory' ) );
+			$errors->add( 'user_email', __( 'Please enter a valid email address.', 'damdir-directory' ) );
 		} else {
 			// Check if email is already used by another user.
 			$existing_user = email_exists( $data['user_email'] );
 			if ( $existing_user && $existing_user !== $this->user_id ) {
-				$errors->add( 'user_email', __( 'This email is already registered to another account.', 'all-purpose-directory' ) );
+				$errors->add( 'user_email', __( 'This email is already registered to another account.', 'damdir-directory' ) );
 			}
 		}
 
 		// URL validation.
 		if ( ! empty( $data['user_url'] ) && ! filter_var( $data['user_url'], FILTER_VALIDATE_URL ) ) {
-			$errors->add( 'user_url', __( 'Please enter a valid website URL.', 'all-purpose-directory' ) );
+			$errors->add( 'user_url', __( 'Please enter a valid website URL.', 'damdir-directory' ) );
 		}
 
 		// Social URL validation.
@@ -442,7 +443,7 @@ class Profile {
 					'social_' . $platform,
 					sprintf(
 						/* translators: %s: Social platform name */
-						__( 'Please enter a valid %s URL.', 'all-purpose-directory' ),
+						__( 'Please enter a valid %s URL.', 'damdir-directory' ),
 						ucfirst( $platform )
 					)
 				);
@@ -559,7 +560,7 @@ class Profile {
 
 		// Check for upload errors.
 		if ( $file['error'] !== UPLOAD_ERR_OK ) {
-			return new \WP_Error( 'upload_error', __( 'There was an error uploading the file. Please try again.', 'all-purpose-directory' ) );
+			return new \WP_Error( 'upload_error', __( 'There was an error uploading the file. Please try again.', 'damdir-directory' ) );
 		}
 
 		// Validate file size.
@@ -568,7 +569,7 @@ class Profile {
 				'file_too_large',
 				sprintf(
 					/* translators: %s: Maximum file size */
-					__( 'Avatar file size must be less than %s.', 'all-purpose-directory' ),
+					__( 'Avatar file size must be less than %s.', 'damdir-directory' ),
 					size_format( self::MAX_AVATAR_SIZE )
 				)
 			);
@@ -581,7 +582,7 @@ class Profile {
 		if ( ! in_array( $mime_type, self::ALLOWED_AVATAR_TYPES, true ) ) {
 			return new \WP_Error(
 				'invalid_file_type',
-				__( 'Invalid file type. Please upload a JPEG, PNG, GIF, or WebP image.', 'all-purpose-directory' )
+				__( 'Invalid file type. Please upload a JPEG, PNG, GIF, or WebP image.', 'damdir-directory' )
 			);
 		}
 
@@ -724,10 +725,10 @@ class Profile {
 	 */
 	public function get_social_labels(): array {
 		return [
-			'facebook'  => __( 'Facebook', 'all-purpose-directory' ),
-			'twitter'   => __( 'X (Twitter)', 'all-purpose-directory' ),
-			'linkedin'  => __( 'LinkedIn', 'all-purpose-directory' ),
-			'instagram' => __( 'Instagram', 'all-purpose-directory' ),
+			'facebook'  => __( 'Facebook', 'damdir-directory' ),
+			'twitter'   => __( 'X (Twitter)', 'damdir-directory' ),
+			'linkedin'  => __( 'LinkedIn', 'damdir-directory' ),
+			'instagram' => __( 'Instagram', 'damdir-directory' ),
 		];
 	}
 

@@ -284,7 +284,7 @@ abstract class AbstractShortcode {
 
 		return sprintf(
 			'<div class="apd-shortcode-error"><strong>%s:</strong> %s</div>',
-			esc_html__( 'Shortcode Error', 'all-purpose-directory' ),
+			esc_html__( 'Shortcode Error', 'damdir-directory' ),
 			esc_html( $message )
 		);
 	}
@@ -304,7 +304,7 @@ abstract class AbstractShortcode {
 			</div>',
 			sprintf(
 				/* translators: %s: Feature name */
-				esc_html__( '%s is coming soon.', 'all-purpose-directory' ),
+				esc_html__( '%s is coming soon.', 'damdir-directory' ),
 				esc_html( $feature )
 			)
 		);
@@ -324,7 +324,7 @@ abstract class AbstractShortcode {
 		}
 
 		if ( empty( $message ) ) {
-			$message = __( 'Please log in to access this content.', 'all-purpose-directory' );
+			$message = __( 'Please log in to access this content.', 'damdir-directory' );
 		}
 
 		$login_url = wp_login_url( get_permalink() );
@@ -336,7 +336,7 @@ abstract class AbstractShortcode {
 			</div>',
 			esc_html( $message ),
 			esc_url( $login_url ),
-			esc_html__( 'Log In', 'all-purpose-directory' )
+			esc_html__( 'Log In', 'damdir-directory' )
 		);
 	}
 }

@@ -4,7 +4,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 IMAGE_TAG="${APD_TEST_IMAGE:-apd/test-tools:local}"
-PLUGIN_SLUG="all-purpose-directory"
+PLUGIN_SLUG="damdir-directory"
 BUILD_DIR="${BUILD_DIR:-$(mktemp -d -t apd-plugin-check-build-XXXXXX)}"
 WP_DIR="${WP_DIR:-$(mktemp -d -t apd-plugin-check-wp-XXXXXX)}"
 STACK_ID="apd-check-$(date +%s)-$RANDOM"

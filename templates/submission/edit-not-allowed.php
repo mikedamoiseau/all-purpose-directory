@@ -6,7 +6,7 @@
  * tries to edit a listing they don't have access to.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/submission/edit-not-allowed.php
+ * yourtheme/damdir-directory/submission/edit-not-allowed.php
  *
  * @package APD\Templates
  * @since   1.0.0
@@ -41,12 +41,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<div class="apd-edit-not-allowed__actions">
 		<a href="<?php echo esc_url( $home_url ); ?>" class="apd-button apd-button--primary">
-			<?php esc_html_e( 'Return to Home', 'all-purpose-directory' ); ?>
+			<?php esc_html_e( 'Return to Home', 'damdir-directory' ); ?>
 		</a>
 
 		<?php if ( ! is_user_logged_in() ) : ?>
 			<a href="<?php echo esc_url( wp_login_url( add_query_arg( [] ) ) ); ?>" class="apd-button apd-button--secondary">
-				<?php esc_html_e( 'Log In', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Log In', 'damdir-directory' ); ?>
 			</a>
 		<?php endif; ?>
 	</div>

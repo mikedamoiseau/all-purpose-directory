@@ -93,7 +93,7 @@ Unit tests for helper functions.
 
 ## Files to Modify
 
-### 1. `all-purpose-directory.php`
+### 1. `damdir-directory.php`
 Add require for module functions (after line ~45):
 ```php
 require_once APD_PLUGIN_DIR . 'includes/module-functions.php';
@@ -170,7 +170,7 @@ Modules hook into `apd_modules_init` to register before other components.
 2. Create `ModuleInterface.php`
 3. Create `ModuleRegistry.php` (full implementation)
 4. Create `includes/module-functions.php`
-5. Modify `all-purpose-directory.php` to require module functions
+5. Modify `damdir-directory.php` to require module functions
 6. Modify `src/Core/Plugin.php` to init modules at priority 1
 7. Create `ModulesAdminPage.php`
 8. Create `assets/css/admin-modules.css`
@@ -189,7 +189,7 @@ Modules hook into `apd_modules_init` to register before other components.
 
 2. **Run Plugin Check:**
    ```bash
-   docker exec wp-all-purpose-directory-web-1 wp plugin check all-purpose-directory \
+   docker exec wp-damdir-directory-web-1 wp plugin check damdir-directory \
      --exclude-directories=tests,bin,research,.git \
      --exclude-files=.gitignore,.distignore,phpunit.xml.dist,phpunit-unit.xml,CLAUDE.md,PLAN.md,TASKS.md,CHANGELOG.md,.gitkeep,.phpunit.result.cache \
      --allow-root

@@ -5,7 +5,7 @@
  * Template for rendering pagination controls for the reviews list.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/review/reviews-pagination.php
+ * yourtheme/damdir-directory/review/reviews-pagination.php
  *
  * @package APD\Templates
  * @since   1.0.0
@@ -44,7 +44,7 @@ if ( $end_page - $start_page < 4 ) {
 }
 ?>
 
-<nav class="apd-reviews-pagination" aria-label="<?php esc_attr_e( 'Reviews navigation', 'all-purpose-directory' ); ?>">
+<nav class="apd-reviews-pagination" aria-label="<?php esc_attr_e( 'Reviews navigation', 'damdir-directory' ); ?>">
 
 	<ul class="apd-reviews-pagination__list">
 
@@ -53,14 +53,14 @@ if ( $end_page - $start_page < 4 ) {
 			<?php if ( $current_page > 1 ) : ?>
 				<a href="<?php echo esc_url( $display->build_pagination_url( $base_url, $current_page - 1 ) . '#reviews' ); ?>"
 					class="apd-reviews-pagination__link"
-					aria-label="<?php esc_attr_e( 'Previous page of reviews', 'all-purpose-directory' ); ?>">
+					aria-label="<?php esc_attr_e( 'Previous page of reviews', 'damdir-directory' ); ?>">
 					<span class="dashicons dashicons-arrow-left-alt2" aria-hidden="true"></span>
-					<span class="apd-reviews-pagination__prev-text"><?php esc_html_e( 'Previous', 'all-purpose-directory' ); ?></span>
+					<span class="apd-reviews-pagination__prev-text"><?php esc_html_e( 'Previous', 'damdir-directory' ); ?></span>
 				</a>
 			<?php else : ?>
 				<span class="apd-reviews-pagination__link apd-reviews-pagination__link--disabled" aria-hidden="true">
 					<span class="dashicons dashicons-arrow-left-alt2"></span>
-					<span class="apd-reviews-pagination__prev-text"><?php esc_html_e( 'Previous', 'all-purpose-directory' ); ?></span>
+					<span class="apd-reviews-pagination__prev-text"><?php esc_html_e( 'Previous', 'damdir-directory' ); ?></span>
 				</span>
 			<?php endif; ?>
 		</li>
@@ -70,7 +70,7 @@ if ( $end_page - $start_page < 4 ) {
 			<li class="apd-reviews-pagination__item">
 				<a href="<?php echo esc_url( $display->build_pagination_url( $base_url, 1 ) . '#reviews' ); ?>"
 					class="apd-reviews-pagination__link apd-reviews-pagination__link--number"
-					aria-label="<?php esc_attr_e( 'Page 1', 'all-purpose-directory' ); ?>">
+					aria-label="<?php esc_attr_e( 'Page 1', 'damdir-directory' ); ?>">
 					1
 				</a>
 			</li>
@@ -95,7 +95,7 @@ if ( $end_page - $start_page < 4 ) {
 						aria-label="
 						<?php
 							/* translators: %d: Page number */
-							echo esc_attr( sprintf( __( 'Page %d', 'all-purpose-directory' ), $page ) );
+							echo esc_attr( sprintf( __( 'Page %d', 'damdir-directory' ), $page ) );
 						?>
 						">
 						<?php echo esc_html( $page ); ?>
@@ -117,7 +117,7 @@ if ( $end_page - $start_page < 4 ) {
 					aria-label="
 					<?php
 						/* translators: %d: Page number */
-						echo esc_attr( sprintf( __( 'Page %d', 'all-purpose-directory' ), $total_pages ) );
+						echo esc_attr( sprintf( __( 'Page %d', 'damdir-directory' ), $total_pages ) );
 					?>
 					">
 					<?php echo esc_html( $total_pages ); ?>
@@ -130,13 +130,13 @@ if ( $end_page - $start_page < 4 ) {
 			<?php if ( $current_page < $total_pages ) : ?>
 				<a href="<?php echo esc_url( $display->build_pagination_url( $base_url, $current_page + 1 ) . '#reviews' ); ?>"
 					class="apd-reviews-pagination__link"
-					aria-label="<?php esc_attr_e( 'Next page of reviews', 'all-purpose-directory' ); ?>">
-					<span class="apd-reviews-pagination__next-text"><?php esc_html_e( 'Next', 'all-purpose-directory' ); ?></span>
+					aria-label="<?php esc_attr_e( 'Next page of reviews', 'damdir-directory' ); ?>">
+					<span class="apd-reviews-pagination__next-text"><?php esc_html_e( 'Next', 'damdir-directory' ); ?></span>
 					<span class="dashicons dashicons-arrow-right-alt2" aria-hidden="true"></span>
 				</a>
 			<?php else : ?>
 				<span class="apd-reviews-pagination__link apd-reviews-pagination__link--disabled" aria-hidden="true">
-					<span class="apd-reviews-pagination__next-text"><?php esc_html_e( 'Next', 'all-purpose-directory' ); ?></span>
+					<span class="apd-reviews-pagination__next-text"><?php esc_html_e( 'Next', 'damdir-directory' ); ?></span>
 					<span class="dashicons dashicons-arrow-right-alt2"></span>
 				</span>
 			<?php endif; ?>
@@ -148,7 +148,7 @@ if ( $end_page - $start_page < 4 ) {
 		<?php
 		printf(
 			/* translators: 1: current page, 2: total pages */
-			esc_html__( 'Page %1$d of %2$d', 'all-purpose-directory' ),
+			esc_html__( 'Page %1$d of %2$d', 'damdir-directory' ),
 			esc_html( number_format_i18n( $current_page ) ),
 			esc_html( number_format_i18n( $total_pages ) )
 		);

@@ -126,7 +126,7 @@ class ContactHandler {
 		if ( ! $this->verify_nonce() ) {
 			wp_send_json_error(
 				[
-					'message' => __( 'Security check failed. Please refresh and try again.', 'all-purpose-directory' ),
+					'message' => __( 'Security check failed. Please refresh and try again.', 'damdir-directory' ),
 					'code'    => 'nonce_failed',
 				]
 			);
@@ -148,7 +148,7 @@ class ContactHandler {
 
 		wp_send_json_success(
 			[
-				'message' => __( 'Your message has been sent successfully!', 'all-purpose-directory' ),
+				'message' => __( 'Your message has been sent successfully!', 'damdir-directory' ),
 			]
 		);
 	}
@@ -194,7 +194,7 @@ class ContactHandler {
 		if ( ! $form->can_receive_contact( $listing_id ) ) {
 			return new \WP_Error(
 				'listing_unavailable',
-				__( 'This listing cannot receive messages at this time.', 'all-purpose-directory' )
+				__( 'This listing cannot receive messages at this time.', 'damdir-directory' )
 			);
 		}
 
@@ -204,7 +204,7 @@ class ContactHandler {
 		if ( ! $listing ) {
 			return new \WP_Error(
 				'listing_not_found',
-				__( 'The listing could not be found.', 'all-purpose-directory' )
+				__( 'The listing could not be found.', 'damdir-directory' )
 			);
 		}
 
@@ -212,7 +212,7 @@ class ContactHandler {
 		if ( ! ( $owner instanceof \WP_User ) ) {
 			return new \WP_Error(
 				'listing_owner_not_found',
-				__( 'The listing owner could not be found.', 'all-purpose-directory' )
+				__( 'The listing owner could not be found.', 'damdir-directory' )
 			);
 		}
 
@@ -232,7 +232,7 @@ class ContactHandler {
 		if ( ! $sent ) {
 			return new \WP_Error(
 				'email_failed',
-				__( 'Failed to send message. Please try again later.', 'all-purpose-directory' )
+				__( 'Failed to send message. Please try again later.', 'damdir-directory' )
 			);
 		}
 
@@ -280,40 +280,40 @@ class ContactHandler {
 
 		// Listing ID required.
 		if ( empty( $data['listing_id'] ) ) {
-			$errors->add( 'listing_id', __( 'Invalid listing.', 'all-purpose-directory' ) );
+			$errors->add( 'listing_id', __( 'Invalid listing.', 'damdir-directory' ) );
 		}
 
 		// Name required.
 		if ( empty( $data['contact_name'] ) ) {
-			$errors->add( 'contact_name', __( 'Please enter your name.', 'all-purpose-directory' ) );
+			$errors->add( 'contact_name', __( 'Please enter your name.', 'damdir-directory' ) );
 		}
 
 		// Email required and valid.
 		if ( empty( $data['contact_email'] ) ) {
-			$errors->add( 'contact_email', __( 'Please enter your email address.', 'all-purpose-directory' ) );
+			$errors->add( 'contact_email', __( 'Please enter your email address.', 'damdir-directory' ) );
 		} elseif ( ! is_email( $data['contact_email'] ) ) {
-			$errors->add( 'contact_email', __( 'Please enter a valid email address.', 'all-purpose-directory' ) );
+			$errors->add( 'contact_email', __( 'Please enter a valid email address.', 'damdir-directory' ) );
 		}
 
 		// Phone required (if configured).
 		if ( $this->config['phone_required'] && empty( $data['contact_phone'] ) ) {
-			$errors->add( 'contact_phone', __( 'Please enter your phone number.', 'all-purpose-directory' ) );
+			$errors->add( 'contact_phone', __( 'Please enter your phone number.', 'damdir-directory' ) );
 		}
 
 		// Subject required (if configured).
 		if ( $this->config['subject_required'] && empty( $data['contact_subject'] ) ) {
-			$errors->add( 'contact_subject', __( 'Please enter a subject.', 'all-purpose-directory' ) );
+			$errors->add( 'contact_subject', __( 'Please enter a subject.', 'damdir-directory' ) );
 		}
 
 		// Message required.
 		if ( empty( $data['contact_message'] ) ) {
-			$errors->add( 'contact_message', __( 'Please enter your message.', 'all-purpose-directory' ) );
+			$errors->add( 'contact_message', __( 'Please enter your message.', 'damdir-directory' ) );
 		} elseif ( strlen( $data['contact_message'] ) < $this->config['min_message_length'] ) {
 			$errors->add(
 				'contact_message',
 				sprintf(
 					/* translators: %d: minimum number of characters */
-					__( 'Message must be at least %d characters.', 'all-purpose-directory' ),
+					__( 'Message must be at least %d characters.', 'damdir-directory' ),
 					$this->config['min_message_length']
 				)
 			);
@@ -361,7 +361,7 @@ class ContactHandler {
 			? $data['contact_subject']
 			: sprintf(
 				/* translators: %s: listing title */
-				__( 'New inquiry about: %s', 'all-purpose-directory' ),
+				__( 'New inquiry about: %s', 'damdir-directory' ),
 				$listing->post_title
 			);
 
@@ -432,33 +432,33 @@ class ContactHandler {
 
 		$message .= '<h2>' . sprintf(
 			/* translators: %s: listing title */
-			esc_html__( 'New inquiry about: %s', 'all-purpose-directory' ),
+			esc_html__( 'New inquiry about: %s', 'damdir-directory' ),
 			esc_html( $listing->post_title )
 		) . '</h2>';
 
 		$message .= '<table style="border-collapse: collapse; width: 100%; max-width: 600px;">';
 
 		$message .= '<tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>'
-			. esc_html__( 'From:', 'all-purpose-directory' ) . '</strong></td>'
+			. esc_html__( 'From:', 'damdir-directory' ) . '</strong></td>'
 			. '<td style="padding: 8px; border-bottom: 1px solid #ddd;">'
 			. esc_html( $data['contact_name'] ) . '</td></tr>';
 
 		$message .= '<tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>'
-			. esc_html__( 'Email:', 'all-purpose-directory' ) . '</strong></td>'
+			. esc_html__( 'Email:', 'damdir-directory' ) . '</strong></td>'
 			. '<td style="padding: 8px; border-bottom: 1px solid #ddd;">'
 			. '<a href="mailto:' . esc_attr( $data['contact_email'] ) . '">'
 			. esc_html( $data['contact_email'] ) . '</a></td></tr>';
 
 		if ( ! empty( $data['contact_phone'] ) ) {
 			$message .= '<tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>'
-				. esc_html__( 'Phone:', 'all-purpose-directory' ) . '</strong></td>'
+				. esc_html__( 'Phone:', 'damdir-directory' ) . '</strong></td>'
 				. '<td style="padding: 8px; border-bottom: 1px solid #ddd;">'
 				. esc_html( $data['contact_phone'] ) . '</td></tr>';
 		}
 
 		$message .= '</table>';
 
-		$message .= '<h3>' . esc_html__( 'Message:', 'all-purpose-directory' ) . '</h3>';
+		$message .= '<h3>' . esc_html__( 'Message:', 'damdir-directory' ) . '</h3>';
 		$message .= '<div style="background: #f9f9f9; padding: 15px; border-radius: 4px;">'
 			. nl2br( esc_html( $data['contact_message'] ) ) . '</div>';
 
@@ -466,7 +466,7 @@ class ContactHandler {
 		$message .= '<p style="color: #666; font-size: 12px;">'
 			. sprintf(
 				/* translators: %s: listing URL */
-				esc_html__( 'This message was sent via the contact form on: %s', 'all-purpose-directory' ),
+				esc_html__( 'This message was sent via the contact form on: %s', 'damdir-directory' ),
 				'<a href="' . esc_url( get_permalink( $listing->ID ) ) . '">'
 				. esc_html( $listing->post_title ) . '</a>'
 			)
@@ -631,10 +631,10 @@ class ContactHandler {
 			return false;
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$value = wp_unslash( $_POST[ $honeypot_field ] );
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$value = sanitize_text_field( wp_unslash( $_POST[ $honeypot_field ] ) );
 
-		return ! hash_equals( '', (string) $value );
+		return ! hash_equals( '', $value );
 	}
 
 	/**
@@ -653,8 +653,8 @@ class ContactHandler {
 			return false;
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$token = wp_unslash( $_POST['apd_contact_token'] );
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$token = sanitize_text_field( wp_unslash( $_POST['apd_contact_token'] ) );
 
 		$decoded = base64_decode( (string) $token, true );
 		if ( $decoded === false || strpos( $decoded, '|' ) === false ) {
@@ -728,7 +728,7 @@ class ContactHandler {
 		if ( $count >= $limit ) {
 			return new \WP_Error(
 				'rate_limited',
-				__( 'You have sent too many messages. Please try again later.', 'all-purpose-directory' )
+				__( 'You have sent too many messages. Please try again later.', 'damdir-directory' )
 			);
 		}
 
@@ -897,7 +897,7 @@ class ContactHandler {
 	private function get_generic_spam_error(): \WP_Error {
 		return new \WP_Error(
 			'submission_failed',
-			__( 'Submission failed. Please try again.', 'all-purpose-directory' )
+			__( 'Submission failed. Please try again.', 'damdir-directory' )
 		);
 	}
 

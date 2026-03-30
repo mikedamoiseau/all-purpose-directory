@@ -5,7 +5,7 @@
  * Displays when a user is not logged in and tries to access the dashboard.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/dashboard/login-required.php
+ * yourtheme/damdir-directory/dashboard/login-required.php
  *
  * @package APD\Templates
  * @since   1.0.0
@@ -44,7 +44,7 @@ $show_register = apply_filters( 'apd_dashboard_show_register', get_option( 'user
 	</div>
 
 	<h2 class="apd-dashboard-login-required__title">
-		<?php esc_html_e( 'Login Required', 'all-purpose-directory' ); ?>
+		<?php esc_html_e( 'Login Required', 'damdir-directory' ); ?>
 	</h2>
 
 	<p class="apd-dashboard-login-required__message">
@@ -53,13 +53,13 @@ $show_register = apply_filters( 'apd_dashboard_show_register', get_option( 'user
 
 	<div class="apd-dashboard-login-required__actions">
 		<a href="<?php echo esc_url( $login_url ); ?>" class="apd-button apd-button--primary">
-			<?php esc_html_e( 'Log In', 'all-purpose-directory' ); ?>
+			<?php esc_html_e( 'Log In', 'damdir-directory' ); ?>
 		</a>
 
 		<?php if ( $show_register && ! empty( $register_url ) ) : ?>
-			<span class="apd-dashboard-login-required__separator"><?php esc_html_e( 'or', 'all-purpose-directory' ); ?></span>
+			<span class="apd-dashboard-login-required__separator"><?php esc_html_e( 'or', 'damdir-directory' ); ?></span>
 			<a href="<?php echo esc_url( $register_url ); ?>" class="apd-button apd-button--secondary">
-				<?php esc_html_e( 'Create an Account', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Create an Account', 'damdir-directory' ); ?>
 			</a>
 		<?php endif; ?>
 	</div>

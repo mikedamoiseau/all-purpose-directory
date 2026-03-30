@@ -143,7 +143,7 @@ class DateField extends AbstractFieldType {
 				'invalid_date',
 				sprintf(
 					/* translators: %s: field label */
-					__( '%s must be a valid date in YYYY-MM-DD format.', 'all-purpose-directory' ),
+					__( '%s must be a valid date in YYYY-MM-DD format.', 'damdir-directory' ),
 					$this->getLabel( $field )
 				)
 			);
@@ -157,7 +157,7 @@ class DateField extends AbstractFieldType {
 					'date_too_early',
 					sprintf(
 						/* translators: 1: field label, 2: minimum date */
-						__( '%1$s must be on or after %2$s.', 'all-purpose-directory' ),
+						__( '%1$s must be on or after %2$s.', 'damdir-directory' ),
 						$this->getLabel( $field ),
 						$field['min']
 					)
@@ -172,7 +172,7 @@ class DateField extends AbstractFieldType {
 					'date_too_late',
 					sprintf(
 						/* translators: 1: field label, 2: maximum date */
-						__( '%1$s must be on or before %2$s.', 'all-purpose-directory' ),
+						__( '%1$s must be on or before %2$s.', 'damdir-directory' ),
 						$this->getLabel( $field ),
 						$field['max']
 					)

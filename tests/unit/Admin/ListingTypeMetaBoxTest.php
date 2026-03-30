@@ -98,6 +98,9 @@ class ListingTypeMetaBoxTest extends TestCase {
 			'wp_unslash' => function ( $value ) {
 				return is_string( $value ) ? stripslashes( $value ) : $value;
 			},
+			'sanitize_text_field' => function ( $str ) {
+				return trim( strip_tags( (string) $str ) );
+			},
 			'current_user_can' => true,
 			'wp_json_encode' => function ( $data ) {
 				return json_encode( $data );

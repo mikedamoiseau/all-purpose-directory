@@ -5,7 +5,7 @@
  * Template for rendering the review submission form on listing pages.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/review/review-form.php
+ * yourtheme/damdir-directory/review/review-form.php
  *
  * @package APD\Templates
  * @since   1.0.0
@@ -79,9 +79,9 @@ do_action( 'apd_before_review_form', $listing_id );
 		<p>
 			<?php
 			if ( $is_edit_mode ) {
-				esc_html_e( 'Your review has been updated successfully.', 'all-purpose-directory' );
+				esc_html_e( 'Your review has been updated successfully.', 'damdir-directory' );
 			} else {
-				esc_html_e( 'Thank you for your review! It has been submitted and is pending approval.', 'all-purpose-directory' );
+				esc_html_e( 'Thank you for your review! It has been submitted and is pending approval.', 'damdir-directory' );
 			}
 			?>
 		</p>
@@ -95,7 +95,7 @@ do_action( 'apd_before_review_form', $listing_id );
 			printf(
 				wp_kses(
 					/* translators: 1: login URL, 2: register URL */
-					__( 'Please <a href="%1$s">log in</a> or <a href="%2$s">register</a> to write a review.', 'all-purpose-directory' ),
+					__( 'Please <a href="%1$s">log in</a> or <a href="%2$s">register</a> to write a review.', 'damdir-directory' ),
 					[ 'a' => [ 'href' => [] ] ]
 				),
 				esc_url( wp_login_url( get_permalink( $listing_id ) ) ),
@@ -111,9 +111,9 @@ do_action( 'apd_before_review_form', $listing_id );
 		<h3 class="apd-review-form__heading">
 			<?php
 			if ( $is_edit_mode ) {
-				esc_html_e( 'Edit Your Review', 'all-purpose-directory' );
+				esc_html_e( 'Edit Your Review', 'damdir-directory' );
 			} else {
-				esc_html_e( 'Write a Review', 'all-purpose-directory' );
+				esc_html_e( 'Write a Review', 'damdir-directory' );
 			}
 			?>
 		</h3>
@@ -127,7 +127,7 @@ do_action( 'apd_before_review_form', $listing_id );
 		<?php if ( ! empty( $flash_errors ) && is_array( $flash_errors ) ) : ?>
 			<div class="apd-review-form__errors" role="alert">
 				<p class="apd-review-form__errors-title">
-					<?php esc_html_e( 'Please fix the following errors:', 'all-purpose-directory' ); ?>
+					<?php esc_html_e( 'Please fix the following errors:', 'damdir-directory' ); ?>
 				</p>
 				<ul class="apd-review-form__errors-list">
 					<?php foreach ( $flash_errors as $error ) : ?>
@@ -143,7 +143,7 @@ do_action( 'apd_before_review_form', $listing_id );
 			data-listing-id="<?php echo absint( $listing_id ); ?>"
 			data-min-content-length="<?php echo absint( $min_content_length ); ?>"
 			novalidate
-			aria-label="<?php echo $is_edit_mode ? esc_attr__( 'Edit review', 'all-purpose-directory' ) : esc_attr__( 'Write review', 'all-purpose-directory' ); ?>">
+			aria-label="<?php echo $is_edit_mode ? esc_attr__( 'Edit review', 'damdir-directory' ) : esc_attr__( 'Write review', 'damdir-directory' ); ?>">
 
 			<?php wp_nonce_field( $nonce_action, $nonce_name ); ?>
 
@@ -168,11 +168,11 @@ do_action( 'apd_before_review_form', $listing_id );
 
 			<div class="apd-review-form__field apd-review-form__field--rating">
 				<label class="apd-review-form__label" id="apd-rating-label">
-					<?php esc_html_e( 'Your Rating', 'all-purpose-directory' ); ?>
+					<?php esc_html_e( 'Your Rating', 'damdir-directory' ); ?>
 					<span class="apd-field__required-indicator" aria-hidden="true">*</span>
 				</label>
 				<p class="apd-review-form__rating-instructions" id="apd-rating-instructions">
-					<?php esc_html_e( 'Click a star to rate', 'all-purpose-directory' ); ?>
+					<?php esc_html_e( 'Click a star to rate', 'damdir-directory' ); ?>
 				</p>
 				<?php
 				$selected_rating = $is_edit_mode && isset( $existing_rating ) ? $existing_rating : 0;
@@ -193,11 +193,11 @@ do_action( 'apd_before_review_form', $listing_id );
 			<?php if ( $config['show_title'] ) : ?>
 				<div class="apd-review-form__field apd-review-form__field--title">
 					<label class="apd-review-form__label" for="apd-review-title">
-						<?php esc_html_e( 'Review Title', 'all-purpose-directory' ); ?>
+						<?php esc_html_e( 'Review Title', 'damdir-directory' ); ?>
 						<?php if ( $config['title_required'] ) : ?>
 							<span class="apd-field__required-indicator" aria-hidden="true">*</span>
 						<?php else : ?>
-							<span class="apd-review-form__optional"><?php esc_html_e( '(optional)', 'all-purpose-directory' ); ?></span>
+							<span class="apd-review-form__optional"><?php esc_html_e( '(optional)', 'damdir-directory' ); ?></span>
 						<?php endif; ?>
 					</label>
 					<input type="text"
@@ -206,14 +206,14 @@ do_action( 'apd_before_review_form', $listing_id );
 						class="apd-review-form__input"
 						value="<?php echo esc_attr( $flash_data['title'] ?? ( $is_edit_mode && isset( $existing_title ) ? $existing_title : '' ) ); ?>"
 						<?php echo $config['title_required'] ? 'required aria-required="true"' : ''; ?>
-						placeholder="<?php esc_attr_e( 'Summarize your experience', 'all-purpose-directory' ); ?>"
+						placeholder="<?php esc_attr_e( 'Summarize your experience', 'damdir-directory' ); ?>"
 						maxlength="150">
 				</div>
 			<?php endif; ?>
 
 			<div class="apd-review-form__field apd-review-form__field--content">
 				<label class="apd-review-form__label" for="apd-review-content">
-					<?php esc_html_e( 'Your Review', 'all-purpose-directory' ); ?>
+					<?php esc_html_e( 'Your Review', 'damdir-directory' ); ?>
 					<span class="apd-field__required-indicator" aria-hidden="true">*</span>
 				</label>
 				<textarea
@@ -224,14 +224,14 @@ do_action( 'apd_before_review_form', $listing_id );
 					required
 					aria-required="true"
 					aria-describedby="apd-review-content-desc"
-					placeholder="<?php esc_attr_e( 'Share your experience...', 'all-purpose-directory' ); ?>"
+					placeholder="<?php esc_attr_e( 'Share your experience...', 'damdir-directory' ); ?>"
 					minlength="<?php echo absint( $min_content_length ); ?>"><?php echo esc_textarea( $flash_data['content'] ?? ( $is_edit_mode && isset( $existing_content ) ? $existing_content : '' ) ); ?></textarea>
 				<p id="apd-review-content-desc" class="apd-review-form__description apd-char-counter" data-min="<?php echo absint( $min_content_length ); ?>">
 					<span class="apd-char-counter__current">0</span> /
 					<?php
 					printf(
 						/* translators: %d: minimum character count */
-						esc_html__( '%d characters minimum', 'all-purpose-directory' ),
+						esc_html__( '%d characters minimum', 'damdir-directory' ),
 						absint( $min_content_length )
 					);
 					?>
@@ -242,7 +242,7 @@ do_action( 'apd_before_review_form', $listing_id );
 				<div class="apd-review-form__guest-fields">
 					<div class="apd-review-form__field apd-review-form__field--name">
 						<label class="apd-review-form__label" for="apd-review-author-name">
-							<?php esc_html_e( 'Your Name', 'all-purpose-directory' ); ?>
+							<?php esc_html_e( 'Your Name', 'damdir-directory' ); ?>
 							<span class="apd-field__required-indicator" aria-hidden="true">*</span>
 						</label>
 						<input type="text"
@@ -256,7 +256,7 @@ do_action( 'apd_before_review_form', $listing_id );
 
 					<div class="apd-review-form__field apd-review-form__field--email">
 						<label class="apd-review-form__label" for="apd-review-author-email">
-							<?php esc_html_e( 'Your Email', 'all-purpose-directory' ); ?>
+							<?php esc_html_e( 'Your Email', 'damdir-directory' ); ?>
 							<span class="apd-field__required-indicator" aria-hidden="true">*</span>
 						</label>
 						<input type="email"
@@ -267,7 +267,7 @@ do_action( 'apd_before_review_form', $listing_id );
 							required
 							aria-required="true">
 						<p class="apd-review-form__description">
-							<?php esc_html_e( 'Your email will not be published.', 'all-purpose-directory' ); ?>
+							<?php esc_html_e( 'Your email will not be published.', 'damdir-directory' ); ?>
 						</p>
 					</div>
 				</div>
@@ -289,9 +289,9 @@ do_action( 'apd_before_review_form', $listing_id );
 				<button type="submit" class="apd-review-form__submit apd-button apd-button--primary">
 					<?php
 					if ( $is_edit_mode ) {
-						esc_html_e( 'Update Review', 'all-purpose-directory' );
+						esc_html_e( 'Update Review', 'damdir-directory' );
 					} else {
-						esc_html_e( 'Submit Review', 'all-purpose-directory' );
+						esc_html_e( 'Submit Review', 'damdir-directory' );
 					}
 					?>
 				</button>

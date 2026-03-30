@@ -156,8 +156,8 @@ class ImageField extends AbstractFieldType {
 		);
 		$html         .= sprintf(
 			'<button type="button" class="apd-image-remove button" aria-label="%s">%s</button>',
-			esc_attr__( 'Remove image', 'all-purpose-directory' ),
-			esc_html__( 'Remove', 'all-purpose-directory' )
+			esc_attr__( 'Remove image', 'damdir-directory' ),
+			esc_html__( 'Remove', 'damdir-directory' )
 		);
 		$html         .= '</div>';
 
@@ -166,9 +166,9 @@ class ImageField extends AbstractFieldType {
 		$html        .= sprintf(
 			'<button type="button" class="apd-image-upload button" style="%s" data-title="%s" data-button="%s">%s</button>',
 			esc_attr( $button_style ),
-			esc_attr__( 'Select Image', 'all-purpose-directory' ),
-			esc_attr__( 'Use this image', 'all-purpose-directory' ),
-			esc_html__( 'Select Image', 'all-purpose-directory' )
+			esc_attr__( 'Select Image', 'damdir-directory' ),
+			esc_attr__( 'Use this image', 'damdir-directory' ),
+			esc_html__( 'Select Image', 'damdir-directory' )
 		);
 
 		$html .= '</div>';
@@ -208,7 +208,7 @@ class ImageField extends AbstractFieldType {
 				'required',
 				sprintf(
 					/* translators: %s: field label */
-					__( '%s is required.', 'all-purpose-directory' ),
+					__( '%s is required.', 'damdir-directory' ),
 					$this->getLabel( $field )
 				)
 			);
@@ -229,7 +229,7 @@ class ImageField extends AbstractFieldType {
 				'invalid_attachment',
 				sprintf(
 					/* translators: %s: field label */
-					__( '%s contains an invalid image.', 'all-purpose-directory' ),
+					__( '%s contains an invalid image.', 'damdir-directory' ),
 					$this->getLabel( $field )
 				)
 			);
@@ -242,7 +242,7 @@ class ImageField extends AbstractFieldType {
 				'not_an_image',
 				sprintf(
 					/* translators: %s: field label */
-					__( '%s must be an image file.', 'all-purpose-directory' ),
+					__( '%s must be an image file.', 'damdir-directory' ),
 					$this->getLabel( $field )
 				)
 			);
@@ -260,7 +260,7 @@ class ImageField extends AbstractFieldType {
 						'invalid_image_type',
 						sprintf(
 							/* translators: 1: field label, 2: allowed image types */
-							__( '%1$s must be one of the following types: %2$s.', 'all-purpose-directory' ),
+							__( '%1$s must be one of the following types: %2$s.', 'damdir-directory' ),
 							$this->getLabel( $field ),
 							implode( ', ', $allowed_types )
 						)

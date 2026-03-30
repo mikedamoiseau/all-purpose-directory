@@ -1,8 +1,8 @@
-# Browser Testing Plan: All Purpose Directory Plugin
+# Browser Testing Plan: DamDir Directory Plugin
 
 ## Context
 
-The All Purpose Directory WordPress plugin is deployed at `http://localhost/` via `bin/sync-to-wordpress-deploy.sh`. The site currently has no listings or demo data. We need to perform comprehensive real-user browser testing of all plugin features using `agent-browser` (CLI tool), organized into parallel sub-agents for speed.
+The DamDir Directory WordPress plugin is deployed at `http://localhost/` via `bin/sync-to-wordpress-deploy.sh`. The site currently has no listings or demo data. We need to perform comprehensive real-user browser testing of all plugin features using `agent-browser` (CLI tool), organized into parallel sub-agents for speed.
 
 **Credentials:** admin / admin
 **Auth state saved:** `/tmp/apd-admin-auth.json`

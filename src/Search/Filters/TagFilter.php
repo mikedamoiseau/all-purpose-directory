@@ -39,7 +39,7 @@ class TagFilter extends AbstractFilter {
 	public function __construct( array $config = [] ) {
 		$defaults = [
 			'name'       => 'tag',
-			'label'      => __( 'Tags', 'all-purpose-directory' ),
+			'label'      => __( 'Tags', 'damdir-directory' ),
 			'source'     => 'taxonomy',
 			'source_key' => 'apd_tag',
 			'multiple'   => true,

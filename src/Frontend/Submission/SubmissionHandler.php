@@ -196,7 +196,8 @@ class SubmissionHandler {
 
 		// Must have our action.
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in process().
-		if ( ! isset( $_POST['apd_action'] ) || $_POST['apd_action'] !== 'submit_listing' ) {
+		$action = isset( $_POST['apd_action'] ) ? sanitize_text_field( wp_unslash( $_POST['apd_action'] ) ) : '';
+		if ( $action !== 'submit_listing' ) {
 			return false;
 		}
 
@@ -215,7 +216,7 @@ class SubmissionHandler {
 		if ( ! $this->verify_nonce() ) {
 			return new WP_Error(
 				'invalid_nonce',
-				__( 'Security check failed. Please try again.', 'all-purpose-directory' )
+				__( 'Security check failed. Please try again.', 'damdir-directory' )
 			);
 		}
 
@@ -245,7 +246,7 @@ class SubmissionHandler {
 			if ( ! $this->can_edit_listing( $listing_id ) ) {
 				return new WP_Error(
 					'permission_denied',
-					__( 'You do not have permission to edit this listing.', 'all-purpose-directory' )
+					__( 'You do not have permission to edit this listing.', 'damdir-directory' )
 				);
 			}
 		}
@@ -317,8 +318,7 @@ class SubmissionHandler {
 			return false;
 		}
 
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce verification.
-		return (bool) wp_verify_nonce( wp_unslash( $_POST[ self::NONCE_NAME ] ), self::NONCE_ACTION );
+		return (bool) wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST[ self::NONCE_NAME ] ) ), self::NONCE_ACTION );
 	}
 
 	/**
@@ -338,13 +338,13 @@ class SubmissionHandler {
 			if ( ! $is_logged_in ) {
 				return new WP_Error(
 					'not_logged_in',
-					__( 'You must be logged in to submit a listing.', 'all-purpose-directory' )
+					__( 'You must be logged in to submit a listing.', 'damdir-directory' )
 				);
 			}
 		} elseif ( 'anyone' === $who_can_submit && ! $guest_allowed && ! $is_logged_in ) {
 			return new WP_Error(
 				'not_logged_in',
-				__( 'You must be logged in to submit a listing.', 'all-purpose-directory' )
+				__( 'You must be logged in to submit a listing.', 'damdir-directory' )
 			);
 		}
 
@@ -357,7 +357,7 @@ class SubmissionHandler {
 				if ( ! $has_role ) {
 					return new WP_Error(
 						'role_not_allowed',
-						__( 'Your user role does not have permission to submit listings.', 'all-purpose-directory' )
+						__( 'Your user role does not have permission to submit listings.', 'damdir-directory' )
 					);
 				}
 			}
@@ -376,7 +376,7 @@ class SubmissionHandler {
 		if ( ! $can_submit ) {
 			return new WP_Error(
 				'permission_denied',
-				__( 'You do not have permission to submit listings.', 'all-purpose-directory' )
+				__( 'You do not have permission to submit listings.', 'damdir-directory' )
 			);
 		}
 
@@ -566,7 +566,7 @@ class SubmissionHandler {
 			if ( empty( $this->submitted_data['listing_title'] ) ) {
 				$this->errors->add(
 					'listing_title',
-					__( 'Listing title is required.', 'all-purpose-directory' )
+					__( 'Listing title is required.', 'damdir-directory' )
 				);
 			}
 		}
@@ -576,7 +576,7 @@ class SubmissionHandler {
 			if ( empty( $this->submitted_data['listing_content'] ) ) {
 				$this->errors->add(
 					'listing_content',
-					__( 'Description is required.', 'all-purpose-directory' )
+					__( 'Description is required.', 'damdir-directory' )
 				);
 			}
 		}
@@ -586,7 +586,7 @@ class SubmissionHandler {
 			if ( empty( $this->submitted_data['listing_categories'] ) ) {
 				$this->errors->add(
 					'listing_categories',
-					__( 'Please select at least one category.', 'all-purpose-directory' )
+					__( 'Please select at least one category.', 'damdir-directory' )
 				);
 			}
 		}
@@ -597,7 +597,7 @@ class SubmissionHandler {
 			if ( empty( $this->submitted_data['terms_accepted'] ) ) {
 				$this->errors->add(
 					'terms_accepted',
-					__( 'You must accept the terms and conditions.', 'all-purpose-directory' )
+					__( 'You must accept the terms and conditions.', 'damdir-directory' )
 				);
 			}
 		}
@@ -647,7 +647,7 @@ class SubmissionHandler {
 				if ( $existing_id <= 0 ) {
 					return new WP_Error(
 						'featured_image',
-						__( 'A featured image is required.', 'all-purpose-directory' )
+						__( 'A featured image is required.', 'damdir-directory' )
 					);
 				}
 			}
@@ -663,7 +663,7 @@ class SubmissionHandler {
 		if ( empty( $file_type['type'] ) || ! in_array( $file_type['type'], self::ALLOWED_IMAGE_TYPES, true ) ) {
 			return new WP_Error(
 				'featured_image',
-				__( 'Invalid image type. Please upload a JPG, PNG, GIF, or WebP image.', 'all-purpose-directory' )
+				__( 'Invalid image type. Please upload a JPG, PNG, GIF, or WebP image.', 'damdir-directory' )
 			);
 		}
 
@@ -674,7 +674,7 @@ class SubmissionHandler {
 				'featured_image',
 				sprintf(
 					/* translators: %s: maximum file size */
-					__( 'Image file is too large. Maximum size is %s.', 'all-purpose-directory' ),
+					__( 'Image file is too large. Maximum size is %s.', 'damdir-directory' ),
 					size_format( $max_size )
 				)
 			);
@@ -718,16 +718,16 @@ class SubmissionHandler {
 	 */
 	private function get_upload_error_message( int $error_code ): string {
 		$messages = [
-			UPLOAD_ERR_INI_SIZE   => __( 'The uploaded file exceeds the maximum file size.', 'all-purpose-directory' ),
-			UPLOAD_ERR_FORM_SIZE  => __( 'The uploaded file exceeds the maximum file size.', 'all-purpose-directory' ),
-			UPLOAD_ERR_PARTIAL    => __( 'The uploaded file was only partially uploaded.', 'all-purpose-directory' ),
-			UPLOAD_ERR_NO_FILE    => __( 'No file was uploaded.', 'all-purpose-directory' ),
-			UPLOAD_ERR_NO_TMP_DIR => __( 'Server configuration error: Missing temporary folder.', 'all-purpose-directory' ),
-			UPLOAD_ERR_CANT_WRITE => __( 'Failed to write file to disk.', 'all-purpose-directory' ),
-			UPLOAD_ERR_EXTENSION  => __( 'A PHP extension stopped the file upload.', 'all-purpose-directory' ),
+			UPLOAD_ERR_INI_SIZE   => __( 'The uploaded file exceeds the maximum file size.', 'damdir-directory' ),
+			UPLOAD_ERR_FORM_SIZE  => __( 'The uploaded file exceeds the maximum file size.', 'damdir-directory' ),
+			UPLOAD_ERR_PARTIAL    => __( 'The uploaded file was only partially uploaded.', 'damdir-directory' ),
+			UPLOAD_ERR_NO_FILE    => __( 'No file was uploaded.', 'damdir-directory' ),
+			UPLOAD_ERR_NO_TMP_DIR => __( 'Server configuration error: Missing temporary folder.', 'damdir-directory' ),
+			UPLOAD_ERR_CANT_WRITE => __( 'Failed to write file to disk.', 'damdir-directory' ),
+			UPLOAD_ERR_EXTENSION  => __( 'A PHP extension stopped the file upload.', 'damdir-directory' ),
 		];
 
-		return $messages[ $error_code ] ?? __( 'Unknown upload error.', 'all-purpose-directory' );
+		return $messages[ $error_code ] ?? __( 'Unknown upload error.', 'damdir-directory' );
 	}
 
 	/**
@@ -1017,7 +1017,7 @@ class SubmissionHandler {
 
 		$subject = sprintf(
 			/* translators: %s: listing title */
-			__( '[%1$s] New Listing Submission: %2$s', 'all-purpose-directory' ),
+			__( '[%1$s] New Listing Submission: %2$s', 'damdir-directory' ),
 			get_bloginfo( 'name' ),
 			$post->post_title
 		);
@@ -1034,7 +1034,7 @@ Author: %2$s
 Status: %3$s
 
 Review the listing: %4$s',
-				'all-purpose-directory'
+				'damdir-directory'
 			),
 			$post->post_title,
 			get_the_author_meta( 'display_name', $post->post_author ),
@@ -1265,12 +1265,12 @@ Review the listing: %4$s',
 			return false;
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$value = wp_unslash( $_POST[ $honeypot_field ] );
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$value = sanitize_text_field( wp_unslash( $_POST[ $honeypot_field ] ) );
 
 		// If the field has any value, it's likely spam.
 		// Use hash_equals for constant-time comparison (prevents timing attacks).
-		return ! hash_equals( '', (string) $value );
+		return ! hash_equals( '', $value );
 	}
 
 	/**
@@ -1290,8 +1290,8 @@ Review the listing: %4$s',
 			return false;
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$token = wp_unslash( $_POST['apd_form_token'] );
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$token = sanitize_text_field( wp_unslash( $_POST['apd_form_token'] ) );
 
 		// Decode and verify the signed timestamp.
 		$decoded = base64_decode( (string) $token, true );
@@ -1366,7 +1366,7 @@ Review the listing: %4$s',
 		if ( $count >= $limit ) {
 			return new WP_Error(
 				'rate_limited',
-				__( 'You have submitted too many listings. Please try again later.', 'all-purpose-directory' )
+				__( 'You have submitted too many listings. Please try again later.', 'damdir-directory' )
 			);
 		}
 
@@ -1538,7 +1538,7 @@ Review the listing: %4$s',
 	private function get_generic_spam_error(): WP_Error {
 		return new WP_Error(
 			'submission_failed',
-			__( 'Submission failed. Please try again.', 'all-purpose-directory' )
+			__( 'Submission failed. Please try again.', 'damdir-directory' )
 		);
 	}
 

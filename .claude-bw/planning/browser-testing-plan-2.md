@@ -57,10 +57,10 @@ For each test: change setting via WP-CLI → verify frontend via agent-browser �
 WP-CLI pattern:
 ```bash
 # Read current value
-docker exec wp-all-purpose-directory-web-1 wp eval "echo apd_get_setting('enable_reviews');" --allow-root
+docker exec wp-damdir-directory-web-1 wp eval "echo apd_get_setting('enable_reviews');" --allow-root
 
 # Set value
-docker exec wp-all-purpose-directory-web-1 wp eval "\$opts = get_option('apd_options'); \$opts['enable_reviews'] = false; update_option('apd_options', \$opts);" --allow-root
+docker exec wp-damdir-directory-web-1 wp eval "\$opts = get_option('apd_options'); \$opts['enable_reviews'] = false; update_option('apd_options', \$opts);" --allow-root
 ```
 
 ### Test 1.1: Disable Reviews → verify reviews section hidden on single listing

@@ -114,9 +114,9 @@ class PrivacyTest extends UnitTestCase {
 	public function test_register_exporter_adds_entry(): void {
 		$result = $this->privacy->register_exporter( [] );
 
-		$this->assertArrayHasKey( 'all-purpose-directory', $result );
-		$this->assertEquals( 'All Purpose Directory', $result['all-purpose-directory']['exporter_friendly_name'] );
-		$this->assertIsCallable( $result['all-purpose-directory']['callback'] );
+		$this->assertArrayHasKey( 'damdir-directory', $result );
+		$this->assertEquals( 'DamDir Directory', $result['damdir-directory']['exporter_friendly_name'] );
+		$this->assertIsCallable( $result['damdir-directory']['callback'] );
 	}
 
 	/**
@@ -129,7 +129,7 @@ class PrivacyTest extends UnitTestCase {
 		$result   = $this->privacy->register_exporter( $existing );
 
 		$this->assertArrayHasKey( 'other-plugin', $result );
-		$this->assertArrayHasKey( 'all-purpose-directory', $result );
+		$this->assertArrayHasKey( 'damdir-directory', $result );
 	}
 
 	// -------------------------------------------------------------------------
@@ -144,9 +144,9 @@ class PrivacyTest extends UnitTestCase {
 	public function test_register_eraser_adds_entry(): void {
 		$result = $this->privacy->register_eraser( [] );
 
-		$this->assertArrayHasKey( 'all-purpose-directory', $result );
-		$this->assertEquals( 'All Purpose Directory', $result['all-purpose-directory']['eraser_friendly_name'] );
-		$this->assertIsCallable( $result['all-purpose-directory']['callback'] );
+		$this->assertArrayHasKey( 'damdir-directory', $result );
+		$this->assertEquals( 'DamDir Directory', $result['damdir-directory']['eraser_friendly_name'] );
+		$this->assertIsCallable( $result['damdir-directory']['callback'] );
 	}
 
 	// -------------------------------------------------------------------------

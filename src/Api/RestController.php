@@ -2,7 +2,7 @@
 /**
  * REST API Controller Class.
  *
- * Provides REST API functionality for the All Purpose Directory plugin.
+ * Provides REST API functionality for the DamDir Directory plugin.
  * Registers the API namespace and handles authentication/permissions.
  *
  * @package APD\Api
@@ -318,7 +318,7 @@ final class RestController {
 			return false;
 		}
 
-		return wp_verify_nonce( $nonce, self::NONCE_ACTION ) !== false;
+		return wp_verify_nonce( sanitize_text_field( $nonce ), self::NONCE_ACTION ) !== false;
 	}
 
 	/**
@@ -474,7 +474,7 @@ final class RestController {
 		if ( ! $this->is_authenticated( $request ) ) {
 			return new \WP_Error(
 				'rest_not_logged_in',
-				__( 'You must be logged in to access this endpoint.', 'all-purpose-directory' ),
+				__( 'You must be logged in to access this endpoint.', 'damdir-directory' ),
 				[ 'status' => 401 ]
 			);
 		}
@@ -500,7 +500,7 @@ final class RestController {
 		if ( ! $this->is_authenticated( $request ) ) {
 			return new \WP_Error(
 				'rest_not_logged_in',
-				$not_logged_in_message ?? __( 'You must be logged in to access this endpoint.', 'all-purpose-directory' ),
+				$not_logged_in_message ?? __( 'You must be logged in to access this endpoint.', 'damdir-directory' ),
 				[ 'status' => 401 ]
 			);
 		}
@@ -511,7 +511,7 @@ final class RestController {
 		if ( $this->is_cookie_auth( $request ) && ! $this->verify_nonce( $request ) ) {
 			return new \WP_Error(
 				'rest_nonce_invalid',
-				__( 'Invalid or missing REST API nonce.', 'all-purpose-directory' ),
+				__( 'Invalid or missing REST API nonce.', 'damdir-directory' ),
 				[ 'status' => 403 ]
 			);
 		}
@@ -530,7 +530,7 @@ final class RestController {
 	public function permission_create_listing( \WP_REST_Request $request ): bool|\WP_Error {
 		$auth_check = $this->permission_authenticated_with_nonce(
 			$request,
-			__( 'You must be logged in to create listings.', 'all-purpose-directory' )
+			__( 'You must be logged in to create listings.', 'damdir-directory' )
 		);
 		if ( is_wp_error( $auth_check ) ) {
 			return $auth_check;
@@ -539,7 +539,7 @@ final class RestController {
 		if ( ! current_user_can( 'edit_apd_listings' ) ) {
 			return new \WP_Error(
 				'rest_forbidden',
-				__( 'You do not have permission to create listings.', 'all-purpose-directory' ),
+				__( 'You do not have permission to create listings.', 'damdir-directory' ),
 				[ 'status' => 403 ]
 			);
 		}
@@ -561,7 +561,7 @@ final class RestController {
 	public function permission_edit_listing( \WP_REST_Request $request ): bool|\WP_Error {
 		$auth_check = $this->permission_authenticated_with_nonce(
 			$request,
-			__( 'You must be logged in to edit listings.', 'all-purpose-directory' )
+			__( 'You must be logged in to edit listings.', 'damdir-directory' )
 		);
 		if ( is_wp_error( $auth_check ) ) {
 			return $auth_check;
@@ -572,7 +572,7 @@ final class RestController {
 		if ( $listing_id <= 0 ) {
 			return new \WP_Error(
 				'rest_invalid_param',
-				__( 'Invalid listing ID.', 'all-purpose-directory' ),
+				__( 'Invalid listing ID.', 'damdir-directory' ),
 				[ 'status' => 400 ]
 			);
 		}
@@ -582,7 +582,7 @@ final class RestController {
 		if ( ! $listing || $listing->post_type !== 'apd_listing' ) {
 			return new \WP_Error(
 				'rest_listing_not_found',
-				__( 'Listing not found.', 'all-purpose-directory' ),
+				__( 'Listing not found.', 'damdir-directory' ),
 				[ 'status' => 404 ]
 			);
 		}
@@ -591,7 +591,7 @@ final class RestController {
 		if ( ! current_user_can( 'edit_post', $listing_id ) ) {
 			return new \WP_Error(
 				'rest_forbidden',
-				__( 'You do not have permission to edit this listing.', 'all-purpose-directory' ),
+				__( 'You do not have permission to edit this listing.', 'damdir-directory' ),
 				[ 'status' => 403 ]
 			);
 		}
@@ -610,7 +610,7 @@ final class RestController {
 	public function permission_delete_listing( \WP_REST_Request $request ): bool|\WP_Error {
 		$auth_check = $this->permission_authenticated_with_nonce(
 			$request,
-			__( 'You must be logged in to delete listings.', 'all-purpose-directory' )
+			__( 'You must be logged in to delete listings.', 'damdir-directory' )
 		);
 		if ( is_wp_error( $auth_check ) ) {
 			return $auth_check;
@@ -621,7 +621,7 @@ final class RestController {
 		if ( $listing_id <= 0 ) {
 			return new \WP_Error(
 				'rest_invalid_param',
-				__( 'Invalid listing ID.', 'all-purpose-directory' ),
+				__( 'Invalid listing ID.', 'damdir-directory' ),
 				[ 'status' => 400 ]
 			);
 		}
@@ -631,7 +631,7 @@ final class RestController {
 		if ( ! $listing || $listing->post_type !== 'apd_listing' ) {
 			return new \WP_Error(
 				'rest_listing_not_found',
-				__( 'Listing not found.', 'all-purpose-directory' ),
+				__( 'Listing not found.', 'damdir-directory' ),
 				[ 'status' => 404 ]
 			);
 		}
@@ -640,7 +640,7 @@ final class RestController {
 		if ( ! current_user_can( 'delete_post', $listing_id ) ) {
 			return new \WP_Error(
 				'rest_forbidden',
-				__( 'You do not have permission to delete this listing.', 'all-purpose-directory' ),
+				__( 'You do not have permission to delete this listing.', 'damdir-directory' ),
 				[ 'status' => 403 ]
 			);
 		}
@@ -660,7 +660,7 @@ final class RestController {
 		if ( ! $this->is_authenticated( $request ) ) {
 			return new \WP_Error(
 				'rest_not_logged_in',
-				__( 'You must be logged in to access this endpoint.', 'all-purpose-directory' ),
+				__( 'You must be logged in to access this endpoint.', 'damdir-directory' ),
 				[ 'status' => 401 ]
 			);
 		}
@@ -668,7 +668,7 @@ final class RestController {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return new \WP_Error(
 				'rest_forbidden',
-				__( 'You do not have permission to access this endpoint.', 'all-purpose-directory' ),
+				__( 'You do not have permission to access this endpoint.', 'damdir-directory' ),
 				[ 'status' => 403 ]
 			);
 		}
@@ -688,7 +688,7 @@ final class RestController {
 		if ( ! $this->is_authenticated( $request ) ) {
 			return new \WP_Error(
 				'rest_not_logged_in',
-				__( 'You must be logged in to manage listings.', 'all-purpose-directory' ),
+				__( 'You must be logged in to manage listings.', 'damdir-directory' ),
 				[ 'status' => 401 ]
 			);
 		}
@@ -696,7 +696,7 @@ final class RestController {
 		if ( ! current_user_can( 'edit_others_apd_listings' ) ) {
 			return new \WP_Error(
 				'rest_forbidden',
-				__( 'You do not have permission to manage listings.', 'all-purpose-directory' ),
+				__( 'You do not have permission to manage listings.', 'damdir-directory' ),
 				[ 'status' => 403 ]
 			);
 		}

@@ -128,8 +128,8 @@ final class BlockManager {
 		array_unshift(
 			$categories,
 			[
-				'slug'  => 'all-purpose-directory',
-				'title' => __( 'All Purpose Directory', 'all-purpose-directory' ),
+				'slug'  => 'damdir-directory',
+				'title' => __( 'DamDir Directory', 'damdir-directory' ),
 				'icon'  => 'dashicons-location-alt',
 			]
 		);
@@ -298,7 +298,7 @@ final class BlockManager {
 		);
 
 		// Set script translations.
-		wp_set_script_translations( 'apd-blocks-editor', 'all-purpose-directory' );
+		wp_set_script_translations( 'apd-blocks-editor', 'damdir-directory' );
 
 		// Enqueue editor styles.
 		wp_enqueue_style(
@@ -328,57 +328,57 @@ final class BlockManager {
 			'viewOptions'    => [
 				[
 					'value' => 'grid',
-					'label' => __( 'Grid', 'all-purpose-directory' ),
+					'label' => __( 'Grid', 'damdir-directory' ),
 				],
 				[
 					'value' => 'list',
-					'label' => __( 'List', 'all-purpose-directory' ),
+					'label' => __( 'List', 'damdir-directory' ),
 				],
 			],
 			'layoutOptions'  => [
 				[
 					'value' => 'horizontal',
-					'label' => __( 'Horizontal', 'all-purpose-directory' ),
+					'label' => __( 'Horizontal', 'damdir-directory' ),
 				],
 				[
 					'value' => 'vertical',
-					'label' => __( 'Vertical', 'all-purpose-directory' ),
+					'label' => __( 'Vertical', 'damdir-directory' ),
 				],
 				[
 					'value' => 'inline',
-					'label' => __( 'Inline', 'all-purpose-directory' ),
+					'label' => __( 'Inline', 'damdir-directory' ),
 				],
 			],
 			'orderbyOptions' => [
 				[
 					'value' => 'date',
-					'label' => __( 'Date', 'all-purpose-directory' ),
+					'label' => __( 'Date', 'damdir-directory' ),
 				],
 				[
 					'value' => 'title',
-					'label' => __( 'Title', 'all-purpose-directory' ),
+					'label' => __( 'Title', 'damdir-directory' ),
 				],
 				[
 					'value' => 'modified',
-					'label' => __( 'Modified', 'all-purpose-directory' ),
+					'label' => __( 'Modified', 'damdir-directory' ),
 				],
 				[
 					'value' => 'rand',
-					'label' => __( 'Random', 'all-purpose-directory' ),
+					'label' => __( 'Random', 'damdir-directory' ),
 				],
 				[
 					'value' => 'views',
-					'label' => __( 'Views', 'all-purpose-directory' ),
+					'label' => __( 'Views', 'damdir-directory' ),
 				],
 			],
 			'orderOptions'   => [
 				[
 					'value' => 'DESC',
-					'label' => __( 'Descending', 'all-purpose-directory' ),
+					'label' => __( 'Descending', 'damdir-directory' ),
 				],
 				[
 					'value' => 'ASC',
-					'label' => __( 'Ascending', 'all-purpose-directory' ),
+					'label' => __( 'Ascending', 'damdir-directory' ),
 				],
 			],
 		];

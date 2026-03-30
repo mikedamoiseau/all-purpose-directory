@@ -1,6 +1,6 @@
 <?php
 /**
- * Hook registry and documentation for All Purpose Directory.
+ * Hook registry and documentation for DamDir Directory.
  *
  * @package APD\Core
  */

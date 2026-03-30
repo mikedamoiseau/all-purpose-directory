@@ -135,7 +135,7 @@ class MapView extends AbstractView {
     ];
 
     public function getLabel(): string {
-        return __( 'Map', 'all-purpose-directory' );
+        return __( 'Map', 'damdir-directory' );
     }
 
     public function getIcon(): string {
@@ -160,8 +160,8 @@ The Template class (`src/Core/Template.php`) provides a WooCommerce-style templa
 
 ### Template Lookup Order
 
-1. Child theme: `{child-theme}/all-purpose-directory/{template_name}`
-2. Parent theme: `{parent-theme}/all-purpose-directory/{template_name}`
+1. Child theme: `{child-theme}/damdir-directory/{template_name}`
+2. Parent theme: `{parent-theme}/damdir-directory/{template_name}`
 3. Plugin: `{plugin}/templates/{template_name}`
 
 ### Template Functions
@@ -176,7 +176,7 @@ apd_get_template_part_html( string $slug, ?string $name = null, array $args = []
 apd_template_exists( string $template_name ): bool
 apd_is_template_overridden( string $template_name ): bool
 apd_get_plugin_template_path(): string                          // Returns plugin templates/ path
-apd_get_theme_template_dir(): string                            // Returns 'all-purpose-directory/'
+apd_get_theme_template_dir(): string                            // Returns 'damdir-directory/'
 ```
 
 ### Template Variables

@@ -143,7 +143,7 @@ apd_register_filter( new CustomFilter() );
 
 ## Search Templates
 
-Search templates are located in `templates/search/` and can be overridden in theme at `all-purpose-directory/search/`:
+Search templates are located in `templates/search/` and can be overridden in theme at `damdir-directory/search/`:
 
 - `search-form.php` - Main search form
 - `filter-select.php` - Dropdown filter

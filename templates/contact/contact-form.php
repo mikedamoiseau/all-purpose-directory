@@ -2,7 +2,7 @@
 /**
  * Contact form template.
  *
- * This template can be overridden by copying it to yourtheme/all-purpose-directory/contact/contact-form.php.
+ * This template can be overridden by copying it to yourtheme/damdir-directory/contact/contact-form.php.
  *
  * @package All_Purpose_Directory
  * @since 1.0.0
@@ -25,7 +25,7 @@ $form_classes = $form->get_css_classes();
 
 <div class="apd-contact-form-wrapper">
 	<h3 class="apd-contact-form-title">
-		<?php esc_html_e( 'Contact the Owner', 'all-purpose-directory' ); ?>
+		<?php esc_html_e( 'Contact the Owner', 'damdir-directory' ); ?>
 	</h3>
 
 	<?php if ( $has_errors ) : ?>
@@ -44,7 +44,7 @@ $form_classes = $form->get_css_classes();
 		action=""
 		novalidate
 		data-listing-id="<?php echo esc_attr( $listing_id ); ?>"
-		aria-label="<?php esc_attr_e( 'Contact form', 'all-purpose-directory' ); ?>"
+		aria-label="<?php esc_attr_e( 'Contact form', 'damdir-directory' ); ?>"
 	>
 		<?php wp_nonce_field( $nonce_action, $nonce_name ); ?>
 		<input type="hidden" name="action" value="apd_send_contact">
@@ -57,13 +57,13 @@ $form_classes = $form->get_css_classes();
 		<input type="hidden" name="apd_contact_token" value="<?php echo esc_attr( base64_encode( $apd_contact_ts . '|' . $apd_contact_sig ) ); ?>">
 		<?php // Honeypot field — hidden from real users, bots will fill it. ?>
 		<div class="apd-field apd-field--hp" aria-hidden="true">
-			<label for="apd-contact-website-<?php echo esc_attr( $listing_id ); ?>"><?php esc_html_e( 'Website', 'all-purpose-directory' ); ?></label>
+			<label for="apd-contact-website-<?php echo esc_attr( $listing_id ); ?>"><?php esc_html_e( 'Website', 'damdir-directory' ); ?></label>
 			<input type="text" id="apd-contact-website-<?php echo esc_attr( $listing_id ); ?>" name="contact_website" class="apd-field__hp-input" value="" tabindex="-1" autocomplete="off">
 		</div>
 
 		<div class="apd-field apd-field--contact-name">
 			<label class="apd-field__label" for="apd-contact-name-<?php echo esc_attr( $listing_id ); ?>">
-				<?php esc_html_e( 'Your Name', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Your Name', 'damdir-directory' ); ?>
 				<span class="apd-field__required-indicator" aria-hidden="true">*</span>
 			</label>
 			<div class="apd-field__input">
@@ -82,7 +82,7 @@ $form_classes = $form->get_css_classes();
 
 		<div class="apd-field apd-field--contact-email">
 			<label class="apd-field__label" for="apd-contact-email-<?php echo esc_attr( $listing_id ); ?>">
-				<?php esc_html_e( 'Your Email', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Your Email', 'damdir-directory' ); ?>
 				<span class="apd-field__required-indicator" aria-hidden="true">*</span>
 			</label>
 			<div class="apd-field__input">
@@ -102,11 +102,11 @@ $form_classes = $form->get_css_classes();
 		<?php if ( $form->show_phone() ) : ?>
 			<div class="apd-field apd-field--contact-phone">
 				<label class="apd-field__label" for="apd-contact-phone-<?php echo esc_attr( $listing_id ); ?>">
-					<?php esc_html_e( 'Your Phone', 'all-purpose-directory' ); ?>
+					<?php esc_html_e( 'Your Phone', 'damdir-directory' ); ?>
 					<?php if ( $form->is_phone_required() ) : ?>
 						<span class="apd-field__required-indicator" aria-hidden="true">*</span>
 					<?php else : ?>
-						<span class="apd-field__optional"><?php esc_html_e( '(optional)', 'all-purpose-directory' ); ?></span>
+						<span class="apd-field__optional"><?php esc_html_e( '(optional)', 'damdir-directory' ); ?></span>
 					<?php endif; ?>
 				</label>
 				<div class="apd-field__input">
@@ -126,11 +126,11 @@ $form_classes = $form->get_css_classes();
 		<?php if ( $form->show_subject() ) : ?>
 			<div class="apd-field apd-field--contact-subject">
 				<label class="apd-field__label" for="apd-contact-subject-<?php echo esc_attr( $listing_id ); ?>">
-					<?php esc_html_e( 'Subject', 'all-purpose-directory' ); ?>
+					<?php esc_html_e( 'Subject', 'damdir-directory' ); ?>
 					<?php if ( $form->is_subject_required() ) : ?>
 						<span class="apd-field__required-indicator" aria-hidden="true">*</span>
 					<?php else : ?>
-						<span class="apd-field__optional"><?php esc_html_e( '(optional)', 'all-purpose-directory' ); ?></span>
+						<span class="apd-field__optional"><?php esc_html_e( '(optional)', 'damdir-directory' ); ?></span>
 					<?php endif; ?>
 				</label>
 				<div class="apd-field__input">
@@ -148,7 +148,7 @@ $form_classes = $form->get_css_classes();
 
 		<div class="apd-field apd-field--contact-message">
 			<label class="apd-field__label" for="apd-contact-message-<?php echo esc_attr( $listing_id ); ?>">
-				<?php esc_html_e( 'Message', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Message', 'damdir-directory' ); ?>
 				<span class="apd-field__required-indicator" aria-hidden="true">*</span>
 			</label>
 			<div class="apd-field__input">
@@ -168,7 +168,7 @@ $form_classes = $form->get_css_classes();
 				<?php
 				printf(
 					/* translators: %d: minimum character count */
-					esc_html__( '%d characters minimum', 'all-purpose-directory' ),
+					esc_html__( '%d characters minimum', 'damdir-directory' ),
 					(int) $form->get_min_message_length()
 				);
 				?>
@@ -188,12 +188,12 @@ $form_classes = $form->get_css_classes();
 
 		<div class="apd-contact-form__actions">
 			<button type="submit" class="apd-button apd-button--primary apd-contact-submit">
-				<?php esc_html_e( 'Send Message', 'all-purpose-directory' ); ?>
+				<?php esc_html_e( 'Send Message', 'damdir-directory' ); ?>
 			</button>
 		</div>
 
 		<div class="apd-contact-form-success apd-notice apd-notice--success apd-hidden" role="alert">
-			<?php esc_html_e( 'Your message has been sent successfully!', 'all-purpose-directory' ); ?>
+			<?php esc_html_e( 'Your message has been sent successfully!', 'damdir-directory' ); ?>
 		</div>
 	</form>
 </div>

@@ -1,6 +1,6 @@
 <?php
 /**
- * Global helper functions for All Purpose Directory.
+ * Global helper functions for DamDir Directory.
  *
  * @package APD
  */
@@ -1038,7 +1038,7 @@ function apd_template(): \APD\Core\Template {
  * Locate a template file.
  *
  * Searches for templates in the following order:
- * 1. Theme: `{theme}/all-purpose-directory/{template_name}`
+ * 1. Theme: `{theme}/damdir-directory/{template_name}`
  * 2. Plugin: `{plugin}/templates/{template_name}`
  *
  * @since 1.0.0
@@ -1089,8 +1089,8 @@ function apd_get_template_html( string $template_name, array $args = [] ): strin
  * 2. `{slug}.php`
  *
  * Example: apd_get_template_part('listing-card', 'grid') will look for:
- * - `{theme}/all-purpose-directory/listing-card-grid.php`
- * - `{theme}/all-purpose-directory/listing-card.php`
+ * - `{theme}/damdir-directory/listing-card-grid.php`
+ * - `{theme}/damdir-directory/listing-card.php`
  * - `{plugin}/templates/listing-card-grid.php`
  * - `{plugin}/templates/listing-card.php`
  *
@@ -1159,7 +1159,7 @@ function apd_get_plugin_template_path(): string {
  *
  * @since 1.0.0
  *
- * @return string Theme template directory (e.g., 'all-purpose-directory/').
+ * @return string Theme template directory (e.g., 'damdir-directory/').
  */
 function apd_get_theme_template_dir(): string {
 	return apd_template()->get_theme_template_dir();
@@ -1947,11 +1947,11 @@ function apd_process_submission( array $data, int $listing_id = 0 ): int|\WP_Err
 
 	// Validate required data.
 	if ( empty( $data['listing_title'] ) ) {
-		$errors->add( 'listing_title', __( 'Listing title is required.', 'all-purpose-directory' ) );
+		$errors->add( 'listing_title', __( 'Listing title is required.', 'damdir-directory' ) );
 	}
 
 	if ( empty( $data['listing_content'] ) ) {
-		$errors->add( 'listing_content', __( 'Listing description is required.', 'all-purpose-directory' ) );
+		$errors->add( 'listing_content', __( 'Listing description is required.', 'damdir-directory' ) );
 	}
 
 	if ( $errors->has_errors() ) {
@@ -2459,7 +2459,7 @@ function apd_is_submission_spam( array $post_data = [] ): bool|\WP_Error {
 	if ( isset( $post_data[ $honeypot_field ] ) && ! hash_equals( '', (string) $post_data[ $honeypot_field ] ) ) {
 		return new \WP_Error(
 			'submission_failed',
-			__( 'Submission failed. Please try again.', 'all-purpose-directory' )
+			__( 'Submission failed. Please try again.', 'damdir-directory' )
 		);
 	}
 
@@ -2478,7 +2478,7 @@ function apd_is_submission_spam( array $post_data = [] ): bool|\WP_Error {
 				if ( $elapsed < $min_time ) {
 					return new \WP_Error(
 						'submission_failed',
-						__( 'Submission failed. Please try again.', 'all-purpose-directory' )
+						__( 'Submission failed. Please try again.', 'damdir-directory' )
 					);
 				}
 			}
@@ -2490,7 +2490,7 @@ function apd_is_submission_spam( array $post_data = [] ): bool|\WP_Error {
 	if ( ! apd_check_submission_rate_limit( $identifier ) ) {
 		return new \WP_Error(
 			'rate_limited',
-			__( 'You have submitted too many listings. Please try again later.', 'all-purpose-directory' )
+			__( 'You have submitted too many listings. Please try again later.', 'damdir-directory' )
 		);
 	}
 
@@ -2907,7 +2907,7 @@ function apd_save_user_profile( array $data, ?int $user_id = null ): bool|\WP_Er
 	}
 
 	if ( $user_id <= 0 ) {
-		return new \WP_Error( 'invalid_user', __( 'Invalid user ID.', 'all-purpose-directory' ) );
+		return new \WP_Error( 'invalid_user', __( 'Invalid user ID.', 'damdir-directory' ) );
 	}
 
 	$profile = apd_profile();

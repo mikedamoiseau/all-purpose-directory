@@ -5,7 +5,7 @@
  * Template for rendering active filter chips/badges.
  *
  * This template can be overridden by copying it to:
- * yourtheme/all-purpose-directory/search/active-filters.php
+ * yourtheme/damdir-directory/search/active-filters.php
  *
  * @package APD\Templates
  * @since   1.0.0
@@ -30,7 +30,7 @@ $base_url = get_post_type_archive_link( 'apd_listing' );
 ?>
 <div class="apd-active-filters" aria-live="polite">
 	<span class="apd-active-filters__label" id="apd-active-filters-label">
-		<?php esc_html_e( 'Active filters:', 'all-purpose-directory' ); ?>
+		<?php esc_html_e( 'Active filters:', 'damdir-directory' ); ?>
 	</span>
 
 	<ul class="apd-active-filters__list" aria-labelledby="apd-active-filters-label">
@@ -67,7 +67,7 @@ $base_url = get_post_type_archive_link( 'apd_listing' );
 					href="<?php echo esc_url( $remove_url ); ?>"
 					class="apd-active-filters__remove"
 					<?php /* translators: %s: Filter label (e.g., Category, Tag, Keyword) */ ?>
-					aria-label="<?php echo esc_attr( sprintf( __( 'Remove %s filter', 'all-purpose-directory' ), $filter->getLabel() ) ); ?>"
+					aria-label="<?php echo esc_attr( sprintf( __( 'Remove %s filter', 'damdir-directory' ), $filter->getLabel() ) ); ?>"
 				>
 					<span aria-hidden="true">&times;</span>
 				</a>
@@ -76,6 +76,6 @@ $base_url = get_post_type_archive_link( 'apd_listing' );
 	</ul>
 
 	<a href="<?php echo esc_url( $base_url ); ?>" class="apd-active-filters__clear">
-		<?php esc_html_e( 'Clear all', 'all-purpose-directory' ); ?>
+		<?php esc_html_e( 'Clear all', 'damdir-directory' ); ?>
 	</a>
 </div>

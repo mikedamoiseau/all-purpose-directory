@@ -387,23 +387,23 @@ class MyListings {
 
 		return [
 			'all'     => [
-				'label' => __( 'All', 'all-purpose-directory' ),
+				'label' => __( 'All', 'damdir-directory' ),
 				'count' => $stats['total'],
 			],
 			'publish' => [
-				'label' => __( 'Published', 'all-purpose-directory' ),
+				'label' => __( 'Published', 'damdir-directory' ),
 				'count' => $stats['published'],
 			],
 			'pending' => [
-				'label' => __( 'Pending', 'all-purpose-directory' ),
+				'label' => __( 'Pending', 'damdir-directory' ),
 				'count' => $stats['pending'],
 			],
 			'draft'   => [
-				'label' => __( 'Draft', 'all-purpose-directory' ),
+				'label' => __( 'Draft', 'damdir-directory' ),
 				'count' => $stats['draft'],
 			],
 			'expired' => [
-				'label' => __( 'Expired', 'all-purpose-directory' ),
+				'label' => __( 'Expired', 'damdir-directory' ),
 				'count' => $stats['expired'],
 			],
 		];
@@ -418,10 +418,10 @@ class MyListings {
 	 */
 	public function get_orderby_options(): array {
 		return [
-			'date'      => __( 'Date', 'all-purpose-directory' ),
-			'title'     => __( 'Title', 'all-purpose-directory' ),
-			'views'     => __( 'Views', 'all-purpose-directory' ),
-			'inquiries' => __( 'Inquiries', 'all-purpose-directory' ),
+			'date'      => __( 'Date', 'damdir-directory' ),
+			'title'     => __( 'Title', 'damdir-directory' ),
+			'views'     => __( 'Views', 'damdir-directory' ),
+			'inquiries' => __( 'Inquiries', 'damdir-directory' ),
 		];
 	}
 
@@ -773,14 +773,14 @@ class MyListings {
 	 */
 	private function get_action_success_message( string $action ): string {
 		$messages = [
-			'delete'  => __( 'Listing permanently deleted.', 'all-purpose-directory' ),
-			'trash'   => __( 'Listing moved to trash.', 'all-purpose-directory' ),
-			'expire'  => __( 'Listing marked as expired.', 'all-purpose-directory' ),
-			'publish' => __( 'Listing published.', 'all-purpose-directory' ),
-			'draft'   => __( 'Listing saved as draft.', 'all-purpose-directory' ),
+			'delete'  => __( 'Listing permanently deleted.', 'damdir-directory' ),
+			'trash'   => __( 'Listing moved to trash.', 'damdir-directory' ),
+			'expire'  => __( 'Listing marked as expired.', 'damdir-directory' ),
+			'publish' => __( 'Listing published.', 'damdir-directory' ),
+			'draft'   => __( 'Listing saved as draft.', 'damdir-directory' ),
 		];
 
-		return $messages[ $action ] ?? __( 'Action completed.', 'all-purpose-directory' );
+		return $messages[ $action ] ?? __( 'Action completed.', 'damdir-directory' );
 	}
 
 	/**
@@ -793,14 +793,14 @@ class MyListings {
 	 */
 	private function get_action_error_message( string $action ): string {
 		$messages = [
-			'delete'  => __( 'Failed to delete listing. You may not have permission.', 'all-purpose-directory' ),
-			'trash'   => __( 'Failed to trash listing. You may not have permission.', 'all-purpose-directory' ),
-			'expire'  => __( 'Failed to expire listing. You may not have permission.', 'all-purpose-directory' ),
-			'publish' => __( 'Failed to publish listing. You may not have permission.', 'all-purpose-directory' ),
-			'draft'   => __( 'Failed to save listing as draft. You may not have permission.', 'all-purpose-directory' ),
+			'delete'  => __( 'Failed to delete listing. You may not have permission.', 'damdir-directory' ),
+			'trash'   => __( 'Failed to trash listing. You may not have permission.', 'damdir-directory' ),
+			'expire'  => __( 'Failed to expire listing. You may not have permission.', 'damdir-directory' ),
+			'publish' => __( 'Failed to publish listing. You may not have permission.', 'damdir-directory' ),
+			'draft'   => __( 'Failed to save listing as draft. You may not have permission.', 'damdir-directory' ),
 		];
 
-		return $messages[ $action ] ?? __( 'Action failed. Please try again.', 'all-purpose-directory' );
+		return $messages[ $action ] ?? __( 'Action failed. Please try again.', 'damdir-directory' );
 	}
 
 	/**
@@ -833,19 +833,19 @@ class MyListings {
 	public function get_status_badge( string $status ): string {
 		$badges = [
 			'publish' => [
-				'label' => __( 'Published', 'all-purpose-directory' ),
+				'label' => __( 'Published', 'damdir-directory' ),
 				'class' => 'apd-status-badge--success',
 			],
 			'pending' => [
-				'label' => __( 'Pending', 'all-purpose-directory' ),
+				'label' => __( 'Pending', 'damdir-directory' ),
 				'class' => 'apd-status-badge--warning',
 			],
 			'draft'   => [
-				'label' => __( 'Draft', 'all-purpose-directory' ),
+				'label' => __( 'Draft', 'damdir-directory' ),
 				'class' => 'apd-status-badge--default',
 			],
 			'expired' => [
-				'label' => __( 'Expired', 'all-purpose-directory' ),
+				'label' => __( 'Expired', 'damdir-directory' ),
 				'class' => 'apd-status-badge--error',
 			],
 		];
@@ -877,7 +877,7 @@ class MyListings {
 		$edit_url = $this->get_edit_url( $post->ID );
 		if ( ! empty( $edit_url ) ) {
 			$actions['edit'] = [
-				'label' => __( 'Edit', 'all-purpose-directory' ),
+				'label' => __( 'Edit', 'damdir-directory' ),
 				'url'   => $edit_url,
 				'class' => 'apd-listing-action--edit',
 			];
@@ -886,7 +886,7 @@ class MyListings {
 		// View action (if published).
 		if ( $post->post_status === 'publish' ) {
 			$actions['view'] = [
-				'label' => __( 'View', 'all-purpose-directory' ),
+				'label' => __( 'View', 'damdir-directory' ),
 				'url'   => get_permalink( $post->ID ),
 				'class' => 'apd-listing-action--view',
 			];
@@ -896,10 +896,10 @@ class MyListings {
 		switch ( $post->post_status ) {
 			case 'publish':
 				$actions['expire'] = [
-					'label'   => __( 'Mark Expired', 'all-purpose-directory' ),
+					'label'   => __( 'Mark Expired', 'damdir-directory' ),
 					'url'     => $this->get_action_url( $post->ID, 'expire' ),
 					'class'   => 'apd-listing-action--expire',
-					'confirm' => __( 'Are you sure you want to mark this listing as expired?', 'all-purpose-directory' ),
+					'confirm' => __( 'Are you sure you want to mark this listing as expired?', 'damdir-directory' ),
 				];
 				break;
 
@@ -907,13 +907,13 @@ class MyListings {
 			case 'expired':
 				if ( current_user_can( 'publish_apd_listings' ) ) {
 					$actions['publish'] = [
-						'label' => __( 'Publish', 'all-purpose-directory' ),
+						'label' => __( 'Publish', 'damdir-directory' ),
 						'url'   => $this->get_action_url( $post->ID, 'publish' ),
 						'class' => 'apd-listing-action--publish',
 					];
 				} else {
 					$actions['pending'] = [
-						'label' => __( 'Submit for Review', 'all-purpose-directory' ),
+						'label' => __( 'Submit for Review', 'damdir-directory' ),
 						'url'   => $this->get_action_url( $post->ID, 'publish' ),
 						'class' => 'apd-listing-action--submit',
 					];
@@ -922,7 +922,7 @@ class MyListings {
 
 			case 'pending':
 				$actions['draft'] = [
-					'label' => __( 'Save as Draft', 'all-purpose-directory' ),
+					'label' => __( 'Save as Draft', 'damdir-directory' ),
 					'url'   => $this->get_action_url( $post->ID, 'draft' ),
 					'class' => 'apd-listing-action--draft',
 				];
@@ -931,10 +931,10 @@ class MyListings {
 
 		// Delete action (always available).
 		$actions['delete'] = [
-			'label'   => __( 'Delete', 'all-purpose-directory' ),
+			'label'   => __( 'Delete', 'damdir-directory' ),
 			'url'     => $this->get_action_url( $post->ID, 'trash' ),
 			'class'   => 'apd-listing-action--delete',
-			'confirm' => __( 'Are you sure you want to delete this listing?', 'all-purpose-directory' ),
+			'confirm' => __( 'Are you sure you want to delete this listing?', 'damdir-directory' ),
 		];
 
 		/**

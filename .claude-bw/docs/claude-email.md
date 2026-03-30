@@ -183,7 +183,7 @@ $email = apd_get_email_from_email();
 
 ## Email Templates
 
-Templates are located in `templates/emails/` and can be overridden in themes at `all-purpose-directory/emails/`.
+Templates are located in `templates/emails/` and can be overridden in themes at `damdir-directory/emails/`.
 
 ### Available Templates
 
@@ -304,7 +304,7 @@ add_filter('apd_email_message', function($message, $to, $subject, $context) {
 
 ### Custom Template
 
-Create `themes/your-theme/all-purpose-directory/emails/listing-approved.php`:
+Create `themes/your-theme/damdir-directory/emails/listing-approved.php`:
 
 ```php
 <?php

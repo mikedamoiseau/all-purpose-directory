@@ -118,8 +118,8 @@ final class ModulesAdminPage {
 	public function register_admin_page(): void {
 		add_submenu_page(
 			self::PARENT_MENU,
-			__( 'Modules', 'all-purpose-directory' ),
-			__( 'Modules', 'all-purpose-directory' ),
+			__( 'Modules', 'damdir-directory' ),
+			__( 'Modules', 'damdir-directory' ),
 			self::CAPABILITY,
 			self::PAGE_SLUG,
 			[ $this, 'render_page' ]
@@ -165,7 +165,7 @@ final class ModulesAdminPage {
 	public function render_page(): void {
 		// Check user capabilities.
 		if ( ! current_user_can( self::CAPABILITY ) ) {
-			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'all-purpose-directory' ) );
+			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'damdir-directory' ) );
 		}
 
 		$registry = ModuleRegistry::get_instance();
@@ -184,20 +184,20 @@ final class ModulesAdminPage {
 					<span class="dashicons dashicons-admin-plugins" aria-hidden="true"></span>
 				</div>
 				<div class="apd-page-header__content">
-					<h1><?php esc_html_e( 'Installed Modules', 'all-purpose-directory' ); ?></h1>
-					<p><?php esc_html_e( 'Modules extend the functionality of All Purpose Directory with specialized features for different use cases.', 'all-purpose-directory' ); ?></p>
+					<h1><?php esc_html_e( 'Installed Modules', 'damdir-directory' ); ?></h1>
+					<p><?php esc_html_e( 'Modules extend the functionality of DamDir Directory with specialized features for different use cases.', 'damdir-directory' ); ?></p>
 				</div>
 			</div>
 
 			<?php if ( $count === 0 ) : ?>
 				<div class="apd-modules-empty">
 					<span class="dashicons dashicons-admin-plugins"></span>
-					<h2><?php esc_html_e( 'No Modules Installed', 'all-purpose-directory' ); ?></h2>
+					<h2><?php esc_html_e( 'No Modules Installed', 'damdir-directory' ); ?></h2>
 					<p>
-						<?php esc_html_e( 'Modules are separate plugins that add specialized features to your directory.', 'all-purpose-directory' ); ?>
+						<?php esc_html_e( 'Modules are separate plugins that add specialized features to your directory.', 'damdir-directory' ); ?>
 					</p>
 					<p>
-						<?php esc_html_e( 'Examples include URL directories, job boards, real estate listings, and more.', 'all-purpose-directory' ); ?>
+						<?php esc_html_e( 'Examples include URL directories, job boards, real estate listings, and more.', 'damdir-directory' ); ?>
 					</p>
 				</div>
 			<?php else : ?>
@@ -205,7 +205,7 @@ final class ModulesAdminPage {
 					<?php
 					printf(
 						/* translators: %s: Number of modules */
-						esc_html( _n( '%s module installed', '%s modules installed', $count, 'all-purpose-directory' ) ),
+						esc_html( _n( '%s module installed', '%s modules installed', $count, 'damdir-directory' ) ),
 						'<strong>' . esc_html( number_format_i18n( $count ) ) . '</strong>'
 					);
 					?>
@@ -214,11 +214,11 @@ final class ModulesAdminPage {
 				<table class="wp-list-table widefat fixed striped apd-modules-table">
 					<thead>
 						<tr>
-							<th scope="col" class="column-icon"><?php esc_html_e( 'Icon', 'all-purpose-directory' ); ?></th>
-							<th scope="col" class="column-name"><?php esc_html_e( 'Module', 'all-purpose-directory' ); ?></th>
-							<th scope="col" class="column-description"><?php esc_html_e( 'Description', 'all-purpose-directory' ); ?></th>
-							<th scope="col" class="column-version"><?php esc_html_e( 'Version', 'all-purpose-directory' ); ?></th>
-							<th scope="col" class="column-author"><?php esc_html_e( 'Author', 'all-purpose-directory' ); ?></th>
+							<th scope="col" class="column-icon"><?php esc_html_e( 'Icon', 'damdir-directory' ); ?></th>
+							<th scope="col" class="column-name"><?php esc_html_e( 'Module', 'damdir-directory' ); ?></th>
+							<th scope="col" class="column-description"><?php esc_html_e( 'Description', 'damdir-directory' ); ?></th>
+							<th scope="col" class="column-version"><?php esc_html_e( 'Version', 'damdir-directory' ); ?></th>
+							<th scope="col" class="column-author"><?php esc_html_e( 'Author', 'damdir-directory' ); ?></th>
 						</tr>
 					</thead>
 					<tbody>

@@ -1,9 +1,9 @@
-# All Purpose Directory - v1.0 Implementation Tasks
+# DamDir Directory - v1.0 Implementation Tasks
 
 ## Project Overview
 
-- **Plugin Name:** All Purpose Directory
-- **Slug:** `all-purpose-directory`
+- **Plugin Name:** DamDir Directory
+- **Slug:** `damdir-directory`
 - **Prefix:** `apd_` / `APD`
 - **Min PHP:** 8.0+
 - **Min WordPress:** 6.0+
@@ -14,7 +14,7 @@
 ## Phase 0: Development Environment & Testing Infrastructure
 
 ### 0.1 Docker Test Environment ✅
-- [x] Create test environment folder: `/path/to/test/wp-all-purpose-directory/`
+- [x] Create test environment folder: `/path/to/test/wp-damdir-directory/`
 - [x] Create `docker-compose.yml` (PHP 8.3-apache + MariaDB 10.11)
   - Use isolated volume name: `apd_db`
   - Port 80 (exclusive use, not shared with other test envs)
@@ -199,7 +199,7 @@ tests/
 
 ### 1.1 Project Scaffolding ✅
 - [x] Create plugin folder structure
-- [x] Create main plugin file (`all-purpose-directory.php`)
+- [x] Create main plugin file (`damdir-directory.php`)
 - [x] Add plugin header with correct metadata
 - [x] Create `composer.json` with PSR-4 autoloading
 - [x] Create `.gitignore`
@@ -207,8 +207,8 @@ tests/
 
 **Folder Structure:**
 ```
-all-purpose-directory/
-├── all-purpose-directory.php    # Main plugin file
+damdir-directory/
+├── damdir-directory.php    # Main plugin file
 ├── composer.json
 ├── README.txt
 ├── uninstall.php
@@ -304,7 +304,7 @@ all-purpose-directory/
 │       ├── listing-approved.php
 │       └── ...
 └── languages/
-    └── all-purpose-directory.pot
+    └── damdir-directory.pot
 ```
 
 ### 1.2 Plugin Bootstrap ✅
@@ -621,7 +621,7 @@ Field storage is fully implemented via:
 ### 6.1 Template System ✅
 - [x] Create template loader utility (`src/Core/Template.php`)
 - [x] Support theme template overrides:
-  - Theme can override in `all-purpose-directory/` folder
+  - Theme can override in `damdir-directory/` folder
   - Child theme templates take priority over parent theme
   - Template cache for performance
 - [x] Implement `apd_get_template_part()` - works like WP's get_template_part()
@@ -973,7 +973,7 @@ Field storage is fully implemented via:
 
 ### 12.3 Email Templates ✅
 - [x] Create template files for each type (7 templates + wrapper)
-- [x] Support theme overrides (`all-purpose-directory/emails/`)
+- [x] Support theme overrides (`damdir-directory/emails/`)
 - [x] Dynamic placeholders:
   - `{site_name}`, `{site_url}`, `{admin_email}`, `{current_date}`, `{current_time}`
   - `{listing_id}`, `{listing_title}`, `{listing_url}`, `{listing_edit_url}`, `{listing_status}`
@@ -1105,14 +1105,14 @@ Field storage is fully implemented via:
 ## Phase 15: Internationalization
 
 ### 15.1 Text Domain ✅
-- [x] Load text domain: `all-purpose-directory`
+- [x] Load text domain: `damdir-directory`
 - [x] Wrap all strings with `__()` or `_e()`
 - [x] Use context with `_x()` where needed
 - [x] Added translator comments for all placeholder strings
 - [x] Fixed multi-line string concatenation in EmailManager
 
 ### 15.2 Translation Files ✅
-- [x] Generate POT file (`languages/all-purpose-directory.pot`)
+- [x] Generate POT file (`languages/damdir-directory.pot`)
   - 938 translatable strings
   - 122 translator comments
   - 18 plural forms

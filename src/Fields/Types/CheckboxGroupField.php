@@ -172,7 +172,7 @@ class CheckboxGroupField extends AbstractFieldType {
 					'invalid_option',
 					sprintf(
 						/* translators: %s: field label */
-						__( '%s contains an invalid selection.', 'all-purpose-directory' ),
+						__( '%s contains an invalid selection.', 'damdir-directory' ),
 						$this->getLabel( $field )
 					)
 				);

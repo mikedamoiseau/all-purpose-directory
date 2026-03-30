@@ -1,6 +1,6 @@
-# All Purpose Directory - Test Suite
+# DamDir Directory - Test Suite
 
-This directory contains the test suite for the All Purpose Directory WordPress plugin.
+This directory contains the test suite for the DamDir Directory WordPress plugin.
 
 ## Test Structure
 

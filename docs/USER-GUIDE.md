@@ -1,6 +1,6 @@
-# All Purpose Directory - User Guide
+# DamDir Directory - User Guide
 
-This guide helps you set up and use All Purpose Directory to create your own directory or listing website.
+This guide helps you set up and use DamDir Directory to create your own directory or listing website.
 
 ## Table of Contents
 
@@ -27,7 +27,7 @@ This guide helps you set up and use All Purpose Directory to create your own dir
 
 1. **Automatic Installation**
    - Go to Plugins > Add New in your WordPress admin
-   - Search for "All Purpose Directory"
+   - Search for "DamDir Directory"
    - Click "Install Now" then "Activate"
 
 2. **Manual Installation**
@@ -528,8 +528,8 @@ Access settings at Listings > Settings.
 Copy templates from the plugin to your theme to customize:
 
 ```
-plugins/all-purpose-directory/templates/
-    → your-theme/all-purpose-directory/
+plugins/damdir-directory/templates/
+    → your-theme/damdir-directory/
 ```
 
 ### Available Templates
@@ -548,9 +548,9 @@ plugins/all-purpose-directory/templates/
 
 ### Template Priority
 
-1. Child theme: `your-child-theme/all-purpose-directory/`
-2. Parent theme: `your-theme/all-purpose-directory/`
-3. Plugin: `all-purpose-directory/templates/`
+1. Child theme: `your-child-theme/damdir-directory/`
+2. Parent theme: `your-theme/damdir-directory/`
+3. Plugin: `damdir-directory/templates/`
 
 ---
 
@@ -598,7 +598,7 @@ plugins/all-purpose-directory/templates/
 ### Contact Admin
 
 If you need further help:
-1. Check the [WordPress.org support forum](https://wordpress.org/support/plugin/all-purpose-directory/)
+1. Check the [WordPress.org support forum](https://wordpress.org/support/plugin/damdir-directory/)
 2. Include: WordPress version, PHP version, error messages, steps to reproduce
 
 ---
